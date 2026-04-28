@@ -1,4 +1,4 @@
-const BASE = '/api'
+const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
 function getToken(): string | null {
   return localStorage.getItem('presagio_token')
@@ -135,6 +135,6 @@ export const usersApi = {
 
 export const authApi = {
   logout: () => request('/auth/logout', { method: 'POST' }),
-  googleUrl: () => '/api/auth/google',
-  githubUrl: () => '/api/auth/github',
+  googleUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/google`,
+  githubUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/github`,
 }

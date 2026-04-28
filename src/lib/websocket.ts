@@ -12,9 +12,11 @@ class MarketSocket {
     this.disconnect()
 
     this.marketId = marketId
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const host = window.location.host
-    this.ws = new WebSocket(`${protocol}://${host}/ws/market/${marketId}`)
+    const backendUrl = import.meta.env.VITE_API_URL ?? ''
+    const wsBase = backendUrl
+      ? backendUrl.replace(/^http/, 'ws')
+      : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`
+    this.ws = new WebSocket(`${wsBase}/ws/market/${marketId}`)
 
     this.ws.onmessage = (e) => {
       try {
@@ -66,9 +68,11 @@ class FeedSocket {
 
   connect() {
     if (this.ws?.readyState === WebSocket.OPEN) return
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const host = window.location.host
-    this.ws = new WebSocket(`${protocol}://${host}/ws/feed`)
+    const backendUrl = import.meta.env.VITE_API_URL ?? ''
+    const wsBase = backendUrl
+      ? backendUrl.replace(/^http/, 'ws')
+      : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`
+    this.ws = new WebSocket(`${wsBase}/ws/feed`)
     this.ws.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data)
