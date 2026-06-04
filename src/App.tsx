@@ -1,11 +1,12 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Home } from './pages/Home'
 import { Markets } from './pages/Markets'
 import { MarketDetail } from './pages/MarketDetail'
 import { Profile } from './pages/Profile'
 import { AuthProvider } from './lib/AuthContext'
+import { setToken } from './lib/api'
 
 export default function App() {
   return (
@@ -47,8 +48,13 @@ export default function App() {
 }
 
 function AuthCallbackRedirect() {
+  const navigate = useNavigate()
   React.useEffect(() => {
-    window.location.replace('/#/')
-  }, [])
+    const hash = window.location.hash
+    const params = new URLSearchParams(hash.split('?')[1] ?? '')
+    const token = params.get('token')
+    if (token) setToken(token)
+    navigate('/', { replace: true })
+  }, [navigate])
   return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Iniciando sesión...</div>
 }

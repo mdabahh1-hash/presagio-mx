@@ -29,17 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Handle OAuth callback token in URL hash
-    const hash = window.location.hash
-    if (hash.includes('/auth/callback')) {
-      const params = new URLSearchParams(hash.split('?')[1])
-      const token = params.get('token')
-      if (token) {
-        setToken(token)
-        // Clean URL
-        window.history.replaceState({}, '', window.location.pathname)
-      }
-    }
     refreshUser().finally(() => setLoading(false))
   }, [refreshUser])
 
