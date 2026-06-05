@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { Market } from '../types'
 import { SparkChart } from './SparkChart'
@@ -9,15 +9,30 @@ function formatVolume(v: number) {
   return v.toFixed(2)
 }
 
-function daysLeft(endsAt: string) {
-  const diff = new Date(endsAt).getTime() - Date.now()
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days < 0) return 'Resuelto'
-  if (days === 0) return 'Hoy'
-  if (days === 1) return '1 día'
-  if (days < 30) return `${days} días`
-  if (days < 365) return `${Math.floor(days / 30)} meses`
-  return `${Math.floor(days / 365)}a ${Math.floor((days % 365) / 30)}m`
+function useCountdown(endsAt: string) {
+  const [diff, setDiff] = useState(() => new Date(endsAt).getTime() - Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setDiff(new Date(endsAt).getTime() - Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [endsAt])
+  return diff
+}
+
+function formatCountdown(diff: number): { text: string; urgent: boolean } {
+  if (diff <= 0) return { text: 'Cerrado', urgent: false }
+  const totalSecs = Math.floor(diff / 1000)
+  const days = Math.floor(totalSecs / 86400)
+  const hours = Math.floor((totalSecs % 86400) / 3600)
+  const mins = Math.floor((totalSecs % 3600) / 60)
+  const secs = totalSecs % 60
+
+  if (days >= 30) {
+    const months = Math.floor(days / 30)
+    return { text: `${months} ${months === 1 ? 'mes' : 'meses'}`, urgent: false }
+  }
+  if (days >= 1) return { text: `${days}d ${hours}h`, urgent: days <= 1 }
+  if (hours >= 1) return { text: `${hours}h ${mins}m`, urgent: true }
+  return { text: `${mins}m ${secs}s`, urgent: true }
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -27,10 +42,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Global': '#6888ff',
   'Tech': '#a060ff',
   'Entretenimiento': '#ff7eb6',
+  'Mundial 2026': '#00d084',
+  'Crypto': '#f7931a',
+  'Mercados Globales': '#6888ff',
+  'México': '#c94828',
 }
 
 interface MarketCardProps {
-  market: Market
+  market: Market & { status?: string }
   animClass?: string
 }
 
@@ -39,48 +58,49 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
     ? market.history[market.history.length - 1].price >= market.history[0].price
     : true
   const catColor = CATEGORY_COLORS[market.category] || '#8888b0'
+  const diff = useCountdown(market.endsAt)
+  const { text: countdownText, urgent } = formatCountdown(diff)
+  const isPending = market.status === 'pending_resolution'
 
   return (
     <Link to={`/mercado/${market.id}`} style={{ textDecoration: 'none' }} className={animClass}>
       <div
         className="card"
-        style={{ padding: 20, cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column', gap: 14 }}
+        style={{
+          padding: 20, cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column', gap: 14,
+          ...(isPending ? { borderColor: 'var(--gold)', opacity: 0.9 } : {}),
+        }}
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-            {/* Category + trending */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Category + trending + status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <span
                 style={{
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: catColor,
-                  background: `${catColor}18`,
-                  border: `1px solid ${catColor}30`,
-                  padding: '2px 8px',
-                  borderRadius: 99,
+                  fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                  color: catColor, background: `${catColor}18`, border: `1px solid ${catColor}30`,
+                  padding: '2px 8px', borderRadius: 99,
                 }}
               >
                 {market.category}
               </span>
               {market.trending && (
-                <span
-                  style={{
-                    fontSize: '0.6rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: 'var(--gold)',
-                    background: 'rgba(240, 192, 64, 0.1)',
-                    border: '1px solid rgba(240, 192, 64, 0.2)',
-                    padding: '2px 8px',
-                    borderRadius: 99,
-                  }}
-                >
+                <span style={{
+                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                  color: 'var(--gold)', background: 'rgba(240, 192, 64, 0.1)',
+                  border: '1px solid rgba(240, 192, 64, 0.2)', padding: '2px 8px', borderRadius: 99,
+                }}>
                   ↑ TENDENCIA
+                </span>
+              )}
+              {isPending && (
+                <span style={{
+                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                  color: 'var(--gold)', background: 'rgba(240, 192, 64, 0.12)',
+                  border: '1px solid var(--gold)', padding: '2px 8px', borderRadius: 99,
+                }}>
+                  ⏳ PENDIENTE
                 </span>
               )}
             </div>
@@ -89,12 +109,8 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             <p
               className="font-display"
               style={{
-                margin: 0,
-                fontSize: '0.92rem',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                lineHeight: 1.4,
-                letterSpacing: '-0.01em',
+                margin: 0, fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)',
+                lineHeight: 1.4, letterSpacing: '-0.01em',
               }}
             >
               {market.question}
@@ -111,28 +127,17 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 800,
-                  fontFamily: 'JetBrains Mono',
-                  color: market.yesPrice > 50 ? 'var(--green)' : market.yesPrice < 30 ? 'var(--red)' : 'var(--gold)',
-                }}
-              >
+              <span style={{
+                fontSize: '1.25rem', fontWeight: 800, fontFamily: 'JetBrains Mono',
+                color: market.yesPrice > 50 ? 'var(--green)' : market.yesPrice < 30 ? 'var(--red)' : 'var(--gold)',
+              }}>
                 {market.yesPrice}%
               </span>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>SÍ</span>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>NO</span>
-              <span
-                style={{
-                  fontSize: '0.875rem',
-                  fontWeight: 700,
-                  fontFamily: 'JetBrains Mono',
-                  color: 'var(--text-secondary)',
-                }}
-              >
+              <span style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-secondary)' }}>
                 {100 - market.yesPrice}%
               </span>
             </span>
@@ -158,10 +163,16 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               </span>
             </span>
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-            Cierra{' '}
-            <span style={{ color: 'var(--text-secondary)' }}>{daysLeft(market.endsAt)}</span>
-          </span>
+          {/* Countdown */}
+          {isPending ? (
+            <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 700 }}>
+              Esperando resolución
+            </span>
+          ) : (
+            <span style={{ fontSize: '0.7rem', color: urgent ? 'var(--red)' : 'var(--text-tertiary)', fontWeight: urgent ? 700 : 400, fontFamily: urgent ? 'JetBrains Mono' : undefined }}>
+              {diff > 0 ? '⏱ ' : ''}{countdownText}
+            </span>
+          )}
         </div>
       </div>
     </Link>

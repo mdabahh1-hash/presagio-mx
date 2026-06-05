@@ -1,4 +1,9 @@
-export type Category = 'Política MX' | 'Economía' | 'Deportes' | 'Global' | 'Tech' | 'Entretenimiento'
+export type Category =
+  | 'Política MX' | 'Economía' | 'Deportes' | 'Global' | 'Tech' | 'Entretenimiento'
+  | 'Mundial 2026' | 'Crypto' | 'Mercados Globales' | 'México'
+
+export type MarketStatus =
+  | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'cancelled'
 
 export interface Market {
   id: string

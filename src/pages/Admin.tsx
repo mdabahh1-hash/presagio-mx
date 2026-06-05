@@ -7,6 +7,7 @@ const ADMIN_EMAIL = 'mdabahh@atid.edu.mx'
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   open: { label: 'Abierto', color: 'var(--green)' },
+  pending_resolution: { label: '⏳ Pendiente', color: 'var(--gold)' },
   closed: { label: 'Cerrado', color: 'var(--gold)' },
   resolved_yes: { label: 'Resuelto SÍ', color: '#60a5fa' },
   resolved_no: { label: 'Resuelto NO', color: 'var(--red)' },
@@ -56,7 +57,7 @@ export function Admin() {
 
   if (loading || !user) return null
 
-  const resolvable = markets.filter(m => m.status === 'open' || m.status === 'closed')
+  const resolvable = markets.filter(m => m.status === 'open' || m.status === 'pending_resolution' || m.status === 'closed')
   const resolved = markets.filter(m => m.status === 'resolved_yes' || m.status === 'resolved_no')
 
   return (
