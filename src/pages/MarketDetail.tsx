@@ -142,7 +142,7 @@ export function MarketDetail() {
     : ((amount / (noPrice / 100)) - amount).toFixed(0)
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
       {/* Breadcrumb */}
       <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 24, fontSize: '0.8rem' }}>
         <Link to="/mercados" style={{ color: 'var(--text-tertiary)', textDecoration: 'none' }}>Mercados</Link>
@@ -152,7 +152,7 @@ export function MarketDetail() {
         <span style={{ color: 'var(--text-primary)' }}>{market.question.slice(0, 40)}...</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 28, alignItems: 'start' }}>
+      <div className="market-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 28, alignItems: 'start' }}>
         {/* Left */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Header card */}
@@ -222,7 +222,7 @@ export function MarketDetail() {
           </div>
 
           {/* Stats */}
-          <div className="anim-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <div className="anim-3 market-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
               { label: 'Volumen', value: formatVolume(volume), unit: 'PT' },
               { label: 'Operaciones', value: market.num_trades.toString(), unit: '' },
@@ -266,7 +266,7 @@ export function MarketDetail() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Comparte tu análisis..." rows={3} style={{ width: '100%', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '10px 14px', fontSize: '0.875rem', color: 'var(--text-primary)', fontFamily: 'Plus Jakarta Sans', resize: 'vertical', outline: 'none' }} />
-                  <button onClick={handlePostComment} style={{ marginTop: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '8px 16px', fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer', fontFamily: 'Syne', letterSpacing: '0.04em' }}>
+                  <button className="btn-comment-submit" onClick={handlePostComment} style={{ marginTop: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '8px 16px', fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 600, cursor: 'pointer', fontFamily: 'Syne', letterSpacing: '0.04em' }}>
                     Publicar
                   </button>
                 </div>
@@ -302,7 +302,7 @@ export function MarketDetail() {
         </div>
 
         {/* Right: Trading panel */}
-        <div style={{ position: 'sticky', top: 80 }}>
+        <div className="market-trading-panel" style={{ position: 'sticky', top: 80 }}>
           <div className="anim-2 card" style={{ padding: '24px' }}>
             <h3 className="font-display" style={{ margin: '0 0 20px', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Operar
@@ -325,15 +325,15 @@ export function MarketDetail() {
                 {user && <span style={{ color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: '0.75rem' }}>Saldo: {Math.floor(user.points).toLocaleString('es-MX')} PT</span>}
               </label>
               <div style={{ display: 'flex', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: 8, overflow: 'hidden' }}>
-                <button onClick={() => setAmount(a => Math.max(10, a - 50))} style={{ background: 'transparent', border: 'none', padding: '10px 14px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}>−</button>
+                <button className="amount-adjust-btn" onClick={() => setAmount(a => Math.max(10, a - 50))} style={{ background: 'transparent', border: 'none', padding: '10px 14px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}>−</button>
                 <input type="number" value={amount} onChange={e => setAmount(Math.max(10, parseInt(e.target.value) || 10))} style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', textAlign: 'center', fontSize: '1rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-primary)' }} />
                 <span style={{ display: 'flex', alignItems: 'center', paddingRight: 12, fontSize: '0.75rem', fontWeight: 700, color: 'var(--gold)' }}>PT</span>
-                <button onClick={() => setAmount(a => a + 50)} style={{ background: 'transparent', border: 'none', padding: '10px 14px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
+                <button className="amount-adjust-btn" onClick={() => setAmount(a => a + 50)} style={{ background: 'transparent', border: 'none', padding: '10px 14px', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
               </div>
               <input type="range" min={10} max={1000} step={10} value={amount} onChange={e => setAmount(parseInt(e.target.value))} style={{ width: '100%', marginTop: 10 }} />
             </div>
 
-            <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+            <div className="amount-presets" style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
               {[50, 100, 250, 500].map(v => (
                 <button key={v} onClick={() => setAmount(v)} style={{ flex: 1, background: amount === v ? 'var(--bg-elevated)' : 'transparent', border: `1px solid ${amount === v ? 'var(--border-default)' : 'var(--border-subtle)'}`, borderRadius: 6, padding: '6px 4px', fontSize: '0.72rem', color: amount === v ? 'var(--text-primary)' : 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
                   {v}

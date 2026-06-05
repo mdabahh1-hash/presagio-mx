@@ -61,7 +61,7 @@ export function Home() {
   const featured = markets[0] ?? MOCK_MARKETS[0]
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
       {/* Hero */}
       <section style={{ padding: '64px 0 48px', textAlign: 'center', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', width: 600, height: 300, background: 'radial-gradient(ellipse, rgba(201, 72, 40, 0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -112,7 +112,7 @@ export function Home() {
 
       {/* Stats bar */}
       <section className="anim-5" style={{ marginBottom: 56 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: 'var(--border-subtle)', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
+        <div className="home-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: 'var(--border-subtle)', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
           {FEATURED_STATS.map((stat, i) => (
             <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '20px 24px', textAlign: 'center' }}>
               <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: i === 0 ? 'var(--gold)' : i === 1 ? 'var(--green)' : 'var(--text-primary)', letterSpacing: '-0.02em' }}>
@@ -163,13 +163,13 @@ export function Home() {
           <Link to="/mercados" style={{ textDecoration: 'none', fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 600 }}>Ver todos →</Link>
         </div>
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+          <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
             {[...Array(6)].map((_, i) => (
               <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 12, height: 200, animation: 'pulse 1.5s ease infinite' }} />
             ))}
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+          <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
             {(trending.length > 0 ? trending : markets).slice(0, 6).map((market, i) => (
               <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
             ))}

@@ -61,7 +61,7 @@ export function Admin() {
   const resolved = markets.filter(m => m.status === 'resolved_yes' || m.status === 'resolved_no')
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-container" style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>
         Panel Admin
       </h1>
@@ -114,6 +114,7 @@ export function Admin() {
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
+                    className="admin-resolve-btn"
                     disabled={resolving === m.id}
                     onClick={() => resolve(m.id, 'YES')}
                     style={{
@@ -125,6 +126,7 @@ export function Admin() {
                     SÍ ✓
                   </button>
                   <button
+                    className="admin-resolve-btn"
                     disabled={resolving === m.id}
                     onClick={() => resolve(m.id, 'NO')}
                     style={{

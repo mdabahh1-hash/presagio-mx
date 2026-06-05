@@ -33,7 +33,7 @@ export default function App() {
             textAlign: 'center',
           }}
         >
-          <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <div className="footer-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
               © 2026 PRESAGIO · Mercado de predicciones con puntos virtuales · No involucra dinero real
             </span>

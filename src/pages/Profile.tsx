@@ -54,11 +54,11 @@ export function Profile() {
   const totalInvested = positions.reduce((s, p) => s + p.avg_cost * p.shares, 0)
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
       {/* Profile header */}
       <div className="anim-1 card" style={{ padding: '32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, var(--brand), var(--gold), var(--brand))' }} />
-        <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div className="profile-header-flex" style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <div style={{ width: 72, height: 72, borderRadius: '50%', background: user.avatar_url ? 'transparent' : 'linear-gradient(135deg, var(--brand), #7a1a08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#fff', fontFamily: 'Syne', border: '3px solid rgba(240,192,64,0.3)', flexShrink: 0, overflow: 'hidden' }}>
             {user.avatar_url ? <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
           </div>
@@ -80,7 +80,7 @@ export function Profile() {
               </div>
             </div>
           </div>
-          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div className="profile-header-balance" style={{ textAlign: 'right', flexShrink: 0 }}>
             <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Saldo disponible</div>
             <div className="font-mono" style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em', lineHeight: 1 }}>
               {Math.floor(user.points).toLocaleString('es-MX')}
@@ -94,7 +94,7 @@ export function Profile() {
       </div>
 
       {/* Stats */}
-      <div className="anim-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
+      <div className="anim-2 profile-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
         <div className="card" style={{ padding: '20px' }}>
           <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Saldo</div>
           <div className="font-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--gold)' }}>{Math.floor(user.points).toLocaleString('es-MX')} PT</div>

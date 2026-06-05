@@ -8,6 +8,7 @@ import { authApi } from '../lib/api'
 export function Navbar() {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const { user, logout } = useAuth()
 
   useEffect(() => {
@@ -15,6 +16,8 @@ export function Navbar() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => { setMenuOpen(false) }, [location.pathname])
 
   const navLinks = [
     { to: '/', label: 'Inicio' },
@@ -33,7 +36,7 @@ export function Navbar() {
   return (
     <>
       {/* Ticker bar */}
-      <div style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', height: 32, overflow: 'hidden', position: 'relative' }}>
+      <div className="navbar-ticker" style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', height: 32, overflow: 'hidden', position: 'relative' }}>
         <div className="fade-left" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 60, zIndex: 2 }} />
         <div className="fade-right" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, zIndex: 2 }} />
         <div className="ticker-wrap" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
@@ -53,12 +56,34 @@ export function Navbar() {
 
       {/* Main navbar */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: scrolled ? 'rgba(7, 7, 14, 0.95)' : 'rgba(7, 7, 14, 0.85)', backdropFilter: 'blur(20px)', borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent', transition: 'all 0.3s ease' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', gap: 32 }}>
+        <div className="navbar-inner" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', gap: 32 }}>
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <LogoFull />
           </Link>
 
-          <div style={{ display: 'flex', gap: 4, flex: 1 }}>
+          {/* Hamburger button — hidden on desktop via CSS, shown on mobile */}
+          <button
+            className="navbar-hamburger"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Menú"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)', display: 'none' }}
+          >
+            {menuOpen ? (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <line x1="4" y1="4" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="18" y1="4" x2="4" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            )}
+          </button>
+
+          {/* Desktop nav links — hidden on mobile via CSS */}
+          <div className="navbar-links" style={{ display: 'flex', gap: 4, flex: 1 }}>
             {navLinks.map(link => (
               <Link key={link.to} to={link.to} style={{ textDecoration: 'none', padding: '6px 14px', borderRadius: 8, fontSize: '0.875rem', fontWeight: 500, color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)', background: isActive(link.to) ? 'var(--bg-elevated)' : 'transparent', transition: 'all 0.15s' }}>
                 {link.label}
@@ -66,7 +91,8 @@ export function Navbar() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          {/* Desktop user section — hidden on mobile via CSS */}
+          <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {user ? (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 12px' }}>
@@ -102,6 +128,96 @@ export function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile drawer — only rendered when menuOpen */}
+      {menuOpen && (
+        <div style={{
+          position: 'fixed', top: 60, left: 0, right: 0, bottom: 0,
+          background: 'rgba(7,7,14,0.97)', backdropFilter: 'blur(16px)',
+          zIndex: 99, display: 'flex', flexDirection: 'column',
+          padding: '24px 20px', gap: 8,
+          borderTop: '1px solid var(--border-subtle)',
+          overflowY: 'auto',
+        }}>
+          {navLinks.map(link => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                textDecoration: 'none', padding: '14px 16px', borderRadius: 10,
+                fontSize: '1rem', fontWeight: 600,
+                color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                background: isActive(link.to) ? 'var(--bg-elevated)' : 'transparent',
+                borderBottom: '1px solid var(--border-subtle)',
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
+            {user ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div className="avatar">{initials}</div>
+                  <div>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {user.display_name}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+                      {Math.floor(user.points).toLocaleString('es-MX')} PT
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  to="/perfil"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    textDecoration: 'none', padding: '12px 16px', borderRadius: 10,
+                    fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)',
+                    background: 'var(--bg-elevated)', textAlign: 'center',
+                  }}
+                >
+                  Mi perfil
+                </Link>
+                <button
+                  onClick={() => { logout(); setMenuOpen(false) }}
+                  style={{
+                    background: 'transparent', border: '1px solid var(--border-subtle)',
+                    borderRadius: 10, padding: '12px 16px', fontSize: '0.875rem',
+                    color: 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans',
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    width: '100%', background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-default)', borderRadius: 10,
+                    padding: '14px', fontSize: '0.9rem', color: 'var(--text-primary)',
+                    cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
+                  }}>
+                    Entrar con Google
+                  </button>
+                </a>
+                <a href={authApi.githubUrl()} style={{ textDecoration: 'none' }}>
+                  <button style={{
+                    width: '100%', background: 'var(--brand)', border: 'none',
+                    borderRadius: 10, padding: '14px', fontSize: '0.9rem',
+                    color: '#fff', cursor: 'pointer', fontFamily: 'Syne', fontWeight: 700,
+                  }}>
+                    Entrar con GitHub
+                  </button>
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 }
