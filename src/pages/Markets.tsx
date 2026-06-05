@@ -5,14 +5,19 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import type { Category, Market } from '../types'
 
-const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', 'Política MX', 'Economía', 'Deportes', 'Global', 'Tech']
+const ALL_CATEGORIES: (Category | 'Todos')[] = [
+  'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
+  'Política MX', 'Deportes', 'México', 'Global', 'Tech',
+]
 const SORT_OPTIONS = [
   { value: 'volume', label: 'Mayor volumen' },
   { value: 'trending', label: 'Tendencias' },
   { value: 'ending', label: 'Cierra pronto' },
 ]
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#c94828', 'Economía': '#f0c040', 'Deportes': '#00d084', 'Global': '#6888ff', 'Tech': '#a060ff',
+  'Política MX': '#c94828', 'Economía': '#f0c040', 'Deportes': '#00d084',
+  'Global': '#6888ff', 'Tech': '#a060ff',
+  'Mundial 2026': '#00d084', 'Crypto': '#f7931a', 'Mercados Globales': '#6888ff', 'México': '#c94828',
 }
 
 function apiToMarket(m: ApiMarket): Market {
