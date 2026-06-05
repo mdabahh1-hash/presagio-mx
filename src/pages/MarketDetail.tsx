@@ -172,6 +172,17 @@ export function MarketDetail() {
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)' }}>EN VIVO</span>
               </span>
             </div>
+            {(market.status === 'resolved_yes' || market.status === 'resolved_no') && (
+              <div style={{
+                background: market.status === 'resolved_yes' ? 'rgba(0,208,132,0.1)' : 'rgba(255,69,96,0.1)',
+                border: `1px solid ${market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)'}`,
+                borderRadius: 8, padding: '10px 16px', marginBottom: 16,
+                fontSize: '0.875rem', fontWeight: 700,
+                color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)',
+              }}>
+                Resultado oficial: {market.status === 'resolved_yes' ? 'SÍ ✓' : 'NO ✗'}
+              </div>
+            )}
             <h1 className="font-display" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.75rem)', fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 16px', lineHeight: 1.3 }}>
               {market.question}
             </h1>
@@ -301,8 +312,58 @@ export function MarketDetail() {
           </div>
         </div>
 
-        {/* Right: Trading panel */}
+        {/* Right: Trading panel or status card */}
         <div className="market-trading-panel" style={{ position: 'sticky', top: 80 }}>
+        {market.status !== 'open' ? (
+          <div className="anim-2 card" style={{ padding: '28px 24px', textAlign: 'center' }}>
+            {market.status === 'pending_resolution' && (
+              <>
+                <div style={{ fontSize: '2rem', marginBottom: 12 }}>⏳</div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold)', margin: '0 0 8px' }}>
+                  Pendiente de resolución
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.6 }}>
+                  Este mercado cerró. En breve se declarará el resultado y se distribuirán los puntos.
+                </p>
+              </>
+            )}
+            {(market.status === 'resolved_yes' || market.status === 'resolved_no') && (
+              <>
+                <div style={{ fontSize: '2rem', marginBottom: 12 }}>
+                  {market.status === 'resolved_yes' ? '✅' : '❌'}
+                </div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)', margin: '0 0 8px' }}>
+                  Resuelto: {market.status === 'resolved_yes' ? 'SÍ ganó' : 'NO ganó'}
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.6 }}>
+                  Los puntos ya fueron distribuidos a los ganadores.
+                </p>
+              </>
+            )}
+            {market.status === 'closed' && (
+              <>
+                <div style={{ fontSize: '2rem', marginBottom: 12 }}>🔒</div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 8px' }}>
+                  Mercado cerrado
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
+                  Este mercado ya no acepta operaciones.
+                </p>
+              </>
+            )}
+            {market.status === 'cancelled' && (
+              <>
+                <div style={{ fontSize: '2rem', marginBottom: 12 }}>🚫</div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-tertiary)', margin: '0 0 8px' }}>
+                  Mercado cancelado
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
+                  Este mercado fue cancelado.
+                </p>
+              </>
+            )}
+          </div>
+        ) : (
           <div className="anim-2 card" style={{ padding: '24px' }}>
             <h3 className="font-display" style={{ margin: '0 0 20px', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Operar
@@ -379,6 +440,7 @@ export function MarketDetail() {
               PRESAGIO es un mercado de predicciones con puntos virtuales. No se involucra dinero real.
             </p>
           </div>
+        )}
         </div>
       </div>
     </div>
