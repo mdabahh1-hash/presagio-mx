@@ -15,8 +15,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   'Tech': '💻',
 }
 
-const FEATURED_STATS = [
-  { label: 'Mercados activos', value: '847', unit: '' },
+const STATIC_STATS = [
   { label: 'Volumen total', value: '12.4M', unit: 'PT' },
   { label: 'Usuarios activos', value: '9,200', unit: '' },
   { label: 'Precisión promedio', value: '71', unit: '%' },
@@ -113,9 +112,16 @@ export function Home() {
       {/* Stats bar */}
       <section className="anim-5" style={{ marginBottom: 56 }}>
         <div className="home-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: 'var(--border-subtle)', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
-          {FEATURED_STATS.map((stat, i) => (
+          {/* First cell: live market count from API */}
+          <div style={{ background: 'var(--bg-card)', padding: '20px 24px', textAlign: 'center' }}>
+            <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--gold)', letterSpacing: '-0.02em' }}>
+              {loading ? '—' : markets.length}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4, fontWeight: 500 }}>Mercados abiertos</div>
+          </div>
+          {STATIC_STATS.map((stat, i) => (
             <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '20px 24px', textAlign: 'center' }}>
-              <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: i === 0 ? 'var(--gold)' : i === 1 ? 'var(--green)' : 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+              <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: i === 0 ? 'var(--green)' : 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                 {stat.value}{stat.unit && <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 4 }}>{stat.unit}</span>}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4, fontWeight: 500 }}>{stat.label}</div>
