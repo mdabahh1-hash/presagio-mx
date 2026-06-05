@@ -5,6 +5,7 @@ import { Home } from './pages/Home'
 import { Markets } from './pages/Markets'
 import { MarketDetail } from './pages/MarketDetail'
 import { Profile } from './pages/Profile'
+import { Admin } from './pages/Admin'
 import { AuthProvider } from './lib/AuthContext'
 import { setToken } from './lib/api'
 
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/perfil" element={<Profile />} />
             {/* OAuth callback is handled in AuthProvider useEffect */}
             <Route path="/auth/callback" element={<AuthCallbackRedirect />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <footer

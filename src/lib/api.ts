@@ -138,3 +138,14 @@ export const authApi = {
   googleUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/google`,
   githubUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/github`,
 }
+
+// ── Admin ──────────────────────────────────────────────────────────────────
+
+export const adminApi = {
+  listAllMarkets: () => request<ApiMarket[]>('/markets?status=all&limit=100'),
+  resolveMarket: (marketId: string, resolution: 'YES' | 'NO') =>
+    request<{ ok: boolean; resolution: string; positions_settled: number }>(
+      `/admin/markets/${marketId}/resolve`,
+      { method: 'POST', body: JSON.stringify({ resolution }) }
+    ),
+}
