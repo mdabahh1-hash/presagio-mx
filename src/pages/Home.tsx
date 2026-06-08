@@ -14,6 +14,20 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Tech': '#a060ff',
 }
 
+const MOBILE_TABS = ['Todos', 'Tendencia', 'Política MX', 'Economía', 'Deportes', 'Mundial 2026', 'Crypto', 'Tech', 'Global'] as const
+type MobileTab = typeof MOBILE_TABS[number]
+
+const MOBILE_TAB_COLORS: Record<string, string> = {
+  'Tendencia': '#ffd060',
+  'Política MX': '#e0522e',
+  'Economía': '#ffd060',
+  'Deportes': '#00e87d',
+  'Mundial 2026': '#00e87d',
+  'Crypto': '#f7931a',
+  'Tech': '#a060ff',
+  'Global': '#4f8eff',
+}
+
 const STATIC_STATS = [
   { label: 'Volumen total', value: '12.4M', unit: 'PT', color: 'var(--green)' },
   { label: 'Usuarios activos', value: '9,200', unit: '', color: 'var(--text-primary)' },
@@ -37,11 +51,23 @@ function apiToMarket(m: ApiMarket): Market {
   }
 }
 
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', fn)
+    return () => window.removeEventListener('resize', fn)
+  }, [])
+  return isMobile
+}
+
 export function Home() {
   const [search, setSearch] = useState('')
   const [markets, setMarkets] = useState<Market[]>([])
   const [loading, setLoading] = useState(true)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('Todos')
   const navigate = useNavigate()
+  const isMobile = useMobile()
 
   useEffect(() => {
     marketsApi.list()
@@ -58,12 +84,119 @@ export function Home() {
   const trending = markets.filter(m => m.trending)
   const featured = markets[0] ?? MOCK_MARKETS[0]
 
+  const mobileMarkets = (() => {
+    if (mobileTab === 'Todos') return markets
+    if (mobileTab === 'Tendencia') return markets.filter(m => m.trending)
+    return markets.filter(m => m.category === mobileTab)
+  })()
+
+  // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <div style={{ minHeight: '100vh' }}>
+
+        {/* Sticky search + tabs */}
+        <div style={{
+          position: 'sticky', top: 62, zIndex: 50,
+          background: 'var(--bg-base)',
+          borderBottom: '1px solid var(--border-subtle)',
+          padding: '10px 14px 0',
+        }}>
+          {/* Search */}
+          <form onSubmit={handleSearch} style={{ marginBottom: 10 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 10, overflow: 'hidden',
+            }}>
+              <span style={{ paddingLeft: 12, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
+                  <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Buscar mercados..."
+                style={{
+                  flex: 1, background: 'transparent', border: 'none',
+                  outline: 'none', padding: '11px 12px',
+                  fontSize: '0.9rem', color: 'var(--text-primary)',
+                  fontFamily: 'Plus Jakarta Sans',
+                }}
+              />
+              {search && (
+                <button type="button" onClick={() => setSearch('')} style={{ background: 'none', border: 'none', padding: '0 12px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1.1rem' }}>×</button>
+              )}
+            </div>
+          </form>
+
+          {/* Category tabs — horizontal scroll */}
+          <div style={{
+            display: 'flex', gap: 8,
+            overflowX: 'auto', paddingBottom: 10,
+            scrollbarWidth: 'none',
+          }}>
+            {MOBILE_TABS.map(tab => {
+              const isActive = tab === mobileTab
+              const color = tab === 'Todos' ? 'var(--blue)' : MOBILE_TAB_COLORS[tab] || 'var(--text-secondary)'
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setMobileTab(tab)}
+                  style={{
+                    flexShrink: 0,
+                    background: isActive ? (tab === 'Todos' ? 'rgba(79,142,255,0.15)' : `${color}18`) : 'transparent',
+                    border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
+                    borderRadius: 99, padding: '7px 14px',
+                    fontSize: '0.8rem', fontWeight: 700,
+                    color: isActive ? color : 'var(--text-secondary)',
+                    cursor: 'pointer', fontFamily: 'Syne',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {tab}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Markets list */}
+        <div style={{ padding: '10px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loading ? (
+            [...Array(5)].map((_, i) => (
+              <div key={i} style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 14, height: 130,
+                animation: 'livePulse 1.8s ease infinite',
+              }} />
+            ))
+          ) : mobileMarkets.length > 0 ? (
+            mobileMarkets.map((market, i) => (
+              <MarketCard key={market.id} market={market} animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''} />
+            ))
+          ) : (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
+              <p style={{ fontWeight: 600 }}>Sin mercados en esta categoría</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // ─── DESKTOP LAYOUT ─────────────────────────────────────────────────────────
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 
       {/* Hero */}
       <section style={{ padding: '72px 0 56px', textAlign: 'center', position: 'relative' }}>
-        {/* Radial glow bg */}
         <div style={{
           position: 'absolute', top: '40%', left: '50%',
           transform: 'translate(-50%, -60%)',
@@ -72,7 +205,6 @@ export function Home() {
           pointerEvents: 'none',
         }} />
 
-        {/* Live badge */}
         <div className="anim-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 28 }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
@@ -81,16 +213,12 @@ export function Home() {
             borderRadius: 99, padding: '6px 14px',
           }}>
             <div className="live-dot" />
-            <span style={{
-              fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em',
-              textTransform: 'uppercase', color: 'var(--green)',
-            }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--green)' }}>
               Mercados en tiempo real
             </span>
           </div>
         </div>
 
-        {/* Title */}
         <h1 className="font-display anim-2" style={{
           fontSize: 'clamp(2.8rem, 7vw, 5rem)',
           fontWeight: 800, letterSpacing: '-0.04em',
@@ -108,7 +236,6 @@ export function Home() {
           El mercado de predicciones de México. Apuesta en eventos políticos, económicos y deportivos con puntos virtuales.
         </p>
 
-        {/* Search */}
         <form onSubmit={handleSearch} className="anim-4" style={{ display: 'flex', justifyContent: 'center' }}>
           <div style={{
             display: 'flex', width: '100%', maxWidth: 540,
@@ -117,10 +244,7 @@ export function Home() {
             borderRadius: 14, overflow: 'hidden',
             boxShadow: '0 4px 32px rgba(0,0,0,0.3)',
           }}>
-            <span style={{
-              display: 'flex', alignItems: 'center', paddingLeft: 18,
-              color: 'var(--text-tertiary)', flexShrink: 0,
-            }}>
+            <span style={{ display: 'flex', alignItems: 'center', paddingLeft: 18, color: 'var(--text-tertiary)', flexShrink: 0 }}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
                 <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -143,14 +267,12 @@ export function Home() {
               fontFamily: 'Syne', fontWeight: 700,
               fontSize: '0.78rem', letterSpacing: '0.08em',
               cursor: 'pointer', flexShrink: 0,
-              transition: 'opacity 0.15s',
             }}>
               BUSCAR
             </button>
           </div>
         </form>
 
-        {/* Category pills */}
         <div className="anim-5" style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 24, flexWrap: 'wrap' }}>
           {CATEGORIES.map(cat => {
             const color = CATEGORY_COLORS[cat] || 'var(--text-secondary)'
@@ -182,13 +304,9 @@ export function Home() {
           borderRadius: 16, overflow: 'hidden',
           border: '1px solid var(--border-subtle)',
         }}>
-          {/* Live market count */}
-          <div style={{ background: 'var(--bg-card)', padding: '24px 28px', textAlign: 'center', position: 'relative' }}>
-            <div className="font-mono" style={{
-              fontSize: '2.4rem', fontWeight: 800,
-              color: 'var(--gold)', letterSpacing: '-0.04em', lineHeight: 1,
-            }}>
-              {loading ? '—' : markets.filter(m => (m as any).status !== 'closed' && (m as any).status !== 'resolved_yes' && (m as any).status !== 'resolved_no').length || markets.length}
+          <div style={{ background: 'var(--bg-card)', padding: '24px 28px', textAlign: 'center' }}>
+            <div className="font-mono" style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.04em', lineHeight: 1 }}>
+              {loading ? '—' : markets.length}
             </div>
             <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', marginTop: 6, fontWeight: 500, letterSpacing: '0.04em' }}>
               Mercados abiertos
@@ -196,16 +314,9 @@ export function Home() {
           </div>
           {STATIC_STATS.map((stat) => (
             <div key={stat.label} style={{ background: 'var(--bg-card)', padding: '24px 28px', textAlign: 'center' }}>
-              <div className="font-mono" style={{
-                fontSize: '2.4rem', fontWeight: 800,
-                color: stat.color, letterSpacing: '-0.04em', lineHeight: 1,
-              }}>
+              <div className="font-mono" style={{ fontSize: '2.4rem', fontWeight: 800, color: stat.color, letterSpacing: '-0.04em', lineHeight: 1 }}>
                 {stat.value}
-                {stat.unit && (
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)', marginLeft: 4, fontWeight: 600 }}>
-                    {stat.unit}
-                  </span>
-                )}
+                {stat.unit && <span style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)', marginLeft: 4, fontWeight: 600 }}>{stat.unit}</span>}
               </div>
               <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', marginTop: 6, fontWeight: 500, letterSpacing: '0.04em' }}>
                 {stat.label}
@@ -266,11 +377,7 @@ export function Home() {
                   </div>
                   <div style={{ width: 1, height: 56, background: 'var(--border-subtle)' }} />
                   <div>
-                    <div style={{
-                      fontSize: '1.5rem', fontWeight: 700,
-                      fontFamily: 'JetBrains Mono',
-                      color: 'var(--text-primary)', lineHeight: 1,
-                    }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-primary)', lineHeight: 1 }}>
                       {(featured.volume / 1000).toFixed(0)}K
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 6, fontWeight: 600, letterSpacing: '0.06em' }}>
@@ -302,12 +409,7 @@ export function Home() {
         {loading ? (
           <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
             {[...Array(6)].map((_, i) => (
-              <div key={i} style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 14, height: 210,
-                animation: 'livePulse 1.8s ease infinite',
-              }} />
+              <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14, height: 210 }} />
             ))}
           </div>
         ) : (
@@ -343,10 +445,7 @@ export function Home() {
               BIENVENIDA: 1,000 PT GRATIS
             </span>
           </div>
-          <h2 className="font-display" style={{
-            fontSize: '2.2rem', fontWeight: 800,
-            letterSpacing: '-0.03em', margin: '0 0 14px',
-          }}>
+          <h2 className="font-display" style={{ fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
             Empieza a predecir hoy
           </h2>
           <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: 32, maxWidth: 400, margin: '0 auto 32px' }}>
@@ -360,7 +459,6 @@ export function Home() {
               fontSize: '0.9rem', letterSpacing: '0.08em',
               borderRadius: 12, cursor: 'pointer',
               boxShadow: '0 8px 32px rgba(224, 82, 46, 0.3)',
-              transition: 'all 0.2s',
             }}>
               REGISTRARSE CON GOOGLE →
             </button>

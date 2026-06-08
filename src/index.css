@@ -390,6 +390,10 @@ input[type='range']::-webkit-slider-thumb {
   box-shadow: 0 0 10px rgba(79, 142, 255, 0.5);
 }
 
+/* Hide scrollbar on horizontal tab bars */
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tabs-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ============================================================
    MOBILE RESPONSIVE — max-width: 768px
    ============================================================ */
