@@ -137,6 +137,16 @@ export const authApi = {
   logout: () => request('/auth/logout', { method: 'POST' }),
   googleUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/google`,
   githubUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/github`,
+  emailLogin: (email: string, password: string) =>
+    request<{ token: string; user: ApiUser }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+  emailRegister: (email: string, password: string, displayName: string) =>
+    request<{ token: string; user: ApiUser }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, display_name: displayName }),
+    }),
 }
 
 // ── Admin ──────────────────────────────────────────────────────────────────
