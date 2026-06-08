@@ -3,22 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #07070e;
-  --bg-surface: #0d0d18;
-  --bg-card: #111120;
-  --bg-elevated: #181830;
-  --border-subtle: #1e1e38;
-  --border-default: #282845;
-  --text-primary: #eeeef8;
-  --text-secondary: #8888b0;
-  --text-tertiary: #555580;
-  --green: #00d084;
-  --green-glow: rgba(0, 208, 132, 0.25);
-  --red: #ff4560;
-  --red-glow: rgba(255, 69, 96, 0.25);
-  --gold: #f0c040;
-  --brand: #c94828;
-  --brand-dim: rgba(201, 72, 40, 0.15);
+  --bg-base: #06061a;
+  --bg-surface: #0b0b24;
+  --bg-card: #0f0f2e;
+  --bg-elevated: #14143a;
+  --border-subtle: #1c1c48;
+  --border-default: #26265e;
+  --text-primary: #f0f0ff;
+  --text-secondary: #8888cc;
+  --text-tertiary: #50507a;
+  --green: #00e87d;
+  --green-glow: rgba(0, 232, 125, 0.3);
+  --red: #ff2d55;
+  --red-glow: rgba(255, 45, 85, 0.3);
+  --gold: #ffd060;
+  --brand: #e0522e;
+  --brand-dim: rgba(224, 82, 46, 0.15);
+  --blue: #4f8eff;
+  --blue-glow: rgba(79, 142, 255, 0.25);
 }
 
 * {
@@ -46,7 +48,7 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
+  opacity: 0.3;
 }
 
 #root {
@@ -56,8 +58,8 @@ body::before {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-surface);
@@ -79,47 +81,58 @@ body::before {
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  border-radius: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 .card:hover {
-  border-color: var(--border-default);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  transform: translateY(-1px);
+  border-color: rgba(79, 142, 255, 0.3);
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(79, 142, 255, 0.08);
+  transform: translateY(-2px);
 }
 
 /* Glow effects */
 .glow-green {
-  box-shadow: 0 0 20px var(--green-glow);
+  box-shadow: 0 0 24px var(--green-glow), 0 0 48px rgba(0, 232, 125, 0.1);
 }
 .glow-red {
-  box-shadow: 0 0 20px var(--red-glow);
+  box-shadow: 0 0 24px var(--red-glow), 0 0 48px rgba(255, 45, 85, 0.1);
+}
+.glow-blue {
+  box-shadow: 0 0 24px var(--blue-glow);
 }
 
 /* Price badge */
 .price-yes {
   color: var(--green);
-  background: rgba(0, 208, 132, 0.1);
-  border: 1px solid rgba(0, 208, 132, 0.2);
+  background: rgba(0, 232, 125, 0.1);
+  border: 1px solid rgba(0, 232, 125, 0.25);
 }
 .price-no {
   color: var(--red);
-  background: rgba(255, 69, 96, 0.1);
-  border: 1px solid rgba(255, 69, 96, 0.2);
+  background: rgba(255, 45, 85, 0.1);
+  border: 1px solid rgba(255, 45, 85, 0.25);
 }
 
 /* Probability bar */
 .prob-bar-track {
-  height: 4px;
+  height: 6px;
   background: var(--border-subtle);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
 .prob-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--green), rgba(0, 208, 132, 0.7));
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--green), rgba(0, 232, 125, 0.55));
+  border-radius: 3px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Probability bar dual (YES + NO) */
+.prob-bar-dual {
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
 }
 
 /* Category pill */
@@ -128,15 +141,20 @@ body::before {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 99px;
   border: 1px solid var(--border-subtle);
   color: var(--text-tertiary);
+  transition: all 0.15s;
 }
 .category-pill.active {
   border-color: var(--brand);
   color: var(--gold);
   background: var(--brand-dim);
+}
+.category-pill:hover:not(.active) {
+  border-color: var(--border-default);
+  color: var(--text-secondary);
 }
 
 /* Input */
@@ -144,15 +162,15 @@ body::before {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   color: var(--text-primary);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border-radius: 10px;
+  padding: 11px 14px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .input-dark:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(240, 192, 64, 0.1);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(79, 142, 255, 0.12);
 }
 .input-dark::placeholder {
   color: var(--text-tertiary);
@@ -160,52 +178,55 @@ body::before {
 
 /* Button variants */
 .btn-yes {
-  background: linear-gradient(135deg, #00d084, #00a868);
-  color: #000;
-  font-weight: 700;
+  background: linear-gradient(135deg, #00e87d, #00ba64);
+  color: #001a0d;
+  font-weight: 800;
   border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
+  border-radius: 10px;
+  padding: 14px 20px;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
   font-family: 'Syne', sans-serif;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 .btn-yes:hover {
-  opacity: 0.9;
+  opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(0, 232, 125, 0.35);
 }
 
 .btn-no {
-  background: linear-gradient(135deg, #ff4560, #cc3040);
+  background: linear-gradient(135deg, #ff2d55, #cc1a40);
   color: #fff;
-  font-weight: 700;
+  font-weight: 800;
   border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
+  border-radius: 10px;
+  padding: 14px 20px;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
   font-family: 'Syne', sans-serif;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 .btn-no:hover {
-  opacity: 0.9;
+  opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255, 45, 85, 0.35);
 }
 
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
-  border-radius: 8px;
-  padding: 10px 16px;
+  border-radius: 10px;
+  padding: 10px 18px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 .btn-ghost:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--blue);
+  color: var(--text-primary);
+  background: rgba(79, 142, 255, 0.06);
 }
 
 /* Ticker */
@@ -215,7 +236,7 @@ body::before {
 }
 .ticker-inner {
   display: inline-flex;
-  animation: ticker 45s linear infinite;
+  animation: ticker 50s linear infinite;
 }
 .ticker-inner:hover {
   animation-play-state: paused;
@@ -237,7 +258,7 @@ body::before {
   stroke-linejoin: round;
 }
 .chart-area {
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 /* Avatar */
@@ -245,7 +266,7 @@ body::before {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand), #a03820);
+  background: linear-gradient(135deg, var(--brand), #8a2010);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,8 +281,12 @@ body::before {
 .stat-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 16px 20px;
+  border-radius: 12px;
+  padding: 18px 20px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover {
+  border-color: var(--border-default);
 }
 
 /* Divider */
@@ -272,17 +297,18 @@ body::before {
 
 /* Live dot */
 .live-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--green);
-  box-shadow: 0 0 6px var(--green);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--green), 0 0 16px rgba(0, 232, 125, 0.4);
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-@keyframes pulse {
+@keyframes livePulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 0.45; transform: scale(0.75); }
 }
 
 /* Staggered fade-up animations */
@@ -294,16 +320,45 @@ body::before {
 .anim-6 { animation: fadeUp 0.5s ease 0.3s both; }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 /* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, var(--gold), var(--brand));
+  background: linear-gradient(135deg, #00e87d 0%, #4f8eff 50%, var(--brand) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold), #ffaa20);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Exchange section header */
+.exchange-header {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.exchange-header::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--blue);
+  flex-shrink: 0;
 }
 
 /* Volume bar */
@@ -330,25 +385,21 @@ input[type='range']::-webkit-slider-thumb {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: var(--gold);
+  background: var(--blue);
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(240, 192, 64, 0.4);
+  box-shadow: 0 0 10px rgba(79, 142, 255, 0.5);
 }
 
 /* ============================================================
    MOBILE RESPONSIVE — max-width: 768px
-   All rules use !important to override React inline styles.
-   Desktop styles are NOT modified.
    ============================================================ */
 @media (max-width: 768px) {
 
-  /* Global page padding */
   .page-container {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
 
-  /* Navbar: hide ticker, hide desktop nav + user section, show hamburger */
   .navbar-ticker    { display: none !important; }
   .navbar-inner     { gap: 0 !important; padding: 0 16px !important; }
   .navbar-links     { display: none !important; }
@@ -362,33 +413,26 @@ input[type='range']::-webkit-slider-thumb {
     min-height: 44px;
   }
 
-  /* Home: stats 4-col → 2-col */
   .home-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
-  /* Market card grids: auto-fill → single column */
   .market-grid { grid-template-columns: 1fr !important; }
 
-  /* MarketDetail: 2-col → stacked */
   .market-detail-grid   { grid-template-columns: 1fr !important; gap: 20px !important; }
   .market-trading-panel { position: static !important; }
   .market-stats-grid    { grid-template-columns: repeat(2, 1fr) !important; }
 
-  /* Tap targets */
   .amount-presets button { min-height: 44px !important; padding: 10px 8px !important; }
   .amount-adjust-btn     { min-height: 44px !important; padding: 10px 18px !important; }
   .btn-comment-submit    { min-height: 44px !important; padding: 12px 20px !important; }
   .admin-resolve-btn     { min-height: 44px !important; padding: 10px 18px !important; }
 
-  /* Profile: header stacks vertically */
   .profile-header-flex    { flex-direction: column !important; align-items: stretch !important; }
   .profile-header-balance { text-align: left !important; flex-shrink: unset !important; }
 
-  /* Markets: filter controls stack + tap targets */
   .markets-controls        { flex-direction: column !important; align-items: stretch !important; }
   .markets-controls button { min-height: 44px !important; padding: 10px 14px !important; }
   .markets-controls select { min-height: 44px !important; width: 100% !important; }
 
-  /* Footer: stack vertically */
   .footer-inner {
     flex-direction: column !important;
     align-items: center !important;
@@ -398,12 +442,8 @@ input[type='range']::-webkit-slider-thumb {
 
 /* ============================================================
    NARROW PHONE — max-width: 480px
-   Extra fixes for 375px (iPhone SE / base)
    ============================================================ */
 @media (max-width: 480px) {
-  /* Profile stats: 3-col → 1-col at 375px (~106px per col is too narrow) */
   .profile-stats-grid { grid-template-columns: 1fr !important; }
-
-  /* Stat card padding: tighter on very small screens */
   .home-stats-grid > div { padding: 14px 12px !important; }
 }

@@ -8,7 +8,6 @@ interface SparkChartProps {
   color?: string
   showArea?: boolean
   showAxes?: boolean
-  showTooltip?: boolean
   className?: string
 }
 
@@ -22,12 +21,12 @@ export function SparkChart({
   className = '',
 }: SparkChartProps) {
   const points = useMemo(() => {
-    if (data.length < 2) return { path: '', area: '', lineColor: '#00d084', isUp: true }
+    if (data.length < 2) return { path: '', area: '', lineColor: '#00e87d', isUp: true }
     const prices = data.map(d => d.price)
     const minP = Math.min(...prices)
     const maxP = Math.max(...prices)
     const range = maxP - minP || 1
-    const pad = 4
+    const pad = 3
     const w = width - pad * 2
     const h = height - pad * 2
 
@@ -42,7 +41,7 @@ export function SparkChart({
     const area = `${path} L${lastX},${bottom} L${firstX},${bottom} Z`
 
     const isUp = data[data.length - 1].price >= data[0].price
-    const lineColor = color || (isUp ? '#00d084' : '#ff4560')
+    const lineColor = color || (isUp ? '#00e87d' : '#ff2d55')
     return { path, area, lineColor, isUp }
   }, [data, width, height, color])
 
@@ -55,16 +54,10 @@ export function SparkChart({
       style={{ display: 'block' }}
     >
       {showAxes && (
-        <>
-          <line x1="4" y1={height - 4} x2={width - 4} y2={height - 4} stroke="var(--border-subtle)" strokeWidth="1" />
-        </>
+        <line x1="3" y1={height - 3} x2={width - 3} y2={height - 3} stroke="var(--border-subtle)" strokeWidth="1" />
       )}
       {showArea && (
-        <path
-          d={points.area}
-          fill={points.lineColor}
-          opacity="0.12"
-        />
+        <path d={points.area} fill={points.lineColor} opacity="0.14" />
       )}
       <path
         d={points.path}
@@ -86,7 +79,7 @@ interface FullChartProps {
 
 export function FullChart({ data, height = 200, color }: FullChartProps) {
   const { path, area, lineColor, ticks } = useMemo(() => {
-    if (data.length < 2) return { path: '', area: '', lineColor: '#00d084', isUp: true, ticks: [] }
+    if (data.length < 2) return { path: '', area: '', lineColor: '#00e87d', isUp: true, ticks: [] }
     const prices = data.map(d => d.price)
     const minP = Math.max(0, Math.min(...prices) - 5)
     const maxP = Math.min(100, Math.max(...prices) + 5)
@@ -110,28 +103,26 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
     const area = `${path} L${lastX},${bottom} L${firstX},${bottom} Z`
 
     const isUp = data[data.length - 1].price >= data[0].price
-    const lineColor = color || (isUp ? '#00d084' : '#ff4560')
+    const lineColor = color || (isUp ? '#00e87d' : '#ff2d55')
 
-    // Y axis ticks
     const tickValues = [minP, (minP + maxP) / 2, maxP].map(v => ({
       y: toY(v).toFixed(1),
       label: `${Math.round(v)}%`,
     }))
 
-    // X axis ticks (every ~10 items)
-    const step = Math.floor(data.length / 6)
+    const step = Math.max(1, Math.floor(data.length / 6))
     const xTicks = data
       .filter((_, i) => i % step === 0 || i === data.length - 1)
-      .map((d, _, arr) => ({
+      .map(d => ({
         x: toX(data.indexOf(d)).toFixed(1),
-        label: d.date.slice(5), // MM-DD
+        label: d.date.slice(5),
       }))
       .slice(0, 7)
 
     return { path, area, lineColor, isUp, ticks: { y: tickValues, x: xTicks } }
   }, [data, height, color])
 
-  const currentPrice = data[data.length - 1]?.price ?? 0
+  const gradientId = `chart-gradient-${Math.random().toString(36).slice(2, 6)}`
 
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>
@@ -141,29 +132,33 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
         preserveAspectRatio="xMidYMid meet"
         style={{ display: 'block' }}
       >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={lineColor} stopOpacity="0.25" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+
         {/* Grid lines */}
         {(ticks as any)?.y?.map((t: any) => (
           <line
             key={t.label}
-            x1="40"
-            y1={t.y}
-            x2="684"
-            y2={t.y}
+            x1="40" y1={t.y} x2="684" y2={t.y}
             stroke="var(--border-subtle)"
             strokeWidth="1"
-            strokeDasharray="4,4"
+            strokeDasharray="4,6"
           />
         ))}
 
-        {/* Area */}
-        <path d={area} fill={lineColor} opacity="0.1" />
+        {/* Area with gradient */}
+        <path d={area} fill={`url(#${gradientId})`} />
 
         {/* Line */}
         <path
           d={path}
           fill="none"
           stroke={lineColor}
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -180,36 +175,25 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
           const x = (padL + w).toFixed(1)
           const y = (padT + h - ((data[data.length - 1].price - minP) / range) * h).toFixed(1)
           return (
-            <circle cx={x} cy={y} r="4" fill={lineColor} />
+            <>
+              <circle cx={x} cy={y} r="6" fill={lineColor} opacity="0.2" />
+              <circle cx={x} cy={y} r="3.5" fill={lineColor} />
+            </>
           )
         })()}
 
         {/* Y axis labels */}
         {(ticks as any)?.y?.map((t: any) => (
-          <text
-            key={t.label}
-            x="36"
-            y={Number(t.y) + 4}
-            textAnchor="end"
-            fill="var(--text-tertiary)"
-            fontSize="10"
-            fontFamily="JetBrains Mono"
-          >
+          <text key={t.label} x="36" y={Number(t.y) + 4} textAnchor="end"
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="JetBrains Mono">
             {t.label}
           </text>
         ))}
 
         {/* X axis labels */}
         {(ticks as any)?.x?.map((t: any) => (
-          <text
-            key={t.x}
-            x={t.x}
-            y={height - 6}
-            textAnchor="middle"
-            fill="var(--text-tertiary)"
-            fontSize="10"
-            fontFamily="JetBrains Mono"
-          >
+          <text key={t.x} x={t.x} y={height - 6} textAnchor="middle"
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="JetBrains Mono">
             {t.label}
           </text>
         ))}

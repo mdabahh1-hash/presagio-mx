@@ -5,10 +5,6 @@ import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
 import type { PricePoint } from '../types'
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#c94828', 'Economía': '#f0c040', 'Deportes': '#00d084', 'Global': '#6888ff', 'Tech': '#a060ff',
-}
-
 interface UserPosition {
   id: number
   market_id: string
@@ -31,11 +27,28 @@ export function Profile() {
 
   if (!user) {
     return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px', textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: 16 }}>🔐</div>
-        <h2 className="font-display" style={{ fontSize: '1.5rem', marginBottom: 12 }}>Inicia sesión para ver tu perfil</h2>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
+        <div style={{
+          width: 64, height: 64, borderRadius: '50%',
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-subtle)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 20px', fontSize: '1.5rem',
+        }}>🔐</div>
+        <h2 className="font-display" style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: 12, letterSpacing: '-0.02em' }}>
+          Inicia sesión para ver tu perfil
+        </h2>
+        <p style={{ color: 'var(--text-tertiary)', marginBottom: 28, fontSize: '0.9rem' }}>
+          Gestiona tu balance, posiciones e historial de operaciones.
+        </p>
         <a href="/api/auth/google" style={{ textDecoration: 'none' }}>
-          <button style={{ background: 'var(--brand)', border: 'none', padding: '12px 24px', color: '#fff', fontFamily: 'Syne', fontWeight: 700, fontSize: '0.9rem', borderRadius: 10, cursor: 'pointer' }}>
+          <button style={{
+            background: 'linear-gradient(135deg, var(--brand), #b03018)',
+            border: 'none', padding: '14px 32px', color: '#fff',
+            fontFamily: 'Syne', fontWeight: 700, fontSize: '0.9rem',
+            borderRadius: 12, cursor: 'pointer',
+            boxShadow: '0 6px 24px rgba(224, 82, 46, 0.3)',
+          }}>
             Iniciar sesión con Google
           </button>
         </a>
@@ -45,7 +58,6 @@ export function Profile() {
 
   const initials = user.display_name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
-  // Mock P&L history from current points (replace with real endpoint later)
   const pnlHistory: PricePoint[] = Array.from({ length: 30 }, (_, i) => ({
     date: new Date(Date.now() - (29 - i) * 86400000).toISOString().slice(0, 10),
     price: user.points * (0.85 + i * 0.005 + Math.random() * 0.02),
@@ -55,114 +67,242 @@ export function Profile() {
 
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
-      {/* Profile header */}
-      <div className="anim-1 card" style={{ padding: '32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(90deg, var(--brand), var(--gold), var(--brand))' }} />
+
+      {/* Profile header card */}
+      <div className="anim-1 card" style={{ padding: '32px 32px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+        {/* Top accent bar */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+          background: 'linear-gradient(90deg, var(--blue), var(--brand), var(--gold))',
+        }} />
         <div className="profile-header-flex" style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div style={{ width: 72, height: 72, borderRadius: '50%', background: user.avatar_url ? 'transparent' : 'linear-gradient(135deg, var(--brand), #7a1a08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#fff', fontFamily: 'Syne', border: '3px solid rgba(240,192,64,0.3)', flexShrink: 0, overflow: 'hidden' }}>
-            {user.avatar_url ? <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+          {/* Avatar */}
+          <div style={{
+            width: 76, height: 76, borderRadius: '50%',
+            background: user.avatar_url ? 'transparent' : 'linear-gradient(135deg, var(--brand), #8a2010)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '1.6rem', fontWeight: 800, color: '#fff',
+            fontFamily: 'Syne',
+            border: '3px solid rgba(79, 142, 255, 0.3)',
+            flexShrink: 0, overflow: 'hidden',
+            boxShadow: '0 0 20px rgba(79, 142, 255, 0.2)',
+          }}>
+            {user.avatar_url
+              ? <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : initials}
           </div>
+
+          {/* User info + metrics */}
           <div style={{ flex: 1 }}>
-            <h1 className="font-display" style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.02em' }}>{user.display_name}</h1>
-            <p style={{ margin: '0 0 16px', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>@{user.username}</p>
-            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              <div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 2 }}>Precisión</span>
-                <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--green)' }}>{user.accuracy}%</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 2 }}>Mercados</span>
-                <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{user.markets_traded}</span>
-              </div>
-              <div>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: 2 }}>Predicciones</span>
-                <span className="font-mono" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{user.total_predictions}</span>
-              </div>
+            <h1 className="font-display" style={{
+              margin: '0 0 4px', fontSize: '1.7rem',
+              fontWeight: 800, letterSpacing: '-0.03em',
+            }}>
+              {user.display_name}
+            </h1>
+            <p style={{ margin: '0 0 20px', fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>
+              @{user.username}
+            </p>
+            <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
+              {[
+                { label: 'PRECISIÓN', value: `${user.accuracy}%`, color: 'var(--green)' },
+                { label: 'MERCADOS', value: user.markets_traded.toString(), color: 'var(--text-primary)' },
+                { label: 'PREDICCIONES', value: user.total_predictions.toString(), color: 'var(--blue)' },
+              ].map(metric => (
+                <div key={metric.label}>
+                  <span style={{
+                    fontSize: '0.65rem', color: 'var(--text-tertiary)',
+                    textTransform: 'uppercase', letterSpacing: '0.1em',
+                    display: 'block', marginBottom: 4, fontWeight: 600,
+                  }}>
+                    {metric.label}
+                  </span>
+                  <span className="font-mono" style={{
+                    fontSize: '1.2rem', fontWeight: 800, color: metric.color,
+                  }}>
+                    {metric.value}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Balance + logout */}
           <div className="profile-header-balance" style={{ textAlign: 'right', flexShrink: 0 }}>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Saldo disponible</div>
-            <div className="font-mono" style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+            <div style={{
+              fontSize: '0.65rem', color: 'var(--text-tertiary)',
+              textTransform: 'uppercase', letterSpacing: '0.1em',
+              marginBottom: 6, fontWeight: 600,
+            }}>
+              SALDO DISPONIBLE
+            </div>
+            <div className="font-mono" style={{
+              fontSize: '2.8rem', fontWeight: 800,
+              color: 'var(--gold)', letterSpacing: '-0.04em', lineHeight: 1,
+            }}>
               {Math.floor(user.points).toLocaleString('es-MX')}
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--gold)', opacity: 0.6, marginTop: 2 }}>PT</div>
-            <button onClick={() => { logout(); navigate('/') }} style={{ marginTop: 12, background: 'transparent', border: '1px solid var(--border-default)', borderRadius: 8, padding: '6px 14px', fontSize: '0.75rem', color: 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans' }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--gold)', opacity: 0.5, marginTop: 4, fontWeight: 700 }}>PT</div>
+            <button
+              onClick={() => { logout(); navigate('/') }}
+              style={{
+                marginTop: 16, background: 'transparent',
+                border: '1px solid var(--border-default)',
+                borderRadius: 8, padding: '7px 16px',
+                fontSize: '0.75rem', color: 'var(--text-tertiary)',
+                cursor: 'pointer', fontFamily: 'Plus Jakarta Sans',
+                transition: 'all 0.15s',
+              }}
+            >
               Cerrar sesión
             </button>
           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="anim-2 profile-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 24 }}>
-        <div className="card" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Saldo</div>
-          <div className="font-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--gold)' }}>{Math.floor(user.points).toLocaleString('es-MX')} PT</div>
-        </div>
-        <div className="card" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Invertido</div>
-          <div className="font-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>{Math.floor(totalInvested).toLocaleString('es-MX')} PT</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{positions.length} posiciones abiertas</div>
-        </div>
-        <div className="card" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Exactitud</div>
-          <div className="font-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--green)' }}>{user.accuracy}%</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{user.correct_predictions} / {user.total_predictions} correctas</div>
-        </div>
+      {/* Stats cards */}
+      <div className="anim-2 profile-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+        {[
+          {
+            label: 'SALDO',
+            value: `${Math.floor(user.points).toLocaleString('es-MX')} PT`,
+            sub: null,
+            color: 'var(--gold)',
+            border: 'rgba(255, 208, 96, 0.2)',
+          },
+          {
+            label: 'INVERTIDO',
+            value: `${Math.floor(totalInvested).toLocaleString('es-MX')} PT`,
+            sub: `${positions.length} posiciones abiertas`,
+            color: 'var(--text-primary)',
+            border: 'transparent',
+          },
+          {
+            label: 'EXACTITUD',
+            value: `${user.accuracy}%`,
+            sub: `${user.correct_predictions} / ${user.total_predictions} correctas`,
+            color: 'var(--green)',
+            border: 'rgba(0, 232, 125, 0.2)',
+          },
+        ].map(stat => (
+          <div
+            key={stat.label}
+            className="card"
+            style={{ padding: '22px 24px', borderColor: stat.border !== 'transparent' ? stat.border : undefined }}
+          >
+            <div style={{
+              fontSize: '0.65rem', color: 'var(--text-tertiary)',
+              textTransform: 'uppercase', letterSpacing: '0.1em',
+              marginBottom: 10, fontWeight: 600,
+            }}>
+              {stat.label}
+            </div>
+            <div className="font-mono" style={{ fontSize: '1.6rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+              {stat.value}
+            </div>
+            {stat.sub && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 8 }}>
+                {stat.sub}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* Points chart */}
+      {/* P&L chart */}
       <div className="anim-3 card" style={{ padding: '24px', marginBottom: 24 }}>
-        <h3 className="font-display" style={{ margin: '0 0 20px', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-          Historial de puntos (30 días)
-        </h3>
+        <div className="exchange-header" style={{ marginBottom: 20 }}>
+          Historial de puntos — 30 días
+        </div>
         <FullChart data={pnlHistory} height={160} color="var(--gold)" />
       </div>
 
       {/* Tabs */}
       <div className="anim-4" style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid var(--border-subtle)', paddingBottom: 0 }}>
         {(['posiciones', 'historial'] as const).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} style={{ background: 'transparent', border: 'none', borderBottom: `2px solid ${activeTab === tab ? 'var(--gold)' : 'transparent'}`, padding: '10px 16px', fontSize: '0.85rem', fontWeight: 700, color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'Syne', letterSpacing: '0.05em', textTransform: 'capitalize', transition: 'color 0.15s', marginBottom: -1 }}>
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              background: 'transparent', border: 'none',
+              borderBottom: `2px solid ${activeTab === tab ? 'var(--blue)' : 'transparent'}`,
+              padding: '10px 18px',
+              fontSize: '0.85rem', fontWeight: 700,
+              color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
+              cursor: 'pointer', fontFamily: 'Syne',
+              letterSpacing: '0.05em', textTransform: 'capitalize',
+              transition: 'color 0.15s', marginBottom: -1,
+            }}
+          >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
 
+      {/* Posiciones */}
       {activeTab === 'posiciones' && (
         positions.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {positions.map((pos, i) => (
               <Link key={pos.id} to={`/mercado/${pos.market_id}`} style={{ textDecoration: 'none' }}>
-                <div className={`card anim-${Math.min(i + 1, 6)}`} style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}>
+                <div
+                  className={`card anim-${Math.min(i + 1, 6)}`}
+                  style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}
+                >
                   <div>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: pos.side === 'YES' ? 'var(--green)' : 'var(--red)', background: pos.side === 'YES' ? 'rgba(0,208,132,0.1)' : 'rgba(255,69,96,0.1)', border: `1px solid ${pos.side === 'YES' ? 'rgba(0,208,132,0.2)' : 'rgba(255,69,96,0.2)'}`, padding: '2px 8px', borderRadius: 99 }}>
+                    <span style={{
+                      fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: pos.side === 'YES' ? 'var(--green)' : 'var(--red)',
+                      background: pos.side === 'YES' ? 'rgba(0, 232, 125, 0.1)' : 'rgba(255, 45, 85, 0.1)',
+                      border: `1px solid ${pos.side === 'YES' ? 'rgba(0, 232, 125, 0.25)' : 'rgba(255, 45, 85, 0.25)'}`,
+                      padding: '3px 10px', borderRadius: 99,
+                    }}>
                       {pos.side}
                     </span>
-                    <p style={{ margin: '8px 0 0', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <p style={{ margin: '10px 0 0', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       Mercado: {pos.market_id}
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{pos.shares.toFixed(2)} acciones</div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>costo prom. {pos.avg_cost.toFixed(1)} PT/acción</div>
+                    <div className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      {pos.shares.toFixed(2)} acc.
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
+                      costo prom. {pos.avg_cost.toFixed(1)} PT
+                    </div>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-            <div style={{ fontSize: '2rem', marginBottom: 12 }}>📊</div>
-            <p style={{ fontWeight: 600 }}>Sin posiciones abiertas</p>
-            <Link to="/mercados" style={{ color: 'var(--gold)', textDecoration: 'none', fontSize: '0.875rem' }}>Explorar mercados →</Link>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-secondary)' }}>
+            <div style={{
+              width: 60, height: 60, borderRadius: '50%',
+              background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 18px', fontSize: '1.4rem',
+            }}>📊</div>
+            <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Sin posiciones abiertas</p>
+            <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
+              Explorar mercados →
+            </Link>
           </div>
         )
       )}
 
+      {/* Historial */}
       {activeTab === 'historial' && (
-        <div style={{ color: 'var(--text-secondary)', padding: '40px 0', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: 12 }}>📋</div>
-          <p style={{ fontWeight: 600 }}>Historial completo próximamente</p>
+        <div style={{ color: 'var(--text-secondary)', padding: '60px 0', textAlign: 'center' }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: '50%',
+            background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 18px', fontSize: '1.4rem',
+          }}>📋</div>
+          <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Historial completo próximamente</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>Estamos preparando esta sección.</p>
         </div>
       )}
     </div>

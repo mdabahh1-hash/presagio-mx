@@ -6,7 +6,7 @@ import { SparkChart } from './SparkChart'
 function formatVolume(v: number) {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`
   if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`
-  return v.toFixed(2)
+  return v.toFixed(0)
 }
 
 function useCountdown(endsAt: string) {
@@ -36,16 +36,16 @@ function formatCountdown(diff: number): { text: string; urgent: boolean } {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#c94828',
-  'Economía': '#f0c040',
-  'Deportes': '#00d084',
-  'Global': '#6888ff',
+  'Política MX': '#e0522e',
+  'Economía': '#ffd060',
+  'Deportes': '#00e87d',
+  'Global': '#4f8eff',
   'Tech': '#a060ff',
   'Entretenimiento': '#ff7eb6',
-  'Mundial 2026': '#00d084',
+  'Mundial 2026': '#00e87d',
   'Crypto': '#f7931a',
-  'Mercados Globales': '#6888ff',
-  'México': '#c94828',
+  'Mercados Globales': '#4f8eff',
+  'México': '#e0522e',
 }
 
 interface MarketCardProps {
@@ -57,119 +57,143 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
   const isUp = market.history.length > 1
     ? market.history[market.history.length - 1].price >= market.history[0].price
     : true
-  const catColor = CATEGORY_COLORS[market.category] || '#8888b0'
+  const catColor = CATEGORY_COLORS[market.category] || '#8888cc'
   const diff = useCountdown(market.endsAt)
   const { text: countdownText, urgent } = formatCountdown(diff)
   const isPending = market.status === 'pending_resolution'
+
+  const yesColor = market.yesPrice >= 70
+    ? 'var(--green)'
+    : market.yesPrice <= 30
+    ? 'var(--red)'
+    : 'var(--gold)'
 
   return (
     <Link to={`/mercado/${market.id}`} style={{ textDecoration: 'none' }} className={animClass}>
       <div
         className="card"
         style={{
-          padding: 20, cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column', gap: 14,
-          ...(isPending ? { borderColor: 'var(--gold)', opacity: 0.9 } : {}),
+          padding: '20px 22px',
+          cursor: 'pointer',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14,
+          ...(isPending ? { borderColor: 'rgba(255, 208, 96, 0.4)' } : {}),
         }}
       >
-        {/* Header */}
+        {/* Header row: badges + sparkline */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-            {/* Category + trending + status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: catColor, background: `${catColor}18`, border: `1px solid ${catColor}30`,
-                  padding: '2px 8px', borderRadius: 99,
-                }}
-              >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+            {/* Badges */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
+                textTransform: 'uppercase', color: catColor,
+                background: `${catColor}16`, border: `1px solid ${catColor}35`,
+                padding: '3px 9px', borderRadius: 99,
+              }}>
                 {market.category}
               </span>
               {market.trending && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: 'var(--gold)', background: 'rgba(240, 192, 64, 0.1)',
-                  border: '1px solid rgba(240, 192, 64, 0.2)', padding: '2px 8px', borderRadius: 99,
+                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  textTransform: 'uppercase', color: 'var(--gold)',
+                  background: 'rgba(255, 208, 96, 0.1)',
+                  border: '1px solid rgba(255, 208, 96, 0.25)',
+                  padding: '3px 8px', borderRadius: 99,
                 }}>
-                  ↑ TENDENCIA
+                  ▲ TENDENCIA
                 </span>
               )}
               {isPending && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
-                  color: 'var(--gold)', background: 'rgba(240, 192, 64, 0.12)',
-                  border: '1px solid var(--gold)', padding: '2px 8px', borderRadius: 99,
+                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  textTransform: 'uppercase', color: 'var(--gold)',
+                  background: 'rgba(255, 208, 96, 0.1)',
+                  border: '1px solid var(--gold)',
+                  padding: '3px 8px', borderRadius: 99,
                 }}>
-                  ⏳ PENDIENTE
+                  PENDIENTE
                 </span>
               )}
             </div>
 
             {/* Question */}
-            <p
-              className="font-display"
-              style={{
-                margin: 0, fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)',
-                lineHeight: 1.4, letterSpacing: '-0.01em',
-              }}
-            >
+            <p className="font-display" style={{
+              margin: 0, fontSize: '0.9rem', fontWeight: 600,
+              color: 'var(--text-primary)', lineHeight: 1.4,
+              letterSpacing: '-0.01em',
+            }}>
               {market.question}
             </p>
           </div>
 
           {/* Sparkline */}
-          <div style={{ flexShrink: 0, marginTop: 4 }}>
-            <SparkChart data={market.history.slice(-20)} width={80} height={36} />
+          <div style={{ flexShrink: 0, marginTop: 2 }}>
+            <SparkChart data={market.history.slice(-24)} width={80} height={38} />
           </div>
         </div>
 
-        {/* Probability bar */}
+        {/* Probability display */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
               <span style={{
-                fontSize: '1.25rem', fontWeight: 800, fontFamily: 'JetBrains Mono',
-                color: market.yesPrice > 50 ? 'var(--green)' : market.yesPrice < 30 ? 'var(--red)' : 'var(--gold)',
+                fontSize: '1.6rem', fontWeight: 800,
+                fontFamily: 'JetBrains Mono', color: yesColor,
+                lineHeight: 1, letterSpacing: '-0.02em',
               }}>
                 {market.yesPrice}%
               </span>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>SÍ</span>
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>NO</span>
-              <span style={{ fontSize: '0.875rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-secondary)' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                SÍ
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                NO
+              </span>
+              <span style={{
+                fontSize: '0.95rem', fontWeight: 700,
+                fontFamily: 'JetBrains Mono', color: 'var(--text-secondary)',
+              }}>
                 {100 - market.yesPrice}%
               </span>
-            </span>
+            </div>
           </div>
           <div className="prob-bar-track">
             <div className="prob-bar-fill" style={{ width: `${market.yesPrice}%` }} />
           </div>
         </div>
 
-        {/* Footer stats */}
+        {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+          <div style={{ display: 'flex', gap: 14 }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               Vol{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 500 }}>
-                {formatVolume(market.volume)} PT
+              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+                {formatVolume(market.volume)}
               </span>
             </span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               Liq{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 500 }}>
-                {formatVolume(market.liquidity)} PT
+              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+                {formatVolume(market.liquidity)}
               </span>
             </span>
           </div>
-          {/* Countdown */}
           {isPending ? (
-            <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.68rem', color: 'var(--gold)', fontWeight: 700 }}>
               Esperando resolución
             </span>
           ) : (
-            <span style={{ fontSize: '0.7rem', color: urgent ? 'var(--red)' : 'var(--text-tertiary)', fontWeight: urgent ? 700 : 400, fontFamily: urgent ? 'JetBrains Mono' : undefined }}>
+            <span style={{
+              fontSize: '0.68rem',
+              color: urgent ? 'var(--red)' : 'var(--text-tertiary)',
+              fontWeight: urgent ? 700 : 400,
+              fontFamily: urgent ? 'JetBrains Mono' : undefined,
+            }}>
               {diff > 0 ? '⏱ ' : ''}{countdownText}
             </span>
           )}

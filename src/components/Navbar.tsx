@@ -36,16 +36,29 @@ export function Navbar() {
   return (
     <>
       {/* Ticker bar */}
-      <div className="navbar-ticker" style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', height: 32, overflow: 'hidden', position: 'relative' }}>
-        <div className="fade-left" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 60, zIndex: 2 }} />
-        <div className="fade-right" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 60, zIndex: 2 }} />
+      <div className="navbar-ticker" style={{
+        background: 'var(--bg-base)',
+        borderBottom: '1px solid var(--border-subtle)',
+        height: 34,
+        overflow: 'hidden',
+        position: 'relative',
+      }}>
+        <div className="fade-left" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 80, zIndex: 2 }} />
+        <div className="fade-right" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 80, zIndex: 2 }} />
         <div className="ticker-wrap" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
           <div className="ticker-inner" style={{ gap: 0 }}>
             {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-              <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, paddingRight: 40, fontSize: '0.72rem', fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-secondary)' }}>
-                <span style={{ color: 'var(--text-tertiary)' }}>{item.label}</span>
-                <span style={{ color: item.price > 50 ? 'var(--green)' : 'var(--red)', fontWeight: 600 }}>{item.price}%</span>
-                <span style={{ color: item.change > 0 ? 'var(--green)' : item.change < 0 ? 'var(--red)' : 'var(--text-tertiary)', fontSize: '0.65rem' }}>
+              <span key={i} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                paddingRight: 48, fontSize: '0.72rem',
+                fontFamily: 'JetBrains Mono, monospace',
+              }}>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: '0.65rem', letterSpacing: '0.06em' }}>{item.label}</span>
+                <span style={{ color: item.price > 50 ? 'var(--green)' : 'var(--red)', fontWeight: 700 }}>{item.price}¢</span>
+                <span style={{
+                  color: item.change > 0 ? 'var(--green)' : item.change < 0 ? 'var(--red)' : 'var(--text-tertiary)',
+                  fontSize: '0.65rem', fontWeight: 600,
+                }}>
                   {item.change > 0 ? `+${item.change}` : item.change}
                 </span>
               </span>
@@ -55,18 +68,30 @@ export function Navbar() {
       </div>
 
       {/* Main navbar */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: scrolled ? 'rgba(7, 7, 14, 0.95)' : 'rgba(7, 7, 14, 0.85)', backdropFilter: 'blur(20px)', borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent', transition: 'all 0.3s ease' }}>
-        <div className="navbar-inner" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', gap: 32 }}>
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 100,
+        background: scrolled ? 'rgba(6, 6, 26, 0.97)' : 'rgba(6, 6, 26, 0.88)',
+        backdropFilter: 'blur(24px)',
+        borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent',
+        transition: 'all 0.3s ease',
+      }}>
+        <div className="navbar-inner" style={{
+          maxWidth: 1200, margin: '0 auto', padding: '0 24px',
+          height: 62, display: 'flex', alignItems: 'center', gap: 28,
+        }}>
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <LogoFull />
           </Link>
 
-          {/* Hamburger button — hidden on desktop via CSS, shown on mobile */}
+          {/* Hamburger — hidden on desktop */}
           <button
             className="navbar-hamburger"
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Menú"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--text-primary)', display: 'none' }}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              padding: '8px', color: 'var(--text-primary)', display: 'none',
+            }}
           >
             {menuOpen ? (
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -82,31 +107,67 @@ export function Navbar() {
             )}
           </button>
 
-          {/* Desktop nav links — hidden on mobile via CSS */}
-          <div className="navbar-links" style={{ display: 'flex', gap: 4, flex: 1 }}>
+          {/* Desktop nav links */}
+          <div className="navbar-links" style={{ display: 'flex', gap: 2, flex: 1 }}>
             {navLinks.map(link => (
-              <Link key={link.to} to={link.to} style={{ textDecoration: 'none', padding: '6px 14px', borderRadius: 8, fontSize: '0.875rem', fontWeight: 500, color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)', background: isActive(link.to) ? 'var(--bg-elevated)' : 'transparent', transition: 'all 0.15s' }}>
+              <Link
+                key={link.to}
+                to={link.to}
+                style={{
+                  textDecoration: 'none', padding: '7px 16px', borderRadius: 8,
+                  fontSize: '0.875rem', fontWeight: 600,
+                  color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  background: isActive(link.to) ? 'rgba(79, 142, 255, 0.1)' : 'transparent',
+                  border: `1px solid ${isActive(link.to) ? 'rgba(79, 142, 255, 0.2)' : 'transparent'}`,
+                  transition: 'all 0.15s',
+                  letterSpacing: '-0.01em',
+                }}
+              >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          {/* Desktop user section — hidden on mobile via CSS */}
+          {/* Desktop user section */}
           <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {user ? (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 8, padding: '6px 12px' }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 600, letterSpacing: '0.08em' }}>PT</span>
-                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                {/* Live indicator */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div className="live-dot" />
+                  <span style={{ fontSize: '0.65rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.1em' }}>EN VIVO</span>
+                </div>
+
+                {/* Points badge */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 10, padding: '7px 14px',
+                }}>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, letterSpacing: '0.1em' }}>PT</span>
+                  <span style={{
+                    fontFamily: 'JetBrains Mono', fontSize: '0.9rem',
+                    fontWeight: 700, color: 'var(--text-primary)',
+                  }}>
                     {Math.floor(user.points).toLocaleString('es-MX')}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div className="live-dot" />
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>EN VIVO</span>
-                </div>
+
+                {/* Avatar */}
                 <Link to="/perfil" style={{ textDecoration: 'none' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, var(--brand), #7a1a08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#fff', fontFamily: 'Syne', cursor: 'pointer', border: location.pathname === '/perfil' ? '2px solid var(--gold)' : '2px solid transparent', transition: 'border-color 0.15s' }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--brand), #8a2010)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.75rem', fontWeight: 800, color: '#fff',
+                    fontFamily: 'Syne', cursor: 'pointer',
+                    border: location.pathname === '/perfil'
+                      ? '2px solid var(--blue)'
+                      : '2px solid rgba(79, 142, 255, 0.2)',
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
+                    boxShadow: location.pathname === '/perfil' ? '0 0 12px rgba(79, 142, 255, 0.4)' : 'none',
+                  }}>
                     {initials}
                   </div>
                 </Link>
@@ -114,12 +175,24 @@ export function Navbar() {
             ) : (
               <div style={{ display: 'flex', gap: 8 }}>
                 <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
-                  <button style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', borderRadius: 8, padding: '8px 14px', fontSize: '0.8rem', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600, letterSpacing: '0.04em' }}>
+                  <button style={{
+                    background: 'var(--bg-elevated)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
+                    color: 'var(--text-secondary)', cursor: 'pointer',
+                    fontFamily: 'Syne', fontWeight: 600, letterSpacing: '0.03em',
+                    transition: 'all 0.15s',
+                  }}>
                     Google
                   </button>
                 </a>
                 <a href={authApi.githubUrl()} style={{ textDecoration: 'none' }}>
-                  <button style={{ background: 'var(--brand)', border: 'none', borderRadius: 8, padding: '8px 14px', fontSize: '0.8rem', color: '#fff', cursor: 'pointer', fontFamily: 'Syne', fontWeight: 700, letterSpacing: '0.04em' }}>
+                  <button style={{
+                    background: 'var(--brand)', border: 'none',
+                    borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
+                    color: '#fff', cursor: 'pointer', fontFamily: 'Syne',
+                    fontWeight: 700, letterSpacing: '0.03em',
+                  }}>
                     GitHub
                   </button>
                 </a>
@@ -129,13 +202,13 @@ export function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile drawer — only rendered when menuOpen */}
+      {/* Mobile drawer */}
       {menuOpen && (
         <div style={{
-          position: 'fixed', top: 60, left: 0, right: 0, bottom: 0,
-          background: 'rgba(7,7,14,0.97)', backdropFilter: 'blur(16px)',
+          position: 'fixed', top: 96, left: 0, right: 0, bottom: 0,
+          background: 'rgba(6, 6, 26, 0.98)', backdropFilter: 'blur(20px)',
           zIndex: 99, display: 'flex', flexDirection: 'column',
-          padding: '24px 20px', gap: 8,
+          padding: '20px 20px', gap: 6,
           borderTop: '1px solid var(--border-subtle)',
           overflowY: 'auto',
         }}>
@@ -145,11 +218,11 @@ export function Navbar() {
               to={link.to}
               onClick={() => setMenuOpen(false)}
               style={{
-                textDecoration: 'none', padding: '14px 16px', borderRadius: 10,
-                fontSize: '1rem', fontWeight: 600,
+                textDecoration: 'none', padding: '14px 18px', borderRadius: 12,
+                fontSize: '1rem', fontWeight: 700, fontFamily: 'Syne',
                 color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                background: isActive(link.to) ? 'var(--bg-elevated)' : 'transparent',
-                borderBottom: '1px solid var(--border-subtle)',
+                background: isActive(link.to) ? 'rgba(79, 142, 255, 0.1)' : 'transparent',
+                border: `1px solid ${isActive(link.to) ? 'rgba(79, 142, 255, 0.2)' : 'var(--border-subtle)'}`,
               }}
             >
               {link.label}
@@ -159,13 +232,13 @@ export function Navbar() {
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
             {user ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div className="avatar">{initials}</div>
                   <div>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Syne' }}>
                       {user.display_name}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 700 }}>
                       {Math.floor(user.points).toLocaleString('es-MX')} PT
                     </div>
                   </div>
@@ -174,9 +247,10 @@ export function Navbar() {
                   to="/perfil"
                   onClick={() => setMenuOpen(false)}
                   style={{
-                    textDecoration: 'none', padding: '12px 16px', borderRadius: 10,
+                    textDecoration: 'none', padding: '13px 18px', borderRadius: 12,
                     fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)',
                     background: 'var(--bg-elevated)', textAlign: 'center',
+                    border: '1px solid var(--border-default)',
                   }}
                 >
                   Mi perfil
@@ -185,7 +259,7 @@ export function Navbar() {
                   onClick={() => { logout(); setMenuOpen(false) }}
                   style={{
                     background: 'transparent', border: '1px solid var(--border-subtle)',
-                    borderRadius: 10, padding: '12px 16px', fontSize: '0.875rem',
+                    borderRadius: 12, padding: '13px 18px', fontSize: '0.875rem',
                     color: 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans',
                   }}
                 >
@@ -197,7 +271,7 @@ export function Navbar() {
                 <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
                   <button style={{
                     width: '100%', background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-default)', borderRadius: 10,
+                    border: '1px solid var(--border-default)', borderRadius: 12,
                     padding: '14px', fontSize: '0.9rem', color: 'var(--text-primary)',
                     cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
                   }}>
@@ -207,7 +281,7 @@ export function Navbar() {
                 <a href={authApi.githubUrl()} style={{ textDecoration: 'none' }}>
                   <button style={{
                     width: '100%', background: 'var(--brand)', border: 'none',
-                    borderRadius: 10, padding: '14px', fontSize: '0.9rem',
+                    borderRadius: 12, padding: '14px', fontSize: '0.9rem',
                     color: '#fff', cursor: 'pointer', fontFamily: 'Syne', fontWeight: 700,
                   }}>
                     Entrar con GitHub
