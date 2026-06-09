@@ -12,10 +12,13 @@ function formatVolume(v: number) {
   return v.toFixed(0)
 }
 
-function daysLeft(endsAt: string) {
+function daysLeft(endsAt: string, status?: string) {
+  if (status === 'resolved_yes' || status === 'resolved_no') return 'Resuelto'
+  if (status === 'closed') return 'Cerrado'
+  if (status === 'pending_resolution') return 'Pendiente'
   const diff = new Date(endsAt).getTime() - Date.now()
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days < 0) return 'Resuelto'
+  if (days < 0) return 'Cerrado'
   if (days === 0) return 'Hoy'
   if (days === 1) return '1 día'
   return `${days} días`
@@ -292,7 +295,7 @@ export function MarketDetail() {
             {[
               { label: 'Volumen', value: formatVolume(volume), unit: 'PT', color: 'var(--text-primary)' },
               { label: 'Operaciones', value: market.num_trades.toString(), unit: '', color: 'var(--text-primary)' },
-              { label: 'Cierre', value: daysLeft(market.ends_at), unit: '', color: 'var(--gold)' },
+              { label: 'Cierre', value: daysLeft(market.ends_at, market.status), unit: '', color: 'var(--gold)' },
               { label: 'Comentarios', value: comments.length.toString(), unit: '', color: 'var(--text-primary)' },
             ].map(stat => (
               <div key={stat.label} className="stat-card" style={{ textAlign: 'center' }}>
