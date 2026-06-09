@@ -16,8 +16,11 @@ export function Profile() {
     if (!user) return
     usersApi.myPositions().then(setPositions).catch(() => {})
     usersApi.pointsHistory()
-      .then(data => setPointsHistory(data.map(d => ({ date: d.date, price: d.price }))))
-      .catch(() => {})
+      .then(data => {
+        console.log('pointsHistory raw:', data)
+        setPointsHistory(data.map(d => ({ date: d.date, price: d.price })))
+      })
+      .catch(err => console.error('pointsHistory error:', err))
   }, [user])
 
   if (!user) {
