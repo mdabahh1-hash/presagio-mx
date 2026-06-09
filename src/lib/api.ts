@@ -120,12 +120,25 @@ export interface ApiUser {
   created_at: string
 }
 
+export interface ApiPosition {
+  id: number
+  market_id: string
+  market_question: string
+  side: string
+  shares: number
+  avg_cost: number
+  updated_at: string
+}
+
+export interface ApiPointsHistory {
+  date: string
+  price: number
+}
+
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
-  myPositions: () =>
-    request<{ id: number; market_id: string; side: string; shares: number; avg_cost: number; updated_at: string }[]>(
-      '/users/me/positions'
-    ),
+  myPositions: () => request<ApiPosition[]>('/users/me/positions'),
+  pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
   update: (data: { display_name?: string; username?: string }) =>
     request<ApiUser>('/users/me', { method: 'PATCH', body: JSON.stringify(data) }),
   get: (username: string) => request<ApiUser>(`/users/${username}`),

@@ -1,28 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { usersApi } from '../lib/api'
+import { usersApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
 import type { PricePoint } from '../types'
 
-interface UserPosition {
-  id: number
-  market_id: string
-  side: string
-  shares: number
-  avg_cost: number
-  updated_at: string
-}
-
 export function Profile() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const [positions, setPositions] = useState<UserPosition[]>([])
+  const [positions, setPositions] = useState<ApiPosition[]>([])
+  const [pointsHistory, setPointsHistory] = useState<PricePoint[]>([])
   const [activeTab, setActiveTab] = useState<'posiciones' | 'historial'>('posiciones')
 
   useEffect(() => {
     if (!user) return
     usersApi.myPositions().then(setPositions).catch(() => {})
+    usersApi.pointsHistory()
+      .then(data => setPointsHistory(data.map(d => ({ date: d.date, price: d.price }))))
+      .catch(() => {})
   }, [user])
 
   if (!user) {
@@ -58,10 +53,6 @@ export function Profile() {
 
   const initials = user.display_name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
-  const pnlHistory: PricePoint[] = Array.from({ length: 30 }, (_, i) => ({
-    date: new Date(Date.now() - (29 - i) * 86400000).toISOString().slice(0, 10),
-    price: user.points * (0.85 + i * 0.005 + Math.random() * 0.02),
-  }))
 
   const totalInvested = positions.reduce((s, p) => s + p.avg_cost * p.shares, 0)
 
@@ -214,7 +205,7 @@ export function Profile() {
         <div className="exchange-header" style={{ marginBottom: 20 }}>
           Historial de puntos — 30 días
         </div>
-        <FullChart data={pnlHistory} height={160} color="var(--gold)" />
+        <FullChart data={pointsHistory} height={160} color="var(--gold)" />
       </div>
 
       {/* Tabs */}
@@ -261,7 +252,7 @@ export function Profile() {
                       {pos.side}
                     </span>
                     <p style={{ margin: '10px 0 0', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                      Mercado: {pos.market_id}
+                      {pos.market_question}
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
