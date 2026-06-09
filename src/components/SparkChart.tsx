@@ -81,8 +81,8 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
   const { path, area, lineColor, ticks } = useMemo(() => {
     if (data.length < 2) return { path: '', area: '', lineColor: '#00e87d', isUp: true, ticks: [] }
     const prices = data.map(d => d.price)
-    const minP = Math.max(0, Math.min(...prices) - 5)
-    const maxP = Math.min(100, Math.max(...prices) + 5)
+    const minP = Math.max(0, Math.min(...prices) * 0.95)
+    const maxP = Math.max(...prices) * 1.05
     const range = maxP - minP || 1
 
     const padL = 40
@@ -107,7 +107,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
 
     const tickValues = [minP, (minP + maxP) / 2, maxP].map(v => ({
       y: toY(v).toFixed(1),
-      label: `${Math.round(v)}%`,
+      label: `${Math.round(v)}`,
     }))
 
     const step = Math.max(1, Math.floor(data.length / 6))
