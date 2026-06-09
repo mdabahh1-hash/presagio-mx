@@ -16,7 +16,7 @@ export function Logo({ size = 28, className = '' }: LogoProps) {
       className={className}
     >
       <path
-        d="M10 8 L46 90 L90 24"
+        d="M10 24 L46 90 L90 8"
         stroke="#FFD700"
         strokeWidth="17"
         strokeLinecap="butt"
