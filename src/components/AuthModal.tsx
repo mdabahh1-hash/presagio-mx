@@ -68,7 +68,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
           width: '100%',
           maxWidth: 400,
           position: 'relative',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(79,142,255,0.1)',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,215,0,0.08)',
         }}
       >
         {/* Top accent */}
@@ -104,7 +104,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
           </div>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
             {mode === 'login'
-              ? 'Entra con tu cuenta de Presagio'
+              ? 'Entra con tu cuenta VEREDIKT'
               : 'Únete a la plataforma de predicciones'}
           </div>
         </div>
@@ -128,7 +128,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                 borderRadius: 9, cursor: 'pointer',
                 fontSize: '0.8rem', fontWeight: 700,
                 color: mode === m ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                fontFamily: 'Syne', letterSpacing: '0.02em',
+                fontFamily: 'DM Sans', letterSpacing: '0.02em',
                 transition: 'all 0.15s',
               }}
             >
@@ -222,11 +222,11 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               border: loading ? '1px solid var(--border-default)' : 'none',
               borderRadius: 12, padding: '13px',
               fontSize: '0.9rem', fontWeight: 700,
-              color: loading ? 'var(--text-tertiary)' : '#fff',
+              color: loading ? 'var(--text-tertiary)' : '#07071A',
               cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: 'Syne', letterSpacing: '0.03em',
+              fontFamily: 'DM Sans', letterSpacing: '0.03em',
               transition: 'all 0.15s',
-              boxShadow: loading ? 'none' : '0 4px 20px rgba(79, 142, 255, 0.35)',
+              boxShadow: loading ? 'none' : '0 4px 20px rgba(255, 215, 0, 0.25)',
             }}
           >
             {loading ? 'Cargando...' : mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
@@ -249,7 +249,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               width: '100%', background: 'var(--bg-elevated)',
               border: '1px solid var(--border-default)', borderRadius: 12,
               padding: '11px 10px', fontSize: '0.82rem', color: 'var(--text-primary)',
-              cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               transition: 'all 0.15s',
             }}>
@@ -267,7 +267,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               width: '100%', background: 'var(--bg-elevated)',
               border: '1px solid var(--border-default)', borderRadius: 12,
               padding: '11px 10px', fontSize: '0.82rem', color: 'var(--text-primary)',
-              cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
               transition: 'all 0.15s',
             }}>

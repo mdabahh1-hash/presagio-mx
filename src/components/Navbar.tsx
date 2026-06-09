@@ -53,7 +53,7 @@ export function Navbar() {
               <span key={i} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 paddingRight: 48, fontSize: '0.72rem',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: "'DM Mono', monospace",
               }}>
                 <span style={{ color: 'var(--text-tertiary)', fontSize: '0.65rem', letterSpacing: '0.06em' }}>{item.label}</span>
                 <span style={{ color: item.price > 50 ? 'var(--green)' : 'var(--red)', fontWeight: 700 }}>{item.price}¢</span>
@@ -91,8 +91,8 @@ export function Navbar() {
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Menú"
             style={{
-              background: menuOpen ? 'rgba(79,142,255,0.1)' : 'none',
-              border: menuOpen ? '1px solid rgba(79,142,255,0.2)' : '1px solid transparent',
+              background: menuOpen ? 'rgba(255,215,0,0.08)' : 'none',
+              border: menuOpen ? '1px solid rgba(255,215,0,0.20)' : '1px solid transparent',
               borderRadius: 8,
               cursor: 'pointer',
               padding: '8px', color: 'var(--text-primary)', display: 'none',
@@ -123,8 +123,8 @@ export function Navbar() {
                   textDecoration: 'none', padding: '7px 16px', borderRadius: 8,
                   fontSize: '0.875rem', fontWeight: 600,
                   color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: isActive(link.to) ? 'rgba(79, 142, 255, 0.1)' : 'transparent',
-                  border: `1px solid ${isActive(link.to) ? 'rgba(79, 142, 255, 0.2)' : 'transparent'}`,
+                  background: isActive(link.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
+                  border: `1px solid ${isActive(link.to) ? 'rgba(255,215,0,0.20)' : 'transparent'}`,
                   transition: 'all 0.15s',
                   letterSpacing: '-0.01em',
                 }}
@@ -149,20 +149,20 @@ export function Navbar() {
                   borderRadius: 10, padding: '7px 14px',
                 }}>
                   <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, letterSpacing: '0.1em' }}>PT</span>
-                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                     {Math.floor(user.points).toLocaleString('es-MX')}
                   </span>
                 </div>
                 <Link to="/perfil" style={{ textDecoration: 'none' }}>
                   <div style={{
                     width: 36, height: 36, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--brand), #8a2010)',
+                    background: 'linear-gradient(135deg, #FFD700, #cc9900)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.75rem', fontWeight: 800, color: '#fff',
-                    fontFamily: 'Syne', cursor: 'pointer',
-                    border: location.pathname === '/perfil' ? '2px solid var(--blue)' : '2px solid rgba(79, 142, 255, 0.2)',
+                    fontSize: '0.75rem', fontWeight: 800, color: '#07071A',
+                    fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
+                    border: location.pathname === '/perfil' ? '2px solid var(--oro)' : '2px solid rgba(255,215,0,0.20)',
                     transition: 'border-color 0.15s, box-shadow 0.15s',
-                    boxShadow: location.pathname === '/perfil' ? '0 0 12px rgba(79, 142, 255, 0.4)' : 'none',
+                    boxShadow: location.pathname === '/perfil' ? '0 0 12px rgba(255,215,0,0.35)' : 'none',
                   }}>
                     {initials}
                   </div>
@@ -177,7 +177,7 @@ export function Navbar() {
                     border: '1px solid var(--border-default)',
                     borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
                     color: 'var(--text-secondary)', cursor: 'pointer',
-                    fontFamily: 'Syne', fontWeight: 600, letterSpacing: '0.03em',
+                    fontFamily: "'DM Sans', sans-serif", fontWeight: 600, letterSpacing: '0.03em',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -186,12 +186,12 @@ export function Navbar() {
                 <button
                   onClick={() => setAuthModal('register')}
                   style={{
-                    background: 'var(--blue)',
+                    background: 'var(--oro)',
                     border: 'none',
                     borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
-                    color: '#fff', cursor: 'pointer', fontFamily: 'Syne',
+                    color: '#07071A', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 700, letterSpacing: '0.03em',
-                    boxShadow: '0 2px 12px rgba(79,142,255,0.3)',
+                    boxShadow: '0 2px 12px rgba(255,215,0,0.25)',
                     transition: 'opacity 0.15s',
                   }}
                 >
@@ -232,10 +232,10 @@ export function Navbar() {
                   textDecoration: 'none',
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '14px 16px', borderRadius: 12, marginBottom: 4,
-                  fontSize: '1rem', fontWeight: 700, fontFamily: 'Syne',
+                  fontSize: '1rem', fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
                   color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: isActive(link.to) ? 'rgba(79,142,255,0.1)' : 'transparent',
-                  border: `1px solid ${isActive(link.to) ? 'rgba(79,142,255,0.25)' : 'transparent'}`,
+                  background: isActive(link.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
+                  border: `1px solid ${isActive(link.to) ? 'rgba(255,215,0,0.20)' : 'transparent'}`,
                 }}
               >
                 {link.to === '/' ? (
@@ -278,18 +278,18 @@ export function Navbar() {
                 }}>
                   <div style={{
                     width: 46, height: 46, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, var(--brand), #8a2010)',
+                    background: 'linear-gradient(135deg, #FFD700, #cc9900)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.9rem', fontWeight: 800, color: '#fff', fontFamily: 'Syne',
-                    border: '2px solid rgba(79,142,255,0.25)',
+                    fontSize: '0.9rem', fontWeight: 800, color: '#07071A', fontFamily: "'DM Sans', sans-serif",
+                    border: '2px solid rgba(255,215,0,0.35)',
                   }}>
                     {initials}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'Syne', marginBottom: 3 }}>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'DM Sans', sans-serif", marginBottom: 3 }}>
                       {user.display_name}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 700 }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--gold)', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>
                       {Math.floor(user.points).toLocaleString('es-MX')} PT
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export function Navbar() {
                     padding: '15px', borderRadius: 12,
                     fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)',
                     background: 'var(--bg-card)', border: '1px solid var(--border-default)',
-                    fontFamily: 'Syne',
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -319,7 +319,7 @@ export function Navbar() {
                     background: 'transparent', border: '1px solid var(--border-subtle)',
                     borderRadius: 12, padding: '14px', fontSize: '0.875rem',
                     color: 'var(--text-tertiary)', cursor: 'pointer',
-                    fontFamily: 'Syne', fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
                   }}
                 >
                   Cerrar sesión
@@ -339,12 +339,12 @@ export function Navbar() {
                 <button
                   onClick={() => { setMenuOpen(false); setAuthModal('register') }}
                   style={{
-                    background: 'var(--blue)', border: 'none',
+                    background: 'var(--oro)', border: 'none',
                     borderRadius: 14, padding: '16px',
-                    fontSize: '0.95rem', fontWeight: 800, color: '#fff',
-                    cursor: 'pointer', fontFamily: 'Syne',
+                    fontSize: '0.95rem', fontWeight: 800, color: '#07071A',
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    boxShadow: '0 4px 20px rgba(79,142,255,0.35)',
+                    boxShadow: '0 4px 20px rgba(255,215,0,0.25)',
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -361,7 +361,7 @@ export function Navbar() {
                     border: '1px solid var(--border-default)',
                     borderRadius: 14, padding: '15px',
                     fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)',
-                    cursor: 'pointer', fontFamily: 'Syne',
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
                   Ya tengo cuenta — Iniciar sesión
@@ -380,7 +380,7 @@ export function Navbar() {
                     width: '100%', background: 'var(--bg-card)',
                     border: '1px solid var(--border-default)', borderRadius: 14,
                     padding: '15px', fontSize: '0.9rem', color: 'var(--text-primary)',
-                    cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                   }}>
                     <svg viewBox="0 0 24 24" width="18" height="18">
@@ -397,7 +397,7 @@ export function Navbar() {
                     width: '100%', background: 'var(--bg-card)',
                     border: '1px solid var(--border-default)', borderRadius: 14,
                     padding: '15px', fontSize: '0.9rem', color: 'var(--text-primary)',
-                    cursor: 'pointer', fontFamily: 'Syne', fontWeight: 600,
+                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                   }}>
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">

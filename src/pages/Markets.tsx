@@ -15,10 +15,10 @@ const SORT_OPTIONS = [
   { value: 'ending', label: 'Cierra pronto' },
 ]
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#e0522e', 'Economía': '#ffd060', 'Deportes': '#00e87d',
-  'Global': '#4f8eff', 'Tech': '#a060ff',
-  'Mundial 2026': '#00e87d', 'Crypto': '#f7931a',
-  'Mercados Globales': '#4f8eff', 'México': '#e0522e',
+  'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
+  'Global': '#a0c4ff', 'Tech': '#a060ff',
+  'Mundial 2026': '#00FF88', 'Crypto': '#f7931a',
+  'Mercados Globales': '#a0c4ff', 'México': '#FFD700',
 }
 
 function apiToMarket(m: ApiMarket): Market {
@@ -100,7 +100,7 @@ export function Markets() {
             <span style={{ color: 'var(--text-tertiary)' }}>Cargando...</span>
           ) : (
             <>
-              <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'JetBrains Mono' }}>{markets.length}</span>
+              <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'DM Mono' }}>{markets.length}</span>
               {' '}mercados activos · Actualizado en tiempo real
             </>
           )}
@@ -137,7 +137,7 @@ export function Markets() {
                 flex: 1, background: 'transparent', border: 'none',
                 outline: 'none', padding: '13px 14px',
                 fontSize: '0.875rem', color: 'var(--text-primary)',
-                fontFamily: 'Plus Jakarta Sans',
+                fontFamily: 'DM Sans',
               }}
             />
             {searchInput && (
@@ -166,14 +166,14 @@ export function Markets() {
                   onClick={() => handleCategoryClick(cat)}
                   style={{
                     background: isActive
-                      ? cat === 'Todos' ? 'rgba(79, 142, 255, 0.12)' : `${color}15`
+                      ? cat === 'Todos' ? 'rgba(255, 215, 0, 0.12)' : `${color}15`
                       : 'transparent',
                     border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
                     borderRadius: 99, padding: '7px 14px',
                     fontSize: '0.78rem', fontWeight: 600,
                     color: isActive ? color : 'var(--text-tertiary)',
                     cursor: 'pointer', transition: 'all 0.15s',
-                    fontFamily: 'Plus Jakarta Sans',
+                    fontFamily: 'DM Sans',
                   }}
                 >
                   {cat}
@@ -190,7 +190,7 @@ export function Markets() {
               borderRadius: 10, padding: '9px 14px',
               fontSize: '0.8rem', color: 'var(--text-secondary)',
               outline: 'none', cursor: 'pointer',
-              fontFamily: 'Plus Jakarta Sans',
+              fontFamily: 'DM Sans',
             }}
           >
             {SORT_OPTIONS.map(opt => (
@@ -209,7 +209,7 @@ export function Markets() {
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 99, padding: '3px 10px',
-            fontFamily: 'JetBrains Mono',
+            fontFamily: 'DM Mono',
           }}>
             {markets.length} resultado{markets.length !== 1 ? 's' : ''}
           </span>

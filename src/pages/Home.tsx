@@ -7,10 +7,10 @@ import type { Category, Market } from '../types'
 
 const CATEGORIES: Category[] = ['Política MX', 'Economía', 'Deportes', 'Global', 'Tech']
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#e0522e',
-  'Economía': '#ffd060',
-  'Deportes': '#00e87d',
-  'Global': '#4f8eff',
+  'Política MX': '#FFD700',
+  'Economía': '#FFD700',
+  'Deportes': '#00FF88',
+  'Global': '#a0c4ff',
   'Tech': '#a060ff',
 }
 
@@ -18,14 +18,14 @@ const MOBILE_TABS = ['Todos', 'Tendencia', 'Política MX', 'Economía', 'Deporte
 type MobileTab = typeof MOBILE_TABS[number]
 
 const MOBILE_TAB_COLORS: Record<string, string> = {
-  'Tendencia': '#ffd060',
-  'Política MX': '#e0522e',
-  'Economía': '#ffd060',
-  'Deportes': '#00e87d',
-  'Mundial 2026': '#00e87d',
+  'Tendencia': '#FFD700',
+  'Política MX': '#FFD700',
+  'Economía': '#FFD700',
+  'Deportes': '#00FF88',
+  'Mundial 2026': '#00FF88',
   'Crypto': '#f7931a',
   'Tech': '#a060ff',
-  'Global': '#4f8eff',
+  'Global': '#a0c4ff',
 }
 
 const STATIC_STATS = [
@@ -125,7 +125,7 @@ export function Home() {
                   flex: 1, background: 'transparent', border: 'none',
                   outline: 'none', padding: '11px 12px',
                   fontSize: '0.9rem', color: 'var(--text-primary)',
-                  fontFamily: 'Plus Jakarta Sans',
+                  fontFamily: 'DM Sans',
                 }}
               />
               {search && (
@@ -149,12 +149,12 @@ export function Home() {
                   onClick={() => setMobileTab(tab)}
                   style={{
                     flexShrink: 0,
-                    background: isActive ? (tab === 'Todos' ? 'rgba(79,142,255,0.15)' : `${color}18`) : 'transparent',
+                    background: isActive ? (tab === 'Todos' ? 'rgba(255,215,0,0.12)' : `${color}18`) : 'transparent',
                     border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
                     borderRadius: 99, padding: '7px 14px',
                     fontSize: '0.8rem', fontWeight: 700,
                     color: isActive ? color : 'var(--text-secondary)',
-                    cursor: 'pointer', fontFamily: 'Syne',
+                    cursor: 'pointer', fontFamily: 'DM Sans',
                     whiteSpace: 'nowrap',
                     transition: 'all 0.15s',
                   }}
@@ -201,7 +201,7 @@ export function Home() {
           position: 'absolute', top: '40%', left: '50%',
           transform: 'translate(-50%, -60%)',
           width: 700, height: 400,
-          background: 'radial-gradient(ellipse, rgba(79, 142, 255, 0.1) 0%, rgba(224, 82, 46, 0.07) 50%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(255, 215, 0, 0.07) 0%, rgba(0, 255, 136, 0.04) 50%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
@@ -258,13 +258,13 @@ export function Home() {
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
                 padding: '16px 16px', fontSize: '0.9rem',
-                color: 'var(--text-primary)', fontFamily: 'Plus Jakarta Sans',
+                color: 'var(--text-primary)', fontFamily: 'DM Sans',
               }}
             />
             <button type="submit" style={{
-              background: 'var(--brand)', border: 'none',
-              padding: '16px 22px', color: '#fff',
-              fontFamily: 'Syne', fontWeight: 700,
+              background: 'var(--oro)', border: 'none',
+              padding: '16px 22px', color: '#07071A',
+              fontFamily: 'DM Sans', fontWeight: 700,
               fontSize: '0.78rem', letterSpacing: '0.08em',
               cursor: 'pointer', flexShrink: 0,
             }}>
@@ -335,16 +335,16 @@ export function Home() {
           <Link to={`/mercado/${featured.id}`} style={{ textDecoration: 'none' }}>
             <div className="card" style={{
               padding: '32px 36px',
-              background: 'linear-gradient(135deg, rgba(224, 82, 46, 0.07) 0%, var(--bg-card) 60%)',
-              borderColor: 'rgba(224, 82, 46, 0.25)',
+              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.06) 0%, var(--bg-card) 60%)',
+              borderColor: 'rgba(255, 215, 0, 0.20)',
               cursor: 'pointer',
             }}>
               <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                 <span style={{
                   fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em',
                   textTransform: 'uppercase', color: 'var(--brand)',
-                  background: 'rgba(224, 82, 46, 0.12)',
-                  border: '1px solid rgba(224, 82, 46, 0.3)',
+                  background: 'rgba(255, 215, 0, 0.10)',
+                  border: '1px solid rgba(255, 215, 0, 0.25)',
                   padding: '3px 10px', borderRadius: 99,
                 }}>
                   {featured.category}
@@ -365,7 +365,7 @@ export function Home() {
                   <div>
                     <div style={{
                       fontSize: '3.5rem', fontWeight: 800,
-                      fontFamily: 'JetBrains Mono',
+                      fontFamily: 'DM Mono',
                       color: featured.yesPrice > 50 ? 'var(--green)' : featured.yesPrice < 35 ? 'var(--red)' : 'var(--gold)',
                       lineHeight: 1, letterSpacing: '-0.04em',
                     }}>
@@ -377,7 +377,7 @@ export function Home() {
                   </div>
                   <div style={{ width: 1, height: 56, background: 'var(--border-subtle)' }} />
                   <div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-primary)', lineHeight: 1 }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-primary)', lineHeight: 1 }}>
                       {(featured.volume / 1000).toFixed(0)}K
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 6, fontWeight: 600, letterSpacing: '0.06em' }}>
@@ -431,7 +431,7 @@ export function Home() {
       }}>
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse at 30% 50%, rgba(79, 142, 255, 0.07) 0%, rgba(224, 82, 46, 0.05) 50%, transparent 70%)',
+          background: 'radial-gradient(ellipse at 30% 50%, rgba(255, 215, 0, 0.06) 0%, rgba(0, 255, 136, 0.03) 50%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div style={{ position: 'relative' }}>
@@ -453,12 +453,12 @@ export function Home() {
           </p>
           <a href="/api/auth/google" style={{ textDecoration: 'none' }}>
             <button style={{
-              background: 'linear-gradient(135deg, var(--brand), #b03018)',
+              background: 'var(--oro)',
               border: 'none', padding: '16px 40px',
-              color: '#fff', fontFamily: 'Syne', fontWeight: 800,
+              color: '#07071A', fontFamily: 'DM Sans', fontWeight: 800,
               fontSize: '0.9rem', letterSpacing: '0.08em',
               borderRadius: 12, cursor: 'pointer',
-              boxShadow: '0 8px 32px rgba(224, 82, 46, 0.3)',
+              boxShadow: '0 8px 32px rgba(255, 215, 0, 0.25)',
             }}>
               REGISTRARSE CON GOOGLE →
             </button>

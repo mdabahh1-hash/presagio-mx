@@ -185,7 +185,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
         {/* Y axis labels */}
         {(ticks as any)?.y?.map((t: any) => (
           <text key={t.label} x="36" y={Number(t.y) + 4} textAnchor="end"
-            fill="var(--text-tertiary)" fontSize="10" fontFamily="JetBrains Mono">
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">
             {t.label}
           </text>
         ))}
@@ -193,7 +193,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
         {/* X axis labels */}
         {(ticks as any)?.x?.map((t: any) => (
           <text key={t.x} x={t.x} y={height - 6} textAnchor="middle"
-            fill="var(--text-tertiary)" fontSize="10" fontFamily="JetBrains Mono">
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">
             {t.label}
           </text>
         ))}

@@ -1,15 +1,15 @@
 const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
 function getToken(): string | null {
-  return localStorage.getItem('presagio_token')
+  return localStorage.getItem('veredikt_token')
 }
 
 export function setToken(token: string) {
-  localStorage.setItem('presagio_token', token)
+  localStorage.setItem('veredikt_token', token)
 }
 
 export function clearToken() {
-  localStorage.removeItem('presagio_token')
+  localStorage.removeItem('veredikt_token')
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {

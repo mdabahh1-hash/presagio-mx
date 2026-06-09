@@ -36,16 +36,16 @@ function formatCountdown(diff: number): { text: string; urgent: boolean } {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#e0522e',
-  'Economía': '#ffd060',
-  'Deportes': '#00e87d',
-  'Global': '#4f8eff',
+  'Política MX': '#FFD700',
+  'Economía': '#FFD700',
+  'Deportes': '#00FF88',
+  'Global': '#a0c4ff',
   'Tech': '#a060ff',
   'Entretenimiento': '#ff7eb6',
-  'Mundial 2026': '#00e87d',
+  'Mundial 2026': '#00FF88',
   'Crypto': '#f7931a',
-  'Mercados Globales': '#4f8eff',
-  'México': '#e0522e',
+  'Mercados Globales': '#a0c4ff',
+  'México': '#FFD700',
 }
 
 interface MarketCardProps {
@@ -141,7 +141,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
               <span style={{
                 fontSize: '1.6rem', fontWeight: 800,
-                fontFamily: 'JetBrains Mono', color: yesColor,
+                fontFamily: 'DM Mono', color: yesColor,
                 lineHeight: 1, letterSpacing: '-0.02em',
               }}>
                 {market.yesPrice}%
@@ -156,7 +156,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               </span>
               <span style={{
                 fontSize: '0.95rem', fontWeight: 700,
-                fontFamily: 'JetBrains Mono', color: 'var(--text-secondary)',
+                fontFamily: 'DM Mono', color: 'var(--text-secondary)',
               }}>
                 {100 - market.yesPrice}%
               </span>
@@ -172,13 +172,13 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
           <div style={{ display: 'flex', gap: 14 }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               Vol{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
                 {formatVolume(market.volume)}
               </span>
             </span>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               Liq{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'JetBrains Mono', fontWeight: 600 }}>
+              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
                 {formatVolume(market.liquidity)}
               </span>
             </span>
@@ -192,7 +192,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               fontSize: '0.68rem',
               color: urgent ? 'var(--red)' : 'var(--text-tertiary)',
               fontWeight: urgent ? 700 : 400,
-              fontFamily: urgent ? 'JetBrains Mono' : undefined,
+              fontFamily: urgent ? 'DM Mono' : undefined,
             }}>
               {diff > 0 ? '⏱ ' : ''}{countdownText}
             </span>

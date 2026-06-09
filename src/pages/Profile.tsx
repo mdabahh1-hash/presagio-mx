@@ -45,9 +45,9 @@ export function Profile() {
           <button style={{
             background: 'linear-gradient(135deg, var(--brand), #b03018)',
             border: 'none', padding: '14px 32px', color: '#fff',
-            fontFamily: 'Syne', fontWeight: 700, fontSize: '0.9rem',
+            fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.9rem',
             borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 6px 24px rgba(224, 82, 46, 0.3)',
+            boxShadow: '0 6px 24px rgba(255, 215, 0, 0.2)',
           }}>
             Iniciar sesión con Google
           </button>
@@ -82,10 +82,10 @@ export function Profile() {
             background: user.avatar_url ? 'transparent' : 'linear-gradient(135deg, var(--brand), #8a2010)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.6rem', fontWeight: 800, color: '#fff',
-            fontFamily: 'Syne',
-            border: '3px solid rgba(79, 142, 255, 0.3)',
+            fontFamily: 'DM Sans',
+            border: '3px solid rgba(255, 215, 0, 0.25)',
             flexShrink: 0, overflow: 'hidden',
-            boxShadow: '0 0 20px rgba(79, 142, 255, 0.2)',
+            boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)',
           }}>
             {user.avatar_url
               ? <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -150,7 +150,7 @@ export function Profile() {
                 border: '1px solid var(--border-default)',
                 borderRadius: 8, padding: '7px 16px',
                 fontSize: '0.75rem', color: 'var(--text-tertiary)',
-                cursor: 'pointer', fontFamily: 'Plus Jakarta Sans',
+                cursor: 'pointer', fontFamily: 'DM Sans',
                 transition: 'all 0.15s',
               }}
             >
@@ -229,7 +229,7 @@ export function Profile() {
               padding: '10px 18px',
               fontSize: '0.85rem', fontWeight: 700,
               color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-              cursor: 'pointer', fontFamily: 'Syne',
+              cursor: 'pointer', fontFamily: 'DM Sans',
               letterSpacing: '0.05em', textTransform: 'capitalize',
               transition: 'color 0.15s', marginBottom: -1,
             }}

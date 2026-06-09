@@ -22,8 +22,8 @@ function daysLeft(endsAt: string) {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#e0522e', 'Economía': '#ffd060', 'Deportes': '#00e87d',
-  'Global': '#4f8eff', 'Tech': '#a060ff',
+  'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
+  'Global': '#a0c4ff', 'Tech': '#a060ff',
 }
 
 export function MarketDetail() {
@@ -218,7 +218,7 @@ export function MarketDetail() {
               <div>
                 <span style={{
                   fontSize: 'clamp(3rem, 6vw, 4.5rem)',
-                  fontWeight: 800, fontFamily: 'JetBrains Mono',
+                  fontWeight: 800, fontFamily: 'DM Mono',
                   color: yesColor, lineHeight: 1,
                   letterSpacing: '-0.04em',
                 }}>
@@ -227,7 +227,7 @@ export function MarketDetail() {
                 <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
               </div>
               <div style={{ paddingBottom: 8, opacity: 0.5 }}>
-                <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'JetBrains Mono', color: 'var(--text-secondary)' }}>
+                <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
                   {noPrice}%
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
@@ -269,7 +269,7 @@ export function MarketDetail() {
                       borderRadius: 6, padding: '4px 12px',
                       fontSize: '0.72rem', fontWeight: 700,
                       color: chartPeriod === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                      cursor: 'pointer', fontFamily: 'JetBrains Mono',
+                      cursor: 'pointer', fontFamily: 'DM Mono',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -328,7 +328,7 @@ export function MarketDetail() {
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 99, padding: '1px 8px',
                 fontSize: '0.68rem', color: 'var(--text-tertiary)',
-                fontFamily: 'JetBrains Mono', fontWeight: 700,
+                fontFamily: 'DM Mono', fontWeight: 700,
               }}>
                 {comments.length}
               </span>
@@ -350,7 +350,7 @@ export function MarketDetail() {
                       border: '1px solid var(--border-default)',
                       borderRadius: 10, padding: '12px 14px',
                       fontSize: '0.875rem', color: 'var(--text-primary)',
-                      fontFamily: 'Plus Jakarta Sans', resize: 'vertical', outline: 'none',
+                      fontFamily: 'DM Sans', resize: 'vertical', outline: 'none',
                       transition: 'border-color 0.15s',
                     }}
                   />
@@ -363,7 +363,7 @@ export function MarketDetail() {
                       border: '1px solid var(--border-default)',
                       borderRadius: 8, padding: '9px 18px',
                       fontSize: '0.78rem', color: 'var(--text-primary)',
-                      fontWeight: 700, cursor: 'pointer', fontFamily: 'Syne',
+                      fontWeight: 700, cursor: 'pointer', fontFamily: 'DM Sans',
                       letterSpacing: '0.04em', transition: 'all 0.15s',
                     }}
                   >
@@ -538,7 +538,7 @@ export function MarketDetail() {
                 <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.78rem' }}>
                   <span style={{ color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.03em' }}>CANTIDAD</span>
                   {user && (
-                    <span style={{ color: 'var(--gold)', fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: '0.75rem' }}>
+                    <span style={{ color: 'var(--gold)', fontFamily: 'DM Mono', fontWeight: 700, fontSize: '0.75rem' }}>
                       {Math.floor(user.points).toLocaleString('es-MX')} PT
                     </span>
                   )}
@@ -566,7 +566,7 @@ export function MarketDetail() {
                       flex: 1, background: 'transparent', border: 'none',
                       outline: 'none', textAlign: 'center',
                       fontSize: '1.05rem', fontWeight: 800,
-                      fontFamily: 'JetBrains Mono', color: 'var(--text-primary)',
+                      fontFamily: 'DM Mono', color: 'var(--text-primary)',
                     }}
                   />
                   <span style={{
@@ -605,7 +605,7 @@ export function MarketDetail() {
                       borderRadius: 8, padding: '7px 4px',
                       fontSize: '0.72rem',
                       color: amount === v ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                      cursor: 'pointer', fontFamily: 'JetBrains Mono', fontWeight: 700,
+                      cursor: 'pointer', fontFamily: 'DM Mono', fontWeight: 700,
                       transition: 'all 0.15s',
                     }}
                   >
@@ -673,7 +673,7 @@ export function MarketDetail() {
                     : 'linear-gradient(135deg, #ff2d55, #cc1a40)',
                   border: 'none', borderRadius: 12,
                   color: side === 'YES' ? '#001a0d' : '#fff',
-                  fontFamily: 'Syne', fontWeight: 800,
+                  fontFamily: 'DM Sans', fontWeight: 800,
                   fontSize: '0.92rem', letterSpacing: '0.06em',
                   cursor: trading ? 'wait' : 'pointer',
                   opacity: trading ? 0.7 : 1,
@@ -695,7 +695,7 @@ export function MarketDetail() {
               )}
 
               <p style={{ margin: '14px 0 0', fontSize: '0.68rem', color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
-                PRESAGIO opera con puntos virtuales. No se involucra dinero real.
+                VEREDIKT opera con puntos virtuales. No se involucra dinero real.
               </p>
             </div>
           )}
