@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LogoFull } from './Logo'
-import { TICKER_ITEMS } from '../data/markets'
 import { useAuth } from '../lib/AuthContext'
 import { authApi } from '../lib/api'
 import { AuthModal } from './AuthModal'
@@ -37,38 +36,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* Ticker bar */}
-      <div className="navbar-ticker" style={{
-        background: 'var(--bg-base)',
-        borderBottom: '1px solid var(--border-subtle)',
-        height: 34,
-        overflow: 'hidden',
-        position: 'relative',
-      }}>
-        <div className="fade-left" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 80, zIndex: 2 }} />
-        <div className="fade-right" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 80, zIndex: 2 }} />
-        <div className="ticker-wrap" style={{ height: '100%', display: 'flex', alignItems: 'center' }}>
-          <div className="ticker-inner" style={{ gap: 0 }}>
-            {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-              <span key={i} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                paddingRight: 48, fontSize: '0.72rem',
-                fontFamily: "'DM Mono', monospace",
-              }}>
-                <span style={{ color: 'var(--text-tertiary)', fontSize: '0.65rem', letterSpacing: '0.06em' }}>{item.label}</span>
-                <span style={{ color: item.price > 50 ? 'var(--green)' : 'var(--red)', fontWeight: 700 }}>{item.price}¢</span>
-                <span style={{
-                  color: item.change > 0 ? 'var(--green)' : item.change < 0 ? 'var(--red)' : 'var(--text-tertiary)',
-                  fontSize: '0.65rem', fontWeight: 600,
-                }}>
-                  {item.change > 0 ? `+${item.change}` : item.change}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Main navbar */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
