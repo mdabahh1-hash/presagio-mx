@@ -156,9 +156,14 @@ export const authApi = {
       body: JSON.stringify({ email, password }),
     }),
   emailRegister: (email: string, password: string, displayName: string) =>
-    request<{ token: string; user: ApiUser }>('/auth/register', {
+    request<{ message: string; email: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, password, display_name: displayName }),
+    }),
+  verifyEmail: (email: string, code: string) =>
+    request<{ token: string; user: ApiUser }>('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ email, code }),
     }),
 }
 
