@@ -179,16 +179,15 @@ export function Navbar() {
               </button>
 
               {deskMenu && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, paddingTop: 10, zIndex: 200 }}>
                 <div
                   className="nav-menu-dropdown anim-1"
                   style={{
-                    position: 'absolute', top: 'calc(100% + 10px)', right: 0,
                     minWidth: 210, padding: 8,
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-default)',
                     borderRadius: 14,
                     boxShadow: '0 16px 48px rgba(0,0,0,0.45)',
-                    zIndex: 200,
                   }}
                 >
                   {[
@@ -240,6 +239,7 @@ export function Navbar() {
                       </button>
                     </>
                   )}
+                </div>
                 </div>
               )}
             </div>
