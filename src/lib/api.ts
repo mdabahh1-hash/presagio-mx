@@ -135,10 +135,22 @@ export interface ApiPointsHistory {
   price: number
 }
 
+export interface ApiLeaderboardEntry {
+  id: number
+  username: string
+  display_name: string
+  avatar_url: string | null
+  points: number
+  markets_traded: number
+  accuracy: number
+  created_at: string
+}
+
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
   pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
+  leaderboard: (limit = 50) => request<ApiLeaderboardEntry[]>(`/users/leaderboard?limit=${limit}`),
   update: (data: { display_name?: string; username?: string }) =>
     request<ApiUser>('/users/me', { method: 'PATCH', body: JSON.stringify(data) }),
   get: (username: string) => request<ApiUser>(`/users/${username}`),

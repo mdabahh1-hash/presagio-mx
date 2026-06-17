@@ -9,6 +9,7 @@ export function Navbar() {
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [deskMenu, setDeskMenu] = useState(false)
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null)
   const { user, logout } = useAuth()
 
@@ -18,11 +19,13 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMenuOpen(false) }, [location.pathname])
+  useEffect(() => { setMenuOpen(false); setDeskMenu(false) }, [location.pathname])
 
   const navLinks = [
     { to: '/', label: 'Inicio' },
     { to: '/mercados', label: 'Mercados' },
+    { to: '/clasificacion', label: 'Clasificación' },
+    { to: '/como-funciona', label: 'Cómo funciona' },
   ]
 
   const isActive = (to: string) => {
@@ -80,26 +83,8 @@ export function Navbar() {
             )}
           </button>
 
-          {/* Desktop nav links */}
-          <div className="navbar-links" style={{ display: 'flex', gap: 2, flex: 1 }}>
-            {navLinks.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                style={{
-                  textDecoration: 'none', padding: '7px 16px', borderRadius: 8,
-                  fontSize: '0.875rem', fontWeight: 600,
-                  color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: isActive(link.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
-                  border: `1px solid ${isActive(link.to) ? 'rgba(255,215,0,0.20)' : 'transparent'}`,
-                  transition: 'all 0.15s',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+          {/* Spacer pushes the user section to the right */}
+          <div style={{ flex: 1 }} />
 
           {/* Desktop user section */}
           <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
@@ -166,6 +151,98 @@ export function Navbar() {
                 </button>
               </div>
             )}
+
+            {/* Desktop dropdown menu (hover) */}
+            <div
+              className="nav-menu-wrap"
+              style={{ position: 'relative' }}
+              onMouseEnter={() => setDeskMenu(true)}
+              onMouseLeave={() => setDeskMenu(false)}
+            >
+              <button
+                onClick={() => setDeskMenu(o => !o)}
+                aria-label="Menú"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 40, height: 40, borderRadius: 10,
+                  background: deskMenu ? 'rgba(255,215,0,0.08)' : 'var(--bg-elevated)',
+                  border: `1px solid ${deskMenu ? 'rgba(255,215,0,0.25)' : 'var(--border-default)'}`,
+                  color: 'var(--text-primary)', cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+                  <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+
+              {deskMenu && (
+                <div
+                  className="nav-menu-dropdown anim-1"
+                  style={{
+                    position: 'absolute', top: 'calc(100% + 10px)', right: 0,
+                    minWidth: 210, padding: 8,
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-default)',
+                    borderRadius: 14,
+                    boxShadow: '0 16px 48px rgba(0,0,0,0.45)',
+                    zIndex: 200,
+                  }}
+                >
+                  {[
+                    { to: '/mercados', label: 'Mercados' },
+                    { to: '/clasificacion', label: 'Clasificación' },
+                    { to: '/como-funciona', label: 'Cómo funciona' },
+                  ].map(item => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setDeskMenu(false)}
+                      style={{
+                        display: 'block', textDecoration: 'none',
+                        padding: '11px 14px', borderRadius: 9,
+                        fontSize: '0.875rem', fontWeight: 600,
+                        color: isActive(item.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        background: isActive(item.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  {user && (
+                    <>
+                      <div style={{ height: 1, background: 'var(--border-subtle)', margin: '6px 8px' }} />
+                      <Link
+                        to="/perfil"
+                        onClick={() => setDeskMenu(false)}
+                        style={{
+                          display: 'block', textDecoration: 'none',
+                          padding: '11px 14px', borderRadius: 9,
+                          fontSize: '0.875rem', fontWeight: 600,
+                          color: isActive('/perfil') ? 'var(--text-primary)' : 'var(--text-secondary)',
+                          background: isActive('/perfil') ? 'rgba(255,215,0,0.08)' : 'transparent',
+                        }}
+                      >
+                        Mi perfil
+                      </Link>
+                      <button
+                        onClick={() => { setDeskMenu(false); logout() }}
+                        style={{
+                          display: 'block', width: '100%', textAlign: 'left',
+                          padding: '11px 14px', borderRadius: 9, border: 'none',
+                          fontSize: '0.875rem', fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                          color: 'var(--text-tertiary)', background: 'transparent', cursor: 'pointer',
+                        }}
+                      >
+                        Cerrar sesión
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>

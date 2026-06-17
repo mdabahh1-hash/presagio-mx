@@ -1,11 +1,14 @@
 import React from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
+import { Footer } from './components/Footer'
 import { Home } from './pages/Home'
 import { Markets } from './pages/Markets'
 import { MarketDetail } from './pages/MarketDetail'
 import { Profile } from './pages/Profile'
 import { Admin } from './pages/Admin'
+import { HowItWorks } from './pages/HowItWorks'
+import { Leaderboard } from './pages/Leaderboard'
 import { AuthProvider } from './lib/AuthContext'
 import { setToken } from './lib/api'
 
@@ -20,30 +23,14 @@ export default function App() {
             <Route path="/mercados" element={<Markets />} />
             <Route path="/mercado/:id" element={<MarketDetail />} />
             <Route path="/perfil" element={<Profile />} />
+            <Route path="/clasificacion" element={<Leaderboard />} />
+            <Route path="/como-funciona" element={<HowItWorks />} />
             {/* OAuth callback is handled in AuthProvider useEffect */}
             <Route path="/auth/callback" element={<AuthCallbackRedirect />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
-        <footer
-          style={{
-            borderTop: '1px solid var(--border-subtle)',
-            padding: '32px 24px',
-            marginTop: 32,
-            textAlign: 'center',
-          }}
-        >
-          <div className="footer-inner" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-              © 2026 VEREDIKT · Mercado de predicciones con puntos virtuales · No involucra dinero real
-            </span>
-            <div style={{ display: 'flex', gap: 20 }}>
-              {['Términos', 'Privacidad', 'Sobre nosotros', 'API'].map(item => (
-                <span key={item} style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', cursor: 'pointer' }}>{item}</span>
-              ))}
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </AuthProvider>
   )
