@@ -7,29 +7,18 @@ interface LogoProps {
 
 export function Logo({ size = 28, className = '' }: LogoProps) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <img
+      src="/logo.png"
+      alt="VEREDIKT"
       className={className}
-    >
-      <path
-        d="M10 24 L46 90 L90 8"
-        stroke="#FFD700"
-        strokeWidth="17"
-        strokeLinecap="butt"
-        strokeLinejoin="miter"
-        strokeMiterlimit="10"
-      />
-    </svg>
+      style={{ height: size, width: 'auto', display: 'block', objectFit: 'contain' }}
+    />
   )
 }
 
 export function LogoFull({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={className} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <Logo size={28} />
       <span
         style={{
