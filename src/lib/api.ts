@@ -140,10 +140,10 @@ export interface ApiLeaderboardEntry {
   username: string
   display_name: string
   avatar_url: string | null
-  points: number
+  pnl: number
+  volume: number
   markets_traded: number
   accuracy: number
-  created_at: string
 }
 
 export const usersApi = {

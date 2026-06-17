@@ -447,9 +447,19 @@ input[type='range']::-webkit-slider-thumb {
 .cat-rail { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 80px; }
 .cat-rail-item:hover { background: var(--bg-surface) !important; }
 
-/* Featured row collapses on smaller desktops/tablets */
+/* Leaderboard row hover */
+.lb-row { transition: background 0.15s; }
+.lb-row:hover { background: var(--bg-surface); }
+
+/* Featured row + leaderboard collapse on smaller desktops/tablets */
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }
+  .leaderboard-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Hide the volume column on narrow phones to keep the row readable */
+@media (max-width: 560px) {
+  .lb-vol { display: none !important; }
 }
 
 /* ============================================================
