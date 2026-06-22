@@ -4,6 +4,7 @@ import { LogoFull } from './Logo'
 import { useAuth } from '../lib/AuthContext'
 import { authApi } from '../lib/api'
 import { AuthModal } from './AuthModal'
+import { DailyBonusPill } from './DailyBonusPill'
 
 export function Navbar() {
   const location = useLocation()
@@ -54,6 +55,8 @@ export function Navbar() {
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <LogoFull />
           </Link>
+
+          <DailyBonusPill />
 
           {/* Hamburger — hidden on desktop, shown via CSS */}
           <button

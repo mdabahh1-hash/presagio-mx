@@ -507,6 +507,9 @@ input[type='range']::-webkit-slider-thumb {
   .footer-cat-grid { grid-template-columns: 1fr 1fr !important; }
   .footer-bottom  { flex-direction: column !important; align-items: flex-start !important; }
 
+  .bonus-amount { display: none !important; }
+  .bonus-pill   { padding: 4px 5px 4px 9px !important; }
+
   .cat-browse { grid-template-columns: 1fr !important; }
   .cat-rail {
     flex-direction: row !important;

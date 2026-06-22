@@ -6,7 +6,6 @@ import { MarketCard } from '../components/MarketCard'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
-import { DailyBonusBanner } from '../components/DailyBonusBanner'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 
@@ -89,8 +88,6 @@ export function Home() {
   if (isMobile) {
     return (
       <div style={{ minHeight: '100vh' }}>
-
-        <div style={{ padding: '0 14px' }}><DailyBonusBanner /></div>
 
         {/* Sticky search + tabs */}
         <div style={{
@@ -209,8 +206,6 @@ export function Home() {
   // ─── DESKTOP LAYOUT ─────────────────────────────────────────────────────────
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-
-      <DailyBonusBanner />
 
       {/* Search */}
       <section style={{ padding: '28px 0 18px' }}>
