@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
+import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = [
@@ -181,90 +182,94 @@ export function Markets() {
               )
             })}
           </div>
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 10, padding: '9px 14px',
-              fontSize: '0.8rem', color: 'var(--text-secondary)',
-              outline: 'none', cursor: 'pointer',
-              fontFamily: 'DM Sans',
-            }}
-          >
-            {SORT_OPTIONS.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+          {activeCategory === 'Todos' && (
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 10, padding: '9px 14px',
+                fontSize: '0.8rem', color: 'var(--text-secondary)',
+                outline: 'none', cursor: 'pointer',
+                fontFamily: 'DM Sans',
+              }}
+            >
+              {SORT_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
-      {/* Results count */}
-      {!loading && (
-        <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{
-            fontSize: '0.72rem', fontWeight: 700,
-            color: 'var(--text-tertiary)',
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 99, padding: '3px 10px',
-            fontFamily: 'DM Mono',
-          }}>
-            {markets.length} resultado{markets.length !== 1 ? 's' : ''}
-          </span>
-          {activeCategory !== 'Todos' && (
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
-              en <span style={{ color: CATEGORY_COLORS[activeCategory] || 'var(--text-secondary)', fontWeight: 600 }}>{activeCategory}</span>
-            </span>
-          )}
-          {searchInput && (
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
-              · búsqueda: <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Grid */}
-      {loading ? (
-        <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-          {[...Array(6)].map((_, i) => (
-            <div key={i} style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 14, height: 210,
-            }} />
-          ))}
-        </div>
-      ) : markets.length > 0 ? (
-        <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-          {markets.map((market, i) => (
-            <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
-          ))}
-        </div>
+      {activeCategory !== 'Todos' ? (
+        /* Category view — same sidebar layout as the home page */
+        <CategoryBrowse category={activeCategory} markets={markets} loading={loading} />
       ) : (
-        <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--text-secondary)' }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: '50%',
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 20px',
-            fontSize: '1.5rem',
-          }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="var(--text-tertiary)" strokeWidth="1.5"/>
-              <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-            No encontramos mercados
-          </p>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
-            Intenta con otra categoría o búsqueda
-          </p>
-        </div>
+        <>
+          {/* Results count */}
+          {!loading && (
+            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                fontSize: '0.72rem', fontWeight: 700,
+                color: 'var(--text-tertiary)',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 99, padding: '3px 10px',
+                fontFamily: 'DM Mono',
+              }}>
+                {markets.length} resultado{markets.length !== 1 ? 's' : ''}
+              </span>
+              {searchInput && (
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+                  · búsqueda: <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Grid */}
+          {loading ? (
+            <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 14, height: 210,
+                }} />
+              ))}
+            </div>
+          ) : markets.length > 0 ? (
+            <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+              {markets.map((market, i) => (
+                <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--text-secondary)' }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: '50%',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px',
+                fontSize: '1.5rem',
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="8" stroke="var(--text-tertiary)" strokeWidth="1.5"/>
+                  <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
+                No encontramos mercados
+              </p>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
+                Intenta con otra categoría o búsqueda
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
