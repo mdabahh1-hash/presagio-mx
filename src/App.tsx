@@ -9,6 +9,7 @@ import { Profile } from './pages/Profile'
 import { Admin } from './pages/Admin'
 import { HowItWorks } from './pages/HowItWorks'
 import { Leaderboard } from './pages/Leaderboard'
+import { PublicProfile } from './pages/PublicProfile'
 import { AuthProvider } from './lib/AuthContext'
 import { setToken } from './lib/api'
 
@@ -25,6 +26,7 @@ export default function App() {
             <Route path="/perfil" element={<Profile />} />
             <Route path="/clasificacion" element={<Leaderboard />} />
             <Route path="/como-funciona" element={<HowItWorks />} />
+            <Route path="/u/:username" element={<PublicProfile />} />
             {/* OAuth callback is handled in AuthProvider useEffect */}
             <Route path="/auth/callback" element={<AuthCallbackRedirect />} />
             <Route path="/admin" element={<Admin />} />

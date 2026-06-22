@@ -6,11 +6,25 @@ import { FullChart } from '../components/SparkChart'
 import type { PricePoint } from '../types'
 
 export function Profile() {
-  const { user, logout } = useAuth()
+  const { user, logout, refreshUser } = useAuth()
   const navigate = useNavigate()
   const [positions, setPositions] = useState<ApiPosition[]>([])
   const [pointsHistory, setPointsHistory] = useState<PricePoint[]>([])
   const [activeTab, setActiveTab] = useState<'posiciones' | 'historial'>('posiciones')
+  const [emailNotif, setEmailNotif] = useState(true)
+
+  useEffect(() => { if (user) setEmailNotif(user.email_notifications) }, [user])
+
+  const toggleEmailNotif = async () => {
+    const next = !emailNotif
+    setEmailNotif(next)
+    try {
+      await usersApi.update({ email_notifications: next })
+      await refreshUser()
+    } catch {
+      setEmailNotif(!next)
+    }
+  }
 
   useEffect(() => {
     if (!user) return
@@ -151,6 +165,32 @@ export function Profile() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Email notifications toggle */}
+      <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 20px', marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Notificaciones por correo</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Te avisamos cuando tus mercados se resuelven</div>
+        </div>
+        <button
+          onClick={toggleEmailNotif}
+          role="switch"
+          aria-checked={emailNotif}
+          aria-label="Notificaciones por correo"
+          style={{
+            width: 46, height: 26, borderRadius: 99, border: 'none', cursor: 'pointer',
+            position: 'relative', flexShrink: 0,
+            background: emailNotif ? 'var(--green)' : 'var(--bg-elevated)',
+            transition: 'background 0.15s',
+          }}
+        >
+          <span style={{
+            position: 'absolute', top: 3, left: emailNotif ? 23 : 3,
+            width: 20, height: 20, borderRadius: '50%', background: '#fff',
+            transition: 'left 0.15s',
+          }} />
+        </button>
       </div>
 
       {/* Stats cards */}

@@ -118,6 +118,21 @@ export interface ApiUser {
   correct_predictions: number
   total_predictions: number
   created_at: string
+  streak: number
+  last_bonus_at: string | null
+  email_notifications: boolean
+}
+
+export interface ApiProfilePublic {
+  id: number
+  username: string
+  display_name: string
+  avatar_url: string | null
+  pnl: number
+  volume: number
+  markets_traded: number
+  accuracy: number
+  created_at: string
 }
 
 export interface ApiPosition {
@@ -151,9 +166,12 @@ export const usersApi = {
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
   pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
   leaderboard: (limit = 50) => request<ApiLeaderboardEntry[]>(`/users/leaderboard?limit=${limit}`),
-  update: (data: { display_name?: string; username?: string }) =>
+  update: (data: { display_name?: string; username?: string; email_notifications?: boolean }) =>
     request<ApiUser>('/users/me', { method: 'PATCH', body: JSON.stringify(data) }),
-  get: (username: string) => request<ApiUser>(`/users/${username}`),
+  get: (username: string) => request<ApiProfilePublic>(`/users/${username}`),
+  publicPositions: (username: string) => request<ApiPosition[]>(`/users/${username}/positions`),
+  claimDailyBonus: () =>
+    request<{ awarded: number; streak: number; new_balance: number }>('/users/me/daily-bonus', { method: 'POST' }),
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { usersApi, type ApiLeaderboardEntry } from '../lib/api'
 
 const MEDAL = ['🥇', '🥈', '🥉']
@@ -160,11 +161,12 @@ export function Leaderboard() {
           ) : (
             <div>
               {rows.map((u, i) => (
-                <div
+                <Link
                   key={u.id}
+                  to={`/u/${u.username}`}
                   className="lb-row"
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 16,
+                    display: 'flex', alignItems: 'center', gap: 16, textDecoration: 'none',
                     padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)',
                   }}
                 >
@@ -188,7 +190,7 @@ export function Leaderboard() {
                   <span className="font-mono lb-vol" style={{ width: 120, textAlign: 'right', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                     {fmtVol(u.volume)}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           )}
