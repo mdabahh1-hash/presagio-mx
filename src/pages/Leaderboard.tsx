@@ -125,7 +125,7 @@ export function Leaderboard() {
           }}>
             <span style={{ width: 28, flexShrink: 0 }} />
             <span style={{ flex: 1 }} />
-            {([['pnl', 'Ganancia/Pérdida'], ['volume', 'Volumen']] as const).map(([key, label]) => (
+            {([['pnl', 'Ganancia/Pérdida'], ['volume', 'Invertido']] as const).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setSort(key)}

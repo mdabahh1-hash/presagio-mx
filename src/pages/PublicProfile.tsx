@@ -58,7 +58,7 @@ export function PublicProfile() {
     { label: 'Ganancia/Pérdida', value: fmtPnl(profile.pnl), color: profile.pnl >= 0 ? 'var(--green)' : 'var(--red)' },
     { label: 'Precisión', value: `${profile.accuracy}%`, color: 'var(--text-primary)' },
     { label: 'Mercados', value: fmtNum(profile.markets_traded), color: 'var(--text-primary)' },
-    { label: 'Volumen', value: `${fmtNum(profile.volume)} PT`, color: 'var(--gold)' },
+    { label: 'Invertido', value: `${fmtNum(profile.volume)} PT`, color: 'var(--gold)' },
   ]
 
   return (
