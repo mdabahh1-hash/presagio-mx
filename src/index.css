@@ -451,6 +451,10 @@ input[type='range']::-webkit-slider-thumb {
 .lb-row { transition: background 0.15s; }
 .lb-row:hover { background: var(--bg-surface); }
 
+/* Share buttons */
+.share-btn { transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.share-btn:hover { border-color: var(--gold) !important; color: var(--text-primary) !important; }
+
 /* Featured row + leaderboard collapse on smaller desktops/tablets */
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }
