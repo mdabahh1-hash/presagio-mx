@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import { usersApi } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 
-const utcDay = (d: Date | string) => new Date(d).toISOString().slice(0, 10)
+// "Day" is anchored to Mexico time so the boundary is midnight Mexico, matching the backend.
+const mxDay = (d: Date | string) =>
+  new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' }) // YYYY-MM-DD
 
 export function DailyBonusPill() {
   const { user, refreshUser } = useAuth()
@@ -10,11 +12,13 @@ export function DailyBonusPill() {
 
   if (!user) return null
 
-  const today = utcDay(new Date())
-  const lastDay = user.last_bonus_at ? utcDay(user.last_bonus_at) : null
+  const today = mxDay(new Date())
+  if (mxDay(user.created_at) === today) return null // no bonus on registration day
+
+  const lastDay = user.last_bonus_at ? mxDay(user.last_bonus_at) : null
   if (lastDay === today) return null // already claimed today
 
-  const yesterday = utcDay(new Date(Date.now() - 86_400_000))
+  const yesterday = mxDay(new Date(Date.now() - 86_400_000))
   const nextStreak = lastDay === yesterday ? user.streak + 1 : 1
   const amount = Math.min(100 + (nextStreak - 1) * 20, 300)
 
