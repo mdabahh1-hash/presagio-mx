@@ -33,13 +33,23 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
     for (const s of series) s.data.forEach(p => dateSet.add(p.date))
     const dates = Array.from(dateSet).sort()
     const n = dates.length
-    if (n < 2) return null
+    if (n === 0) return null
 
-    const toX = (i: number) => padL + (i / (n - 1)) * cW
+    const toX = (i: number) => n === 1 ? padL + cW / 2 : padL + (i / (n - 1)) * cW
     const toY = (p: number) => padT + cH - (p / 100) * cH
 
     const paths = series.map((s, si) => {
       const color = MULTI_COLORS[si % MULTI_COLORS.length]
+
+      if (n === 1) {
+        // Only one data point — draw a horizontal flat line across the chart
+        const price = s.data[0]?.price ?? null
+        if (price === null) return { d: '', color, dotX: null, dotY: null, lastPrice: null }
+        const y = toY(price).toFixed(1)
+        const d = `M${padL.toFixed(1)},${y} L${(padL + cW).toFixed(1)},${y}`
+        return { d, color, dotX: padL + cW, dotY: toY(price), lastPrice: price }
+      }
+
       const pts = dates.map(d => {
         const match = s.data.find(p => p.date === d)
         return match ? match.price : null

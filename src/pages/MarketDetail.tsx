@@ -70,6 +70,14 @@ export function MarketDetail() {
           if (!series[pt.outcome_key]) series[pt.outcome_key] = []
           series[pt.outcome_key].push({ date: pt.recorded_at.slice(0, 10), price: pt.yes_price })
         }
+        // If no per-outcome history yet, seed with current prices so chart renders
+        const hasOutcomeHistory = Object.keys(series).length > 0
+        if (!hasOutcomeHistory) {
+          const today = new Date().toISOString().slice(0, 10)
+          for (const o of m.outcomes ?? []) {
+            series[o.outcome_key] = [{ date: today, price: o.price }]
+          }
+        }
         setOutcomeSeries(series)
       }
     }).finally(() => setLoading(false))
