@@ -58,6 +58,7 @@ export interface ApiPricePoint {
   recorded_at: string
   yes_price: number
   volume_snapshot: number
+  outcome_key?: string | null
 }
 
 export interface ApiComment {

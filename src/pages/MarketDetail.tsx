@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { marketsApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
-import { FullChart } from '../components/SparkChart'
+import { FullChart, MultiLineChart } from '../components/SparkChart'
 import { BetBox } from '../components/BetBox'
 import type { PricePoint } from '../types'
 
@@ -41,6 +41,7 @@ export function MarketDetail() {
   const [comments, setComments] = useState<ApiComment[]>([])
   const [outcomes, setOutcomes] = useState<ApiOutcome[]>([])
   const [selectedOutcomeKey, setSelectedOutcomeKey] = useState<string | null>(null)
+  const [outcomeSeries, setOutcomeSeries] = useState<Record<string, PricePoint[]>>({})
   const [loading, setLoading] = useState(true)
 
   const [comment, setComment] = useState('')
@@ -63,6 +64,13 @@ export function MarketDetail() {
         const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
         setOutcomes(sorted)
         setSelectedOutcomeKey(sorted[0]?.outcome_key ?? null)
+        const series: Record<string, PricePoint[]> = {}
+        for (const pt of hist) {
+          if (!pt.outcome_key) continue
+          if (!series[pt.outcome_key]) series[pt.outcome_key] = []
+          series[pt.outcome_key].push({ date: pt.recorded_at.slice(0, 10), price: pt.yes_price })
+        }
+        setOutcomeSeries(series)
       }
     }).finally(() => setLoading(false))
   }, [id])
@@ -74,7 +82,18 @@ export function MarketDetail() {
       if (data.type === 'price_update' && data.market_id === id) {
         if (typeof data.yes_price === 'number') setYesPrice(data.yes_price as number)
         if (typeof data.volume === 'number') setVolume(data.volume as number)
-        setHistory(prev => [...prev, { date: new Date().toISOString().slice(0, 10), price: data.yes_price as number }])
+        if (Array.isArray(data.outcomes)) {
+          const now = new Date().toISOString().slice(0, 10)
+          setOutcomeSeries(prev => {
+            const next = { ...prev }
+            for (const o of data.outcomes as { outcome_key: string; price: number }[]) {
+              next[o.outcome_key] = [...(next[o.outcome_key] ?? []), { date: now, price: o.price }]
+            }
+            return next
+          })
+        } else {
+          setHistory(prev => [...prev, { date: new Date().toISOString().slice(0, 10), price: data.yes_price as number }])
+        }
       }
       if (data.event === 'new_comment' && data.market_id === id) {
         marketsApi.comments(id).then(setComments).catch(() => {})
@@ -357,7 +376,20 @@ export function MarketDetail() {
                 ))}
               </div>
             </div>
-            {chartData.length > 1 ? (
+            {market.market_type === 'multi' ? (
+              <MultiLineChart
+                series={outcomes.map(o => ({
+                  outcome_key: o.outcome_key,
+                  label: o.label,
+                  data: chartPeriod === '7d'
+                    ? (outcomeSeries[o.outcome_key] ?? []).slice(-7)
+                    : chartPeriod === '30d'
+                    ? (outcomeSeries[o.outcome_key] ?? []).slice(-30)
+                    : (outcomeSeries[o.outcome_key] ?? []),
+                }))}
+                height={220}
+              />
+            ) : chartData.length > 1 ? (
               <FullChart data={chartData} height={200} />
             ) : (
               <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
