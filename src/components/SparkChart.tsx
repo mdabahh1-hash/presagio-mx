@@ -73,9 +73,16 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
     const yTicks = [0, 25, 50, 75, 100].map(v => ({ y: toY(v).toFixed(1), label: `${v}%` }))
 
     // X ticks — spread ~6 across dates
+    const isTimestamp = dates[0]?.includes('T')
+    const allSameDay = isTimestamp ? dates.every(d => d.slice(0, 10) === dates[0].slice(0, 10)) : false
+    const formatLabel = (d: string) => {
+      if (!isTimestamp) return d.slice(5)
+      if (allSameDay) return d.slice(11, 16)
+      return d.slice(5, 10) + ' ' + d.slice(11, 16)
+    }
     const step = Math.max(1, Math.floor(n / 6))
     const xTicks = dates
-      .map((d, i) => ({ x: toX(i).toFixed(1), label: d.slice(5), i }))
+      .map((d, i) => ({ x: toX(i).toFixed(1), label: formatLabel(d), i }))
       .filter(({ i }) => i % step === 0 || i === n - 1)
       .slice(0, 7)
 

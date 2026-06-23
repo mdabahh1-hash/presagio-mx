@@ -68,12 +68,12 @@ export function MarketDetail() {
         for (const pt of hist) {
           if (!pt.outcome_key) continue
           if (!series[pt.outcome_key]) series[pt.outcome_key] = []
-          series[pt.outcome_key].push({ date: pt.recorded_at.slice(0, 10), price: pt.yes_price })
+          series[pt.outcome_key].push({ date: pt.recorded_at, price: pt.yes_price })
         }
         // If no per-outcome history yet, seed with current prices so chart renders
         const hasOutcomeHistory = Object.keys(series).length > 0
         if (!hasOutcomeHistory) {
-          const today = new Date().toISOString().slice(0, 10)
+          const today = new Date().toISOString()
           for (const o of m.outcomes ?? []) {
             series[o.outcome_key] = [{ date: today, price: o.price }]
           }
@@ -91,7 +91,7 @@ export function MarketDetail() {
         if (typeof data.yes_price === 'number') setYesPrice(data.yes_price as number)
         if (typeof data.volume === 'number') setVolume(data.volume as number)
         if (Array.isArray(data.outcomes)) {
-          const now = new Date().toISOString().slice(0, 10)
+          const now = new Date().toISOString()
           setOutcomeSeries(prev => {
             const next = { ...prev }
             for (const o of data.outcomes as { outcome_key: string; price: number }[]) {
