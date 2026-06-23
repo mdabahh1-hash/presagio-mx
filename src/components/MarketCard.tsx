@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import type { Market } from '../types'
+import type { Market, Outcome } from '../types'
 import { SparkChart } from './SparkChart'
 
 function formatVolume(v: number) {
@@ -53,7 +53,46 @@ interface MarketCardProps {
   animClass?: string
 }
 
+function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
+  const sorted = [...outcomes].sort((a, b) => b.price - a.price)
+  const top = sorted.slice(0, 3)
+  const rest = sorted.length - 3
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '4px 0' }}>
+      {top.map((o) => (
+        <div key={o.outcome_key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: '0.75rem', color: 'var(--text-secondary)', flex: 1,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {o.label}
+          </span>
+          <div style={{ width: 60, background: 'rgba(255,255,255,0.06)', borderRadius: 3, height: 4, flexShrink: 0 }}>
+            <div style={{
+              width: `${Math.min(o.price, 100)}%`, height: '100%',
+              background: 'var(--gold)', borderRadius: 3,
+            }} />
+          </div>
+          <span style={{
+            fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 700,
+            color: 'var(--gold)', width: 36, textAlign: 'right', flexShrink: 0,
+          }}>
+            {o.price.toFixed(1)}%
+          </span>
+        </div>
+      ))}
+      {rest > 0 && (
+        <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
+          + {rest} más →
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function MarketCard({ market, animClass = '' }: MarketCardProps) {
+  const isMulti = market.marketType === 'multi'
   const isUp = market.history.length > 1
     ? market.history[market.history.length - 1].price >= market.history[0].price
     : true
@@ -95,6 +134,17 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               }}>
                 {market.category}
               </span>
+              {isMulti && (
+                <span style={{
+                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  textTransform: 'uppercase', color: '#a0c4ff',
+                  background: 'rgba(160,196,255,0.1)',
+                  border: '1px solid rgba(160,196,255,0.3)',
+                  padding: '3px 8px', borderRadius: 99,
+                }}>
+                  MULTI
+                </span>
+              )}
               {market.trending && (
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
@@ -129,43 +179,49 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             </p>
           </div>
 
-          {/* Sparkline */}
-          <div style={{ flexShrink: 0, marginTop: 2 }}>
-            <SparkChart data={market.history.slice(-24)} width={80} height={38} />
-          </div>
+          {/* Sparkline — only for binary */}
+          {!isMulti && (
+            <div style={{ flexShrink: 0, marginTop: 2 }}>
+              <SparkChart data={market.history.slice(-24)} width={80} height={38} />
+            </div>
+          )}
         </div>
 
         {/* Probability display */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{
-                fontSize: '1.6rem', fontWeight: 800,
-                fontFamily: 'DM Mono', color: yesColor,
-                lineHeight: 1, letterSpacing: '-0.02em',
-              }}>
-                {market.yesPrice}%
-              </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                SÍ
-              </span>
+        {isMulti ? (
+          <MultiOutcomeList outcomes={market.outcomes ?? []} />
+        ) : (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                <span style={{
+                  fontSize: '1.6rem', fontWeight: 800,
+                  fontFamily: 'DM Mono', color: yesColor,
+                  lineHeight: 1, letterSpacing: '-0.02em',
+                }}>
+                  {market.yesPrice}%
+                </span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  SÍ
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  NO
+                </span>
+                <span style={{
+                  fontSize: '0.95rem', fontWeight: 700,
+                  fontFamily: 'DM Mono', color: 'var(--text-secondary)',
+                }}>
+                  {100 - market.yesPrice}%
+                </span>
+              </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                NO
-              </span>
-              <span style={{
-                fontSize: '0.95rem', fontWeight: 700,
-                fontFamily: 'DM Mono', color: 'var(--text-secondary)',
-              }}>
-                {100 - market.yesPrice}%
-              </span>
+            <div className="prob-bar-track">
+              <div className="prob-bar-fill" style={{ width: `${market.yesPrice}%` }} />
             </div>
           </div>
-          <div className="prob-bar-track">
-            <div className="prob-bar-fill" style={{ width: `${market.yesPrice}%` }} />
-          </div>
-        </div>
+        )}
 
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
@@ -176,12 +232,14 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                 {formatVolume(market.volume)}
               </span>
             </span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-              Liq{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
-                {formatVolume(market.liquidity)}
+            {!isMulti && (
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
+                Liq{' '}
+                <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
+                  {formatVolume(market.liquidity)}
+                </span>
               </span>
-            </span>
+            )}
           </div>
           {isPending ? (
             <span style={{ fontSize: '0.68rem', color: 'var(--gold)', fontWeight: 700 }}>

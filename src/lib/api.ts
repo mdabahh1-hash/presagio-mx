@@ -30,6 +30,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 // ── Markets ────────────────────────────────────────────────────────────────
 
+export interface ApiOutcome {
+  outcome_key: string
+  label: string
+  price: number
+}
+
 export interface ApiMarket {
   id: string
   question: string
@@ -43,6 +49,9 @@ export interface ApiMarket {
   trending: boolean
   ends_at: string
   created_at: string
+  market_type: 'binary' | 'multi'
+  outcomes: ApiOutcome[]
+  resolved_outcome_key?: string | null
 }
 
 export interface ApiPricePoint {
@@ -68,7 +77,9 @@ export const marketsApi = {
     if (params?.sort) qs.set('sort', params.sort)
     return request<ApiMarket[]>(`/markets?${qs}`)
   },
-  get: (id: string) => request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
+  get: (id: string) =>
+    request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
+  outcomes: (id: string) => request<ApiOutcome[]>(`/markets/${id}/outcomes`),
   history: (id: string, days = 60) => request<ApiPricePoint[]>(`/markets/${id}/history?days=${days}`),
   comments: (id: string) => request<ApiComment[]>(`/markets/${id}/comments`),
   postComment: (id: string, text: string) =>
@@ -82,7 +93,8 @@ export const marketsApi = {
 export interface TradeResponse {
   id: number
   market_id: string
-  side: 'YES' | 'NO'
+  side: 'YES' | 'NO' | null
+  outcome_key: string | null
   shares: number
   cost: number
   price_before: number
@@ -93,13 +105,13 @@ export interface TradeResponse {
 }
 
 export const tradesApi = {
-  execute: (marketId: string, side: 'YES' | 'NO', points: number) =>
+  execute: (marketId: string, opts: { side?: 'YES' | 'NO'; outcome_key?: string; points: number }) =>
     request<TradeResponse>(`/markets/${marketId}/trade`, {
       method: 'POST',
-      body: JSON.stringify({ side, points }),
+      body: JSON.stringify(opts),
     }),
   myPositions: (marketId: string) =>
-    request<{ id: number; side: string; shares: number; avg_cost: number }[]>(
+    request<{ id: number; side: string | null; outcome_key: string | null; shares: number; avg_cost: number }[]>(
       `/markets/${marketId}/positions`
     ),
 }
@@ -139,7 +151,8 @@ export interface ApiPosition {
   id: number
   market_id: string
   market_question: string
-  side: string
+  side: string | null
+  outcome_key: string | null
   shares: number
   avg_cost: number
   updated_at: string
@@ -201,9 +214,9 @@ export const authApi = {
 
 export const adminApi = {
   listAllMarkets: () => request<ApiMarket[]>('/markets?status=all&limit=100'),
-  resolveMarket: (marketId: string, resolution: 'YES' | 'NO') =>
+  resolveMarket: (marketId: string, opts: { resolution?: string; outcome_key?: string }) =>
     request<{ ok: boolean; resolution: string; positions_settled: number }>(
       `/admin/markets/${marketId}/resolve`,
-      { method: 'POST', body: JSON.stringify({ resolution }) }
+      { method: 'POST', body: JSON.stringify(opts) }
     ),
 }

@@ -35,6 +35,9 @@ function apiToMarket(m: ApiMarket): Market {
     endsAt: m.ends_at,
     resolutionCriteria: '',
     trending: m.trending,
+    marketType: m.market_type ?? 'binary',
+    outcomes: m.outcomes ?? [],
+    resolvedOutcomeKey: m.resolved_outcome_key,
     history: [],
     comments: [],
   }

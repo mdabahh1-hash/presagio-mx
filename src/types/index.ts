@@ -3,7 +3,13 @@ export type Category =
   | 'Mundial 2026' | 'Crypto' | 'Mercados Globales' | 'México'
 
 export type MarketStatus =
-  | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'cancelled'
+  | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'resolved' | 'cancelled'
+
+export interface Outcome {
+  outcome_key: string
+  label: string
+  price: number
+}
 
 export interface Market {
   id: string
@@ -16,8 +22,9 @@ export interface Market {
   endsAt: string
   resolutionCriteria: string
   trending: boolean
-  isMultiChoice?: boolean
-  choices?: Choice[]
+  marketType?: 'binary' | 'multi'
+  outcomes?: Outcome[]
+  resolvedOutcomeKey?: string | null
   history: PricePoint[]
   comments: Comment[]
 }

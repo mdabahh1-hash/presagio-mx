@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { marketsApi, type ApiMarket, type ApiComment, type ApiPricePoint } from '../lib/api'
+import { marketsApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
@@ -14,7 +14,7 @@ function formatVolume(v: number) {
 }
 
 function daysLeft(endsAt: string, status?: string) {
-  if (status === 'resolved_yes' || status === 'resolved_no') return 'Resuelto'
+  if (status === 'resolved_yes' || status === 'resolved_no' || status === 'resolved') return 'Resuelto'
   if (status === 'closed') return 'Cerrado'
   if (status === 'pending_resolution') return 'Pendiente'
   const diff = new Date(endsAt).getTime() - Date.now()
@@ -39,6 +39,8 @@ export function MarketDetail() {
   const [volume, setVolume] = useState(0)
   const [history, setHistory] = useState<PricePoint[]>([])
   const [comments, setComments] = useState<ApiComment[]>([])
+  const [outcomes, setOutcomes] = useState<ApiOutcome[]>([])
+  const [selectedOutcomeKey, setSelectedOutcomeKey] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   const [comment, setComment] = useState('')
@@ -57,6 +59,11 @@ export function MarketDetail() {
       setVolume(m.volume)
       setHistory(hist.map((p: ApiPricePoint) => ({ date: p.recorded_at.slice(0, 10), price: p.yes_price })))
       setComments(cmts)
+      if (m.market_type === 'multi') {
+        const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
+        setOutcomes(sorted)
+        setSelectedOutcomeKey(sorted[0]?.outcome_key ?? null)
+      }
     }).finally(() => setLoading(false))
   }, [id])
 
@@ -176,6 +183,16 @@ export function MarketDetail() {
                 Resultado oficial: {market.status === 'resolved_yes' ? 'SÍ ✓' : 'NO ✗'}
               </div>
             )}
+            {market.status === 'resolved' && market.resolved_outcome_key && (
+              <div style={{
+                background: 'rgba(0, 232, 125, 0.08)',
+                border: '1px solid var(--green)',
+                borderRadius: 10, padding: '12px 16px', marginBottom: 20,
+                fontSize: '0.875rem', fontWeight: 700, color: 'var(--green)',
+              }}>
+                Ganador: {outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key} ✓
+              </div>
+            )}
 
             {/* Question */}
             <h1 className="font-display" style={{
@@ -190,45 +207,88 @@ export function MarketDetail() {
               {market.description}
             </p>
 
-            {/* Big probability display */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
-              <div>
-                <span style={{
-                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
-                  fontWeight: 800, fontFamily: 'DM Mono',
-                  color: yesColor, lineHeight: 1,
-                  letterSpacing: '-0.04em',
-                }}>
-                  {Math.round(yesPrice)}%
-                </span>
-                <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
+            {/* Probability display — binary or multi */}
+            {market.market_type === 'multi' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 4 }}>
+                {outcomes.map((o, i) => {
+                  const isSelected = selectedOutcomeKey === o.outcome_key
+                  const isWinner = market.status === 'resolved' && market.resolved_outcome_key === o.outcome_key
+                  return (
+                    <div
+                      key={o.outcome_key}
+                      onClick={() => setSelectedOutcomeKey(o.outcome_key)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
+                        border: `1.5px solid ${isWinner ? 'var(--green)' : isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
+                        background: isWinner ? 'rgba(0,232,125,0.06)' : isSelected ? 'rgba(255,208,96,0.06)' : 'transparent',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{
+                        fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 800, width: 28, flexShrink: 0,
+                        color: i === 0 ? 'var(--gold)' : 'var(--text-tertiary)',
+                      }}>
+                        #{i + 1}
+                      </span>
+                      <span style={{ flex: 1, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {o.label}
+                        {isWinner && <span style={{ marginLeft: 8, color: 'var(--green)' }}>✓</span>}
+                      </span>
+                      <div style={{ width: 80, background: 'rgba(255,255,255,0.05)', borderRadius: 3, height: 5, flexShrink: 0 }}>
+                        <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--gold)', borderRadius: 3 }} />
+                      </div>
+                      <span style={{
+                        width: 48, textAlign: 'right', flexShrink: 0,
+                        fontSize: '0.88rem', fontFamily: 'DM Mono', fontWeight: 800,
+                        color: isWinner ? 'var(--green)' : 'var(--gold)',
+                      }}>
+                        {o.price.toFixed(1)}%
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
-              <div style={{ paddingBottom: 8, opacity: 0.5 }}>
-                <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
-                  {noPrice}%
-                </span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
-              </div>
-            </div>
-
-            {/* Dual probability bar */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                <span style={{ color: 'var(--green)' }}>SÍ · {Math.round(yesPrice)}%</span>
-                <span style={{ color: 'var(--red)' }}>NO · {noPrice}%</span>
-              </div>
-              <div className="prob-bar-dual">
-                <div style={{
-                  width: `${yesPrice}%`,
-                  background: 'linear-gradient(90deg, var(--green), rgba(0, 232, 125, 0.55))',
-                  transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                }} />
-                <div style={{
-                  flex: 1,
-                  background: 'linear-gradient(90deg, rgba(255, 45, 85, 0.4), var(--red))',
-                }} />
-              </div>
-            </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
+                  <div>
+                    <span style={{
+                      fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                      fontWeight: 800, fontFamily: 'DM Mono',
+                      color: yesColor, lineHeight: 1,
+                      letterSpacing: '-0.04em',
+                    }}>
+                      {Math.round(yesPrice)}%
+                    </span>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
+                  </div>
+                  <div style={{ paddingBottom: 8, opacity: 0.5 }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
+                      {noPrice}%
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                    <span style={{ color: 'var(--green)' }}>SÍ · {Math.round(yesPrice)}%</span>
+                    <span style={{ color: 'var(--red)' }}>NO · {noPrice}%</span>
+                  </div>
+                  <div className="prob-bar-dual">
+                    <div style={{
+                      width: `${yesPrice}%`,
+                      background: 'linear-gradient(90deg, var(--green), rgba(0, 232, 125, 0.55))',
+                      transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }} />
+                    <div style={{
+                      flex: 1,
+                      background: 'linear-gradient(90deg, rgba(255, 45, 85, 0.4), var(--red))',
+                    }} />
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Share */}
             {(() => {
@@ -438,6 +498,22 @@ export function MarketDetail() {
         <div className="market-trading-panel" style={{ position: 'sticky', top: 80 }}>
           {market.status !== 'open' ? (
             <div className="anim-2 card" style={{ padding: '32px 26px', textAlign: 'center' }}>
+              {market.status === 'resolved' && (
+                <>
+                  <div style={{
+                    width: 52, height: 52, borderRadius: '50%',
+                    background: 'rgba(0,232,125,0.1)', border: '1px solid var(--green)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 16px', fontSize: '1.4rem',
+                  }}>🏆</div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--green)', margin: '0 0 10px' }}>
+                    Ganador: {outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key}
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
+                    Los puntos ya fueron distribuidos a los ganadores.
+                  </p>
+                </>
+              )}
               {market.status === 'pending_resolution' && (
                 <>
                   <div style={{
@@ -515,7 +591,18 @@ export function MarketDetail() {
               <BetBox
                 marketId={market.id}
                 yesPrice={yesPrice}
-                onTraded={(p) => setYesPrice(p)}
+                marketType={market.market_type as 'binary' | 'multi'}
+                outcomes={outcomes}
+                selectedOutcomeKey={selectedOutcomeKey}
+                onOutcomeSelect={setSelectedOutcomeKey}
+                onTraded={(p) => {
+                  setYesPrice(p)
+                  if (market.market_type === 'multi') {
+                    marketsApi.outcomes(market.id).then(updated => {
+                      setOutcomes([...updated].sort((a, b) => b.price - a.price))
+                    }).catch(() => {})
+                  }
+                }}
               />
             </div>
           )}

@@ -1,20 +1,30 @@
 import React, { useState } from 'react'
-import { tradesApi } from '../lib/api'
+import { tradesApi, type ApiOutcome } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 
 interface BetBoxProps {
   marketId: string
   yesPrice: number
-  /** Called with the new YES price after a successful trade so the parent can update its display. */
+  marketType?: 'binary' | 'multi'
+  outcomes?: ApiOutcome[]
+  selectedOutcomeKey?: string | null
+  onOutcomeSelect?: (key: string) => void
   onTraded?: (newYesPrice: number) => void
-  /** If provided, a logged-out user clicking COMPRAR triggers this (e.g. open the auth modal)
-   *  instead of seeing the inline login link. */
   onRequireAuth?: () => void
-  /** Tighter paddings for use inside the homepage carousel slide. */
   compact?: boolean
 }
 
-export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = false }: BetBoxProps) {
+export function BetBox({
+  marketId,
+  yesPrice,
+  marketType = 'binary',
+  outcomes = [],
+  selectedOutcomeKey,
+  onOutcomeSelect,
+  onTraded,
+  onRequireAuth,
+  compact = false,
+}: BetBoxProps) {
   const { user, refreshUser } = useAuth()
   const [side, setSide] = useState<'YES' | 'NO'>('YES')
   const [amount, setAmount] = useState(100)
@@ -22,10 +32,20 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
 
+  const isMulti = marketType === 'multi'
   const noPrice = Math.round(100 - yesPrice)
-  const potential = side === 'YES'
-    ? ((amount / (yesPrice / 100)) - amount).toFixed(0)
-    : ((amount / (noPrice / 100)) - amount).toFixed(0)
+
+  const selectedOutcome = isMulti
+    ? outcomes.find(o => o.outcome_key === selectedOutcomeKey) ?? outcomes[0] ?? null
+    : null
+
+  const currentPrice = isMulti
+    ? (selectedOutcome?.price ?? 0)
+    : side === 'YES' ? yesPrice : noPrice
+
+  const potential = currentPrice > 0
+    ? ((amount / (currentPrice / 100)) - amount).toFixed(0)
+    : '0'
 
   const handleTrade = async () => {
     if (!user) {
@@ -37,9 +57,16 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
     setTradeError(null)
     setTradeSuccess(null)
     try {
-      const result = await tradesApi.execute(marketId, side, amount)
+      let result
+      if (isMulti) {
+        if (!selectedOutcome) { setTradeError('Selecciona un resultado'); setTrading(false); return }
+        result = await tradesApi.execute(marketId, { outcome_key: selectedOutcome.outcome_key, points: amount })
+        setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones de "${selectedOutcome.label}" por ${result.cost.toFixed(0)} PT`)
+      } else {
+        result = await tradesApi.execute(marketId, { side, points: amount })
+        setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones ${side} por ${result.cost.toFixed(0)} PT`)
+      }
       onTraded?.(result.new_yes_price)
-      setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones ${side} por ${result.cost.toFixed(0)} PT`)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)
     } catch (e: any) {
@@ -53,43 +80,73 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
     <div>
       <div className="exchange-header" style={{ marginBottom: compact ? 16 : 20 }}>Operar</div>
 
-      {/* YES / NO selector */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: compact ? 16 : 22 }}>
-        {(['YES', 'NO'] as const).map(s => {
-          const isSelected = side === s
-          const color = s === 'YES' ? 'var(--green)' : 'var(--red)'
-          const price = s === 'YES' ? Math.round(yesPrice) : noPrice
-          return (
-            <button
-              key={s}
-              onClick={() => setSide(s)}
-              style={{
-                padding: compact ? '13px 10px' : '16px 12px', borderRadius: 12, cursor: 'pointer',
-                border: `2px solid ${isSelected ? color : 'var(--border-subtle)'}`,
-                background: isSelected
-                  ? s === 'YES' ? 'rgba(0, 232, 125, 0.1)' : 'rgba(255, 45, 85, 0.1)'
-                  : 'transparent',
-                transition: 'all 0.15s', textAlign: 'center',
-              }}
-            >
-              <div style={{
-                fontSize: '0.65rem', fontWeight: 800,
-                color: isSelected ? color : 'var(--text-tertiary)',
-                letterSpacing: '0.12em', marginBottom: 6,
-              }}>
-                {s === 'YES' ? 'SÍ' : 'NO'}
-              </div>
-              <div className="font-mono" style={{
-                fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 800,
-                color: isSelected ? color : 'var(--text-secondary)',
-                lineHeight: 1, letterSpacing: '-0.02em',
-              }}>
-                {price}%
-              </div>
-            </button>
-          )
-        })}
-      </div>
+      {isMulti ? (
+        /* ── Multi-outcome: outcome selector ── */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: compact ? 16 : 22 }}>
+          {outcomes.map(o => {
+            const isSelected = selectedOutcomeKey === o.outcome_key
+              || (!selectedOutcomeKey && outcomes[0]?.outcome_key === o.outcome_key)
+            return (
+              <button
+                key={o.outcome_key}
+                onClick={() => onOutcomeSelect?.(o.outcome_key)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
+                  border: `2px solid ${isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
+                  background: isSelected ? 'rgba(255,208,96,0.08)' : 'transparent',
+                  transition: 'all 0.15s', textAlign: 'left',
+                }}
+              >
+                <span style={{ flex: 1, fontSize: '0.82rem', fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                  {o.label}
+                </span>
+                <span style={{ fontSize: '0.78rem', fontFamily: 'DM Mono', fontWeight: 800, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
+                  {o.price.toFixed(1)}%
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        /* ── Binary: YES / NO selector ── */
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: compact ? 16 : 22 }}>
+          {(['YES', 'NO'] as const).map(s => {
+            const isSelected = side === s
+            const color = s === 'YES' ? 'var(--green)' : 'var(--red)'
+            const price = s === 'YES' ? Math.round(yesPrice) : noPrice
+            return (
+              <button
+                key={s}
+                onClick={() => setSide(s)}
+                style={{
+                  padding: compact ? '13px 10px' : '16px 12px', borderRadius: 12, cursor: 'pointer',
+                  border: `2px solid ${isSelected ? color : 'var(--border-subtle)'}`,
+                  background: isSelected
+                    ? s === 'YES' ? 'rgba(0, 232, 125, 0.1)' : 'rgba(255, 45, 85, 0.1)'
+                    : 'transparent',
+                  transition: 'all 0.15s', textAlign: 'center',
+                }}
+              >
+                <div style={{
+                  fontSize: '0.65rem', fontWeight: 800,
+                  color: isSelected ? color : 'var(--text-tertiary)',
+                  letterSpacing: '0.12em', marginBottom: 6,
+                }}>
+                  {s === 'YES' ? 'SÍ' : 'NO'}
+                </div>
+                <div className="font-mono" style={{
+                  fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 800,
+                  color: isSelected ? color : 'var(--text-secondary)',
+                  lineHeight: 1, letterSpacing: '-0.02em',
+                }}>
+                  {price}%
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* Amount input */}
       <div style={{ marginBottom: 16 }}>
@@ -182,7 +239,7 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--text-tertiary)' }}>Precio actual</span>
           <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
-            {side === 'YES' ? Math.round(yesPrice) : noPrice}%
+            {currentPrice.toFixed(1)}%
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
@@ -199,7 +256,6 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
         </div>
       </div>
 
-      {/* Error / Success */}
       {tradeError && (
         <div style={{
           margin: '0 0 14px', fontSize: '0.8rem', color: 'var(--red)',
@@ -221,28 +277,38 @@ export function BetBox({ marketId, yesPrice, onTraded, onRequireAuth, compact = 
         </div>
       )}
 
-      {/* Buy button */}
       <button
         onClick={handleTrade}
-        disabled={trading}
+        disabled={trading || (isMulti && !selectedOutcome)}
         style={{
           width: '100%', padding: '16px',
-          background: side === 'YES'
+          background: isMulti
+            ? 'linear-gradient(135deg, #c8a000, #a07800)'
+            : side === 'YES'
             ? 'linear-gradient(135deg, #00e87d, #00ba64)'
             : 'linear-gradient(135deg, #ff2d55, #cc1a40)',
           border: 'none', borderRadius: 12,
-          color: side === 'YES' ? '#001a0d' : '#fff',
+          color: isMulti ? '#07071A' : side === 'YES' ? '#001a0d' : '#fff',
           fontFamily: 'DM Sans', fontWeight: 800,
           fontSize: '0.92rem', letterSpacing: '0.06em',
-          cursor: trading ? 'wait' : 'pointer',
-          opacity: trading ? 0.7 : 1,
-          boxShadow: side === 'YES'
+          cursor: (trading || (isMulti && !selectedOutcome)) ? 'not-allowed' : 'pointer',
+          opacity: (trading || (isMulti && !selectedOutcome)) ? 0.6 : 1,
+          boxShadow: isMulti
+            ? '0 6px 28px rgba(200, 160, 0, 0.3)'
+            : side === 'YES'
             ? '0 6px 28px rgba(0, 232, 125, 0.3)'
             : '0 6px 28px rgba(255, 45, 85, 0.3)',
           transition: 'opacity 0.15s, box-shadow 0.2s',
         }}
       >
-        {trading ? 'PROCESANDO...' : `COMPRAR ${side === 'YES' ? 'SÍ' : 'NO'} · ${amount} PT`}
+        {trading
+          ? 'PROCESANDO...'
+          : isMulti
+          ? selectedOutcome
+            ? `APOSTAR "${selectedOutcome.label}" · ${amount} PT`
+            : 'SELECCIONA UN RESULTADO'
+          : `COMPRAR ${side === 'YES' ? 'SÍ' : 'NO'} · ${amount} PT`
+        }
       </button>
 
       {!user && !onRequireAuth && (
