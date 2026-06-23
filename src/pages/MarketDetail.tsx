@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { marketsApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -33,6 +33,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export function MarketDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [market, setMarket] = useState<ApiMarket | null>(null)
   const [yesPrice, setYesPrice] = useState(50)
@@ -154,12 +155,28 @@ export function MarketDetail() {
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
       {/* Breadcrumb */}
-      <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 28, fontSize: '0.78rem' }}>
+      <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 28, fontSize: '0.78rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            color: 'var(--text-tertiary)', fontSize: '0.78rem', fontFamily: 'DM Sans',
+            display: 'flex', alignItems: 'center', gap: 4, transition: 'color 0.15s',
+          }}
+        >
+          ← Volver
+        </button>
+        <span style={{ color: 'var(--border-subtle)' }}>·</span>
         <Link to="/mercados" style={{ color: 'var(--text-tertiary)', textDecoration: 'none', transition: 'color 0.15s' }}>
           Mercados
         </Link>
         <span style={{ color: 'var(--border-default)' }}>›</span>
-        <span style={{ color: catColor }}>{market.category}</span>
+        <Link
+          to={`/mercados?cat=${encodeURIComponent(market.category)}`}
+          style={{ color: catColor, textDecoration: 'none', transition: 'opacity 0.15s' }}
+        >
+          {market.category}
+        </Link>
         <span style={{ color: 'var(--border-default)' }}>›</span>
         <span style={{ color: 'var(--text-secondary)' }}>{market.question.slice(0, 42)}…</span>
       </div>
