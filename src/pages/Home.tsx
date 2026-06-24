@@ -60,8 +60,11 @@ export function Home() {
   const [loading, setLoading] = useState(true)
   const [mobileTab, setMobileTab] = useState<MobileTab>('Tendencia')
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null)
+  const [visibleTrending, setVisibleTrending] = useState(12)
   const navigate = useNavigate()
   const isMobile = useMobile()
+
+  useEffect(() => { setVisibleTrending(12) }, [mobileTab])
 
   useEffect(() => {
     marketsApi.list()
@@ -315,11 +318,38 @@ export function Home() {
                 ))}
               </div>
             ) : filtered.length > 0 ? (
-              <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-                {filtered.slice(0, 12).map((market, i) => (
-                  <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
-                ))}
-              </div>
+              <>
+                <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+                  {filtered.slice(0, visibleTrending).map((market, i) => (
+                    <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
+                  ))}
+                </div>
+                {filtered.length > visibleTrending && (
+                  <div style={{ textAlign: 'center', marginTop: 24 }}>
+                    <button
+                      onClick={() => setVisibleTrending(v => v + 12)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: 99, padding: '10px 28px',
+                        color: 'var(--text-secondary)',
+                        fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.84rem',
+                        cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.borderColor = 'var(--oro)'
+                        e.currentTarget.style.color = 'var(--oro)'
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.borderColor = 'var(--border-default)'
+                        e.currentTarget.style.color = 'var(--text-secondary)'
+                      }}
+                    >
+                      Ver más mercados ({filtered.length - visibleTrending} restantes)
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
               <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
                 <p style={{ fontWeight: 600 }}>Sin mercados en tendencia</p>
