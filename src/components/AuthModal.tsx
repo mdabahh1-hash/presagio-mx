@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { authApi, setToken } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
+import { track } from '../lib/analytics'
 
 interface AuthModalProps {
   onClose: () => void
@@ -58,6 +59,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
     try {
       const result = await authApi.verifyEmail(pendingEmail, code)
       setToken(result.token)
+      track('Signup', { method: 'email' })
       await refreshUser()
       onClose()
     } catch (err: unknown) {

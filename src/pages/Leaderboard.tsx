@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { usersApi, type ApiLeaderboardEntry } from '../lib/api'
+import { usersApi, type ApiLeaderboardEntry, type LeaderboardPeriod } from '../lib/api'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 const PERIODS = ['Hoy', 'Semanal', 'Mensual', 'Todos'] as const
+const PERIOD_PARAM: Record<typeof PERIODS[number], LeaderboardPeriod> = {
+  Hoy: 'today', Semanal: 'week', Mensual: 'month', Todos: 'all',
+}
 
 function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
@@ -41,11 +44,13 @@ export function Leaderboard() {
   const [sort, setSort] = useState<'pnl' | 'volume'>('pnl')
 
   useEffect(() => {
-    usersApi.leaderboard(50)
+    setLoading(true)
+    setError(false)
+    usersApi.leaderboard(50, PERIOD_PARAM[period])
       .then(setUsers)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [])
+  }, [period])
 
   // Sidebar: top gainers always by P&L
   const topGainers = useMemo(
@@ -69,20 +74,17 @@ export function Leaderboard() {
       <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
         {PERIODS.map(p => {
           const active = p === period
-          const enabled = p === 'Todos'
           return (
             <button
               key={p}
-              onClick={() => enabled && setPeriod(p)}
-              title={enabled ? undefined : 'Próximamente'}
+              onClick={() => setPeriod(p)}
               style={{
                 background: active ? 'rgba(255,215,0,0.12)' : 'var(--bg-card)',
                 border: `1px solid ${active ? 'var(--gold)' : 'var(--border-subtle)'}`,
                 borderRadius: 99, padding: '8px 18px',
                 fontSize: '0.82rem', fontWeight: 700,
                 color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-                cursor: enabled ? 'pointer' : 'default',
-                opacity: enabled ? 1 : 0.4,
+                cursor: 'pointer',
                 fontFamily: 'DM Sans', transition: 'all 0.15s',
               }}
             >

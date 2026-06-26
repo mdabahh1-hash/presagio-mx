@@ -10,7 +10,7 @@ import { Admin } from './pages/Admin'
 import { HowItWorks } from './pages/HowItWorks'
 import { Leaderboard } from './pages/Leaderboard'
 import { PublicProfile } from './pages/PublicProfile'
-import { AuthProvider } from './lib/AuthContext'
+import { AuthProvider, useAuth } from './lib/AuthContext'
 import { setToken } from './lib/api'
 
 export default function App() {
@@ -40,12 +40,14 @@ export default function App() {
 
 function AuthCallbackRedirect() {
   const navigate = useNavigate()
+  const { refreshUser } = useAuth()
   React.useEffect(() => {
     const hash = window.location.hash
     const params = new URLSearchParams(hash.split('?')[1] ?? '')
     const token = params.get('token')
     if (token) setToken(token)
-    navigate('/', { replace: true })
-  }, [navigate])
+    // Load the user (and attach any pending referral) before leaving the page.
+    refreshUser().finally(() => navigate('/', { replace: true }))
+  }, [navigate, refreshUser])
   return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Iniciando sesión...</div>
 }

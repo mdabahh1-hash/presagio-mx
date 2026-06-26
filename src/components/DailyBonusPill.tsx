@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { usersApi } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
+import { track } from '../lib/analytics'
 
 // "Day" is anchored to Mexico time so the boundary is midnight Mexico, matching the backend.
 const mxDay = (d: Date | string) =>
@@ -26,6 +27,7 @@ export function DailyBonusPill() {
     setClaiming(true)
     try {
       await usersApi.claimDailyBonus()
+      track('DailyBonus', { streak: nextStreak, amount })
       await refreshUser()
     } catch {
       await refreshUser().catch(() => {})

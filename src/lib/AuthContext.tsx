@@ -1,5 +1,24 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { usersApi, authApi, setToken, clearToken, type ApiUser } from './api'
+import { getPendingRef, clearPendingRef } from './referral'
+import { track } from './analytics'
+
+// Attach a pending referral code to the just-authenticated user. The server only
+// accepts it for brand-new users (no prior referrer, no trades yet) and ignores
+// self-referrals, so attempting once per load is safe.
+async function attachPendingReferral(user: ApiUser): Promise<void> {
+  const code = getPendingRef()
+  if (!code) return
+  if (user.referral_code && code === user.referral_code) { clearPendingRef(); return } // own link
+  try {
+    const res = await usersApi.attachReferral(code)
+    if (res.ok) track('ReferralSignup')
+    // Whether accepted or rejected as ineligible, don't retry endlessly.
+    if (res.ok || res.reason !== undefined) clearPendingRef()
+  } catch {
+    /* keep the code for a later attempt */
+  }
+}
 
 interface AuthContextValue {
   user: ApiUser | null
@@ -23,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const me = await usersApi.me()
       setUser(me)
+      await attachPendingReferral(me)
     } catch {
       setUser(null)
     }

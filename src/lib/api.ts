@@ -134,7 +134,10 @@ export interface ApiUser {
   streak: number
   last_bonus_at: string | null
   email_notifications: boolean
+  referral_code: string | null
 }
+
+export type LeaderboardPeriod = 'today' | 'week' | 'month' | 'all'
 
 export interface ApiProfilePublic {
   id: number
@@ -179,7 +182,15 @@ export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
   pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
-  leaderboard: (limit = 50) => request<ApiLeaderboardEntry[]>(`/users/leaderboard?limit=${limit}`),
+  leaderboard: (limit = 50, period: LeaderboardPeriod = 'all') => {
+    const qs = new URLSearchParams({ limit: String(limit), period })
+    return request<ApiLeaderboardEntry[]>(`/users/leaderboard?${qs}`)
+  },
+  attachReferral: (code: string) =>
+    request<{ ok: boolean; reason?: string }>('/users/me/referral', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
   update: (data: { display_name?: string; username?: string; email_notifications?: boolean }) =>
     request<ApiUser>('/users/me', { method: 'PATCH', body: JSON.stringify(data) }),
   get: (username: string) => request<ApiProfilePublic>(`/users/${username}`),

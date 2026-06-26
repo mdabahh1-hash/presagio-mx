@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { tradesApi, type ApiOutcome } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
+import { track } from '../lib/analytics'
 
 interface BetBoxProps {
   marketId: string
@@ -66,6 +67,7 @@ export function BetBox({
         result = await tradesApi.execute(marketId, { side, points: amount })
         setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones ${side} por ${result.cost.toFixed(0)} PT`)
       }
+      track('Trade', { market: marketId, type: marketType, cost: Math.round(result.cost) })
       onTraded?.(result.new_yes_price)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { usersApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
+import { ReferralCard } from '../components/ReferralCard'
 import type { PricePoint } from '../types'
 
 export function Profile() {
@@ -192,6 +193,9 @@ export function Profile() {
           }} />
         </button>
       </div>
+
+      {/* Referral */}
+      <ReferralCard code={user.referral_code} />
 
       {/* Stats cards */}
       <div className="anim-2 profile-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
