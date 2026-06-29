@@ -294,7 +294,7 @@ export function Home() {
               {loading ? (
                 <div className="card" style={{ height: 380, animation: 'livePulse 1.8s ease infinite' }} />
               ) : (
-                <PopularTopics />
+                <PopularTopics markets={markets} />
               )}
             </div>
           </section>
