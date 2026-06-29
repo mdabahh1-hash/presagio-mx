@@ -29,6 +29,9 @@ function daysLeft(endsAt: string, status?: string) {
 const CATEGORY_COLORS: Record<string, string> = {
   'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
   'Global': '#a0c4ff', 'Tech': '#a060ff',
+  'Mundial 2026': '#00FF88', 'Crypto': '#f7931a', 'Mercados Globales': '#a0c4ff',
+  'México': '#FFD700', 'Entretenimiento': '#ff7eb6',
+  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
 }
 
 export function MarketDetail() {

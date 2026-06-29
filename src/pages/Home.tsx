@@ -9,7 +9,7 @@ import { CategoryBrowse } from '../components/CategoryBrowse'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 
-const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Mundial 2026', 'Crypto', 'Tech', 'Global'] as const
+const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Boxeo', 'Motor', 'Mundial 2026', 'Crypto', 'Tech', 'Global', 'Clima'] as const
 type MobileTab = typeof MOBILE_TABS[number]
 
 const MOBILE_TAB_COLORS: Record<string, string> = {
@@ -17,10 +17,13 @@ const MOBILE_TAB_COLORS: Record<string, string> = {
   'Política MX': '#FFD700',
   'Economía': '#FFD700',
   'Deportes': '#00FF88',
+  'Boxeo': '#ff4d6d',
+  'Motor': '#ff7849',
   'Mundial 2026': '#00FF88',
   'Crypto': '#f7931a',
   'Tech': '#a060ff',
   'Global': '#a0c4ff',
+  'Clima': '#38bdf8',
 }
 
 function apiToMarket(m: ApiMarket): Market {

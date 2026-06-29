@@ -8,6 +8,7 @@ import type { PricePoint } from '../types'
 const CATEGORY_COLORS: Record<string, string> = {
   'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
   'Global': '#a0c4ff', 'Tech': '#a060ff', 'Mundial 2026': '#00FF88', 'Crypto': '#f7931a',
+  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
 }
 
 function formatVolume(v: number) {

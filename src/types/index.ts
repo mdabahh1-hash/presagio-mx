@@ -1,6 +1,7 @@
 export type Category =
   | 'Política MX' | 'Economía' | 'Deportes' | 'Global' | 'Tech' | 'Entretenimiento'
   | 'Mundial 2026' | 'Crypto' | 'Mercados Globales' | 'México'
+  | 'Clima' | 'Boxeo' | 'Motor'
 
 export type MarketStatus =
   | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'resolved' | 'cancelled'

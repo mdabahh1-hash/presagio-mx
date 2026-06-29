@@ -8,7 +8,7 @@ import type { Category, Market } from '../types'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = [
   'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
-  'Política MX', 'Deportes', 'México', 'Global', 'Tech',
+  'Política MX', 'Deportes', 'Boxeo', 'Motor', 'México', 'Global', 'Tech', 'Clima',
 ]
 const SORT_OPTIONS = [
   { value: 'volume', label: 'Mayor volumen' },
@@ -20,6 +20,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Global': '#a0c4ff', 'Tech': '#a060ff',
   'Mundial 2026': '#00FF88', 'Crypto': '#f7931a',
   'Mercados Globales': '#a0c4ff', 'México': '#FFD700',
+  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
 }
 
 function apiToMarket(m: ApiMarket): Market {

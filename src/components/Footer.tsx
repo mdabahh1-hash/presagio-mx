@@ -5,6 +5,7 @@ import { LogoFull } from './Logo'
 const CATEGORIES = [
   'Política MX', 'Economía', 'Deportes', 'Mundial 2026', 'Crypto',
   'Tech', 'Global', 'Entretenimiento', 'México', 'Mercados Globales',
+  'Boxeo', 'Motor', 'Clima',
 ]
 
 const colLink: React.CSSProperties = {

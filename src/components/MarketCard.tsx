@@ -46,6 +46,9 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Crypto': '#f7931a',
   'Mercados Globales': '#a0c4ff',
   'México': '#FFD700',
+  'Clima': '#38bdf8',
+  'Boxeo': '#ff4d6d',
+  'Motor': '#ff7849',
 }
 
 interface MarketCardProps {
