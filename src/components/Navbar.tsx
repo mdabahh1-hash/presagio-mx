@@ -56,8 +56,6 @@ export function Navbar() {
             <LogoFull />
           </Link>
 
-          <span aria-hidden style={{ fontSize: '1.4rem', lineHeight: 1, flexShrink: 0 }}>🙂</span>
-
           <DailyBonusPill />
 
           {/* Hamburger — hidden on desktop, shown via CSS */}
