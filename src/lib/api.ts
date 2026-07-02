@@ -22,7 +22,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    throw new Error(err.detail ?? 'Error desconocido')
+    // FastAPI 422 returns `detail` as an array of error objects; surface the first msg.
+    const d = err?.detail
+    const msg = typeof d === 'string'
+      ? d
+      : Array.isArray(d) ? (d[0]?.msg ?? 'Datos inválidos') : 'Error desconocido'
+    const e = new Error(msg) as Error & { status?: number }
+    e.status = res.status
+    throw e
   }
   if (res.status === 204) return undefined as T
   return res.json()
@@ -71,11 +78,12 @@ export interface ApiComment {
 }
 
 export const marketsApi = {
-  list: (params?: { category?: string; q?: string; sort?: string }) => {
+  list: (params?: { category?: string; q?: string; sort?: string; limit?: number }) => {
     const qs = new URLSearchParams()
     if (params?.category) qs.set('category', params.category)
     if (params?.q) qs.set('q', params.q)
     if (params?.sort) qs.set('sort', params.sort)
+    if (params?.limit) qs.set('limit', String(params.limit))
     return request<ApiMarket[]>(`/markets?${qs}`)
   },
   get: (id: string) =>

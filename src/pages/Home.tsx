@@ -9,7 +9,7 @@ import { CategoryBrowse } from '../components/CategoryBrowse'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 
-const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Boxeo', 'Motor', 'Mundial 2026', 'Crypto', 'Tech', 'Global', 'Clima'] as const
+const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Boxeo', 'Motor', 'Mundial 2026', 'Crypto', 'Tech', 'Global', 'Clima', 'Entretenimiento'] as const
 type MobileTab = typeof MOBILE_TABS[number]
 
 const MOBILE_TAB_COLORS: Record<string, string> = {
@@ -70,7 +70,7 @@ export function Home() {
   useEffect(() => { setVisibleTrending(12) }, [mobileTab])
 
   useEffect(() => {
-    marketsApi.list()
+    marketsApi.list({ limit: 100 })
       .then(data => setApiMarkets(data))
       .catch(() => setUsingMock(true))
       .finally(() => setLoading(false))

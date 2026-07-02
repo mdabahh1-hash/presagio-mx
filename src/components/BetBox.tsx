@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { tradesApi, type ApiOutcome } from '../lib/api'
+import { tradesApi, authApi, type ApiOutcome } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 
@@ -315,7 +315,7 @@ export function BetBox({
 
       {!user && !onRequireAuth && (
         <div style={{ marginTop: 14, textAlign: 'center' }}>
-          <a href="/api/auth/google" style={{ fontSize: '0.82rem', color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+          <a href={authApi.googleUrl()} style={{ fontSize: '0.82rem', color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
             Inicia sesión para operar →
           </a>
         </div>

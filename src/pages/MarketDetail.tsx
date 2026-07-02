@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { marketsApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
+import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart, MultiLineChart } from '../components/SparkChart'
@@ -55,37 +55,37 @@ export function MarketDetail() {
 
   useEffect(() => {
     if (!id) return
-    Promise.all([
-      marketsApi.get(id),
-      marketsApi.history(id, 90),
-      marketsApi.comments(id),
-    ]).then(([m, hist, cmts]) => {
+    // Market fetch is the only critical call; a transient history/comments failure
+    // must not make an existing market read as "no encontrado".
+    marketsApi.get(id).then((m) => {
       setMarket(m)
       setYesPrice(m.yes_price)
       setVolume(m.volume)
-      setHistory(hist.map((p: ApiPricePoint) => ({ date: p.recorded_at.slice(0, 10), price: p.yes_price })))
-      setComments(cmts)
       if (m.market_type === 'multi') {
         const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
         setOutcomes(sorted)
         setSelectedOutcomeKey(sorted[0]?.outcome_key ?? null)
-        const series: Record<string, PricePoint[]> = {}
-        for (const pt of hist) {
-          if (!pt.outcome_key) continue
-          if (!series[pt.outcome_key]) series[pt.outcome_key] = []
-          series[pt.outcome_key].push({ date: pt.recorded_at, price: pt.yes_price })
-        }
-        // If no per-outcome history yet, seed with current prices so chart renders
-        const hasOutcomeHistory = Object.keys(series).length > 0
-        if (!hasOutcomeHistory) {
-          const today = new Date().toISOString()
-          for (const o of m.outcomes ?? []) {
-            series[o.outcome_key] = [{ date: today, price: o.price }]
-          }
-        }
-        setOutcomeSeries(series)
       }
-    }).finally(() => setLoading(false))
+
+      marketsApi.history(id, 90).then((hist) => {
+        setHistory(hist.map((p: ApiPricePoint) => ({ date: p.recorded_at.slice(0, 10), price: p.yes_price })))
+        if (m.market_type === 'multi') {
+          const series: Record<string, PricePoint[]> = {}
+          for (const pt of hist) {
+            if (!pt.outcome_key) continue
+            if (!series[pt.outcome_key]) series[pt.outcome_key] = []
+            series[pt.outcome_key].push({ date: pt.recorded_at, price: pt.yes_price })
+          }
+          if (Object.keys(series).length === 0) {
+            const today = new Date().toISOString()
+            for (const o of m.outcomes ?? []) series[o.outcome_key] = [{ date: today, price: o.price }]
+          }
+          setOutcomeSeries(series)
+        }
+      }).catch(() => {})
+
+      marketsApi.comments(id).then(setComments).catch(() => {})
+    }).catch(() => setMarket(null)).finally(() => setLoading(false))
   }, [id])
 
   useEffect(() => {
@@ -96,15 +96,25 @@ export function MarketDetail() {
         if (typeof data.yes_price === 'number') setYesPrice(data.yes_price as number)
         if (typeof data.volume === 'number') setVolume(data.volume as number)
         if (Array.isArray(data.outcomes)) {
+          const incoming = data.outcomes as { outcome_key: string; price: number }[]
           const now = new Date().toISOString()
           setOutcomeSeries(prev => {
             const next = { ...prev }
-            for (const o of data.outcomes as { outcome_key: string; price: number }[]) {
+            for (const o of incoming) {
               next[o.outcome_key] = [...(next[o.outcome_key] ?? []), { date: now, price: o.price }]
             }
             return next
           })
-        } else {
+          // Also update the visible outcome prices (ranked list + BetBox) on others' trades.
+          setOutcomes(prev => {
+            const updated = prev.map(o => {
+              const u = incoming.find(x => x.outcome_key === o.outcome_key)
+              return u ? { ...o, price: u.price } : o
+            })
+            return [...updated].sort((a, b) => b.price - a.price)
+          })
+        } else if (typeof data.yes_price === 'number') {
+          // Guard: comment broadcasts also carry type 'price_update' but no yes_price.
           setHistory(prev => [...prev, { date: new Date().toISOString().slice(0, 10), price: data.yes_price as number }])
         }
       }
@@ -513,7 +523,7 @@ export function MarketDetail() {
               </div>
             ) : (
               <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: 24 }}>
-                <a href="/api/auth/google" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+                <a href={authApi.googleUrl()} style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
                   Inicia sesión
                 </a>{' '}para comentar
               </p>

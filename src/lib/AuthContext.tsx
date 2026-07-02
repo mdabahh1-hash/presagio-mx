@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { usersApi, authApi, setToken, clearToken, type ApiUser } from './api'
+import { usersApi, authApi, clearToken, type ApiUser } from './api'
 import { getPendingRef, clearPendingRef } from './referral'
 import { track } from './analytics'
 
@@ -43,8 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const me = await usersApi.me()
       setUser(me)
       await attachPendingReferral(me)
-    } catch {
+    } catch (e) {
       setUser(null)
+      // Only drop the token on a real auth failure — not on transient network errors.
+      if ((e as { status?: number })?.status === 401) clearToken()
     }
   }, [])
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { usersApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
+import { usersApi, authApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
 import { ReferralCard } from '../components/ReferralCard'
@@ -53,7 +53,7 @@ export function Profile() {
         <p style={{ color: 'var(--text-tertiary)', marginBottom: 28, fontSize: '0.9rem' }}>
           Gestiona tu balance, posiciones e historial de operaciones.
         </p>
-        <a href="/api/auth/google" style={{ textDecoration: 'none' }}>
+        <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
           <button style={{
             background: 'linear-gradient(135deg, var(--brand), #b03018)',
             border: 'none', padding: '14px 32px', color: '#fff',
@@ -287,16 +287,24 @@ export function Profile() {
                   style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}
                 >
                   <div>
-                    <span style={{
-                      fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      color: pos.side === 'YES' ? 'var(--green)' : 'var(--red)',
-                      background: pos.side === 'YES' ? 'rgba(0, 232, 125, 0.1)' : 'rgba(255, 45, 85, 0.1)',
-                      border: `1px solid ${pos.side === 'YES' ? 'rgba(0, 232, 125, 0.25)' : 'rgba(255, 45, 85, 0.25)'}`,
-                      padding: '3px 10px', borderRadius: 99,
-                    }}>
-                      {pos.side}
-                    </span>
+                    {(() => {
+                      // Binary positions have side YES/NO; multi positions carry the outcome label in outcome_key.
+                      const isYes = pos.side === 'YES'
+                      const isNo = pos.side === 'NO'
+                      const label = pos.side ?? pos.outcome_key ?? '—'
+                      const color = isYes ? 'var(--green)' : isNo ? 'var(--red)' : 'var(--gold)'
+                      const bg = isYes ? 'rgba(0, 232, 125, 0.1)' : isNo ? 'rgba(255, 45, 85, 0.1)' : 'rgba(255, 215, 0, 0.1)'
+                      const border = isYes ? 'rgba(0, 232, 125, 0.25)' : isNo ? 'rgba(255, 45, 85, 0.25)' : 'rgba(255, 215, 0, 0.25)'
+                      return (
+                        <span style={{
+                          fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em',
+                          textTransform: 'uppercase', color, background: bg,
+                          border: `1px solid ${border}`, padding: '3px 10px', borderRadius: 99,
+                        }}>
+                          {label}
+                        </span>
+                      )
+                    })()}
                     <p style={{ margin: '10px 0 0', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {pos.market_question}
                     </p>

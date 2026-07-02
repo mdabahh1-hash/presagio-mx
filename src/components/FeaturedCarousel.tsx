@@ -34,7 +34,8 @@ interface FeaturedCarouselProps {
 export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselProps) {
   const featured = useMemo(() => {
     return markets
-      .filter(m => m.status === 'open')
+      // Binary only — the carousel's YES/NO BetBox + "SÍ x%" headline don't fit multi markets.
+      .filter(m => m.status === 'open' && m.market_type !== 'multi')
       .sort((a, b) => {
         if (a.trending !== b.trending) return a.trending ? -1 : 1
         return b.volume - a.volume

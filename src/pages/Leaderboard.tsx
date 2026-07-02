@@ -44,12 +44,14 @@ export function Leaderboard() {
   const [sort, setSort] = useState<'pnl' | 'volume'>('pnl')
 
   useEffect(() => {
+    let active = true
     setLoading(true)
     setError(false)
     usersApi.leaderboard(50, PERIOD_PARAM[period])
-      .then(setUsers)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false))
+      .then(data => { if (active) setUsers(data) })
+      .catch(() => { if (active) setError(true) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }  // ignore a stale response if the period changed
   }, [period])
 
   // Sidebar: top gainers always by P&L

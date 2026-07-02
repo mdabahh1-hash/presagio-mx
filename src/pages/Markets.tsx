@@ -8,7 +8,7 @@ import type { Category, Market } from '../types'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = [
   'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
-  'Política MX', 'Deportes', 'Boxeo', 'Motor', 'México', 'Global', 'Tech', 'Clima',
+  'Política MX', 'Deportes', 'Boxeo', 'Motor', 'México', 'Global', 'Tech', 'Clima', 'Entretenimiento',
 ]
 const SORT_OPTIONS = [
   { value: 'volume', label: 'Mayor volumen' },
@@ -60,15 +60,18 @@ export function Markets() {
   }, [queryParam, catParam])
 
   useEffect(() => {
+    let active = true
     setLoading(true)
     marketsApi.list({
       category: activeCategory !== 'Todos' ? activeCategory : undefined,
       q: searchInput || undefined,
       sort: sortBy,
+      limit: 100,
     })
-      .then(data => setMarkets(data.map(apiToMarket)))
-      .catch(() => setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))))
-      .finally(() => setLoading(false))
+      .then(data => { if (active) setMarkets(data.map(apiToMarket)) })
+      .catch(() => { if (active) setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }  // drop out-of-order responses from fast typing / tab switches
   }, [activeCategory, searchInput, sortBy])
 
   const handleSearch = (e: React.FormEvent) => {

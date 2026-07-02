@@ -72,6 +72,7 @@ export default async function handler(req, res) {
       const m = await r.json()
       if (m && m.question) {
         title = `${m.question} — VEREDIKT`
+        if (m.description) description = m.description
       }
     }
   } catch (_e) {
