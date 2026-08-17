@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -38,6 +38,11 @@ export function MarketDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
+  // "Copiar jugada" prefill: /mercado/:id?side=YES&monto=120&outcome=key
+  const [searchParams] = useSearchParams()
+  const copySide = searchParams.get('side') === 'NO' ? 'NO' : searchParams.get('side') === 'YES' ? 'YES' : undefined
+  const copyAmount = Number(searchParams.get('monto')) || undefined
+  const copyOutcome = searchParams.get('outcome')
 
   const [market, setMarket] = useState<ApiMarket | null>(null)
   const [yesPrice, setYesPrice] = useState(50)
@@ -64,7 +69,8 @@ export function MarketDetail() {
       if (m.market_type === 'multi') {
         const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
         setOutcomes(sorted)
-        setSelectedOutcomeKey(sorted[0]?.outcome_key ?? null)
+        const preselected = copyOutcome && sorted.some(o => o.outcome_key === copyOutcome) ? copyOutcome : null
+        setSelectedOutcomeKey(preselected ?? sorted[0]?.outcome_key ?? null)
       }
 
       marketsApi.history(id, 90).then((hist) => {
@@ -666,6 +672,8 @@ export function MarketDetail() {
                 outcomes={outcomes}
                 selectedOutcomeKey={selectedOutcomeKey}
                 onOutcomeSelect={setSelectedOutcomeKey}
+                initialSide={copySide}
+                initialAmount={copyAmount}
                 onTraded={(p) => {
                   setYesPrice(p)
                   if (market.market_type === 'multi') {

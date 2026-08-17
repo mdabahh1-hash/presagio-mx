@@ -13,6 +13,8 @@ interface BetBoxProps {
   onTraded?: (newYesPrice: number) => void
   onRequireAuth?: () => void
   compact?: boolean
+  initialSide?: 'YES' | 'NO'
+  initialAmount?: number
 }
 
 export function BetBox({
@@ -25,10 +27,12 @@ export function BetBox({
   onTraded,
   onRequireAuth,
   compact = false,
+  initialSide,
+  initialAmount,
 }: BetBoxProps) {
   const { user, refreshUser } = useAuth()
-  const [side, setSide] = useState<'YES' | 'NO'>('YES')
-  const [amount, setAmount] = useState(100)
+  const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
+  const [amount, setAmount] = useState(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 100)
   const [trading, setTrading] = useState(false)
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)

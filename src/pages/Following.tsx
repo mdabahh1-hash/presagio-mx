@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { usersApi, type ApiFollowedUser } from '../lib/api'
+import { usersApi, type ApiFollowedUser, type ApiFeedTrade } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
+
+const TABS = ['Actividad', 'Usuarios'] as const
 
 function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
@@ -13,6 +15,13 @@ function fmtPnl(n: number) {
 }
 function fmtNum(n: number) {
   return Math.round(n).toLocaleString('es-MX')
+}
+function timeAgo(iso: string) {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000)
+  if (s < 60) return 'ahora'
+  if (s < 3600) return `hace ${Math.floor(s / 60)} min`
+  if (s < 86400) return `hace ${Math.floor(s / 3600)} h`
+  return `hace ${Math.floor(s / 86400)} d`
 }
 
 function Avatar({ name, url, size = 48 }: { name: string; url?: string | null; size?: number }) {
@@ -37,9 +46,26 @@ function positionTag(p: { side: string | null; outcome_key: string | null }) {
   return p.outcome_key ?? ''
 }
 
+function tradeTag(t: ApiFeedTrade) {
+  if (t.side === 'YES') return 'SÍ'
+  if (t.side === 'NO') return 'NO'
+  return t.outcome_label ?? t.outcome_key ?? ''
+}
+function tradeColor(t: ApiFeedTrade) {
+  if (t.side === 'YES') return 'var(--green)'
+  if (t.side === 'NO') return 'var(--red)'
+  return 'var(--blue)'
+}
+// price_after is the YES price for binary markets; a NO buyer paid the complement.
+function tradePrice(t: ApiFeedTrade) {
+  return t.side === 'NO' ? 100 - t.price_after : t.price_after
+}
+
 export function Following() {
   const { user, loading: authLoading } = useAuth()
+  const [tab, setTab] = useState<typeof TABS[number]>('Actividad')
   const [users, setUsers] = useState<ApiFollowedUser[]>([])
+  const [feed, setFeed] = useState<ApiFeedTrade[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -48,8 +74,8 @@ export function Following() {
     if (!user) { setLoading(false); return }
     let active = true
     setLoading(true)
-    usersApi.following()
-      .then(data => { if (active) setUsers(data) })
+    Promise.all([usersApi.following(), usersApi.feed()])
+      .then(([f, t]) => { if (active) { setUsers(f); setFeed(t) } })
       .catch(() => { if (active) setError(true) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
@@ -57,6 +83,7 @@ export function Following() {
 
   async function unfollow(u: ApiFollowedUser) {
     setUsers(prev => prev.filter(x => x.id !== u.id))  // optimistic
+    setFeed(prev => prev.filter(t => t.username !== u.username))
     try {
       await usersApi.unfollow(u.username)
       track('Unfollow', { username: u.username, context: 'following_page' })
@@ -86,24 +113,104 @@ export function Following() {
     )
   }
 
+  const emptyState = (
+    <div className="card" style={{ padding: 40, textAlign: 'center' }}>
+      <p style={{ color: 'var(--text-secondary)', margin: '0 0 14px' }}>Aún no sigues a nadie.</p>
+      <Link to="/clasificacion" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+        Ver clasificación →
+      </Link>
+    </div>
+  )
+
   return (
     <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '44px 24px 24px' }}>
       <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
         Siguiendo
       </h1>
 
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
+        {TABS.map(t => {
+          const active = t === tab
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              style={{
+                background: active ? 'rgba(255,215,0,0.12)' : 'var(--bg-card)',
+                border: `1px solid ${active ? 'var(--gold)' : 'var(--border-subtle)'}`,
+                borderRadius: 99, padding: '8px 18px',
+                fontSize: '0.82rem', fontWeight: 700,
+                color: active ? 'var(--gold)' : 'var(--text-tertiary)',
+                cursor: 'pointer',
+                fontFamily: 'DM Sans', transition: 'all 0.15s',
+              }}
+            >
+              {t}
+            </button>
+          )
+        })}
+      </div>
+
       {error ? (
         <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
           No se pudo cargar la lista. Intenta más tarde.
         </div>
       ) : users.length === 0 ? (
-        <div className="card" style={{ padding: 40, textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-secondary)', margin: '0 0 14px' }}>Aún no sigues a nadie.</p>
-          <Link to="/clasificacion" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-            Ver clasificación →
-          </Link>
-        </div>
+        emptyState
+      ) : tab === 'Actividad' ? (
+        /* ── Activity feed ── */
+        feed.length === 0 ? (
+          <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>
+            Los usuarios que sigues todavía no hacen ninguna jugada.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {feed.map(t => (
+              <div key={t.id} className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', flexWrap: 'wrap' }}>
+                <Link to={`/u/${t.username}`} style={{ flexShrink: 0 }}>
+                  <Avatar name={t.display_name} url={t.avatar_url} size={40} />
+                </Link>
+                <div style={{ flex: 1, minWidth: 220 }}>
+                  <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <Link to={`/u/${t.username}`} style={{ color: 'var(--text-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                      {t.display_name}
+                    </Link>
+                    {' '}compró{' '}
+                    <span style={{ color: tradeColor(t), fontWeight: 800 }}>{tradeTag(t)}</span>
+                    {' '}a <span className="font-mono" style={{ fontWeight: 700 }}>{Math.round(tradePrice(t))}%</span> en{' '}
+                    <Link to={`/mercado/${t.market_id}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                      {t.market_question}
+                    </Link>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 3 }}>
+                    <span className="font-mono" style={{ color: 'var(--gold)', fontWeight: 700 }}>{fmtNum(t.cost)} PT</span>
+                    {' · '}{timeAgo(t.created_at)}
+                  </div>
+                </div>
+                {t.market_status === 'open' && (
+                  <Link
+                    to={`/mercado/${t.market_id}?${new URLSearchParams({
+                      ...(t.side ? { side: t.side } : {}),
+                      ...(t.outcome_key && t.market_type === 'multi' ? { outcome: t.outcome_key } : {}),
+                      monto: String(Math.max(1, Math.round(t.cost))),
+                    })}`}
+                    onClick={() => track('CopyTrade', { market: t.market_id, from: t.username })}
+                    style={{
+                      flexShrink: 0, textDecoration: 'none',
+                      background: 'linear-gradient(135deg, #FFD700, #cc9900)', color: '#07071A',
+                      borderRadius: 10, padding: '9px 16px', fontSize: '0.78rem', fontWeight: 800,
+                    }}
+                  >
+                    Copiar jugada
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        )
       ) : (
+        /* ── Followed users list ── */
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {users.map(u => (
             <div key={u.id} className="card" style={{ padding: '18px 20px' }}>

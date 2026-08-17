@@ -196,6 +196,24 @@ export interface ApiFollowedUser extends ApiLeaderboardEntry {
   top_positions: ApiPosition[]
 }
 
+export interface ApiFeedTrade {
+  id: number
+  created_at: string
+  side: 'YES' | 'NO' | null
+  outcome_key: string | null
+  outcome_label: string | null
+  shares: number
+  cost: number
+  price_after: number
+  username: string
+  display_name: string
+  avatar_url: string | null
+  market_id: string
+  market_question: string
+  market_status: string
+  market_type: 'binary' | 'multi'
+}
+
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
@@ -218,6 +236,7 @@ export const usersApi = {
   unfollow: (username: string) =>
     request<{ following: boolean; followers_count: number }>(`/users/${username}/follow`, { method: 'DELETE' }),
   following: () => request<ApiFollowedUser[]>('/users/me/following'),
+  feed: (limit = 50) => request<ApiFeedTrade[]>(`/users/me/feed?limit=${limit}`),
   claimDailyBonus: () =>
     request<{ awarded: number; streak: number; new_balance: number }>('/users/me/daily-bonus', { method: 'POST' }),
 }
