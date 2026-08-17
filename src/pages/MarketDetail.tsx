@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { displayPair } from '../lib/prices'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -169,7 +170,7 @@ export function MarketDetail() {
   }
 
   const catColor = CATEGORY_COLORS[market.category] || '#8888cc'
-  const noPrice = Math.round(100 - yesPrice)
+  const pair = displayPair(yesPrice)  // NO derived from rounded YES: always sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
 
   return (
@@ -323,21 +324,21 @@ export function MarketDetail() {
                       color: yesColor, lineHeight: 1,
                       letterSpacing: '-0.04em',
                     }}>
-                      {Math.round(yesPrice)}%
+                      {pair.yes}%
                     </span>
                     <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
                   </div>
                   <div style={{ paddingBottom: 8, opacity: 0.5 }}>
                     <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
-                      {noPrice}%
+                      {pair.no}%
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
                   </div>
                 </div>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                    <span style={{ color: 'var(--green)' }}>SÍ · {Math.round(yesPrice)}%</span>
-                    <span style={{ color: 'var(--red)' }}>NO · {noPrice}%</span>
+                    <span style={{ color: 'var(--green)' }}>SÍ · {pair.yes}%</span>
+                    <span style={{ color: 'var(--red)' }}>NO · {pair.no}%</span>
                   </div>
                   <div className="prob-bar-dual">
                     <div style={{

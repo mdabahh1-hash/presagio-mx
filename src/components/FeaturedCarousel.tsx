@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { marketsApi, type ApiMarket, type ApiPricePoint } from '../lib/api'
 import { FullChart } from './SparkChart'
 import { BetBox } from './BetBox'
+import { displayPair } from '../lib/prices'
 import type { PricePoint } from '../types'
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -73,8 +74,9 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
   if (featured.length === 0 || !current) return null
 
   const m = current
-  const yesPrice = priceOverrides[m.id] ?? Math.round(m.yes_price)
-  const noPrice = Math.round(100 - yesPrice)
+  // Keep the RAW float (BetBox needs the exact spot); round only at the labels.
+  const yesPrice = priceOverrides[m.id] ?? m.yes_price
+  const pair = displayPair(yesPrice)  // NO derived from rounded YES: sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
   const catColor = CATEGORY_COLORS[m.category] || '#a0c4ff'
   const chartData = historyCache[m.id] ?? []
@@ -157,13 +159,13 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
                   fontWeight: 800, fontFamily: 'DM Mono',
                   color: yesColor, lineHeight: 1, letterSpacing: '-0.04em',
                 }}>
-                  {yesPrice}%
+                  {pair.yes}%
                 </span>
                 <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
               </div>
               <div style={{ paddingBottom: 6, opacity: 0.5 }}>
                 <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
-                  {noPrice}%
+                  {pair.no}%
                 </span>
                 <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
               </div>
@@ -234,7 +236,7 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
               yesPrice={yesPrice}
               compact
               onRequireAuth={onRequireAuth}
-              onTraded={(p) => setPriceOverrides(prev => ({ ...prev, [m.id]: Math.round(p) }))}
+              onTraded={(p) => setPriceOverrides(prev => ({ ...prev, [m.id]: p }))}
             />
           </div>
         </div>
