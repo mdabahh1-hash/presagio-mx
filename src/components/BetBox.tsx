@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
-import { tradesApi, authApi, type ApiOutcome } from '../lib/api'
+import React, { useState, useEffect } from 'react'
+import { tradesApi, marketsApi, authApi, type ApiOutcome, type ApiQuote } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
+import { displayPair } from '../lib/prices'
+import { useDebouncedValue, useThrottledValue } from '../lib/useDebouncedValue'
 
 interface BetBoxProps {
   marketId: string
@@ -36,21 +38,36 @@ export function BetBox({
   const [trading, setTrading] = useState(false)
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
+  const [quote, setQuote] = useState<ApiQuote | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   const isMulti = marketType === 'multi'
-  const noPrice = Math.round(100 - yesPrice)
+  // NO label derived from rounded YES so the pair always sums to 100.
+  const pair = displayPair(yesPrice)
 
   const selectedOutcome = isMulti
     ? outcomes.find(o => o.outcome_key === selectedOutcomeKey) ?? outcomes[0] ?? null
     : null
 
-  const currentPrice = isMulti
-    ? (selectedOutcome?.price ?? 0)
-    : side === 'YES' ? yesPrice : noPrice
+  // Re-quote triggers: amount is debounced (300ms — user input), while
+  // WS-driven price ticks are throttled to at most one re-quote per 2s
+  // (latest value wins; intermediate ticks are not queued).
+  const debouncedAmount = useDebouncedValue(amount, 300)
+  const wsPrice = isMulti ? (selectedOutcome?.price ?? 0) : yesPrice
+  const throttledWsPrice = useThrottledValue(wsPrice, 2000)
 
-  const potential = currentPrice > 0
-    ? ((amount / (currentPrice / 100)) - amount).toFixed(0)
-    : '0'
+  useEffect(() => {
+    let cancelled = false
+    const opts = isMulti
+      ? selectedOutcome ? { outcome_key: selectedOutcome.outcome_key, amount: debouncedAmount } : null
+      : { side, amount: debouncedAmount }
+    if (!opts) { setQuote(null); return }
+    marketsApi.quote(marketId, opts)
+      .then(q => { if (!cancelled) setQuote(q) })
+      .catch(() => { if (!cancelled) setQuote(null) })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketId, debouncedAmount, side, selectedOutcome?.outcome_key, isMulti, throttledWsPrice])
 
   const handleTrade = async () => {
     if (!user) {
@@ -62,21 +79,43 @@ export function BetBox({
     setTradeError(null)
     setTradeSuccess(null)
     try {
+      // Use the current quote's price as protection; if it expired, refresh it first.
+      let quotedPrice = quote?.avg_fill_price
+      if (quote && Date.now() > new Date(quote.quote_expires_at).getTime()) {
+        try {
+          const fresh = await marketsApi.quote(marketId, isMulti
+            ? { outcome_key: selectedOutcome!.outcome_key, amount }
+            : { side, amount })
+          setQuote(fresh)
+          quotedPrice = fresh.avg_fill_price
+        } catch { quotedPrice = undefined }
+      }
+
       let result
       if (isMulti) {
         if (!selectedOutcome) { setTradeError('Selecciona un resultado'); setTrading(false); return }
-        result = await tradesApi.execute(marketId, { outcome_key: selectedOutcome.outcome_key, points: amount })
-        setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones de "${selectedOutcome.label}" por ${result.cost.toFixed(0)} PT`)
+        result = await tradesApi.execute(marketId, { outcome_key: selectedOutcome.outcome_key, points: amount, quoted_avg_price: quotedPrice })
+        setTradeSuccess(`Compraste ${result.shares.toFixed(1)} acciones de "${selectedOutcome.label}" por ${Math.round(result.cost)} PT`)
       } else {
-        result = await tradesApi.execute(marketId, { side, points: amount })
-        setTradeSuccess(`Compraste ${result.shares.toFixed(2)} acciones ${side} por ${result.cost.toFixed(0)} PT`)
+        result = await tradesApi.execute(marketId, { side, points: amount, quoted_avg_price: quotedPrice })
+        setTradeSuccess(`Compraste ${result.shares.toFixed(1)} acciones ${side === 'YES' ? 'SÍ' : 'NO'} por ${Math.round(result.cost)} PT`)
       }
       track('Trade', { market: marketId, type: marketType, cost: Math.round(result.cost) })
       onTraded?.(result.new_yes_price)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)
     } catch (e: any) {
-      setTradeError(e.message)
+      if (e.code === 'PRICE_MOVED') {
+        setTradeError('El precio cambió, revisa tu orden')
+        // Auto re-quote so the panel shows the fresh execution price.
+        marketsApi.quote(marketId, isMulti
+          ? { outcome_key: selectedOutcome!.outcome_key, amount }
+          : { side, amount })
+          .then(setQuote)
+          .catch(() => {})
+      } else {
+        setTradeError(e.message)
+      }
     } finally {
       setTrading(false)
     }
@@ -120,7 +159,7 @@ export function BetBox({
           {(['YES', 'NO'] as const).map(s => {
             const isSelected = side === s
             const color = s === 'YES' ? 'var(--green)' : 'var(--red)'
-            const price = s === 'YES' ? Math.round(yesPrice) : noPrice
+            const price = s === 'YES' ? pair.yes : pair.no
             return (
               <button
                 key={s}
@@ -236,31 +275,85 @@ export function BetBox({
         ))}
       </div>
 
-      {/* Trade summary */}
+      {/* Trade summary — every number comes from the SAME quote (single source of truth) */}
       <div style={{
         background: 'var(--bg-surface)',
         borderRadius: 10, padding: '14px 16px',
         marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10,
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-tertiary)' }}>Precio actual</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>Precio promedio de ejecución</span>
           <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
-            {currentPrice.toFixed(1)}%
+            {quote ? `${quote.avg_fill_price.toFixed(1)}%` : '—'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+          <span style={{ color: 'var(--text-tertiary)' }}>Recibes</span>
+          <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+            {quote ? `${quote.shares.toFixed(1)} acciones` : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--text-tertiary)' }}>Ganancia potencial</span>
           <span className="font-mono" style={{ color: 'var(--green)', fontWeight: 800 }}>
-            +{potential} PT
+            {quote ? `+${Math.round(quote.potential_gain)} PT` : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--text-tertiary)' }}>Máx. pérdida</span>
           <span className="font-mono" style={{ color: 'var(--red)', fontWeight: 700 }}>
-            -{amount} PT
+            {quote ? `-${Math.round(quote.max_loss)} PT` : `-${amount} PT`}
           </span>
         </div>
+
+        {/* Collapsible price details */}
+        {quote && (
+          <div>
+            <button
+              onClick={() => setDetailsOpen(o => !o)}
+              style={{
+                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700,
+                fontFamily: 'DM Sans', display: 'flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              Detalles del precio {detailsOpen ? '▴' : '▾'}
+            </button>
+            {detailsOpen && (
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-tertiary)' }}>Mejor precio disponible</span>
+                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.mid_price.toFixed(1)}%</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-tertiary)' }}>Precio promedio de tu orden</span>
+                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.avg_fill_price.toFixed(1)}%</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                  <span style={{ color: 'var(--text-tertiary)' }}>Costo por tamaño de orden</span>
+                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.slippage_cost.toFixed(1)} PT</span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                  Tu orden mueve el precio de {quote.mid_price.toFixed(1)}% a {quote.price_after.toFixed(1)}% por su tamaño.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Low-liquidity warning (amber) — informs, never blocks */}
+      {quote?.liquidity_warning && (
+        <div style={{
+          margin: '0 0 14px', fontSize: '0.78rem', color: '#ffc107',
+          background: 'rgba(255, 193, 7, 0.08)',
+          border: '1px solid rgba(255, 193, 7, 0.25)',
+          borderRadius: 8, padding: '10px 14px', lineHeight: 1.5,
+        }}>
+          Este mercado tiene poca liquidez. Tu orden se ejecutará a un precio promedio
+          de {quote.avg_fill_price.toFixed(1)}%, mayor al precio mostrado.
+        </div>
+      )}
 
       {tradeError && (
         <div style={{
