@@ -22,13 +22,20 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...init, headers })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }))
-    // FastAPI 422 returns `detail` as an array of error objects; surface the first msg.
+    // FastAPI `detail` can be a string, a 422 array of error objects, or a
+    // structured dict like {code: 'PRICE_MOVED', message: '...'}.
     const d = err?.detail
     const msg = typeof d === 'string'
       ? d
-      : Array.isArray(d) ? (d[0]?.msg ?? 'Datos inválidos') : 'Error desconocido'
-    const e = new Error(msg) as Error & { status?: number }
+      : Array.isArray(d) ? (d[0]?.msg ?? 'Datos inválidos')
+      : (d && typeof d === 'object' && typeof d.message === 'string') ? d.message
+      : 'Error desconocido'
+    const e = new Error(msg) as Error & { status?: number; code?: string; detail?: unknown }
     e.status = res.status
+    if (d && typeof d === 'object' && !Array.isArray(d)) {
+      e.code = d.code
+      e.detail = d
+    }
     throw e
   }
   if (res.status === 204) return undefined as T
@@ -77,7 +84,35 @@ export interface ApiComment {
   user: { id: number; username: string; display_name: string; avatar_url: string | null; points: number; markets_traded: number; accuracy: number; created_at: string }
 }
 
+export interface ApiQuote {
+  market_id: string
+  market_type: 'binary' | 'multi'
+  side: 'YES' | 'NO' | null
+  outcome_key: string | null
+  amount: number
+  mid_price: number
+  mid_yes_price: number
+  mid_no_price: number
+  avg_fill_price: number
+  price_after: number
+  shares: number
+  potential_payout: number
+  potential_gain: number
+  max_loss: number
+  slippage_cost: number
+  spread_pct: number
+  slippage_pct: number
+  liquidity_warning: boolean
+  quote_expires_at: string
+}
+
 export const marketsApi = {
+  quote: (id: string, opts: { side?: 'YES' | 'NO'; outcome_key?: string; amount: number }) => {
+    const qs = new URLSearchParams({ amount: String(opts.amount) })
+    if (opts.side) qs.set('side', opts.side)
+    if (opts.outcome_key) qs.set('outcome_key', opts.outcome_key)
+    return request<ApiQuote>(`/markets/${id}/quote?${qs}`)
+  },
   list: (params?: { category?: string; q?: string; sort?: string; limit?: number }) => {
     const qs = new URLSearchParams()
     if (params?.category) qs.set('category', params.category)
@@ -114,7 +149,7 @@ export interface TradeResponse {
 }
 
 export const tradesApi = {
-  execute: (marketId: string, opts: { side?: 'YES' | 'NO'; outcome_key?: string; points: number }) =>
+  execute: (marketId: string, opts: { side?: 'YES' | 'NO'; outcome_key?: string; points: number; quoted_avg_price?: number }) =>
     request<TradeResponse>(`/markets/${marketId}/trade`, {
       method: 'POST',
       body: JSON.stringify(opts),
