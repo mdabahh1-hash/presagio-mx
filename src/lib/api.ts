@@ -157,6 +157,9 @@ export interface ApiProfilePublic {
   markets_traded: number
   accuracy: number
   created_at: string
+  followers_count: number
+  following_count: number
+  is_following: boolean | null
 }
 
 export interface ApiPosition {
@@ -186,6 +189,13 @@ export interface ApiLeaderboardEntry {
   accuracy: number
 }
 
+export interface ApiFollowedUser extends ApiLeaderboardEntry {
+  points: number
+  followed_at: string
+  positions_count: number
+  top_positions: ApiPosition[]
+}
+
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
@@ -203,6 +213,11 @@ export const usersApi = {
     request<ApiUser>('/users/me', { method: 'PATCH', body: JSON.stringify(data) }),
   get: (username: string) => request<ApiProfilePublic>(`/users/${username}`),
   publicPositions: (username: string) => request<ApiPosition[]>(`/users/${username}/positions`),
+  follow: (username: string) =>
+    request<{ following: boolean; followers_count: number }>(`/users/${username}/follow`, { method: 'POST' }),
+  unfollow: (username: string) =>
+    request<{ following: boolean; followers_count: number }>(`/users/${username}/follow`, { method: 'DELETE' }),
+  following: () => request<ApiFollowedUser[]>('/users/me/following'),
   claimDailyBonus: () =>
     request<{ awarded: number; streak: number; new_balance: number }>('/users/me/daily-bonus', { method: 'POST' }),
 }

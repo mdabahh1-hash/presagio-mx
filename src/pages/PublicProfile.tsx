@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { usersApi, type ApiProfilePublic, type ApiPosition } from '../lib/api'
+import { useAuth } from '../lib/AuthContext'
+import { AuthModal } from '../components/AuthModal'
+import { track } from '../lib/analytics'
 
 function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
@@ -15,10 +18,15 @@ function fmtNum(n: number) {
 
 export function PublicProfile() {
   const { username } = useParams<{ username: string }>()
+  const { user } = useAuth()
   const [profile, setProfile] = useState<ApiProfilePublic | null>(null)
   const [positions, setPositions] = useState<ApiPosition[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [followersCount, setFollowersCount] = useState(0)
+  const [followBusy, setFollowBusy] = useState(false)
+  const [authModal, setAuthModal] = useState(false)
 
   useEffect(() => {
     if (!username) return
@@ -27,11 +35,36 @@ export function PublicProfile() {
     usersApi.get(username)
       .then(p => {
         setProfile(p)
+        setIsFollowing(p.is_following === true)
+        setFollowersCount(p.followers_count)
         return usersApi.publicPositions(username).then(setPositions).catch(() => {})
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
-  }, [username])
+  }, [username, user?.id])
+
+  async function toggleFollow() {
+    if (!profile || followBusy) return
+    if (!user) { setAuthModal(true); return }
+    const wasFollowing = isFollowing
+    setFollowBusy(true)
+    setIsFollowing(!wasFollowing)
+    setFollowersCount(c => c + (wasFollowing ? -1 : 1))
+    try {
+      const res = wasFollowing
+        ? await usersApi.unfollow(profile.username)
+        : await usersApi.follow(profile.username)
+      setIsFollowing(res.following)
+      setFollowersCount(res.followers_count)
+      track(wasFollowing ? 'Unfollow' : 'Follow', { username: profile.username })
+    } catch {
+      // Revert optimistic update on error
+      setIsFollowing(wasFollowing)
+      setFollowersCount(c => c + (wasFollowing ? 1 : -1))
+    } finally {
+      setFollowBusy(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -53,7 +86,9 @@ export function PublicProfile() {
     )
   }
 
+  const isOwnProfile = user?.username === profile.username
   const memberSince = new Date(profile.created_at).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
+  const followersLabel = followersCount === 1 ? '1 seguidor' : `${fmtNum(followersCount)} seguidores`
   const stats = [
     { label: 'Ganancia/Pérdida', value: fmtPnl(profile.pnl), color: profile.pnl >= 0 ? 'var(--green)' : 'var(--red)' },
     { label: 'Precisión', value: `${profile.accuracy}%`, color: 'var(--text-primary)' },
@@ -80,7 +115,30 @@ export function PublicProfile() {
             {profile.display_name}
           </h1>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>Miembro desde {memberSince}</div>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
+            {followersLabel} · sigue a {fmtNum(profile.following_count)}
+          </div>
         </div>
+        {!isOwnProfile && (
+          <button
+            onClick={toggleFollow}
+            disabled={followBusy}
+            style={isFollowing ? {
+              marginLeft: 'auto', flexShrink: 0, cursor: 'pointer',
+              background: 'var(--bg-elevated)', color: 'var(--text-secondary)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 10, padding: '9px 18px', fontSize: '0.85rem', fontWeight: 700,
+              opacity: followBusy ? 0.6 : 1,
+            } : {
+              marginLeft: 'auto', flexShrink: 0, cursor: 'pointer',
+              background: 'linear-gradient(135deg, #FFD700, #cc9900)', color: '#07071A',
+              border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: '0.85rem', fontWeight: 800,
+              opacity: followBusy ? 0.6 : 1,
+            }}
+          >
+            {isFollowing ? 'Siguiendo ✓' : 'Seguir'}
+          </button>
+        )}
       </div>
 
       {/* Stats */}
@@ -102,8 +160,12 @@ export function PublicProfile() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {positions.map(p => {
-            const side = p.side === 'YES' ? 'SÍ' : 'NO'
-            const color = p.side === 'YES' ? 'var(--green)' : 'var(--red)'
+            // Binary markets have side YES/NO; multi-outcome markets have side
+            // null and the outcome label in outcome_key.
+            const isBinary = p.side === 'YES' || p.side === 'NO'
+            const label = isBinary ? (p.side === 'YES' ? 'SÍ' : 'NO') : (p.outcome_key ?? '—')
+            const color = isBinary ? (p.side === 'YES' ? 'var(--green)' : 'var(--red)') : 'var(--blue)'
+            const bg = p.side === 'YES' ? 'rgba(0,232,125,0.1)' : p.side === 'NO' ? 'rgba(255,45,85,0.1)' : 'rgba(60,130,246,0.1)'
             const invested = p.avg_cost * p.shares
             return (
               <Link key={p.id} to={`/mercado/${p.market_id}`} className="lb-row card" style={{
@@ -111,9 +173,10 @@ export function PublicProfile() {
               }}>
                 <span style={{
                   fontSize: '0.7rem', fontWeight: 800, color, flexShrink: 0,
-                  background: `${color === 'var(--green)' ? 'rgba(0,232,125,0.1)' : 'rgba(255,45,85,0.1)'}`,
+                  background: bg,
                   border: `1px solid ${color}`, borderRadius: 8, padding: '4px 10px',
-                }}>{side}</span>
+                  maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>{label}</span>
                 <span style={{ flex: 1, minWidth: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {p.market_question}
                 </span>
@@ -125,6 +188,8 @@ export function PublicProfile() {
           })}
         </div>
       )}
+
+      {authModal && <AuthModal initialMode="login" onClose={() => setAuthModal(false)} />}
     </div>
   )
 }

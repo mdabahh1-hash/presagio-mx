@@ -217,6 +217,19 @@ export function Navbar() {
                     <>
                       <div style={{ height: 1, background: 'var(--border-subtle)', margin: '6px 8px' }} />
                       <Link
+                        to="/siguiendo"
+                        onClick={() => setDeskMenu(false)}
+                        style={{
+                          display: 'block', textDecoration: 'none',
+                          padding: '11px 14px', borderRadius: 9,
+                          fontSize: '0.875rem', fontWeight: 600,
+                          color: isActive('/siguiendo') ? 'var(--text-primary)' : 'var(--text-secondary)',
+                          background: isActive('/siguiendo') ? 'rgba(255,215,0,0.08)' : 'transparent',
+                        }}
+                      >
+                        Siguiendo
+                      </Link>
+                      <Link
                         to="/perfil"
                         onClick={() => setDeskMenu(false)}
                         style={{
@@ -343,6 +356,23 @@ export function Navbar() {
                   <div className="live-dot" />
                 </div>
 
+                <Link
+                  to="/siguiendo"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '15px', borderRadius: 12,
+                    fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)',
+                    background: 'var(--bg-card)', border: '1px solid var(--border-default)',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                  Siguiendo
+                </Link>
                 <Link
                   to="/perfil"
                   onClick={() => setMenuOpen(false)}

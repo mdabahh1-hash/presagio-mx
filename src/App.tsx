@@ -10,6 +10,7 @@ import { Admin } from './pages/Admin'
 import { HowItWorks } from './pages/HowItWorks'
 import { Leaderboard } from './pages/Leaderboard'
 import { PublicProfile } from './pages/PublicProfile'
+import { Following } from './pages/Following'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { setToken } from './lib/api'
 
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/mercados" element={<Markets />} />
             <Route path="/mercado/:id" element={<MarketDetail />} />
             <Route path="/perfil" element={<Profile />} />
+            <Route path="/siguiendo" element={<Following />} />
             <Route path="/clasificacion" element={<Leaderboard />} />
             <Route path="/como-funciona" element={<HowItWorks />} />
             <Route path="/u/:username" element={<PublicProfile />} />
