@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
@@ -96,23 +96,37 @@ export function Markets() {
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '36px 24px' }}>
 
       {/* Page header */}
-      <div className="anim-1" style={{ marginBottom: 36 }}>
-        <h1 className="font-display" style={{
-          fontSize: '2.2rem', fontWeight: 800,
-          letterSpacing: '-0.04em', margin: '0 0 8px',
+      <div className="anim-1" style={{
+        marginBottom: 36, display: 'flex', justifyContent: 'space-between',
+        alignItems: 'flex-start', flexWrap: 'wrap', gap: 16,
+      }}>
+        <div>
+          <h1 className="font-display" style={{
+            fontSize: '2.2rem', fontWeight: 800,
+            letterSpacing: '-0.04em', margin: '0 0 8px',
+          }}>
+            Mercados
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
+            {loading ? (
+              <span style={{ color: 'var(--text-tertiary)' }}>Cargando...</span>
+            ) : (
+              <>
+                <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'DM Mono' }}>{markets.length}</span>
+                {' '}mercados activos · Actualizado en tiempo real
+              </>
+            )}
+          </p>
+        </div>
+        <Link to="/proponer" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
+          border: '1px solid var(--gold)', color: 'var(--gold)',
+          background: 'rgba(255,215,0,0.06)', fontWeight: 700, fontSize: '0.85rem',
+          fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
-          Mercados
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
-          {loading ? (
-            <span style={{ color: 'var(--text-tertiary)' }}>Cargando...</span>
-          ) : (
-            <>
-              <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'DM Mono' }}>{markets.length}</span>
-              {' '}mercados activos · Actualizado en tiempo real
-            </>
-          )}
-        </p>
+          + Proponer mercado
+        </Link>
       </div>
 
       {/* Search + Controls */}
