@@ -276,6 +276,13 @@ export const usersApi = {
     request<{ awarded: number; streak: number; new_balance: number }>('/users/me/daily-bonus', { method: 'POST' }),
 }
 
+// ── Proposals ──────────────────────────────────────────────────────────────
+
+export const proposalsApi = {
+  submit: (data: { question: string; category: string; description?: string; proposer_contact?: string }) =>
+    request<{ ok: boolean; message: string }>('/proposals', { method: 'POST', body: JSON.stringify(data) }),
+}
+
 // ── Auth ───────────────────────────────────────────────────────────────────
 
 export const authApi = {

@@ -27,6 +27,7 @@ export function Navbar() {
     { to: '/mercados', label: 'Mercados' },
     { to: '/clasificacion', label: 'Clasificación' },
     { to: '/como-funciona', label: 'Cómo funciona' },
+    { to: '/proponer', label: 'Proponer mercado' },
   ]
 
   const isActive = (to: string) => {
@@ -197,6 +198,7 @@ export function Navbar() {
                     { to: '/mercados', label: 'Mercados' },
                     { to: '/clasificacion', label: 'Clasificación' },
                     { to: '/como-funciona', label: 'Cómo funciona' },
+                    { to: '/proponer', label: 'Proponer mercado' },
                   ].map(item => (
                     <Link
                       key={item.to}

@@ -5,6 +5,9 @@ import { useAuth } from '../lib/AuthContext'
 
 const ADMIN_EMAIL = 'mdabahh@atid.edu.mx'
 
+// TODO(admin): sección de propuestas de mercado (GET pending de market_proposals,
+// aprobar → crear mercado, rechazar). Backend: app/api/proposals.py.
+
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   open: { label: 'Abierto', color: 'var(--green)' },
   pending_resolution: { label: '⏳ Pendiente', color: 'var(--gold)' },

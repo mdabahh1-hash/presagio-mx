@@ -8,6 +8,7 @@ import { MarketDetail } from './pages/MarketDetail'
 import { Profile } from './pages/Profile'
 import { Admin } from './pages/Admin'
 import { HowItWorks } from './pages/HowItWorks'
+import { Propose } from './pages/Propose'
 import { Leaderboard } from './pages/Leaderboard'
 import { PublicProfile } from './pages/PublicProfile'
 import { Following } from './pages/Following'
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/siguiendo" element={<Following />} />
             <Route path="/clasificacion" element={<Leaderboard />} />
             <Route path="/como-funciona" element={<HowItWorks />} />
+            <Route path="/proponer" element={<Propose />} />
             <Route path="/u/:username" element={<PublicProfile />} />
             {/* OAuth callback is handled in AuthProvider useEffect */}
             <Route path="/auth/callback" element={<AuthCallbackRedirect />} />

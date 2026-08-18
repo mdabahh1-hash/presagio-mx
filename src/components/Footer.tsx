@@ -67,6 +67,7 @@ export function Footer() {
             <Link to="/como-funciona" style={colLink} className="footer-link">Cómo funciona</Link>
             <Link to="/clasificacion" style={colLink} className="footer-link">Clasificación</Link>
             <Link to="/mercados" style={colLink} className="footer-link">Mercados</Link>
+            <Link to="/proponer" style={colLink} className="footer-link">Proponer mercado</Link>
             <a href="#" style={colLink} className="footer-link">API</a>
           </div>
         </div>
