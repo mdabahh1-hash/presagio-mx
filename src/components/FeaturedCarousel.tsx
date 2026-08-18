@@ -5,12 +5,8 @@ import { FullChart } from './SparkChart'
 import { BetBox } from './BetBox'
 import { displayPair } from '../lib/prices'
 import type { PricePoint } from '../types'
+import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
-  'Global': '#a0c4ff', 'Tech': '#a060ff', 'Mundial 2026': '#00FF88', 'Crypto': '#f7931a',
-  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
-}
 
 function formatVolume(v: number) {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M`
@@ -78,7 +74,7 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
   const yesPrice = priceOverrides[m.id] ?? m.yes_price
   const pair = displayPair(yesPrice)  // NO derived from rounded YES: sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
-  const catColor = CATEGORY_COLORS[m.category] || '#a0c4ff'
+  const catColor = getCategoryColor(m.category)
   const chartData = historyCache[m.id] ?? []
 
   const go = (dir: number) => setActive(i => (i + dir + featured.length) % featured.length)
@@ -94,7 +90,7 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
               <span style={{
                 fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em',
                 textTransform: 'uppercase', color: catColor,
-                background: `${catColor}15`, border: `1px solid ${catColor}35`,
+                background: getCategoryBg(m.category), border: `1px solid ${getCategoryBorder(m.category)}`,
                 padding: '3px 10px', borderRadius: 99,
               }}>
                 {m.category}
@@ -103,8 +99,8 @@ export function FeaturedCarousel({ markets, onRequireAuth }: FeaturedCarouselPro
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
                   textTransform: 'uppercase', color: 'var(--gold)',
-                  background: 'rgba(255, 208, 96, 0.1)',
-                  border: '1px solid rgba(255, 208, 96, 0.25)',
+                  background: 'var(--oro-dim)',
+                  border: '1px solid var(--oro-glow)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
                   ▲ TENDENCIA

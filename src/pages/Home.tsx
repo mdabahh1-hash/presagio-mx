@@ -8,23 +8,11 @@ import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
+import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 
 const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Boxeo', 'Motor', 'Mundial 2026', 'Crypto', 'Tech', 'Global', 'Clima', 'Entretenimiento'] as const
 type MobileTab = typeof MOBILE_TABS[number]
 
-const MOBILE_TAB_COLORS: Record<string, string> = {
-  'Tendencia': '#FFD700',
-  'Política MX': '#FFD700',
-  'Economía': '#FFD700',
-  'Deportes': '#00FF88',
-  'Boxeo': '#ff4d6d',
-  'Motor': '#ff7849',
-  'Mundial 2026': '#00FF88',
-  'Crypto': '#f7931a',
-  'Tech': '#a060ff',
-  'Global': '#a0c4ff',
-  'Clima': '#38bdf8',
-}
 
 function apiToMarket(m: ApiMarket): Market {
   return {
@@ -145,14 +133,15 @@ export function Home() {
           }}>
             {MOBILE_TABS.map(tab => {
               const isActive = tab === mobileTab
-              const color = MOBILE_TAB_COLORS[tab] || 'var(--text-secondary)'
+              const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
+              const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
               return (
                 <button
                   key={tab}
                   onClick={() => setMobileTab(tab)}
                   style={{
                     flexShrink: 0,
-                    background: isActive ? `${color}18` : 'transparent',
+                    background: isActive ? activeBg : 'transparent',
                     border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
                     borderRadius: 99, padding: '7px 14px',
                     fontSize: '0.8rem', fontWeight: 700,
@@ -243,7 +232,7 @@ export function Home() {
               }}
             />
             <button type="submit" style={{
-              background: 'var(--oro)', border: 'none',
+              background: 'var(--oro-fill)', border: 'none',
               padding: '13px 20px', color: '#07071A',
               fontFamily: 'DM Sans', fontWeight: 700,
               fontSize: '0.78rem', letterSpacing: '0.08em',
@@ -257,7 +246,7 @@ export function Home() {
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
           border: '1px solid var(--gold)', color: 'var(--gold)',
-          background: 'rgba(255,215,0,0.06)', fontWeight: 700, fontSize: '0.85rem',
+          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
           fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
           + Proponer mercado
@@ -268,14 +257,15 @@ export function Home() {
       <div className="cat-tabs tabs-scroll anim-2" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 24 }}>
         {MOBILE_TABS.map(tab => {
           const isActive = tab === mobileTab
-          const color = MOBILE_TAB_COLORS[tab] || 'var(--text-secondary)'
+          const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
+              const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
           return (
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
               style={{
                 flexShrink: 0,
-                background: isActive ? `${color}18` : 'var(--bg-card)',
+                background: isActive ? activeBg : 'var(--bg-card)',
                 border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
                 borderRadius: 99, padding: '8px 16px',
                 fontSize: '0.82rem', fontWeight: 700,

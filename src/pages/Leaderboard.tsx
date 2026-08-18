@@ -26,7 +26,7 @@ function Avatar({ name, size = 40 }: { name: string; size?: number }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+      background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.34, fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
     }}>

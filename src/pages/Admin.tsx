@@ -12,9 +12,9 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   open: { label: 'Abierto', color: 'var(--green)' },
   pending_resolution: { label: '⏳ Pendiente', color: 'var(--gold)' },
   closed: { label: 'Cerrado', color: 'var(--gold)' },
-  resolved_yes: { label: 'Resuelto SÍ', color: '#60a5fa' },
+  resolved_yes: { label: 'Resuelto SÍ', color: 'var(--accent-alt)' },
   resolved_no: { label: 'Resuelto NO', color: 'var(--red)' },
-  resolved: { label: 'Resuelto', color: '#60a5fa' },
+  resolved: { label: 'Resuelto', color: 'var(--accent-alt)' },
   cancelled: { label: 'Cancelado', color: 'var(--text-tertiary)' },
 }
 
@@ -106,7 +106,7 @@ export function Admin() {
 
       {message && (
         <div style={{
-          background: message.startsWith('✓') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+          background: message.startsWith('✓') ? 'var(--green-soft)' : 'var(--red-soft)',
           border: `1px solid ${message.startsWith('✓') ? 'var(--green)' : 'var(--red)'}`,
           borderRadius: 8, padding: '12px 16px', marginBottom: 24,
           color: message.startsWith('✓') ? 'var(--green)' : 'var(--red)',
@@ -144,8 +144,8 @@ export function Admin() {
                     </span>
                     {isMulti && (
                       <span style={{
-                        fontSize: '0.6rem', fontWeight: 700, color: '#a0c4ff',
-                        background: 'rgba(160,196,255,0.1)', border: '1px solid rgba(160,196,255,0.3)',
+                        fontSize: '0.6rem', fontWeight: 700, color: 'var(--accent-alt)',
+                        background: 'var(--accent-alt-bg)', border: '1px solid var(--accent-alt-border)',
                         padding: '2px 6px', borderRadius: 99,
                       }}>MULTI</span>
                     )}

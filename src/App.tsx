@@ -13,10 +13,12 @@ import { Leaderboard } from './pages/Leaderboard'
 import { PublicProfile } from './pages/PublicProfile'
 import { Following } from './pages/Following'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { ThemeProvider } from './lib/ThemeContext'
 import { setToken } from './lib/api'
 
 export default function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
         <Navbar />
@@ -39,6 +41,7 @@ export default function App() {
         <Footer />
       </div>
     </AuthProvider>
+    </ThemeProvider>
   )
 }
 

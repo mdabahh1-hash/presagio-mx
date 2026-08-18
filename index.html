@@ -4,6 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" id="meta-theme-color" content="#07071A" />
+    <script>
+      // Anti-FOUC: resuelve el tema ANTES del primer paint. 'system' (o
+      // ausencia de preferencia) sigue prefers-color-scheme; sin señal de
+      // light cae en dark (comportamiento histórico de la app).
+      ;(function () {
+        var pref = null
+        try { pref = localStorage.getItem('veredikt-theme') } catch (e) {}
+        var resolved =
+          pref === 'light' || pref === 'dark'
+            ? pref
+            : window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark'
+        document.documentElement.dataset.theme = resolved
+        var meta = document.getElementById('meta-theme-color')
+        if (meta) meta.setAttribute('content', resolved === 'light' ? '#F7F3EA' : '#07071A')
+      })()
+    </script>
     <title>VEREDIKT — El veredicto del mercado.</title>
     <meta name="description" content="Predice en VEREDIKT — el veredicto del mercado." />
     <meta property="og:type" content="website" />

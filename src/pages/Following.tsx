@@ -26,12 +26,12 @@ function timeAgo(iso: string) {
 
 function Avatar({ name, url, size = 48 }: { name: string; url?: string | null; size?: number }) {
   if (url) {
-    return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(255,215,0,0.3)' }} />
+    return <img src={url} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid var(--oro-glow)' }} />
   }
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+      background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: size * 0.34, fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
     }}>
@@ -198,7 +198,7 @@ export function Following() {
                     onClick={() => track('CopyTrade', { market: t.market_id, from: t.username })}
                     style={{
                       flexShrink: 0, textDecoration: 'none',
-                      background: 'linear-gradient(135deg, #FFD700, #cc9900)', color: '#07071A',
+                      background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
                       borderRadius: 10, padding: '9px 16px', fontSize: '0.78rem', fontWeight: 800,
                     }}
                   >

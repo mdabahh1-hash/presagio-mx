@@ -105,7 +105,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 200,
-        background: 'rgba(3, 3, 16, 0.88)',
+        background: 'var(--overlay)',
         backdropFilter: 'blur(14px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '16px',
@@ -121,7 +121,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
           width: '100%',
           maxWidth: 400,
           position: 'relative',
-          boxShadow: '0 32px 80px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,215,0,0.08)',
+          boxShadow: '0 32px 80px var(--shadow-card), 0 0 0 1px var(--oro-dim)',
         }}
       >
         {/* Top accent */}
@@ -182,8 +182,8 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               {error && (
                 <div style={{
                   marginBottom: 14, padding: '10px 14px',
-                  background: 'rgba(255, 45, 85, 0.1)',
-                  border: '1px solid rgba(255, 45, 85, 0.3)',
+                  background: 'var(--red-soft)',
+                  border: '1px solid var(--red-border)',
                   borderRadius: 10, fontSize: '0.8rem', color: 'var(--red)',
                 }}>
                   {error}
@@ -203,7 +203,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   cursor: (loading || code.length < 6) ? 'not-allowed' : 'pointer',
                   fontFamily: 'DM Sans',
                   transition: 'all 0.15s',
-                  boxShadow: (loading || code.length < 6) ? 'none' : '0 4px 20px rgba(255,215,0,0.25)',
+                  boxShadow: (loading || code.length < 6) ? 'none' : '0 4px 20px var(--oro-glow)',
                 }}
               >
                 {loading ? 'Verificando...' : 'Confirmar cuenta'}
@@ -348,8 +348,8 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               {error && (
                 <div style={{
                   marginBottom: 14, padding: '10px 14px',
-                  background: 'rgba(255, 45, 85, 0.1)',
-                  border: '1px solid rgba(255, 45, 85, 0.3)',
+                  background: 'var(--red-soft)',
+                  border: '1px solid var(--red-border)',
                   borderRadius: 10, fontSize: '0.8rem', color: 'var(--red)',
                 }}>
                   {error}
@@ -369,7 +369,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontFamily: 'DM Sans', letterSpacing: '0.03em',
                   transition: 'all 0.15s',
-                  boxShadow: loading ? 'none' : '0 4px 20px rgba(255,215,0,0.25)',
+                  boxShadow: loading ? 'none' : '0 4px 20px var(--oro-glow)',
                 }}
               >
                 {loading

@@ -39,7 +39,7 @@ export function DailyBonusPill() {
   return (
     <div className="bonus-pill" style={{
       display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-      background: 'rgba(255,215,0,0.10)', border: '1px solid rgba(255,215,0,0.3)',
+      background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
       borderRadius: 99, padding: '4px 5px 4px 11px',
     }}>
       <span style={{ fontSize: '0.95rem', lineHeight: 1 }} aria-hidden>🎁</span>
@@ -50,7 +50,7 @@ export function DailyBonusPill() {
         onClick={claim}
         disabled={claiming}
         style={{
-          background: 'var(--oro)', border: 'none', borderRadius: 99,
+          background: 'var(--oro-fill)', border: 'none', borderRadius: 99,
           padding: '5px 13px', fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.03em',
           color: '#07071A', cursor: claiming ? 'wait' : 'pointer', opacity: claiming ? 0.7 : 1,
           fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',

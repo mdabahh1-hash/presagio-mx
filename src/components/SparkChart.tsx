@@ -1,18 +1,20 @@
-import React, { useMemo } from 'react'
+import React, { useId, useMemo } from 'react'
 import type { PricePoint } from '../types'
 
 // ── MultiLineChart ─────────────────────────────────────────────────────────
 
+// Tokens --chart-N de index.css: cambian con el tema. Ojo: los var() de CSS
+// solo resuelven vía `style`, no como atributo de presentación SVG.
 const MULTI_COLORS = [
-  '#3b82f6',
-  '#f59e0b',
-  '#10b981',
-  '#ef4444',
-  '#8b5cf6',
-  '#f97316',
-  '#06b6d4',
-  '#ec4899',
-  '#84cc16',
+  'var(--chart-1)',
+  'var(--chart-2)',
+  'var(--chart-3)',
+  'var(--chart-4)',
+  'var(--chart-5)',
+  'var(--chart-6)',
+  'var(--chart-7)',
+  'var(--chart-8)',
+  'var(--chart-9)',
 ]
 
 interface MultiSeries {
@@ -110,13 +112,13 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
           ))}
           {/* Lines */}
           {paths.map((p, i) => (
-            <path key={i} d={p.d} fill="none" stroke={p.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path key={i} d={p.d} fill="none" style={{ stroke: p.color }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           ))}
           {/* Dots at last point */}
           {paths.map((p, i) => p.dotX !== null && p.dotY !== null && (
             <g key={`dot-${i}`}>
-              <circle cx={p.dotX} cy={p.dotY} r="5" fill={p.color} opacity="0.2" />
-              <circle cx={p.dotX} cy={p.dotY} r="3" fill={p.color} />
+              <circle cx={p.dotX} cy={p.dotY} r="5" style={{ fill: p.color }} opacity="0.2" />
+              <circle cx={p.dotX} cy={p.dotY} r="3" style={{ fill: p.color }} />
             </g>
           ))}
           {/* Y labels */}
@@ -173,7 +175,7 @@ export function SparkChart({
   className = '',
 }: SparkChartProps) {
   const points = useMemo(() => {
-    if (data.length < 2) return { path: '', area: '', lineColor: '#00e87d', isUp: true }
+    if (data.length < 2) return { path: '', area: '', lineColor: 'var(--green)', isUp: true }
     const prices = data.map(d => d.price)
     const minP = Math.min(...prices)
     const maxP = Math.max(...prices)
@@ -193,7 +195,7 @@ export function SparkChart({
     const area = `${path} L${lastX},${bottom} L${firstX},${bottom} Z`
 
     const isUp = data[data.length - 1].price >= data[0].price
-    const lineColor = color || (isUp ? '#00e87d' : '#ff2d55')
+    const lineColor = color || (isUp ? 'var(--green)' : 'var(--red)')
     return { path, area, lineColor, isUp }
   }, [data, width, height, color])
 
@@ -209,12 +211,12 @@ export function SparkChart({
         <line x1="3" y1={height - 3} x2={width - 3} y2={height - 3} stroke="var(--border-subtle)" strokeWidth="1" />
       )}
       {showArea && (
-        <path d={points.area} fill={points.lineColor} opacity="0.14" />
+        <path d={points.area} style={{ fill: points.lineColor }} opacity="0.14" />
       )}
       <path
         d={points.path}
         fill="none"
-        stroke={points.lineColor}
+        style={{ stroke: points.lineColor }}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -231,7 +233,7 @@ interface FullChartProps {
 
 export function FullChart({ data, height = 200, color }: FullChartProps) {
   const { path, area, lineColor, ticks } = useMemo(() => {
-    if (data.length < 2) return { path: '', area: '', lineColor: '#00e87d', isUp: true, ticks: [] }
+    if (data.length < 2) return { path: '', area: '', lineColor: 'var(--green)', isUp: true, ticks: [] }
     const prices = data.map(d => d.price)
     const minP = Math.max(0, Math.min(...prices) * 0.95)
     const maxP = Math.max(...prices) * 1.05
@@ -255,7 +257,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
     const area = `${path} L${lastX},${bottom} L${firstX},${bottom} Z`
 
     const isUp = data[data.length - 1].price >= data[0].price
-    const lineColor = color || (isUp ? '#00e87d' : '#ff2d55')
+    const lineColor = color || (isUp ? 'var(--green)' : 'var(--red)')
 
     const tickValues = [minP, (minP + maxP) / 2, maxP].map(v => ({
       y: toY(v).toFixed(1),
@@ -274,7 +276,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
     return { path, area, lineColor, isUp, ticks: { y: tickValues, x: xTicks } }
   }, [data, height, color])
 
-  const gradientId = `chart-gradient-${Math.random().toString(36).slice(2, 6)}`
+  const gradientId = useId()
 
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>
@@ -286,8 +288,8 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={lineColor} stopOpacity="0.25" />
-            <stop offset="100%" stopColor={lineColor} stopOpacity="0.02" />
+            <stop offset="0%" style={{ stopColor: lineColor }} stopOpacity="0.25" />
+            <stop offset="100%" style={{ stopColor: lineColor }} stopOpacity="0.02" />
           </linearGradient>
         </defs>
 
@@ -309,7 +311,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
         <path
           d={path}
           fill="none"
-          stroke={lineColor}
+          style={{ stroke: lineColor }}
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -328,8 +330,8 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
           const y = (padT + h - ((data[data.length - 1].price - minP) / range) * h).toFixed(1)
           return (
             <>
-              <circle cx={x} cy={y} r="6" fill={lineColor} opacity="0.2" />
-              <circle cx={x} cy={y} r="3.5" fill={lineColor} />
+              <circle cx={x} cy={y} r="6" style={{ fill: lineColor }} opacity="0.2" />
+              <circle cx={x} cy={y} r="3.5" style={{ fill: lineColor }} />
             </>
           )
         })()}

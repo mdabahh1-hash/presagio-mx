@@ -2,7 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Tema oscuro (default). `data-theme` en <html> lo pone el script inline
+   de index.html antes del primer paint; 'system' nunca llega al DOM. ── */
 :root {
+  color-scheme: dark;
+
   /* ── Backgrounds ── */
   --bg-base:     #07071A;
   --bg-surface:  #0c0c22;
@@ -12,6 +16,7 @@
   /* ── Borders ── */
   --border-subtle:  rgba(255, 215, 0, 0.10);
   --border-default: rgba(255, 215, 0, 0.18);
+  --border-hover:   rgba(255, 215, 0, 0.22);
 
   /* ── Text ── */
   --text-primary:   #F5F0E8;
@@ -28,12 +33,155 @@
   --red-glow:   rgba(255, 45, 85, 0.30);
   --cream:      #F5F0E8;
 
+  /* ── Fills: fondos saturados de marca con texto encima; mantienen su
+     saturación en ambos temas (los tokens de arriba se oscurecen en light
+     porque también se usan como texto) ── */
+  --oro-fill:     #FFD700;
+  --oro-fill-2:   #CC9900;
+  --oro-grad-2:   #ffaa20;
+  --green-fill:   #00FF88;
+  --green-fill-2: #00cc6e;
+  --red-fill:     #FF2D55;
+  --red-fill-2:   #cc1a40;
+
+  /* ── Soft backgrounds / borders (badges de precio, glows suaves) ── */
+  --green-soft:   rgba(0, 232, 125, 0.10);
+  --green-border: rgba(0, 232, 125, 0.25);
+  --green-grad-2: rgba(0, 232, 125, 0.55);
+  --red-soft:     rgba(255, 45, 85, 0.10);
+  --red-border:   rgba(255, 45, 85, 0.25);
+  --red-grad-2:   rgba(255, 45, 85, 0.40);
+
+  /* ── Misc ── */
+  --accent-alt:        #A0C4FF;
+  --accent-alt-bg:     rgba(160, 196, 255, 0.10);
+  --accent-alt-border: rgba(160, 196, 255, 0.30);
+  --nav-bg:          rgba(6, 6, 26, 0.88);
+  --nav-bg-scrolled: rgba(6, 6, 26, 0.97);
+  --overlay:         rgba(3, 3, 16, 0.88);
+  --warning:         #ffc107;
+  --warning-bg:      rgba(255, 193, 7, 0.08);
+  --warning-border:  rgba(255, 193, 7, 0.25);
+  --focus-ring:      rgba(255, 215, 0, 0.15);
+  --shadow-card:     rgba(0, 0, 0, 0.6);
+  --shadow-menu:     rgba(0, 0, 0, 0.45);
+  --noise-opacity:   0.3;
+  --avatar-grad-end: #8a2010;
+
+  /* ── Chart series (MultiLineChart) ── */
+  --chart-1: #3b82f6;
+  --chart-2: #f59e0b;
+  --chart-3: #10b981;
+  --chart-4: #ef4444;
+  --chart-5: #8b5cf6;
+  --chart-6: #f97316;
+  --chart-7: #06b6d4;
+  --chart-8: #ec4899;
+  --chart-9: #84cc16;
+
+  /* ── Category palette (ver src/lib/categoryColors.ts) ── */
+  --cat-gold:    #FFD700;  --cat-gold-bg:    rgba(255, 215, 0, 0.09);    --cat-gold-border:    rgba(255, 215, 0, 0.21);
+  --cat-green:   #00FF88;  --cat-green-bg:   rgba(0, 255, 136, 0.09);    --cat-green-border:   rgba(0, 255, 136, 0.21);
+  --cat-blue:    #a0c4ff;  --cat-blue-bg:    rgba(160, 196, 255, 0.09);  --cat-blue-border:    rgba(160, 196, 255, 0.21);
+  --cat-purple:  #a060ff;  --cat-purple-bg:  rgba(160, 96, 255, 0.09);   --cat-purple-border:  rgba(160, 96, 255, 0.21);
+  --cat-pink:    #ff7eb6;  --cat-pink-bg:    rgba(255, 126, 182, 0.09);  --cat-pink-border:    rgba(255, 126, 182, 0.21);
+  --cat-orange:  #f7931a;  --cat-orange-bg:  rgba(247, 147, 26, 0.09);   --cat-orange-border:  rgba(247, 147, 26, 0.21);
+  --cat-sky:     #38bdf8;  --cat-sky-bg:     rgba(56, 189, 248, 0.09);   --cat-sky-border:     rgba(56, 189, 248, 0.21);
+  --cat-rose:    #ff4d6d;  --cat-rose-bg:    rgba(255, 77, 109, 0.09);   --cat-rose-border:    rgba(255, 77, 109, 0.21);
+  --cat-coral:   #ff7849;  --cat-coral-bg:   rgba(255, 120, 73, 0.09);   --cat-coral-border:   rgba(255, 120, 73, 0.21);
+  --cat-default: #8888cc;  --cat-default-bg: rgba(136, 136, 204, 0.09);  --cat-default-border: rgba(136, 136, 204, 0.21);
+
   /* Legacy aliases so componentes existentes no se rompen */
   --gold:       #FFD700;
   --brand:      #FFD700;
   --brand-dim:  rgba(255, 215, 0, 0.08);
   --blue:       #FFD700;
   --blue-glow:  rgba(255, 215, 0, 0.25);
+}
+
+/* ── Tema claro. Verificado AA (≥4.5:1) para oro/verde/rojo/categorías como
+   texto sobre #FFF y sobre --bg-base. ── */
+html[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-base:     #F7F3EA;
+  --bg-surface:  #FDFBF5;
+  --bg-card:     #FFFFFF;
+  --bg-elevated: #FFFFFF;
+
+  --border-subtle:  rgba(140, 110, 20, 0.14);
+  --border-default: rgba(140, 110, 20, 0.28);
+  --border-hover:   rgba(140, 110, 20, 0.40);
+
+  --text-primary:   #1C1810;
+  --text-secondary: rgba(28, 24, 16, 0.65);
+  --text-tertiary:  rgba(28, 24, 16, 0.45);
+
+  --oro:        #8A6A00;
+  --oro-dim:    rgba(138, 106, 0, 0.10);
+  --oro-glow:   rgba(138, 106, 0, 0.22);
+  --green:      #007A43;
+  --green-glow: rgba(0, 122, 67, 0.22);
+  --red:        #C8103A;
+  --red-glow:   rgba(200, 16, 58, 0.20);
+  --cream:      #1C1810;
+
+  --oro-fill:     #F2C200;
+  --oro-fill-2:   #CC9900;
+  --oro-grad-2:   #A66B00;
+  --green-fill:   #00E87D;
+  --green-fill-2: #00C468;
+  --red-fill:     #E11D48;
+  --red-fill-2:   #BE123C;
+
+  --green-soft:   rgba(0, 122, 67, 0.08);
+  --green-border: rgba(0, 122, 67, 0.30);
+  --green-grad-2: rgba(0, 122, 67, 0.55);
+  --red-soft:     rgba(200, 16, 58, 0.08);
+  --red-border:   rgba(200, 16, 58, 0.30);
+  --red-grad-2:   rgba(200, 16, 58, 0.45);
+
+  --accent-alt:        #3D5AA8;
+  --accent-alt-bg:     rgba(61, 90, 168, 0.09);
+  --accent-alt-border: rgba(61, 90, 168, 0.30);
+  --nav-bg:          rgba(253, 251, 245, 0.88);
+  --nav-bg-scrolled: rgba(253, 251, 245, 0.97);
+  --overlay:         rgba(35, 30, 15, 0.50);
+  --warning:         #8F6400;
+  --warning-bg:      rgba(143, 100, 0, 0.08);
+  --warning-border:  rgba(143, 100, 0, 0.28);
+  --focus-ring:      rgba(138, 106, 0, 0.18);
+  --shadow-card:     rgba(80, 65, 20, 0.14);
+  --shadow-menu:     rgba(80, 65, 20, 0.16);
+  --noise-opacity:   0.12;
+  --avatar-grad-end: #8a2010;
+
+  --chart-1: #2563eb;
+  --chart-2: #b45309;
+  --chart-3: #047857;
+  --chart-4: #dc2626;
+  --chart-5: #6d28d9;
+  --chart-6: #c2410c;
+  --chart-7: #0e7490;
+  --chart-8: #be185d;
+  --chart-9: #4d7c0f;
+
+  --cat-gold:    #8A6A00;  --cat-gold-bg:    rgba(138, 106, 0, 0.09);   --cat-gold-border:    rgba(138, 106, 0, 0.30);
+  --cat-green:   #007A43;  --cat-green-bg:   rgba(0, 122, 67, 0.09);    --cat-green-border:   rgba(0, 122, 67, 0.30);
+  --cat-blue:    #3D5AA8;  --cat-blue-bg:    rgba(61, 90, 168, 0.09);   --cat-blue-border:    rgba(61, 90, 168, 0.30);
+  --cat-purple:  #6D28D9;  --cat-purple-bg:  rgba(109, 40, 217, 0.09);  --cat-purple-border:  rgba(109, 40, 217, 0.30);
+  --cat-pink:    #BE185D;  --cat-pink-bg:    rgba(190, 24, 93, 0.09);   --cat-pink-border:    rgba(190, 24, 93, 0.30);
+  --cat-orange:  #B45309;  --cat-orange-bg:  rgba(180, 83, 9, 0.09);    --cat-orange-border:  rgba(180, 83, 9, 0.30);
+  --cat-sky:     #0369A1;  --cat-sky-bg:     rgba(3, 105, 161, 0.09);   --cat-sky-border:     rgba(3, 105, 161, 0.30);
+  --cat-rose:    #BE123C;  --cat-rose-bg:    rgba(190, 18, 60, 0.09);   --cat-rose-border:    rgba(190, 18, 60, 0.30);
+  --cat-coral:   #C2410C;  --cat-coral-bg:   rgba(194, 64, 12, 0.09);   --cat-coral-border:   rgba(194, 64, 12, 0.30);
+  --cat-default: #4A488F;  --cat-default-bg: rgba(74, 72, 143, 0.09);   --cat-default-border: rgba(74, 72, 143, 0.30);
+
+  --gold:       #8A6A00;
+  --brand:      #8A6A00;
+  --brand-dim:  rgba(138, 106, 0, 0.10);
+  --blue:       #8A6A00;
+  --blue-glow:  rgba(138, 106, 0, 0.22);
 }
 
 * {
@@ -61,7 +209,7 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.3;
+  opacity: var(--noise-opacity);
 }
 
 #root {
@@ -98,17 +246,17 @@ body::before {
   transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 .card:hover {
-  border-color: rgba(255, 215, 0, 0.22);
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 215, 0, 0.06);
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 48px var(--shadow-card), 0 0 0 1px var(--oro-dim);
   transform: translateY(-2px);
 }
 
 /* Glow effects */
 .glow-green {
-  box-shadow: 0 0 24px var(--green-glow), 0 0 48px rgba(0, 232, 125, 0.1);
+  box-shadow: 0 0 24px var(--green-glow), 0 0 48px var(--green-soft);
 }
 .glow-red {
-  box-shadow: 0 0 24px var(--red-glow), 0 0 48px rgba(255, 45, 85, 0.1);
+  box-shadow: 0 0 24px var(--red-glow), 0 0 48px var(--red-soft);
 }
 .glow-blue {
   box-shadow: 0 0 24px var(--blue-glow);
@@ -117,13 +265,13 @@ body::before {
 /* Price badge */
 .price-yes {
   color: var(--green);
-  background: rgba(0, 232, 125, 0.1);
-  border: 1px solid rgba(0, 232, 125, 0.25);
+  background: var(--green-soft);
+  border: 1px solid var(--green-border);
 }
 .price-no {
   color: var(--red);
-  background: rgba(255, 45, 85, 0.1);
-  border: 1px solid rgba(255, 45, 85, 0.25);
+  background: var(--red-soft);
+  border: 1px solid var(--red-border);
 }
 
 /* Probability bar */
@@ -135,7 +283,7 @@ body::before {
 }
 .prob-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--green), rgba(0, 232, 125, 0.55));
+  background: linear-gradient(90deg, var(--green), var(--green-grad-2));
   border-radius: 3px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -183,7 +331,7 @@ body::before {
 }
 .input-dark:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .input-dark::placeholder {
   color: var(--text-tertiary);
@@ -191,7 +339,7 @@ body::before {
 
 /* Button variants */
 .btn-yes {
-  background: linear-gradient(135deg, #00FF88, #00cc6e);
+  background: linear-gradient(135deg, var(--green-fill), var(--green-fill-2));
   color: #001a0d;
   font-weight: 800;
   border: none;
@@ -205,11 +353,11 @@ body::before {
 .btn-yes:hover {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(0, 232, 125, 0.35);
+  box-shadow: 0 6px 24px var(--green-glow);
 }
 
 .btn-no {
-  background: linear-gradient(135deg, #ff2d55, #cc1a40);
+  background: linear-gradient(135deg, var(--red-fill), var(--red-fill-2));
   color: #fff;
   font-weight: 800;
   border: none;
@@ -223,7 +371,7 @@ body::before {
 .btn-no:hover {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(255, 45, 85, 0.35);
+  box-shadow: 0 6px 24px var(--red-glow);
 }
 
 .btn-ghost {
@@ -239,7 +387,7 @@ body::before {
 .btn-ghost:hover {
   border-color: var(--blue);
   color: var(--text-primary);
-  background: rgba(255, 215, 0, 0.06);
+  background: var(--oro-dim);
 }
 
 /* Ticker */
@@ -279,7 +427,7 @@ body::before {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand), #8a2010);
+  background: linear-gradient(135deg, var(--brand), var(--avatar-grad-end));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,7 +462,7 @@ body::before {
   height: 7px;
   border-radius: 50%;
   background: var(--green);
-  box-shadow: 0 0 8px var(--green), 0 0 16px rgba(0, 232, 125, 0.4);
+  box-shadow: 0 0 8px var(--green), 0 0 16px var(--green-glow);
   animation: livePulse 2s ease-in-out infinite;
   flex-shrink: 0;
 }
@@ -339,14 +487,14 @@ body::before {
 
 /* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, #00FF88 0%, #FFD700 60%, #F5F0E8 100%);
+  background: linear-gradient(135deg, var(--green) 0%, var(--oro) 60%, var(--text-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, var(--gold), #ffaa20);
+  background: linear-gradient(135deg, var(--gold), var(--oro-grad-2));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -400,7 +548,7 @@ input[type='range']::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--blue);
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.40);
+  box-shadow: 0 0 10px var(--oro-glow);
 }
 
 /* Hide scrollbar on horizontal tab bars */

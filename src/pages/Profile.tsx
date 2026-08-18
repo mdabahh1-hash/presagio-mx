@@ -95,7 +95,7 @@ export function Profile() {
             border: 'none', padding: '14px 32px', color: '#fff',
             fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.9rem',
             borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 6px 24px rgba(255, 215, 0, 0.2)',
+            boxShadow: '0 6px 24px var(--oro-glow)',
           }}>
             Iniciar sesión con Google
           </button>
@@ -127,9 +127,9 @@ export function Profile() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.6rem', fontWeight: 800, color: '#fff',
             fontFamily: 'DM Sans',
-            border: '3px solid rgba(255, 215, 0, 0.25)',
+            border: '3px solid var(--oro-glow)',
             flexShrink: 0, overflow: 'hidden',
-            boxShadow: '0 0 20px rgba(255, 215, 0, 0.15)',
+            boxShadow: '0 0 20px var(--focus-ring)',
           }}>
             {user.avatar_url
               ? <img src={user.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -290,7 +290,7 @@ export function Profile() {
             value: `${Math.floor(user.points).toLocaleString('es-MX')} PT`,
             sub: null,
             color: 'var(--gold)',
-            border: 'rgba(255, 208, 96, 0.2)',
+            border: 'var(--oro-glow)',
           },
           {
             label: 'INVERTIDO',
@@ -304,7 +304,7 @@ export function Profile() {
             value: `${user.accuracy}%`,
             sub: `${user.correct_predictions} / ${user.total_predictions} correctas`,
             color: 'var(--green)',
-            border: 'rgba(0, 232, 125, 0.2)',
+            border: 'var(--green-border)',
           },
         ].map(stat => (
           <div
@@ -378,8 +378,8 @@ export function Profile() {
                       const isNo = pos.side === 'NO'
                       const label = pos.side ?? pos.outcome_key ?? '—'
                       const color = isYes ? 'var(--green)' : isNo ? 'var(--red)' : 'var(--gold)'
-                      const bg = isYes ? 'rgba(0, 232, 125, 0.1)' : isNo ? 'rgba(255, 45, 85, 0.1)' : 'rgba(255, 215, 0, 0.1)'
-                      const border = isYes ? 'rgba(0, 232, 125, 0.25)' : isNo ? 'rgba(255, 45, 85, 0.25)' : 'rgba(255, 215, 0, 0.25)'
+                      const bg = isYes ? 'var(--green-soft)' : isNo ? 'var(--red-soft)' : 'var(--oro-dim)'
+                      const border = isYes ? 'var(--green-border)' : isNo ? 'var(--red-border)' : 'var(--oro-glow)'
                       return (
                         <span style={{
                           fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em',

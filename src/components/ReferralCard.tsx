@@ -19,7 +19,7 @@ export function ReferralCard({ code }: { code: string | null }) {
   }
 
   return (
-    <div className="card" style={{ padding: '18px 20px', marginBottom: 20, border: '1px solid rgba(255,215,0,0.25)' }}>
+    <div className="card" style={{ padding: '18px 20px', marginBottom: 20, border: '1px solid var(--oro-glow)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <span aria-hidden style={{ fontSize: '1rem' }}>🎁</span>
         <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>Invita y ganen 200 PT cada uno</div>

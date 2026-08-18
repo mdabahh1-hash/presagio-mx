@@ -2,9 +2,78 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LogoFull } from './Logo'
 import { useAuth } from '../lib/AuthContext'
+import { useTheme } from '../lib/ThemeContext'
 import { authApi } from '../lib/api'
 import { AuthModal } from './AuthModal'
 import { DailyBonusPill } from './DailyBonusPill'
+
+/* Fila "Modo oscuro" (luna + switch) y opción "Usar tema del sistema".
+   OJO: sus handlers NO cierran el menú — el dropdown desktop abre por hover
+   y debe permanecer abierto mientras se interactúa con estos controles. */
+function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
+  const { preference, resolved, setPreference } = useTheme()
+  const isDark = resolved === 'dark'
+  const pad = variant === 'drawer' ? '14px 16px' : '11px 14px'
+  const radius = variant === 'drawer' ? 12 : 9
+  const fontSize = variant === 'drawer' ? '0.9rem' : '0.875rem'
+
+  return (
+    <>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 12, padding: pad, borderRadius: radius,
+      }}>
+        <span style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          fontSize, fontWeight: 600, color: 'var(--text-secondary)',
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+          Modo oscuro
+        </span>
+        <button
+          role="switch"
+          aria-checked={isDark}
+          aria-label="Modo oscuro"
+          onClick={() => setPreference(isDark ? 'light' : 'dark')}
+          style={{
+            position: 'relative', width: 38, height: 22, borderRadius: 99,
+            border: '1px solid var(--border-default)',
+            background: isDark ? 'var(--oro-fill)' : 'var(--bg-elevated)',
+            cursor: 'pointer', padding: 0, flexShrink: 0,
+            transition: 'background 0.15s',
+          }}
+        >
+          <span style={{
+            position: 'absolute', top: 2, left: isDark ? 17 : 2,
+            width: 16, height: 16, borderRadius: '50%',
+            background: isDark ? '#07071A' : 'var(--text-tertiary)',
+            transition: 'left 0.15s',
+          }} />
+        </button>
+      </div>
+      <button
+        onClick={() => setPreference('system')}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          textAlign: 'left', padding: pad, borderRadius: radius,
+          border: 'none', cursor: 'pointer',
+          fontFamily: "'DM Sans', sans-serif", fontSize, fontWeight: 600,
+          color: preference === 'system' ? 'var(--text-primary)' : 'var(--text-tertiary)',
+          background: preference === 'system' ? 'var(--oro-dim)' : 'transparent',
+          transition: 'background 0.15s, color 0.15s',
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>
+        </svg>
+        Usar tema del sistema
+      </button>
+    </>
+  )
+}
 
 export function Navbar() {
   const location = useLocation()
@@ -44,7 +113,7 @@ export function Navbar() {
       {/* Main navbar */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: scrolled ? 'rgba(6, 6, 26, 0.97)' : 'rgba(6, 6, 26, 0.88)',
+        background: scrolled ? 'var(--nav-bg-scrolled)' : 'var(--nav-bg)',
         backdropFilter: 'blur(24px)',
         borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent',
         transition: 'all 0.3s ease',
@@ -65,8 +134,8 @@ export function Navbar() {
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Menú"
             style={{
-              background: menuOpen ? 'rgba(255,215,0,0.08)' : 'none',
-              border: menuOpen ? '1px solid rgba(255,215,0,0.20)' : '1px solid transparent',
+              background: menuOpen ? 'var(--oro-dim)' : 'none',
+              border: menuOpen ? '1px solid var(--border-hover)' : '1px solid transparent',
               borderRadius: 8,
               cursor: 'pointer',
               padding: '8px', color: 'var(--text-primary)', display: 'none',
@@ -112,13 +181,13 @@ export function Navbar() {
                 <Link to="/perfil" style={{ textDecoration: 'none' }}>
                   <div style={{
                     width: 36, height: 36, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+                    background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '0.75rem', fontWeight: 800, color: '#07071A',
                     fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
-                    border: location.pathname === '/perfil' ? '2px solid var(--oro)' : '2px solid rgba(255,215,0,0.20)',
+                    border: location.pathname === '/perfil' ? '2px solid var(--oro)' : '2px solid var(--border-hover)',
                     transition: 'border-color 0.15s, box-shadow 0.15s',
-                    boxShadow: location.pathname === '/perfil' ? '0 0 12px rgba(255,215,0,0.35)' : 'none',
+                    boxShadow: location.pathname === '/perfil' ? '0 0 12px var(--oro-glow)' : 'none',
                   }}>
                     {initials}
                   </div>
@@ -142,12 +211,12 @@ export function Navbar() {
                 <button
                   onClick={() => setAuthModal('register')}
                   style={{
-                    background: 'var(--oro)',
+                    background: 'var(--oro-fill)',
                     border: 'none',
                     borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
                     color: '#07071A', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                     fontWeight: 700, letterSpacing: '0.03em',
-                    boxShadow: '0 2px 12px rgba(255,215,0,0.25)',
+                    boxShadow: '0 2px 12px var(--oro-glow)',
                     transition: 'opacity 0.15s',
                   }}
                 >
@@ -169,8 +238,8 @@ export function Navbar() {
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 40, height: 40, borderRadius: 10,
-                  background: deskMenu ? 'rgba(255,215,0,0.08)' : 'var(--bg-elevated)',
-                  border: `1px solid ${deskMenu ? 'rgba(255,215,0,0.25)' : 'var(--border-default)'}`,
+                  background: deskMenu ? 'var(--oro-dim)' : 'var(--bg-elevated)',
+                  border: `1px solid ${deskMenu ? 'var(--oro-glow)' : 'var(--border-default)'}`,
                   color: 'var(--text-primary)', cursor: 'pointer',
                   transition: 'all 0.15s',
                 }}
@@ -191,7 +260,7 @@ export function Navbar() {
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-default)',
                     borderRadius: 14,
-                    boxShadow: '0 16px 48px rgba(0,0,0,0.45)',
+                    boxShadow: '0 16px 48px var(--shadow-menu)',
                   }}
                 >
                   {[
@@ -209,12 +278,14 @@ export function Navbar() {
                         padding: '11px 14px', borderRadius: 9,
                         fontSize: '0.875rem', fontWeight: 600,
                         color: isActive(item.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                        background: isActive(item.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
+                        background: isActive(item.to) ? 'var(--oro-dim)' : 'transparent',
                       }}
                     >
                       {item.label}
                     </Link>
                   ))}
+                  <div style={{ height: 1, background: 'var(--border-subtle)', margin: '6px 8px' }} />
+                  <ThemeControls variant="dropdown" />
                   {user && (
                     <>
                       <div style={{ height: 1, background: 'var(--border-subtle)', margin: '6px 8px' }} />
@@ -226,7 +297,7 @@ export function Navbar() {
                           padding: '11px 14px', borderRadius: 9,
                           fontSize: '0.875rem', fontWeight: 600,
                           color: isActive('/siguiendo') ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          background: isActive('/siguiendo') ? 'rgba(255,215,0,0.08)' : 'transparent',
+                          background: isActive('/siguiendo') ? 'var(--oro-dim)' : 'transparent',
                         }}
                       >
                         Siguiendo
@@ -239,7 +310,7 @@ export function Navbar() {
                           padding: '11px 14px', borderRadius: 9,
                           fontSize: '0.875rem', fontWeight: 600,
                           color: isActive('/perfil') ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          background: isActive('/perfil') ? 'rgba(255,215,0,0.08)' : 'transparent',
+                          background: isActive('/perfil') ? 'var(--oro-dim)' : 'transparent',
                         }}
                       >
                         Mi perfil
@@ -296,8 +367,8 @@ export function Navbar() {
                   padding: '14px 16px', borderRadius: 12, marginBottom: 4,
                   fontSize: '1rem', fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
                   color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: isActive(link.to) ? 'rgba(255,215,0,0.08)' : 'transparent',
-                  border: `1px solid ${isActive(link.to) ? 'rgba(255,215,0,0.20)' : 'transparent'}`,
+                  background: isActive(link.to) ? 'var(--oro-dim)' : 'transparent',
+                  border: `1px solid ${isActive(link.to) ? 'var(--border-hover)' : 'transparent'}`,
                 }}
               >
                 {link.to === '/' ? (
@@ -340,10 +411,10 @@ export function Navbar() {
                 }}>
                   <div style={{
                     width: 46, height: 46, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+                    background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '0.9rem', fontWeight: 800, color: '#07071A', fontFamily: "'DM Sans', sans-serif",
-                    border: '2px solid rgba(255,215,0,0.35)',
+                    border: '2px solid var(--oro-glow)',
                   }}>
                     {initials}
                   </div>
@@ -418,12 +489,12 @@ export function Navbar() {
                 <button
                   onClick={() => { setMenuOpen(false); setAuthModal('register') }}
                   style={{
-                    background: 'var(--oro)', border: 'none',
+                    background: 'var(--oro-fill)', border: 'none',
                     borderRadius: 14, padding: '16px',
                     fontSize: '0.95rem', fontWeight: 800, color: '#07071A',
                     cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    boxShadow: '0 4px 20px rgba(255,215,0,0.25)',
+                    boxShadow: '0 4px 20px var(--oro-glow)',
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -487,6 +558,17 @@ export function Navbar() {
                 </a>
               </div>
             )}
+
+            {/* Preferencias (tema) */}
+            <div style={{ height: 1, background: 'var(--border-subtle)', margin: '20px 0 12px' }} />
+            <div style={{
+              fontSize: '0.62rem', color: 'var(--text-tertiary)',
+              fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+              padding: '4px 4px 8px',
+            }}>
+              Preferencias
+            </div>
+            <ThemeControls variant="drawer" />
           </div>
         </div>
       )}

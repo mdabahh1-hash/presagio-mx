@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { Market, Outcome } from '../types'
 import { SparkChart } from './SparkChart'
+import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
 
 function formatVolume(v: number) {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`
@@ -35,22 +36,6 @@ function formatCountdown(diff: number): { text: string; urgent: boolean } {
   return { text: `${mins}m ${secs}s`, urgent: true }
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#FFD700',
-  'Economía': '#FFD700',
-  'Deportes': '#00FF88',
-  'Global': '#a0c4ff',
-  'Tech': '#a060ff',
-  'Entretenimiento': '#ff7eb6',
-  'Mundial 2026': '#00FF88',
-  'Crypto': '#f7931a',
-  'Mercados Globales': '#a0c4ff',
-  'México': '#FFD700',
-  'Clima': '#38bdf8',
-  'Boxeo': '#ff4d6d',
-  'Motor': '#ff7849',
-}
-
 interface MarketCardProps {
   market: Market & { status?: string }
   animClass?: string
@@ -71,7 +56,7 @@ function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
           }}>
             {o.label}
           </span>
-          <div style={{ width: 60, background: 'rgba(255,255,255,0.06)', borderRadius: 3, height: 4, flexShrink: 0 }}>
+          <div style={{ width: 60, background: 'var(--border-subtle)', borderRadius: 3, height: 4, flexShrink: 0 }}>
             <div style={{
               width: `${Math.min(o.price, 100)}%`, height: '100%',
               background: 'var(--gold)', borderRadius: 3,
@@ -99,7 +84,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
   const isUp = market.history.length > 1
     ? market.history[market.history.length - 1].price >= market.history[0].price
     : true
-  const catColor = CATEGORY_COLORS[market.category] || '#8888cc'
+  const catColor = getCategoryColor(market.category)
   const diff = useCountdown(market.endsAt)
   const { text: countdownText, urgent } = formatCountdown(diff)
   const isPending = market.status === 'pending_resolution'
@@ -121,7 +106,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
           display: 'flex',
           flexDirection: 'column',
           gap: 14,
-          ...(isPending ? { borderColor: 'rgba(255, 208, 96, 0.4)' } : {}),
+          ...(isPending ? { borderColor: 'var(--oro-glow)' } : {}),
         }}
       >
         {/* Header row: badges + sparkline */}
@@ -132,7 +117,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               <span style={{
                 fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
                 textTransform: 'uppercase', color: catColor,
-                background: `${catColor}16`, border: `1px solid ${catColor}35`,
+                background: getCategoryBg(market.category), border: `1px solid ${getCategoryBorder(market.category)}`,
                 padding: '3px 9px', borderRadius: 99,
               }}>
                 {market.category}
@@ -140,9 +125,9 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               {isMulti && (
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
-                  textTransform: 'uppercase', color: '#a0c4ff',
-                  background: 'rgba(160,196,255,0.1)',
-                  border: '1px solid rgba(160,196,255,0.3)',
+                  textTransform: 'uppercase', color: 'var(--accent-alt)',
+                  background: 'var(--accent-alt-bg)',
+                  border: '1px solid var(--accent-alt-border)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
                   MULTI
@@ -152,8 +137,8 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
                   textTransform: 'uppercase', color: 'var(--gold)',
-                  background: 'rgba(255, 208, 96, 0.1)',
-                  border: '1px solid rgba(255, 208, 96, 0.25)',
+                  background: 'var(--oro-dim)',
+                  border: '1px solid var(--oro-glow)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
                   ▲ TENDENCIA
@@ -163,7 +148,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
                   textTransform: 'uppercase', color: 'var(--gold)',
-                  background: 'rgba(255, 208, 96, 0.1)',
+                  background: 'var(--oro-dim)',
                   border: '1px solid var(--gold)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>

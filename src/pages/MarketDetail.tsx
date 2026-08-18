@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { displayPair } from '../lib/prices'
+import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -27,13 +28,6 @@ function daysLeft(endsAt: string, status?: string) {
   return `${days} días`
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
-  'Global': '#a0c4ff', 'Tech': '#a060ff',
-  'Mundial 2026': '#00FF88', 'Crypto': '#f7931a', 'Mercados Globales': '#a0c4ff',
-  'México': '#FFD700', 'Entretenimiento': '#ff7eb6',
-  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
-}
 
 export function MarketDetail() {
   const { id } = useParams<{ id: string }>()
@@ -169,7 +163,7 @@ export function MarketDetail() {
     )
   }
 
-  const catColor = CATEGORY_COLORS[market.category] || '#8888cc'
+  const catColor = getCategoryColor(market.category)
   const pair = displayPair(yesPrice)  // NO derived from rounded YES: always sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
 
@@ -214,7 +208,7 @@ export function MarketDetail() {
               <span style={{
                 fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em',
                 textTransform: 'uppercase', color: catColor,
-                background: `${catColor}15`, border: `1px solid ${catColor}35`,
+                background: getCategoryBg(market.category), border: `1px solid ${getCategoryBorder(market.category)}`,
                 padding: '3px 10px', borderRadius: 99,
               }}>
                 {market.category}
@@ -223,8 +217,8 @@ export function MarketDetail() {
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
                   textTransform: 'uppercase', color: 'var(--gold)',
-                  background: 'rgba(255, 208, 96, 0.1)',
-                  border: '1px solid rgba(255, 208, 96, 0.25)',
+                  background: 'var(--oro-dim)',
+                  border: '1px solid var(--oro-glow)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
                   ▲ TENDENCIA
@@ -239,7 +233,7 @@ export function MarketDetail() {
             {/* Resolved banner */}
             {(market.status === 'resolved_yes' || market.status === 'resolved_no') && (
               <div style={{
-                background: market.status === 'resolved_yes' ? 'rgba(0, 232, 125, 0.08)' : 'rgba(255, 45, 85, 0.08)',
+                background: market.status === 'resolved_yes' ? 'var(--green-soft)' : 'var(--red-soft)',
                 border: `1px solid ${market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)'}`,
                 borderRadius: 10, padding: '12px 16px', marginBottom: 20,
                 fontSize: '0.875rem', fontWeight: 700,
@@ -250,7 +244,7 @@ export function MarketDetail() {
             )}
             {market.status === 'resolved' && market.resolved_outcome_key && (
               <div style={{
-                background: 'rgba(0, 232, 125, 0.08)',
+                background: 'var(--green-soft)',
                 border: '1px solid var(--green)',
                 borderRadius: 10, padding: '12px 16px', marginBottom: 20,
                 fontSize: '0.875rem', fontWeight: 700, color: 'var(--green)',
@@ -286,7 +280,7 @@ export function MarketDetail() {
                         display: 'flex', alignItems: 'center', gap: 12,
                         padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
                         border: `1.5px solid ${isWinner ? 'var(--green)' : isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
-                        background: isWinner ? 'rgba(0,232,125,0.06)' : isSelected ? 'rgba(255,208,96,0.06)' : 'transparent',
+                        background: isWinner ? 'var(--green-soft)' : isSelected ? 'var(--oro-dim)' : 'transparent',
                         transition: 'all 0.15s',
                       }}
                     >
@@ -300,7 +294,7 @@ export function MarketDetail() {
                         {o.label}
                         {isWinner && <span style={{ marginLeft: 8, color: 'var(--green)' }}>✓</span>}
                       </span>
-                      <div style={{ width: 80, background: 'rgba(255,255,255,0.05)', borderRadius: 3, height: 5, flexShrink: 0 }}>
+                      <div style={{ width: 80, background: 'var(--border-subtle)', borderRadius: 3, height: 5, flexShrink: 0 }}>
                         <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--gold)', borderRadius: 3 }} />
                       </div>
                       <span style={{
@@ -343,12 +337,12 @@ export function MarketDetail() {
                   <div className="prob-bar-dual">
                     <div style={{
                       width: `${yesPrice}%`,
-                      background: 'linear-gradient(90deg, var(--green), rgba(0, 232, 125, 0.55))',
+                      background: 'linear-gradient(90deg, var(--green), var(--green-grad-2))',
                       transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                     }} />
                     <div style={{
                       flex: 1,
-                      background: 'linear-gradient(90deg, rgba(255, 45, 85, 0.4), var(--red))',
+                      background: 'linear-gradient(90deg, var(--red-grad-2), var(--red))',
                     }} />
                   </div>
                 </div>
@@ -580,7 +574,7 @@ export function MarketDetail() {
                 <>
                   <div style={{
                     width: 52, height: 52, borderRadius: '50%',
-                    background: 'rgba(0,232,125,0.1)', border: '1px solid var(--green)',
+                    background: 'var(--green-soft)', border: '1px solid var(--green)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>🏆</div>
@@ -596,8 +590,8 @@ export function MarketDetail() {
                 <>
                   <div style={{
                     width: 52, height: 52, borderRadius: '50%',
-                    background: 'rgba(255, 208, 96, 0.1)',
-                    border: '1px solid rgba(255, 208, 96, 0.25)',
+                    background: 'var(--oro-dim)',
+                    border: '1px solid var(--oro-glow)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>⏳</div>
@@ -613,7 +607,7 @@ export function MarketDetail() {
                 <>
                   <div style={{
                     width: 52, height: 52, borderRadius: '50%',
-                    background: market.status === 'resolved_yes' ? 'rgba(0,232,125,0.1)' : 'rgba(255,45,85,0.1)',
+                    background: market.status === 'resolved_yes' ? 'var(--green-soft)' : 'var(--red-soft)',
                     border: `1px solid ${market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     margin: '0 auto 16px', fontSize: '1.4rem',

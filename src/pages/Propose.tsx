@@ -64,8 +64,8 @@ export function Propose() {
       {success && (
         <div style={{
           margin: '0 0 20px', fontSize: '0.85rem', color: 'var(--green)',
-          background: 'rgba(0, 232, 125, 0.08)',
-          border: '1px solid rgba(0, 232, 125, 0.2)',
+          background: 'var(--green-soft)',
+          border: '1px solid var(--green-border)',
           borderRadius: 10, padding: '14px 16px',
         }}>
           ✓ {success}
@@ -74,8 +74,8 @@ export function Propose() {
       {error && (
         <div style={{
           margin: '0 0 20px', fontSize: '0.85rem', color: 'var(--red)',
-          background: 'rgba(255, 45, 85, 0.08)',
-          border: '1px solid rgba(255, 45, 85, 0.2)',
+          background: 'var(--red-soft)',
+          border: '1px solid var(--red-border)',
           borderRadius: 10, padding: '14px 16px',
         }}>
           {error}
@@ -139,7 +139,7 @@ export function Propose() {
           disabled={submitting || !question.trim()}
           style={{
             width: '100%', padding: '15px',
-            background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+            background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
             border: 'none', borderRadius: 12, color: '#07071A',
             fontFamily: 'DM Sans', fontWeight: 800, fontSize: '0.92rem',
             letterSpacing: '0.05em',

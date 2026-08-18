@@ -139,7 +139,7 @@ export function BetBox({
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
                   border: `2px solid ${isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
-                  background: isSelected ? 'rgba(255,208,96,0.08)' : 'transparent',
+                  background: isSelected ? 'var(--oro-dim)' : 'transparent',
                   transition: 'all 0.15s', textAlign: 'left',
                 }}
               >
@@ -168,7 +168,7 @@ export function BetBox({
                   padding: compact ? '13px 10px' : '16px 12px', borderRadius: 12, cursor: 'pointer',
                   border: `2px solid ${isSelected ? color : 'var(--border-subtle)'}`,
                   background: isSelected
-                    ? s === 'YES' ? 'rgba(0, 232, 125, 0.1)' : 'rgba(255, 45, 85, 0.1)'
+                    ? s === 'YES' ? 'var(--green-soft)' : 'var(--red-soft)'
                     : 'transparent',
                   transition: 'all 0.15s', textAlign: 'center',
                 }}
@@ -345,9 +345,9 @@ export function BetBox({
       {/* Low-liquidity warning (amber) — informs, never blocks */}
       {quote?.liquidity_warning && (
         <div style={{
-          margin: '0 0 14px', fontSize: '0.78rem', color: '#ffc107',
-          background: 'rgba(255, 193, 7, 0.08)',
-          border: '1px solid rgba(255, 193, 7, 0.25)',
+          margin: '0 0 14px', fontSize: '0.78rem', color: 'var(--warning)',
+          background: 'var(--warning-bg)',
+          border: '1px solid var(--warning-border)',
           borderRadius: 8, padding: '10px 14px', lineHeight: 1.5,
         }}>
           Este mercado tiene poca liquidez. Tu orden se ejecutará a un precio promedio
@@ -358,8 +358,8 @@ export function BetBox({
       {tradeError && (
         <div style={{
           margin: '0 0 14px', fontSize: '0.8rem', color: 'var(--red)',
-          background: 'rgba(255, 45, 85, 0.08)',
-          border: '1px solid rgba(255, 45, 85, 0.2)',
+          background: 'var(--red-soft)',
+          border: '1px solid var(--red-border)',
           borderRadius: 8, padding: '10px 14px',
         }}>
           {tradeError}
@@ -368,8 +368,8 @@ export function BetBox({
       {tradeSuccess && (
         <div style={{
           margin: '0 0 14px', fontSize: '0.8rem', color: 'var(--green)',
-          background: 'rgba(0, 232, 125, 0.08)',
-          border: '1px solid rgba(0, 232, 125, 0.2)',
+          background: 'var(--green-soft)',
+          border: '1px solid var(--green-border)',
           borderRadius: 8, padding: '10px 14px',
         }}>
           ✓ {tradeSuccess}

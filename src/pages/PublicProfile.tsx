@@ -101,11 +101,11 @@ export function PublicProfile() {
       {/* Header */}
       <div className="anim-1 card" style={{ padding: '28px 30px', marginBottom: 16, display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={profile.display_name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(255,215,0,0.3)' }} />
+          <img src={profile.avatar_url} alt={profile.display_name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid var(--oro-glow)' }} />
         ) : (
           <div style={{
             width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg, #FFD700, #cc9900)',
+            background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.5rem', fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
           }}>{initials(profile.display_name)}</div>
@@ -131,7 +131,7 @@ export function PublicProfile() {
               opacity: followBusy ? 0.6 : 1,
             } : {
               marginLeft: 'auto', flexShrink: 0, cursor: 'pointer',
-              background: 'linear-gradient(135deg, #FFD700, #cc9900)', color: '#07071A',
+              background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
               border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: '0.85rem', fontWeight: 800,
               opacity: followBusy ? 0.6 : 1,
             }}
@@ -165,7 +165,7 @@ export function PublicProfile() {
             const isBinary = p.side === 'YES' || p.side === 'NO'
             const label = isBinary ? (p.side === 'YES' ? 'SÍ' : 'NO') : (p.outcome_key ?? '—')
             const color = isBinary ? (p.side === 'YES' ? 'var(--green)' : 'var(--red)') : 'var(--blue)'
-            const bg = p.side === 'YES' ? 'rgba(0,232,125,0.1)' : p.side === 'NO' ? 'rgba(255,45,85,0.1)' : 'rgba(60,130,246,0.1)'
+            const bg = p.side === 'YES' ? 'var(--green-soft)' : p.side === 'NO' ? 'var(--red-soft)' : 'var(--accent-alt-bg)'
             const invested = p.avg_cost * p.shares
             return (
               <Link key={p.id} to={`/mercado/${p.market_id}`} className="lb-row card" style={{

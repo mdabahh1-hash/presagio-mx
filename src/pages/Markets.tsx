@@ -5,6 +5,7 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
+import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = [
   'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
@@ -15,13 +16,6 @@ const SORT_OPTIONS = [
   { value: 'trending', label: 'Tendencias' },
   { value: 'ending', label: 'Cierra pronto' },
 ]
-const CATEGORY_COLORS: Record<string, string> = {
-  'Política MX': '#FFD700', 'Economía': '#FFD700', 'Deportes': '#00FF88',
-  'Global': '#a0c4ff', 'Tech': '#a060ff',
-  'Mundial 2026': '#00FF88', 'Crypto': '#f7931a',
-  'Mercados Globales': '#a0c4ff', 'México': '#FFD700',
-  'Clima': '#38bdf8', 'Boxeo': '#ff4d6d', 'Motor': '#ff7849',
-}
 
 function apiToMarket(m: ApiMarket): Market {
   return {
@@ -122,7 +116,7 @@ export function Markets() {
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
           border: '1px solid var(--gold)', color: 'var(--gold)',
-          background: 'rgba(255,215,0,0.06)', fontWeight: 700, fontSize: '0.85rem',
+          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
           fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
           + Proponer mercado
@@ -181,14 +175,14 @@ export function Markets() {
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {ALL_CATEGORIES.map(cat => {
               const isActive = cat === activeCategory
-              const color = cat === 'Todos' ? 'var(--blue)' : CATEGORY_COLORS[cat] || 'var(--text-secondary)'
+              const color = cat === 'Todos' ? 'var(--blue)' : getCategoryColor(cat)
               return (
                 <button
                   key={cat}
                   onClick={() => handleCategoryClick(cat)}
                   style={{
                     background: isActive
-                      ? cat === 'Todos' ? 'rgba(255, 215, 0, 0.12)' : `${color}15`
+                      ? cat === 'Todos' ? 'var(--oro-dim)' : getCategoryBg(cat)
                       : 'transparent',
                     border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
                     borderRadius: 99, padding: '7px 14px',

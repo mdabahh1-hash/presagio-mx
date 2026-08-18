@@ -26,7 +26,7 @@ export function LogoFull({ className = '' }: { className?: string }) {
           fontSize: '1.2rem',
           fontWeight: 800,
           letterSpacing: '0.08em',
-          color: '#F5F0E8',
+          color: 'var(--cream)',
           lineHeight: 1,
         }}
       >

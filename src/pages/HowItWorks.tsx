@@ -58,7 +58,7 @@ export function HowItWorks() {
           <div key={s.n} className={`card anim-${Math.min(i + 1, 6)}`} style={{ display: 'flex', gap: 18, padding: '22px 24px', alignItems: 'flex-start' }}>
             <div style={{
               flexShrink: 0, width: 42, height: 42, borderRadius: 12,
-              background: 'rgba(255,215,0,0.1)', border: '1px solid rgba(255,215,0,0.25)',
+              background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: 'DM Mono', fontWeight: 800, fontSize: '1.1rem', color: 'var(--gold)',
             }}>
@@ -93,10 +93,10 @@ export function HowItWorks() {
       <div style={{ textAlign: 'center' }}>
         <Link to="/mercados" style={{ textDecoration: 'none' }}>
           <button style={{
-            background: 'var(--oro)', border: 'none', padding: '15px 36px',
+            background: 'var(--oro-fill)', border: 'none', padding: '15px 36px',
             color: '#07071A', fontFamily: 'DM Sans', fontWeight: 800,
             fontSize: '0.9rem', letterSpacing: '0.06em', borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 8px 32px rgba(255, 215, 0, 0.25)',
+            boxShadow: '0 8px 32px var(--oro-glow)',
           }}>
             EXPLORAR MERCADOS →
           </button>
