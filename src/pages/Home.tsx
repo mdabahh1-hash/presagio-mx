@@ -216,11 +216,11 @@ export function Home() {
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 
-      {/* Search */}
-      <section style={{ padding: '28px 0 18px' }}>
-        <form onSubmit={handleSearch} className="anim-1" style={{ display: 'flex' }}>
+      {/* Search + Propose CTA */}
+      <section className="anim-1" style={{ padding: '28px 0 18px', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <form onSubmit={handleSearch} style={{ display: 'flex', flex: '1 1 320px', maxWidth: 560 }}>
           <div style={{
-            display: 'flex', width: '100%', maxWidth: 560,
+            display: 'flex', width: '100%',
             background: 'var(--bg-card)',
             border: '1px solid var(--border-default)',
             borderRadius: 12, overflow: 'hidden',
@@ -253,6 +253,15 @@ export function Home() {
             </button>
           </div>
         </form>
+        <Link to="/proponer" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+          padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
+          border: '1px solid var(--gold)', color: 'var(--gold)',
+          background: 'rgba(255,215,0,0.06)', fontWeight: 700, fontSize: '0.85rem',
+          fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
+        }}>
+          + Proponer mercado
+        </Link>
       </section>
 
       {/* One-line category tabs */}
