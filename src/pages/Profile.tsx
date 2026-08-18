@@ -4,6 +4,8 @@ import { usersApi, authApi, type ApiPosition, type ApiPointsHistory } from '../l
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
 import { ReferralCard } from '../components/ReferralCard'
+import { registerPasskey, supportsPasskeys, isPasskeyCancel } from '../lib/webauthn'
+import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 
 export function Profile() {
@@ -24,6 +26,40 @@ export function Profile() {
       await refreshUser()
     } catch {
       setEmailNotif(!next)
+    }
+  }
+
+  const [passkeyBusy, setPasskeyBusy] = useState(false)
+  const [passkeyMsg, setPasskeyMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
+  const addPasskey = async () => {
+    setPasskeyBusy(true)
+    setPasskeyMsg(null)
+    try {
+      await registerPasskey()
+      track('PasskeyAdded')
+      await refreshUser()
+      setPasskeyMsg({ ok: true, text: 'Passkey agregada ✓' })
+    } catch (err: unknown) {
+      if (!isPasskeyCancel(err)) {
+        setPasskeyMsg({ ok: false, text: err instanceof Error ? err.message : 'No se pudo agregar la passkey' })
+      }
+    } finally {
+      setPasskeyBusy(false)
+    }
+  }
+
+  const removePasskey = async () => {
+    setPasskeyBusy(true)
+    setPasskeyMsg(null)
+    try {
+      await authApi.passkeyDelete()
+      await refreshUser()
+      setPasskeyMsg({ ok: true, text: 'Passkey eliminada' })
+    } catch (err: unknown) {
+      setPasskeyMsg({ ok: false, text: err instanceof Error ? err.message : 'Error' })
+    } finally {
+      setPasskeyBusy(false)
     }
   }
 
@@ -193,6 +229,55 @@ export function Profile() {
           }} />
         </button>
       </div>
+
+      {/* Seguridad: passkey */}
+      {supportsPasskeys() && (
+        <div className="card" style={{ padding: '14px 20px', marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Seguridad</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                Passkey: entra con Face ID, Touch ID o tu llave de seguridad
+              </div>
+            </div>
+            {user.has_passkey ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--green)', fontWeight: 700 }}>Configurada ✓</span>
+                <button
+                  onClick={removePasskey}
+                  disabled={passkeyBusy}
+                  style={{
+                    background: 'transparent', border: '1px solid var(--border-default)',
+                    borderRadius: 8, padding: '7px 12px', fontSize: '0.75rem',
+                    color: 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 600,
+                    opacity: passkeyBusy ? 0.6 : 1,
+                  }}
+                >
+                  Eliminar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={addPasskey}
+                disabled={passkeyBusy}
+                style={{
+                  background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
+                  borderRadius: 10, padding: '9px 16px', fontSize: '0.8rem',
+                  color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 700,
+                  flexShrink: 0, opacity: passkeyBusy ? 0.6 : 1,
+                }}
+              >
+                {passkeyBusy ? 'Esperando...' : 'Agregar passkey'}
+              </button>
+            )}
+          </div>
+          {passkeyMsg && (
+            <div style={{ marginTop: 10, fontSize: '0.78rem', color: passkeyMsg.ok ? 'var(--green)' : 'var(--red)' }}>
+              {passkeyMsg.text}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Referral */}
       <ReferralCard code={user.referral_code} />

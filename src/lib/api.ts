@@ -178,6 +178,7 @@ export interface ApiUser {
   last_bonus_at: string | null
   email_notifications: boolean
   referral_code: string | null
+  has_passkey: boolean
 }
 
 export type LeaderboardPeriod = 'today' | 'week' | 'month' | 'all'
@@ -304,6 +305,21 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ email, code }),
     }),
+  passkeyRegisterOptions: () =>
+    request<{ state: string; options: any }>('/auth/passkey/register/options', { method: 'POST' }),
+  passkeyRegisterVerify: (state: string, credential: unknown) =>
+    request<{ ok: boolean; message: string }>('/auth/passkey/register/verify', {
+      method: 'POST',
+      body: JSON.stringify({ state, credential }),
+    }),
+  passkeyLoginOptions: () =>
+    request<{ state: string; options: any }>('/auth/passkey/login/options', { method: 'POST' }),
+  passkeyLoginVerify: (state: string, credential: unknown) =>
+    request<{ token: string; user: ApiUser }>('/auth/passkey/login/verify', {
+      method: 'POST',
+      body: JSON.stringify({ state, credential }),
+    }),
+  passkeyDelete: () => request<{ ok: boolean }>('/auth/passkey', { method: 'DELETE' }),
 }
 
 // ── Admin ──────────────────────────────────────────────────────────────────
