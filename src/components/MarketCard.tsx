@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Market, Outcome } from '../types'
 import { SparkChart } from './SparkChart'
 import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
-
-function formatVolume(v: number) {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`
-  if (v >= 1_000) return `${(v / 1_000).toFixed(0)}K`
-  return v.toFixed(0)
-}
+import { formatVolume, formatCountdown } from '../lib/format'
 
 function useCountdown(endsAt: string) {
   const [diff, setDiff] = useState(() => new Date(endsAt).getTime() - Date.now())
@@ -19,29 +15,13 @@ function useCountdown(endsAt: string) {
   return diff
 }
 
-function formatCountdown(diff: number): { text: string; urgent: boolean } {
-  if (diff <= 0) return { text: 'Cerrado', urgent: false }
-  const totalSecs = Math.floor(diff / 1000)
-  const days = Math.floor(totalSecs / 86400)
-  const hours = Math.floor((totalSecs % 86400) / 3600)
-  const mins = Math.floor((totalSecs % 3600) / 60)
-  const secs = totalSecs % 60
-
-  if (days >= 30) {
-    const months = Math.floor(days / 30)
-    return { text: `${months} ${months === 1 ? 'mes' : 'meses'}`, urgent: false }
-  }
-  if (days >= 1) return { text: `${days}d ${hours}h`, urgent: days <= 1 }
-  if (hours >= 1) return { text: `${hours}h ${mins}m`, urgent: true }
-  return { text: `${mins}m ${secs}s`, urgent: true }
-}
-
 interface MarketCardProps {
   market: Market & { status?: string }
   animClass?: string
 }
 
 function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
+  const { t } = useTranslation()
   const sorted = [...outcomes].sort((a, b) => b.price - a.price)
   const top = sorted.slice(0, 3)
   const rest = sorted.length - 3
@@ -72,7 +52,7 @@ function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
       ))}
       {rest > 0 && (
         <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
-          + {rest} más →
+          {t('card.more', { count: rest })}
         </span>
       )}
     </div>
@@ -80,6 +60,7 @@ function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
 }
 
 export function MarketCard({ market, animClass = '' }: MarketCardProps) {
+  const { t } = useTranslation()
   const isMulti = market.marketType === 'multi'
   const isUp = market.history.length > 1
     ? market.history[market.history.length - 1].price >= market.history[0].price
@@ -130,7 +111,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                   border: '1px solid var(--accent-alt-border)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
-                  MULTI
+                  {t('common.multiBadge')}
                 </span>
               )}
               {market.trending && (
@@ -141,7 +122,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                   border: '1px solid var(--oro-glow)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
-                  ▲ TENDENCIA
+                  {t('common.trendingBadge')}
                 </span>
               )}
               {isPending && (
@@ -152,7 +133,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                   border: '1px solid var(--gold)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
-                  PENDIENTE
+                  {t('common.pendingBadge')}
                 </span>
               )}
             </div>
@@ -190,12 +171,12 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                   {market.yesPrice}%
                 </span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                  SÍ
+                  {t('common.yes')}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                  NO
+                  {t('common.no')}
                 </span>
                 <span style={{
                   fontSize: '0.95rem', fontWeight: 700,
@@ -215,14 +196,14 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
           <div style={{ display: 'flex', gap: 14 }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-              Vol{' '}
+              {t('card.vol')}{' '}
               <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
                 {formatVolume(market.volume)}
               </span>
             </span>
             {!isMulti && (
               <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-                Liq{' '}
+                {t('card.liq')}{' '}
                 <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
                   {formatVolume(market.liquidity)}
                 </span>
@@ -231,7 +212,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
           </div>
           {isPending ? (
             <span style={{ fontSize: '0.68rem', color: 'var(--gold)', fontWeight: 700 }}>
-              Esperando resolución
+              {t('card.waitingResolution')}
             </span>
           ) : (
             <span style={{

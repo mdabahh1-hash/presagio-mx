@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { proposalsApi } from '../lib/api'
 import { track } from '../lib/analytics'
+import { translateApiError } from '../lib/errors'
 
 const CATEGORIES = ['Mundial 2026', 'Banxico', 'Crypto', 'Liga MX', 'Clima', 'Boxeo', 'Motor', 'Otro']
 
@@ -18,6 +20,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export function Propose() {
+  const { t } = useTranslation()
   const [question, setQuestion] = useState('')
   const [category, setCategory] = useState(CATEGORIES[0])
   const [description, setDescription] = useState('')
@@ -44,8 +47,8 @@ export function Propose() {
       setQuestion('')
       setDescription('')
       setContact('')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err) {
+      setError(translateApiError(err))
     } finally {
       setSubmitting(false)
     }
@@ -54,11 +57,10 @@ export function Propose() {
   return (
     <div className="page-container" style={{ maxWidth: 560, margin: '0 auto', padding: '44px 24px 24px' }}>
       <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 10px' }}>
-        Proponer mercado
+        {t('propose.title')}
       </h1>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 28px', lineHeight: 1.6 }}>
-        ¿Hay algo sobre lo que te gustaría predecir? Cuéntanos y lo revisamos.
-        No necesitas cuenta para proponer.
+        {t('propose.intro')}
       </p>
 
       {success && (
@@ -85,7 +87,7 @@ export function Propose() {
       <form onSubmit={handleSubmit} className="anim-2 card" style={{ padding: '26px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div>
           <label style={labelStyle}>
-            Pregunta del mercado *
+            {t('propose.questionLabel')}
             <span style={{ float: 'right', fontFamily: 'DM Mono', textTransform: 'none', letterSpacing: 0 }}>
               {question.length}/200
             </span>
@@ -95,13 +97,13 @@ export function Propose() {
             value={question}
             onChange={e => setQuestion(e.target.value)}
             maxLength={200}
-            placeholder="¿Ganará México la Copa Oro 2027?"
+            placeholder={t('propose.questionPlaceholder')}
             required
           />
         </div>
 
         <div>
-          <label style={labelStyle}>Categoría</label>
+          <label style={labelStyle}>{t('propose.categoryLabel')}</label>
           <select
             value={category}
             onChange={e => setCategory(e.target.value)}
@@ -112,25 +114,25 @@ export function Propose() {
         </div>
 
         <div>
-          <label style={labelStyle}>Descripción o criterio de resolución (opcional)</label>
+          <label style={labelStyle}>{t('propose.descriptionLabel')}</label>
           <textarea
             style={{ ...inputStyle, resize: 'vertical', minHeight: 90 }}
             value={description}
             onChange={e => setDescription(e.target.value)}
             maxLength={2000}
             rows={4}
-            placeholder="¿Cómo sabremos el resultado? ¿Cuál es la fuente oficial?"
+            placeholder={t('propose.descriptionPlaceholder')}
           />
         </div>
 
         <div>
-          <label style={labelStyle}>Tu email o usuario (opcional)</label>
+          <label style={labelStyle}>{t('propose.contactLabel')}</label>
           <input
             style={inputStyle}
             value={contact}
             onChange={e => setContact(e.target.value)}
             maxLength={200}
-            placeholder="Para avisarte si publicamos tu mercado"
+            placeholder={t('propose.contactPlaceholder')}
           />
         </div>
 
@@ -148,12 +150,12 @@ export function Propose() {
             transition: 'opacity 0.15s',
           }}
         >
-          {submitting ? 'ENVIANDO...' : 'ENVIAR PROPUESTA'}
+          {submitting ? t('propose.submitting') : t('propose.submit')}
         </button>
       </form>
 
       <p style={{ margin: '18px 0 0', fontSize: '0.7rem', color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
-        Revisamos cada propuesta manualmente antes de publicarla como mercado.
+        {t('propose.reviewNote')}
       </p>
     </div>
   )

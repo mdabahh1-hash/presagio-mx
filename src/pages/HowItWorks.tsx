@@ -1,60 +1,34 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
-const STEPS = [
-  {
-    n: '1',
-    title: 'Crea tu cuenta gratis',
-    body: 'Regístrate en segundos y recibe 1,000 PT (puntos virtuales) de bienvenida para empezar a predecir.',
-  },
-  {
-    n: '2',
-    title: 'Elige un mercado',
-    body: 'Explora mercados sobre política, deportes, economía y más. Cada uno es una pregunta de SÍ o NO.',
-  },
-  {
-    n: '3',
-    title: 'Predice SÍ o NO',
-    body: 'Compra acciones del lado que crees que va a pasar. El precio refleja la probabilidad que el mercado le da.',
-  },
-  {
-    n: '4',
-    title: 'Gana puntos si aciertas',
-    body: 'Cuando el evento se resuelve, cada acción ganadora vale 100 PT. Sube en la clasificación con tus aciertos.',
-  },
-]
-
-const FAQ = [
-  {
-    q: '¿Se juega con dinero real?',
-    a: 'No. VEREDIKT opera 100% con puntos virtuales (PT). No hay depósitos, retiros ni apuestas con dinero real. Es solo por diversión y para medir tu instinto.',
-  },
-  {
-    q: '¿Cómo se deciden los precios?',
-    a: 'El precio de SÍ es la probabilidad estimada por el mercado (de 1% a 99%). Cuando la gente compra SÍ, sube; cuando compra NO, baja.',
-  },
-  {
-    q: '¿Cuánto puedo ganar?',
-    a: 'Cada acción que aciertas paga 100 PT. Si compras SÍ a 40% (40 PT por acción) y aciertas, ganas 100 PT por acción: una ganancia de 60 PT.',
-  },
-]
+import { useTranslation } from 'react-i18next'
 
 export function HowItWorks() {
+  const { t } = useTranslation()
+  const steps = [
+    { n: '1', title: t('how.step1Title'), body: t('how.step1Body') },
+    { n: '2', title: t('how.step2Title'), body: t('how.step2Body') },
+    { n: '3', title: t('how.step3Title'), body: t('how.step3Body') },
+    { n: '4', title: t('how.step4Title'), body: t('how.step4Body') },
+  ]
+  const faq = [
+    { q: t('how.faq1Q'), a: t('how.faq1A') },
+    { q: t('how.faq2Q'), a: t('how.faq2A') },
+    { q: t('how.faq3Q'), a: t('how.faq3A') },
+  ]
   return (
     <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '48px 24px 24px' }}>
       <div className="anim-1" style={{ textAlign: 'center', marginBottom: 48 }}>
         <h1 className="font-display" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
-          Cómo funciona
+          {t('how.title')}
         </h1>
         <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
-          VEREDIKT es un mercado de predicciones con puntos virtuales. Predice eventos reales,
-          compite y demuestra qué tan bien lees el futuro — sin arriesgar un solo peso.
+          {t('how.intro')}
         </p>
       </div>
 
       {/* Steps */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 48 }}>
-        {STEPS.map((s, i) => (
+        {steps.map((s, i) => (
           <div key={s.n} className={`card anim-${Math.min(i + 1, 6)}`} style={{ display: 'flex', gap: 18, padding: '22px 24px', alignItems: 'flex-start' }}>
             <div style={{
               flexShrink: 0, width: 42, height: 42, borderRadius: 12,
@@ -78,9 +52,9 @@ export function HowItWorks() {
 
       {/* FAQ */}
       <div style={{ marginBottom: 48 }}>
-        <div className="exchange-header" style={{ marginBottom: 18 }}>Preguntas frecuentes</div>
+        <div className="exchange-header" style={{ marginBottom: 18 }}>{t('how.faqTitle')}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {FAQ.map(f => (
+          {faq.map(f => (
             <div key={f.q} className="card" style={{ padding: '20px 24px' }}>
               <h4 style={{ margin: '0 0 8px', fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>{f.q}</h4>
               <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.a}</p>
@@ -98,7 +72,7 @@ export function HowItWorks() {
             fontSize: '0.9rem', letterSpacing: '0.06em', borderRadius: 12, cursor: 'pointer',
             boxShadow: '0 8px 32px var(--oro-glow)',
           }}>
-            EXPLORAR MERCADOS →
+            {t('how.cta')}
           </button>
         </Link>
       </div>

@@ -1,17 +1,11 @@
 import React, { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { MarketCard } from './MarketCard'
 import type { Category, Market } from '../types'
 
 type BucketKey = 'all' | 'now' | 'today' | 'week' | 'month' | 'later'
 
-const BUCKETS: { key: BucketKey; label: string }[] = [
-  { key: 'all', label: 'Todos' },
-  { key: 'now', label: 'Cierran ya' },
-  { key: 'today', label: 'Hoy' },
-  { key: 'week', label: 'Esta semana' },
-  { key: 'month', label: 'Este mes' },
-  { key: 'later', label: 'Más adelante' },
-]
+const BUCKET_KEYS: BucketKey[] = ['all', 'now', 'today', 'week', 'month', 'later']
 
 // Bucket a market by hours-until-close (future-proof: minute/hour markets land in "now").
 function bucketOf(endsAt: string): Exclude<BucketKey, 'all'> {
@@ -30,7 +24,16 @@ interface CategoryBrowseProps {
 }
 
 export function CategoryBrowse({ category, markets, loading }: CategoryBrowseProps) {
+  const { t } = useTranslation()
   const [bucket, setBucket] = useState<BucketKey>('all')
+  const bucketLabels: Record<BucketKey, string> = {
+    all: t('categoryBrowse.bucketAll'),
+    now: t('categoryBrowse.bucketNow'),
+    today: t('categoryBrowse.bucketToday'),
+    week: t('categoryBrowse.bucketWeek'),
+    month: t('categoryBrowse.bucketMonth'),
+    later: t('categoryBrowse.bucketLater'),
+  }
 
   const inCat = useMemo(() => markets.filter(m => m.category === category), [markets, category])
 
@@ -62,12 +65,12 @@ export function CategoryBrowse({ category, markets, loading }: CategoryBrowsePro
     <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start', marginBottom: 48 }}>
       {/* Left rail */}
       <div className="cat-rail">
-        {BUCKETS.map(b => {
-          const active = b.key === bucket
+        {BUCKET_KEYS.map(key => {
+          const active = key === bucket
           return (
             <button
-              key={b.key}
-              onClick={() => setBucket(b.key)}
+              key={key}
+              onClick={() => setBucket(key)}
               className="cat-rail-item"
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
@@ -80,15 +83,15 @@ export function CategoryBrowse({ category, markets, loading }: CategoryBrowsePro
                 transition: 'all 0.15s', whiteSpace: 'nowrap',
               }}
             >
-              <span>{b.label}</span>
+              <span>{bucketLabels[key]}</span>
               <span className="font-mono" style={{
                 fontSize: '0.72rem', fontWeight: 700,
                 color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-                background: active ? 'rgba(255,215,0,0.12)' : 'var(--bg-elevated)',
+                background: active ? 'var(--oro-dim)' : 'var(--bg-elevated)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 99, padding: '1px 8px', minWidth: 22, textAlign: 'center',
               }}>
-                {counts[b.key]}
+                {counts[key]}
               </span>
             </button>
           )
@@ -99,7 +102,7 @@ export function CategoryBrowse({ category, markets, loading }: CategoryBrowsePro
       <div>
         <div className="cat-browse-head" style={{ marginBottom: 18 }}>
           <div className="exchange-header" style={{ margin: 0 }}>
-            {category} · {shown.length} mercado{shown.length !== 1 ? 's' : ''}
+            {category} · {t('categoryBrowse.marketCount', { count: shown.length })}
           </div>
         </div>
 
@@ -111,7 +114,7 @@ export function CategoryBrowse({ category, markets, loading }: CategoryBrowsePro
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-            <p style={{ fontWeight: 600 }}>Sin mercados en este filtro</p>
+            <p style={{ fontWeight: 600 }}>{t('categoryBrowse.emptyFilter')}</p>
           </div>
         )}
       </div>

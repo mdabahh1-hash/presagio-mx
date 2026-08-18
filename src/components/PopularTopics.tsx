@@ -1,17 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Market } from '../types'
+import { formatVolume } from '../lib/format'
 
 // "Temas populares" — real data: the markets with the most actual betting volume.
 // Reuses the markets already loaded on Home (no extra request). Falls back to
 // trending markets if nothing has volume yet, so it's never empty.
-function fmtVol(v: number) {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`
-  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`
-  return `${Math.round(v)}`
-}
-
 export function PopularTopics({ markets }: { markets: Market[] }) {
+  const { t } = useTranslation()
   const top = (() => {
     const withVol = markets.filter(m => m.volume > 0).sort((a, b) => b.volume - a.volume)
     if (withVol.length >= 3) return withVol.slice(0, 7)
@@ -25,7 +22,7 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
 
   return (
     <div className="card" style={{ padding: '18px 18px 10px' }}>
-      <div className="exchange-header" style={{ marginBottom: 14 }}>Temas populares</div>
+      <div className="exchange-header" style={{ marginBottom: 14 }}>{t('popular.title')}</div>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {top.map((m, i) => (
           <Link
@@ -52,7 +49,7 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
                 {m.question}
               </div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'DM Mono', marginTop: 2 }}>
-                {m.volume > 0 ? `${fmtVol(m.volume)} PT en volumen` : 'En tendencia'}
+                {m.volume > 0 ? t('popular.volumeLine', { vol: formatVolume(m.volume) }) : t('popular.trending')}
               </div>
             </div>
             <span style={{ fontSize: '1rem', flexShrink: 0 }} aria-hidden>🔥</span>

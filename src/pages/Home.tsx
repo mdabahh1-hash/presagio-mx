@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
@@ -45,6 +46,7 @@ function useMobile() {
 }
 
 export function Home() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>([])
   const [usingMock, setUsingMock] = useState(false)
@@ -111,7 +113,7 @@ export function Home() {
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Buscar mercados..."
+                placeholder={t('home.searchPlaceholder')}
                 style={{
                   flex: 1, background: 'transparent', border: 'none',
                   outline: 'none', padding: '11px 12px',
@@ -134,7 +136,7 @@ export function Home() {
             {MOBILE_TABS.map(tab => {
               const isActive = tab === mobileTab
               const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
-              const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
+          const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
               return (
                 <button
                   key={tab}
@@ -151,7 +153,7 @@ export function Home() {
                     transition: 'all 0.15s',
                   }}
                 >
-                  {tab}
+                  {tab === 'Tendencia' ? t('home.tabTrending') : tab}
                 </button>
               )
             })}
@@ -163,7 +165,7 @@ export function Home() {
             {/* Featured carousel */}
             {!loading && (
               <div style={{ padding: '14px 14px 4px' }}>
-                <div className="exchange-header" style={{ marginBottom: 12 }}>Mercado destacado</div>
+                <div className="exchange-header" style={{ marginBottom: 12 }}>{t('home.featuredMarket')}</div>
                 <FeaturedCarousel markets={apiMarkets} onRequireAuth={requireAuth} />
               </div>
             )}
@@ -185,7 +187,7 @@ export function Home() {
                 ))
               ) : (
                 <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-                  <p style={{ fontWeight: 600 }}>Sin mercados en tendencia</p>
+                  <p style={{ fontWeight: 600 }}>{t('home.noTrending')}</p>
                 </div>
               )}
             </div>
@@ -224,7 +226,7 @@ export function Home() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar un mercado..."
+              placeholder={t('home.searchPlaceholderDesktop')}
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
                 padding: '13px 14px', fontSize: '0.9rem',
@@ -238,7 +240,7 @@ export function Home() {
               fontSize: '0.78rem', letterSpacing: '0.08em',
               cursor: 'pointer', flexShrink: 0,
             }}>
-              BUSCAR
+              {t('home.searchBtn')}
             </button>
           </div>
         </form>
@@ -249,7 +251,7 @@ export function Home() {
           background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
           fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
-          + Proponer mercado
+          {t('home.proposeCta')}
         </Link>
       </section>
 
@@ -258,7 +260,7 @@ export function Home() {
         {MOBILE_TABS.map(tab => {
           const isActive = tab === mobileTab
           const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
-              const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
+          const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
           return (
             <button
               key={tab}
@@ -274,7 +276,7 @@ export function Home() {
                 transition: 'all 0.15s',
               }}
             >
-              {tab}
+              {tab === 'Tendencia' ? t('home.tabTrending') : tab}
             </button>
           )
         })}
@@ -301,13 +303,13 @@ export function Home() {
           {/* Trending markets grid */}
           <section style={{ marginBottom: 56 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div className="exchange-header">Mercados en tendencia</div>
+              <div className="exchange-header">{t('home.trendingMarkets')}</div>
               <Link to="/mercados" style={{
                 textDecoration: 'none', fontSize: '0.8rem',
                 color: 'var(--blue)', fontWeight: 600,
                 display: 'flex', alignItems: 'center', gap: 4,
               }}>
-                Ver todos
+                {t('home.viewAll')}
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -347,14 +349,14 @@ export function Home() {
                         e.currentTarget.style.color = 'var(--text-secondary)'
                       }}
                     >
-                      Ver más mercados ({filtered.length - visibleTrending} restantes)
+                      {t('home.seeMore', { count: filtered.length - visibleTrending })}
                     </button>
                   </div>
                 )}
               </>
             ) : (
               <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-                <p style={{ fontWeight: 600 }}>Sin mercados en tendencia</p>
+                <p style={{ fontWeight: 600 }}>{t('home.noTrending')}</p>
               </div>
             )}
           </section>

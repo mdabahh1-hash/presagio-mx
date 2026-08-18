@@ -15,6 +15,7 @@ import { Following } from './pages/Following'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { ThemeProvider } from './lib/ThemeContext'
 import { setToken } from './lib/api'
+import { useTranslation } from 'react-i18next'
 
 export default function App() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
 }
 
 function AuthCallbackRedirect() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { refreshUser } = useAuth()
   React.useEffect(() => {
@@ -56,5 +58,5 @@ function AuthCallbackRedirect() {
     // Load the user (and attach any pending referral) before leaving the page.
     refreshUser().finally(() => navigate('/', { replace: true }))
   }, [navigate, refreshUser])
-  return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>Iniciando sesión...</div>
+  return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>{t('app.signingIn')}</div>
 }

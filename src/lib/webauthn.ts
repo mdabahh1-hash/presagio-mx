@@ -2,6 +2,7 @@
 // dependency-light setup. Handles the base64url <-> ArrayBuffer plumbing the
 // browser API requires.
 import { authApi, setToken } from './api'
+import i18n from '../i18n'
 
 function b64urlToBuf(s: string): ArrayBuffer {
   const pad = '='.repeat((4 - (s.length % 4)) % 4)
@@ -29,7 +30,7 @@ export function isPasskeyCancel(err: unknown): boolean {
 
 // Register a new passkey for the CURRENT logged-in user (called from Profile).
 export async function registerPasskey(): Promise<void> {
-  if (!supportsPasskeys()) throw new Error('Tu navegador no soporta passkeys')
+  if (!supportsPasskeys()) throw new Error(i18n.t('errors.webauthnUnsupported'))
   const { state, options } = await authApi.passkeyRegisterOptions()
 
   const publicKey: PublicKeyCredentialCreationOptions = {
@@ -43,7 +44,7 @@ export async function registerPasskey(): Promise<void> {
   }
 
   const cred = (await navigator.credentials.create({ publicKey })) as PublicKeyCredential
-  if (!cred) throw new Error('No se pudo crear la passkey')
+  if (!cred) throw new Error(i18n.t('errors.passkeyCreateFailed'))
   const resp = cred.response as AuthenticatorAttestationResponse
 
   await authApi.passkeyRegisterVerify(state, {
@@ -62,7 +63,7 @@ export async function registerPasskey(): Promise<void> {
 
 // Log in with a discoverable passkey (no email needed). Stores the token.
 export async function loginPasskey(): Promise<void> {
-  if (!supportsPasskeys()) throw new Error('Tu navegador no soporta passkeys')
+  if (!supportsPasskeys()) throw new Error(i18n.t('errors.webauthnUnsupported'))
   const { state, options } = await authApi.passkeyLoginOptions()
 
   const publicKey: PublicKeyCredentialRequestOptions = {
@@ -75,7 +76,7 @@ export async function loginPasskey(): Promise<void> {
   }
 
   const cred = (await navigator.credentials.get({ publicKey })) as PublicKeyCredential
-  if (!cred) throw new Error('No se pudo verificar la passkey')
+  if (!cred) throw new Error(i18n.t('errors.passkeyVerifyFailed'))
   const resp = cred.response as AuthenticatorAssertionResponse
 
   const result = await authApi.passkeyLoginVerify(state, {

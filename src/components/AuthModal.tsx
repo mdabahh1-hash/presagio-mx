@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { authApi, setToken } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { loginPasskey, supportsPasskeys, isPasskeyCancel } from '../lib/webauthn'
+import { translateApiError } from '../lib/errors'
 
 interface AuthModalProps {
   onClose: () => void
@@ -10,6 +12,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
   const [step, setStep] = useState<'form' | 'verify'>('form')
   const [name, setName] = useState('')
@@ -48,7 +51,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
         setStep('verify')
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      setError(translateApiError(err))
     } finally {
       setLoading(false)
     }
@@ -65,7 +68,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
       await refreshUser()
       onClose()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Código incorrecto')
+      setError(translateApiError(err))
     } finally {
       setLoading(false)
     }
@@ -81,7 +84,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
       onClose()
     } catch (err: unknown) {
       // User cancelled the browser prompt → stay quiet
-      if (!isPasskeyCancel(err) && err instanceof Error && err.message) setError(err.message)
+      if (!isPasskeyCancel(err) && err instanceof Error && err.message) setError(translateApiError(err))
     } finally {
       setPasskeyLoading(false)
     }
@@ -134,7 +137,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
         {/* Close button */}
         <button
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t('common.close')}
           style={{
             position: 'absolute', top: 16, right: 16,
             background: 'var(--bg-elevated)',
@@ -155,17 +158,17 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
           <>
             <div style={{ marginBottom: 24, paddingRight: 36 }}>
               <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-                Verifica tu correo
+                {t('auth.verifyTitle')}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 6, lineHeight: 1.5 }}>
-                Enviamos un código de 6 dígitos a<br />
+                {t('auth.verifySubtitle')}<br />
                 <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{pendingEmail}</span>
               </div>
             </div>
 
             <form onSubmit={handleVerify}>
               <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Código de verificación</label>
+                <label style={labelStyle}>{t('auth.codeLabel')}</label>
                 <input
                   style={{ ...inputStyle, fontSize: '1.6rem', letterSpacing: '0.3em', textAlign: 'center', fontFamily: 'DM Mono' }}
                   type="text"
@@ -206,7 +209,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   boxShadow: (loading || code.length < 6) ? 'none' : '0 4px 20px var(--oro-glow)',
                 }}
               >
-                {loading ? 'Verificando...' : 'Confirmar cuenta'}
+                {loading ? t('auth.verifying') : t('auth.confirmAccount')}
               </button>
 
               <button
@@ -219,7 +222,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   cursor: 'pointer', fontFamily: 'DM Sans', padding: '8px',
                 }}
               >
-                ← Volver
+                {t('common.back')}
               </button>
             </form>
           </>
@@ -228,12 +231,12 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
             {/* ── Form step ── */}
             <div style={{ marginBottom: 22, paddingRight: 36 }}>
               <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-                {mode === 'login' ? 'Bienvenido de vuelta' : 'Crear cuenta'}
+                {mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
                 {mode === 'login'
-                  ? 'Entra con tu cuenta VEREDIKT'
-                  : 'Únete a la plataforma de predicciones'}
+                  ? t('auth.loginSubtitle')
+                  : t('auth.registerSubtitle')}
               </div>
             </div>
 
@@ -260,14 +263,14 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                     transition: 'all 0.15s',
                   }}
                 >
-                  {m === 'login' ? 'Iniciar sesión' : 'Registrarse'}
+                  {m === 'login' ? t('auth.tabLogin') : t('auth.tabRegister')}
                 </button>
               ))}
             </div>
 
             {/* Provider icon row (Polymarket-style) */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-              <a href={authApi.googleUrl()} aria-label="Continuar con Google" style={{
+              <a href={authApi.googleUrl()} aria-label={t('nav.continueGoogle')} style={{
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 height: 52, background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-default)', borderRadius: 12,
@@ -280,7 +283,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
               </a>
-              <a href={authApi.githubUrl()} aria-label="Continuar con GitHub" style={{
+              <a href={authApi.githubUrl()} aria-label={t('nav.continueGithub')} style={{
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 height: 52, background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-default)', borderRadius: 12,
@@ -296,7 +299,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 16px' }}>
               <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
               <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.06em' }}>
-                O CON TU CORREO
+                {t('auth.orEmail')}
               </span>
               <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
             </div>
@@ -306,11 +309,11 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 14 }}>
                 {mode === 'register' && (
                   <div>
-                    <label style={labelStyle}>Nombre completo</label>
+                    <label style={labelStyle}>{t('auth.nameLabel')}</label>
                     <input
                       style={inputStyle}
                       type="text"
-                      placeholder="Tu nombre"
+                      placeholder={t('auth.namePlaceholder')}
                       value={name}
                       onChange={e => setName(e.target.value)}
                       required
@@ -319,11 +322,11 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   </div>
                 )}
                 <div>
-                  <label style={labelStyle}>Correo electrónico</label>
+                  <label style={labelStyle}>{t('auth.emailLabel')}</label>
                   <input
                     style={inputStyle}
                     type="email"
-                    placeholder="tu@correo.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
@@ -331,11 +334,11 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Contraseña</label>
+                  <label style={labelStyle}>{t('auth.passwordLabel')}</label>
                   <input
                     style={inputStyle}
                     type="password"
-                    placeholder={mode === 'register' ? 'Mínimo 8 caracteres' : '••••••••'}
+                    placeholder={mode === 'register' ? t('auth.passwordPlaceholderRegister') : '••••••••'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
@@ -373,8 +376,8 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                 }}
               >
                 {loading
-                  ? 'Cargando...'
-                  : mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
+                  ? t('auth.loadingBtn')
+                  : mode === 'login' ? t('auth.tabLogin') : t('auth.createAccount')}
               </button>
             </form>
 
@@ -407,7 +410,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
                     <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
                     <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
                   </svg>
-                  {passkeyLoading ? 'Conectando...' : 'Entrar con passkey'}
+                  {passkeyLoading ? t('auth.passkeyConnecting') : t('auth.passkeyLogin')}
                 </button>
               </>
             )}

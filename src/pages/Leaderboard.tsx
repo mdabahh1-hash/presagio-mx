@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { usersApi, type ApiLeaderboardEntry, type LeaderboardPeriod } from '../lib/api'
+import { formatPnl, formatNum } from '../lib/format'
 
 const MEDAL = ['🥇', '🥈', '🥉']
 const PERIODS = ['Hoy', 'Semanal', 'Mensual', 'Todos'] as const
@@ -10,16 +12,6 @@ const PERIOD_PARAM: Record<typeof PERIODS[number], LeaderboardPeriod> = {
 
 function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
-}
-
-function fmtPnl(n: number) {
-  const r = Math.round(n)
-  const sign = r >= 0 ? '+' : '−'
-  return `${sign}${Math.abs(r).toLocaleString('es-MX')} PT`
-}
-
-function fmtVol(n: number) {
-  return `${Math.round(n).toLocaleString('es-MX')} PT`
 }
 
 function Avatar({ name, size = 40 }: { name: string; size?: number }) {
@@ -36,6 +28,13 @@ function Avatar({ name, size = 40 }: { name: string; size?: number }) {
 }
 
 export function Leaderboard() {
+  const { t } = useTranslation()
+  const periodLabels: Record<typeof PERIODS[number], string> = {
+    Hoy: t('leaderboard.periodToday'),
+    Semanal: t('leaderboard.periodWeek'),
+    Mensual: t('leaderboard.periodMonth'),
+    Todos: t('leaderboard.periodAll'),
+  }
   const [users, setUsers] = useState<ApiLeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -69,7 +68,7 @@ export function Leaderboard() {
   return (
     <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '44px 24px 24px' }}>
       <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
-        Tabla de clasificación
+        {t('leaderboard.title')}
       </h1>
 
       {/* Period tabs */}
@@ -81,7 +80,7 @@ export function Leaderboard() {
               key={p}
               onClick={() => setPeriod(p)}
               style={{
-                background: active ? 'rgba(255,215,0,0.12)' : 'var(--bg-card)',
+                background: active ? 'var(--oro-dim)' : 'var(--bg-card)',
                 border: `1px solid ${active ? 'var(--gold)' : 'var(--border-subtle)'}`,
                 borderRadius: 99, padding: '8px 18px',
                 fontSize: '0.82rem', fontWeight: 700,
@@ -90,7 +89,7 @@ export function Leaderboard() {
                 fontFamily: 'DM Sans', transition: 'all 0.15s',
               }}
             >
-              {p}
+              {periodLabels[p]}
             </button>
           )
         })}
@@ -111,7 +110,7 @@ export function Leaderboard() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nombre"
+          placeholder={t('leaderboard.searchPlaceholder')}
           style={{
             flex: 1, background: 'transparent', border: 'none', outline: 'none',
             padding: '11px 12px', fontSize: '0.875rem', color: 'var(--text-primary)', fontFamily: 'DM Sans',
@@ -129,7 +128,7 @@ export function Leaderboard() {
           }}>
             <span style={{ width: 28, flexShrink: 0 }} />
             <span style={{ flex: 1 }} />
-            {([['pnl', 'Ganancia/Pérdida'], ['volume', 'Invertido']] as const).map(([key, label]) => (
+            {([['pnl', t('leaderboard.colPnl')], ['volume', t('leaderboard.colVolume')]] as const).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setSort(key)}
@@ -156,11 +155,11 @@ export function Leaderboard() {
             </div>
           ) : error ? (
             <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)', marginTop: 16 }}>
-              No se pudo cargar la clasificación. Intenta más tarde.
+              {t('leaderboard.loadError')}
             </div>
           ) : rows.length === 0 ? (
             <div className="card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)', marginTop: 16 }}>
-              {search ? 'Sin resultados para tu búsqueda.' : 'Aún no hay traders en la clasificación. ¡Sé el primero en operar!'}
+              {search ? t('leaderboard.emptySearch') : t('leaderboard.emptyNoTraders')}
             </div>
           ) : (
             <div>
@@ -185,14 +184,14 @@ export function Leaderboard() {
                       {u.display_name}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
-                      {u.accuracy}% precisión · {u.markets_traded} mercados
+                      {t('leaderboard.statLine', { accuracy: u.accuracy, markets: u.markets_traded })}
                     </div>
                   </div>
                   <span className="font-mono lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: '0.95rem', fontWeight: 800, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
-                    {fmtPnl(u.pnl)}
+                    {formatPnl(u.pnl)}
                   </span>
                   <span className="font-mono lb-vol" style={{ width: 120, textAlign: 'right', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                    {fmtVol(u.volume)}
+                    {`${formatNum(u.volume)} PT`}
                   </span>
                 </Link>
               ))}
@@ -203,7 +202,7 @@ export function Leaderboard() {
         {/* ── Sidebar: top gainers ── */}
         <div className="leaderboard-side">
           <div className="card" style={{ padding: '20px 18px' }}>
-            <div className="exchange-header" style={{ marginBottom: 16 }}>Mayores ganancias</div>
+            <div className="exchange-header" style={{ marginBottom: 16 }}>{t('leaderboard.topGainers')}</div>
             {loading ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[...Array(6)].map((_, i) => (
@@ -211,7 +210,7 @@ export function Leaderboard() {
                 ))}
               </div>
             ) : topGainers.length === 0 ? (
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', margin: 0 }}>Aún no hay datos.</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', margin: 0 }}>{t('leaderboard.noData')}</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {topGainers.map((u, i) => (
@@ -225,7 +224,7 @@ export function Leaderboard() {
                       {u.display_name}
                     </span>
                     <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
-                      {fmtPnl(u.pnl)}
+                      {formatPnl(u.pnl)}
                     </span>
                   </div>
                 ))}

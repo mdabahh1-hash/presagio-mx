@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { usersApi, type ApiProfilePublic, type ApiPosition } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { AuthModal } from '../components/AuthModal'
 import { track } from '../lib/analytics'
+import { formatPnl, formatNum, formatDate } from '../lib/format'
 
 function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
-function fmtPnl(n: number) {
-  const r = Math.round(n)
-  return `${r >= 0 ? '+' : '−'}${Math.abs(r).toLocaleString('es-MX')} PT`
-}
-function fmtNum(n: number) {
-  return Math.round(n).toLocaleString('es-MX')
-}
 
 export function PublicProfile() {
+  const { t } = useTranslation()
   const { username } = useParams<{ username: string }>()
   const { user } = useAuth()
   const [profile, setProfile] = useState<ApiProfilePublic | null>(null)
@@ -78,22 +74,22 @@ export function PublicProfile() {
   if (notFound || !profile) {
     return (
       <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>Usuario no encontrado.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('publicProfile.notFound')}</p>
         <Link to="/clasificacion" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-          ← Ver clasificación
+          {t('publicProfile.seeLeaderboard')}
         </Link>
       </div>
     )
   }
 
   const isOwnProfile = user?.username === profile.username
-  const memberSince = new Date(profile.created_at).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
-  const followersLabel = followersCount === 1 ? '1 seguidor' : `${fmtNum(followersCount)} seguidores`
+  const memberSince = formatDate(profile.created_at, { month: 'long', year: 'numeric' })
+  const followersLabel = t('publicProfile.followers', { count: followersCount })
   const stats = [
-    { label: 'Ganancia/Pérdida', value: fmtPnl(profile.pnl), color: profile.pnl >= 0 ? 'var(--green)' : 'var(--red)' },
-    { label: 'Precisión', value: `${profile.accuracy}%`, color: 'var(--text-primary)' },
-    { label: 'Mercados', value: fmtNum(profile.markets_traded), color: 'var(--text-primary)' },
-    { label: 'Invertido', value: `${fmtNum(profile.volume)} PT`, color: 'var(--gold)' },
+    { label: t('publicProfile.pnl'), value: formatPnl(profile.pnl), color: profile.pnl >= 0 ? 'var(--green)' : 'var(--red)' },
+    { label: t('publicProfile.precision'), value: `${profile.accuracy}%`, color: 'var(--text-primary)' },
+    { label: t('publicProfile.markets'), value: formatNum(profile.markets_traded), color: 'var(--text-primary)' },
+    { label: t('publicProfile.invested'), value: `${formatNum(profile.volume)} PT`, color: 'var(--gold)' },
   ]
 
   return (
@@ -114,9 +110,9 @@ export function PublicProfile() {
           <h1 className="font-display" style={{ fontSize: '1.7rem', fontWeight: 800, letterSpacing: '-0.02em', margin: '0 0 4px' }}>
             {profile.display_name}
           </h1>
-          <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>Miembro desde {memberSince}</div>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>{t('publicProfile.memberSince', { date: memberSince })}</div>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
-            {followersLabel} · sigue a {fmtNum(profile.following_count)}
+            {followersLabel} · {t('publicProfile.followsCount', { count: profile.following_count })}
           </div>
         </div>
         {!isOwnProfile && (
@@ -136,7 +132,7 @@ export function PublicProfile() {
               opacity: followBusy ? 0.6 : 1,
             }}
           >
-            {isFollowing ? 'Siguiendo ✓' : 'Seguir'}
+            {isFollowing ? t('publicProfile.followingBtn') : t('publicProfile.follow')}
           </button>
         )}
       </div>
@@ -152,10 +148,10 @@ export function PublicProfile() {
       </div>
 
       {/* Open positions */}
-      <div className="exchange-header" style={{ marginBottom: 14 }}>Posiciones abiertas</div>
+      <div className="exchange-header" style={{ marginBottom: 14 }}>{t('publicProfile.openPositions')}</div>
       {positions.length === 0 ? (
         <div className="card" style={{ padding: 32, textAlign: 'center', color: 'var(--text-secondary)' }}>
-          Sin posiciones abiertas.
+          {t('publicProfile.noOpenPositions')}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -163,7 +159,7 @@ export function PublicProfile() {
             // Binary markets have side YES/NO; multi-outcome markets have side
             // null and the outcome label in outcome_key.
             const isBinary = p.side === 'YES' || p.side === 'NO'
-            const label = isBinary ? (p.side === 'YES' ? 'SÍ' : 'NO') : (p.outcome_key ?? '—')
+            const label = isBinary ? (p.side === 'YES' ? t('common.yes') : t('common.no')) : (p.outcome_key ?? '—')
             const color = isBinary ? (p.side === 'YES' ? 'var(--green)' : 'var(--red)') : 'var(--blue)'
             const bg = p.side === 'YES' ? 'var(--green-soft)' : p.side === 'NO' ? 'var(--red-soft)' : 'var(--accent-alt-bg)'
             const invested = p.avg_cost * p.shares
@@ -181,7 +177,7 @@ export function PublicProfile() {
                   {p.market_question}
                 </span>
                 <span className="font-mono" style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', flexShrink: 0 }}>
-                  {fmtNum(invested)} PT
+                  {formatNum(invested)} PT
                 </span>
               </Link>
             )

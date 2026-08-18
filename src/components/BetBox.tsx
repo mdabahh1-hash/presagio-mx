@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { tradesApi, marketsApi, authApi, type ApiOutcome, type ApiQuote } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { displayPair } from '../lib/prices'
 import { useDebouncedValue, useThrottledValue } from '../lib/useDebouncedValue'
+import { formatNum } from '../lib/format'
+import { translateApiError } from '../lib/errors'
 
 interface BetBoxProps {
   marketId: string
@@ -32,6 +35,7 @@ export function BetBox({
   initialSide,
   initialAmount,
 }: BetBoxProps) {
+  const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
   const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
   const [amount, setAmount] = useState(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 100)
@@ -72,7 +76,7 @@ export function BetBox({
   const handleTrade = async () => {
     if (!user) {
       if (onRequireAuth) { onRequireAuth(); return }
-      setTradeError('Inicia sesión para operar')
+      setTradeError(t('bet.loginToTrade'))
       return
     }
     setTrading(true)
@@ -93,20 +97,21 @@ export function BetBox({
 
       let result
       if (isMulti) {
-        if (!selectedOutcome) { setTradeError('Selecciona un resultado'); setTrading(false); return }
+        if (!selectedOutcome) { setTradeError(t('bet.selectOutcome')); setTrading(false); return }
         result = await tradesApi.execute(marketId, { outcome_key: selectedOutcome.outcome_key, points: amount, quoted_avg_price: quotedPrice })
-        setTradeSuccess(`Compraste ${result.shares.toFixed(1)} acciones de "${selectedOutcome.label}" por ${Math.round(result.cost)} PT`)
+        setTradeSuccess(t('bet.successMulti', { shares: result.shares.toFixed(1), label: selectedOutcome.label, cost: Math.round(result.cost) }))
       } else {
         result = await tradesApi.execute(marketId, { side, points: amount, quoted_avg_price: quotedPrice })
-        setTradeSuccess(`Compraste ${result.shares.toFixed(1)} acciones ${side === 'YES' ? 'SÍ' : 'NO'} por ${Math.round(result.cost)} PT`)
+        setTradeSuccess(t('bet.successBinary', { shares: result.shares.toFixed(1), side: side === 'YES' ? t('common.yes') : t('common.no'), cost: Math.round(result.cost) }))
       }
       track('Trade', { market: marketId, type: marketType, cost: Math.round(result.cost) })
       onTraded?.(result.new_yes_price)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)
-    } catch (e: any) {
-      if (e.code === 'PRICE_MOVED') {
-        setTradeError('El precio cambió, revisa tu orden')
+    } catch (e) {
+      const err = e as Error & { code?: string }
+      if (err.code === 'PRICE_MOVED') {
+        setTradeError(t('errors.PRICE_MOVED'))
         // Auto re-quote so the panel shows the fresh execution price.
         marketsApi.quote(marketId, isMulti
           ? { outcome_key: selectedOutcome!.outcome_key, amount }
@@ -114,7 +119,7 @@ export function BetBox({
           .then(setQuote)
           .catch(() => {})
       } else {
-        setTradeError(e.message)
+        setTradeError(translateApiError(err))
       }
     } finally {
       setTrading(false)
@@ -123,7 +128,7 @@ export function BetBox({
 
   return (
     <div>
-      <div className="exchange-header" style={{ marginBottom: compact ? 16 : 20 }}>Operar</div>
+      <div className="exchange-header" style={{ marginBottom: compact ? 16 : 20 }}>{t('bet.title')}</div>
 
       {isMulti ? (
         /* ── Multi-outcome: outcome selector ── */
@@ -178,7 +183,7 @@ export function BetBox({
                   color: isSelected ? color : 'var(--text-tertiary)',
                   letterSpacing: '0.12em', marginBottom: 6,
                 }}>
-                  {s === 'YES' ? 'SÍ' : 'NO'}
+                  {s === 'YES' ? t('common.yes') : t('common.no')}
                 </div>
                 <div className="font-mono" style={{
                   fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 800,
@@ -196,10 +201,10 @@ export function BetBox({
       {/* Amount input */}
       <div style={{ marginBottom: 16 }}>
         <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.03em' }}>CANTIDAD</span>
+          <span style={{ color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.03em' }}>{t('bet.amount')}</span>
           {user && (
             <span style={{ color: 'var(--gold)', fontFamily: 'DM Mono', fontWeight: 700, fontSize: '0.75rem' }}>
-              {Math.floor(user.points).toLocaleString('es-MX')} PT
+              {formatNum(Math.floor(user.points))} PT
             </span>
           )}
         </label>
@@ -282,25 +287,25 @@ export function BetBox({
         marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10,
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-tertiary)' }}>Precio promedio de ejecución</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.avgPrice')}</span>
           <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
             {quote ? `${quote.avg_fill_price.toFixed(1)}%` : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-tertiary)' }}>Recibes</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.receive')}</span>
           <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
-            {quote ? `${quote.shares.toFixed(1)} acciones` : '—'}
+            {quote ? t('bet.sharesValue', { value: quote.shares.toFixed(1) }) : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-tertiary)' }}>Ganancia potencial</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.potentialGain')}</span>
           <span className="font-mono" style={{ color: 'var(--green)', fontWeight: 800 }}>
             {quote ? `+${Math.round(quote.potential_gain)} PT` : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-tertiary)' }}>Máx. pérdida</span>
+          <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.maxLoss')}</span>
           <span className="font-mono" style={{ color: 'var(--red)', fontWeight: 700 }}>
             {quote ? `-${Math.round(quote.max_loss)} PT` : `-${amount} PT`}
           </span>
@@ -317,24 +322,24 @@ export function BetBox({
                 fontFamily: 'DM Sans', display: 'flex', alignItems: 'center', gap: 4,
               }}
             >
-              Detalles del precio {detailsOpen ? '▴' : '▾'}
+              {t('bet.priceDetails')} {detailsOpen ? '▴' : '▾'}
             </button>
             {detailsOpen && (
               <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                  <span style={{ color: 'var(--text-tertiary)' }}>Mejor precio disponible</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.bestPrice')}</span>
                   <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.mid_price.toFixed(1)}%</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                  <span style={{ color: 'var(--text-tertiary)' }}>Precio promedio de tu orden</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.orderAvgPrice')}</span>
                   <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.avg_fill_price.toFixed(1)}%</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
-                  <span style={{ color: 'var(--text-tertiary)' }}>Costo por tamaño de orden</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.slippageCost')}</span>
                   <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.slippage_cost.toFixed(1)} PT</span>
                 </div>
                 <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
-                  Tu orden mueve el precio de {quote.mid_price.toFixed(1)}% a {quote.price_after.toFixed(1)}% por su tamaño.
+                  {t('bet.priceImpact', { from: quote.mid_price.toFixed(1), to: quote.price_after.toFixed(1) })}
                 </p>
               </div>
             )}
@@ -350,8 +355,7 @@ export function BetBox({
           border: '1px solid var(--warning-border)',
           borderRadius: 8, padding: '10px 14px', lineHeight: 1.5,
         }}>
-          Este mercado tiene poca liquidez. Tu orden se ejecutará a un precio promedio
-          de {quote.avg_fill_price.toFixed(1)}%, mayor al precio mostrado.
+          {t('bet.lowLiquidity', { price: quote.avg_fill_price.toFixed(1) })}
         </div>
       )}
 
@@ -401,25 +405,25 @@ export function BetBox({
         }}
       >
         {trading
-          ? 'PROCESANDO...'
+          ? t('bet.processing')
           : isMulti
           ? selectedOutcome
-            ? `APOSTAR "${selectedOutcome.label}" · ${amount} PT`
-            : 'SELECCIONA UN RESULTADO'
-          : `COMPRAR ${side === 'YES' ? 'SÍ' : 'NO'} · ${amount} PT`
+            ? t('bet.betBtn', { label: selectedOutcome.label, amount })
+            : t('bet.selectOutcomeBtn')
+          : t('bet.buyBtn', { side: side === 'YES' ? t('common.yes') : t('common.no'), amount })
         }
       </button>
 
       {!user && !onRequireAuth && (
         <div style={{ marginTop: 14, textAlign: 'center' }}>
           <a href={authApi.googleUrl()} style={{ fontSize: '0.82rem', color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-            Inicia sesión para operar →
+            {t('bet.loginToTradeLink')}
           </a>
         </div>
       )}
 
       <p style={{ margin: '14px 0 0', fontSize: '0.68rem', color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
-        VEREDIKT opera con puntos virtuales. No se involucra dinero real.
+        {t('bet.disclaimer')}
       </p>
     </div>
   )

@@ -1,3 +1,5 @@
+import i18n from '../i18n'
+
 const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
 function getToken(): string | null {
@@ -27,9 +29,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const d = err?.detail
     const msg = typeof d === 'string'
       ? d
-      : Array.isArray(d) ? (d[0]?.msg ?? 'Datos inválidos')
+      : Array.isArray(d) ? (d[0]?.msg ?? i18n.t('errors.invalidData'))
       : (d && typeof d === 'object' && typeof d.message === 'string') ? d.message
-      : 'Error desconocido'
+      : i18n.t('errors.unknown')
     const e = new Error(msg) as Error & { status?: number; code?: string; detail?: unknown }
     e.status = res.status
     if (d && typeof d === 'object' && !Array.isArray(d)) {

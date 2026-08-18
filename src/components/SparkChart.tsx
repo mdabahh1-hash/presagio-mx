@@ -1,4 +1,5 @@
 import React, { useId, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { PricePoint } from '../types'
 
 // ── MultiLineChart ─────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ interface MultiSeries {
 }
 
 export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]; height?: number }) {
+  const { t } = useTranslation()
   const chart = useMemo(() => {
     const padL = 44, padR = 16, padT = 16, padB = 44
     const W = 700, H = height
@@ -94,7 +96,7 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
   if (!chart) {
     return (
       <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
-        Sin suficientes datos de historial aún
+        {t('common.noHistory')}
       </div>
     )
   }

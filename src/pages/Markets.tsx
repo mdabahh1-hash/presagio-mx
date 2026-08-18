@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
@@ -11,12 +12,6 @@ const ALL_CATEGORIES: (Category | 'Todos')[] = [
   'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
   'Política MX', 'Deportes', 'Boxeo', 'Motor', 'México', 'Global', 'Tech', 'Clima', 'Entretenimiento',
 ]
-const SORT_OPTIONS = [
-  { value: 'volume', label: 'Mayor volumen' },
-  { value: 'trending', label: 'Tendencias' },
-  { value: 'ending', label: 'Cierra pronto' },
-]
-
 function apiToMarket(m: ApiMarket): Market {
   return {
     id: m.id,
@@ -38,7 +33,13 @@ function apiToMarket(m: ApiMarket): Market {
 }
 
 export function Markets() {
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
+  const sortOptions = [
+    { value: 'volume', label: t('markets.sortVolume') },
+    { value: 'trending', label: t('markets.sortTrending') },
+    { value: 'ending', label: t('markets.sortEnding') },
+  ]
   const [sortBy, setSortBy] = useState('volume')
   const [markets, setMarkets] = useState<Market[]>([])
   const [loading, setLoading] = useState(true)
@@ -99,15 +100,15 @@ export function Markets() {
             fontSize: '2.2rem', fontWeight: 800,
             letterSpacing: '-0.04em', margin: '0 0 8px',
           }}>
-            Mercados
+            {t('markets.title')}
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
             {loading ? (
-              <span style={{ color: 'var(--text-tertiary)' }}>Cargando...</span>
+              <span style={{ color: 'var(--text-tertiary)' }}>{t('common.loading')}</span>
             ) : (
               <>
                 <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'DM Mono' }}>{markets.length}</span>
-                {' '}mercados activos · Actualizado en tiempo real
+                {' '}{t('markets.activeCount')}
               </>
             )}
           </p>
@@ -119,7 +120,7 @@ export function Markets() {
           background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
           fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
-          + Proponer mercado
+          {t('home.proposeCta')}
         </Link>
       </div>
 
@@ -148,7 +149,7 @@ export function Markets() {
               type="text"
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
-              placeholder="Buscar mercados..."
+              placeholder={t('home.searchPlaceholder')}
               style={{
                 flex: 1, background: 'transparent', border: 'none',
                 outline: 'none', padding: '13px 14px',
@@ -192,7 +193,7 @@ export function Markets() {
                     fontFamily: 'DM Sans',
                   }}
                 >
-                  {cat}
+                  {cat === 'Todos' ? t('markets.allCategory') : cat}
                 </button>
               )
             })}
@@ -210,7 +211,7 @@ export function Markets() {
                 fontFamily: 'DM Sans',
               }}
             >
-              {SORT_OPTIONS.map(opt => (
+              {sortOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
@@ -234,11 +235,11 @@ export function Markets() {
                 borderRadius: 99, padding: '3px 10px',
                 fontFamily: 'DM Mono',
               }}>
-                {markets.length} resultado{markets.length !== 1 ? 's' : ''}
+                {t('markets.resultCount', { count: markets.length })}
               </span>
               {searchInput && (
                 <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
-                  · búsqueda: <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
+                  {t('markets.searchLabel')} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
                 </span>
               )}
             </div>
@@ -277,10 +278,10 @@ export function Markets() {
                 </svg>
               </div>
               <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
-                No encontramos mercados
+                {t('markets.emptyTitle')}
               </p>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
-                Intenta con otra categoría o búsqueda
+                {t('markets.emptySubtitle')}
               </p>
             </div>
           )}

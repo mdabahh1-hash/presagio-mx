@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { LogoFull } from './Logo'
 
 const CATEGORIES = [
@@ -20,6 +21,7 @@ const colHeader: React.CSSProperties = {
 }
 
 export function Footer() {
+  const { t } = useTranslation()
   return (
     <footer style={{ borderTop: '1px solid var(--border-subtle)', marginTop: 56, background: 'var(--bg-surface)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 24px 28px' }}>
@@ -28,7 +30,7 @@ export function Footer() {
         <div style={{ marginBottom: 40 }}>
           <LogoFull />
           <p style={{ margin: '14px 0 0', fontSize: '0.9rem', color: 'var(--text-tertiary)', maxWidth: 420, lineHeight: 1.5 }}>
-            El mercado de predicciones de México.
+            {t('footer.tagline')}
           </p>
         </div>
 
@@ -37,13 +39,13 @@ export function Footer() {
 
           {/* Markets by category */}
           <div>
-            <div style={colHeader}>Mercados por categoría y temas</div>
+            <div style={colHeader}>{t('footer.categoriesHeader')}</div>
             <div className="footer-cat-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
               {CATEGORIES.map(cat => (
                 <Link key={cat} to={`/mercados?cat=${encodeURIComponent(cat)}`} style={{ ...colLink, padding: '8px 0' }} className="footer-link">
                   {cat}
                   <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 500, color: 'var(--text-tertiary)', marginTop: 2 }}>
-                    Predicciones y cuotas
+                    {t('footer.categorySub')}
                   </span>
                 </Link>
               ))}
@@ -52,22 +54,22 @@ export function Footer() {
 
           {/* Community */}
           <div>
-            <div style={colHeader}>Comunidad</div>
+            <div style={colHeader}>{t('footer.community')}</div>
             <a href="#" style={colLink} className="footer-link">X (Twitter)</a>
             <a href="#" style={colLink} className="footer-link">Instagram</a>
             <a href="#" style={colLink} className="footer-link">Discord</a>
             <a href="#" style={colLink} className="footer-link">TikTok</a>
-            <a href="mailto:hola@veredikt.mx" style={colLink} className="footer-link">Contáctanos</a>
-            <Link to="/como-funciona" style={colLink} className="footer-link">Centro de ayuda</Link>
+            <a href="mailto:hola@veredikt.mx" style={colLink} className="footer-link">{t('footer.contact')}</a>
+            <Link to="/como-funciona" style={colLink} className="footer-link">{t('footer.helpCenter')}</Link>
           </div>
 
           {/* VEREDIKT */}
           <div>
             <div style={colHeader}>VEREDIKT</div>
-            <Link to="/como-funciona" style={colLink} className="footer-link">Cómo funciona</Link>
-            <Link to="/clasificacion" style={colLink} className="footer-link">Clasificación</Link>
-            <Link to="/mercados" style={colLink} className="footer-link">Mercados</Link>
-            <Link to="/proponer" style={colLink} className="footer-link">Proponer mercado</Link>
+            <Link to="/como-funciona" style={colLink} className="footer-link">{t('nav.howItWorks')}</Link>
+            <Link to="/clasificacion" style={colLink} className="footer-link">{t('nav.leaderboard')}</Link>
+            <Link to="/mercados" style={colLink} className="footer-link">{t('nav.markets')}</Link>
+            <Link to="/proponer" style={colLink} className="footer-link">{t('nav.propose')}</Link>
             <a href="#" style={colLink} className="footer-link">API</a>
           </div>
         </div>
@@ -82,12 +84,12 @@ export function Footer() {
             © 2026 VEREDIKT
           </span>
           <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
-            {['Términos', 'Privacidad', 'Integridad del mercado'].map(item => (
+            {[t('footer.terms'), t('footer.privacy'), t('footer.integrity')].map(item => (
               <a key={item} href="#" style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', textDecoration: 'none' }} className="footer-link">
                 {item}
               </a>
             ))}
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>🌐 Español</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{t('footer.languageTag')}</span>
           </div>
         </div>
 

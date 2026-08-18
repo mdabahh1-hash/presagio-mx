@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { usersApi, authApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
@@ -7,8 +8,11 @@ import { ReferralCard } from '../components/ReferralCard'
 import { registerPasskey, supportsPasskeys, isPasskeyCancel } from '../lib/webauthn'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
+import { formatNum } from '../lib/format'
+import { translateApiError } from '../lib/errors'
 
 export function Profile() {
+  const { t } = useTranslation()
   const { user, logout, refreshUser } = useAuth()
   const navigate = useNavigate()
   const [positions, setPositions] = useState<ApiPosition[]>([])
@@ -39,10 +43,10 @@ export function Profile() {
       await registerPasskey()
       track('PasskeyAdded')
       await refreshUser()
-      setPasskeyMsg({ ok: true, text: 'Passkey agregada ✓' })
+      setPasskeyMsg({ ok: true, text: t('profile.passkeyAdded') })
     } catch (err: unknown) {
       if (!isPasskeyCancel(err)) {
-        setPasskeyMsg({ ok: false, text: err instanceof Error ? err.message : 'No se pudo agregar la passkey' })
+        setPasskeyMsg({ ok: false, text: err instanceof Error ? translateApiError(err) : t('profile.passkeyAddError') })
       }
     } finally {
       setPasskeyBusy(false)
@@ -55,9 +59,9 @@ export function Profile() {
     try {
       await authApi.passkeyDelete()
       await refreshUser()
-      setPasskeyMsg({ ok: true, text: 'Passkey eliminada' })
+      setPasskeyMsg({ ok: true, text: t('profile.passkeyRemoved') })
     } catch (err: unknown) {
-      setPasskeyMsg({ ok: false, text: err instanceof Error ? err.message : 'Error' })
+      setPasskeyMsg({ ok: false, text: translateApiError(err) })
     } finally {
       setPasskeyBusy(false)
     }
@@ -84,10 +88,10 @@ export function Profile() {
           margin: '0 auto 20px', fontSize: '1.5rem',
         }}>🔐</div>
         <h2 className="font-display" style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: 12, letterSpacing: '-0.02em' }}>
-          Inicia sesión para ver tu perfil
+          {t('profile.loginTitle')}
         </h2>
         <p style={{ color: 'var(--text-tertiary)', marginBottom: 28, fontSize: '0.9rem' }}>
-          Gestiona tu balance, posiciones e historial de operaciones.
+          {t('profile.loginSubtitle')}
         </p>
         <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
           <button style={{
@@ -97,7 +101,7 @@ export function Profile() {
             borderRadius: 12, cursor: 'pointer',
             boxShadow: '0 6px 24px var(--oro-glow)',
           }}>
-            Iniciar sesión con Google
+            {t('profile.loginGoogle')}
           </button>
         </a>
       </div>
@@ -149,9 +153,9 @@ export function Profile() {
             </p>
             <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
               {[
-                { label: 'PRECISIÓN', value: `${user.accuracy}%`, color: 'var(--green)' },
-                { label: 'MERCADOS', value: user.markets_traded.toString(), color: 'var(--text-primary)' },
-                { label: 'PREDICCIONES', value: user.total_predictions.toString(), color: 'var(--blue)' },
+                { label: t('profile.accuracy'), value: `${user.accuracy}%`, color: 'var(--green)' },
+                { label: t('profile.marketsMetric'), value: user.markets_traded.toString(), color: 'var(--text-primary)' },
+                { label: t('profile.predictions'), value: user.total_predictions.toString(), color: 'var(--blue)' },
               ].map(metric => (
                 <div key={metric.label}>
                   <span style={{
@@ -178,13 +182,13 @@ export function Profile() {
               textTransform: 'uppercase', letterSpacing: '0.1em',
               marginBottom: 6, fontWeight: 600,
             }}>
-              SALDO DISPONIBLE
+              {t('profile.availableBalance')}
             </div>
             <div className="font-mono" style={{
               fontSize: '2.8rem', fontWeight: 800,
               color: 'var(--gold)', letterSpacing: '-0.04em', lineHeight: 1,
             }}>
-              {Math.floor(user.points).toLocaleString('es-MX')}
+              {formatNum(Math.floor(user.points))}
             </div>
             <div style={{ fontSize: '0.78rem', color: 'var(--gold)', opacity: 0.5, marginTop: 4, fontWeight: 700 }}>PT</div>
             <button
@@ -198,7 +202,7 @@ export function Profile() {
                 transition: 'all 0.15s',
               }}
             >
-              Cerrar sesión
+              {t('profile.logout')}
             </button>
           </div>
         </div>
@@ -207,14 +211,14 @@ export function Profile() {
       {/* Email notifications toggle */}
       <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 20px', marginBottom: 20 }}>
         <div>
-          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Notificaciones por correo</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Te avisamos cuando tus mercados se resuelven</div>
+          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('profile.emailNotifTitle')}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{t('profile.emailNotifSub')}</div>
         </div>
         <button
           onClick={toggleEmailNotif}
           role="switch"
           aria-checked={emailNotif}
-          aria-label="Notificaciones por correo"
+          aria-label={t('profile.emailNotifTitle')}
           style={{
             width: 46, height: 26, borderRadius: 99, border: 'none', cursor: 'pointer',
             position: 'relative', flexShrink: 0,
@@ -235,14 +239,14 @@ export function Profile() {
         <div className="card" style={{ padding: '14px 20px', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
             <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Seguridad</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('profile.securityTitle')}</div>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-                Passkey: entra con Face ID, Touch ID o tu llave de seguridad
+                {t('profile.securitySub')}
               </div>
             </div>
             {user.has_passkey ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--green)', fontWeight: 700 }}>Configurada ✓</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--green)', fontWeight: 700 }}>{t('profile.passkeyConfigured')}</span>
                 <button
                   onClick={removePasskey}
                   disabled={passkeyBusy}
@@ -253,7 +257,7 @@ export function Profile() {
                     opacity: passkeyBusy ? 0.6 : 1,
                   }}
                 >
-                  Eliminar
+                  {t('profile.passkeyDelete')}
                 </button>
               </div>
             ) : (
@@ -267,7 +271,7 @@ export function Profile() {
                   flexShrink: 0, opacity: passkeyBusy ? 0.6 : 1,
                 }}
               >
-                {passkeyBusy ? 'Esperando...' : 'Agregar passkey'}
+                {passkeyBusy ? t('profile.passkeyWaiting') : t('profile.passkeyAdd')}
               </button>
             )}
           </div>
@@ -286,23 +290,23 @@ export function Profile() {
       <div className="anim-2 profile-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
         {[
           {
-            label: 'SALDO',
-            value: `${Math.floor(user.points).toLocaleString('es-MX')} PT`,
+            label: t('profile.balance'),
+            value: `${formatNum(Math.floor(user.points))} PT`,
             sub: null,
             color: 'var(--gold)',
             border: 'var(--oro-glow)',
           },
           {
-            label: 'INVERTIDO',
-            value: `${Math.floor(totalInvested).toLocaleString('es-MX')} PT`,
-            sub: `${positions.length} posiciones abiertas`,
+            label: t('profile.invested'),
+            value: `${formatNum(Math.floor(totalInvested))} PT`,
+            sub: t('profile.openPositions', { count: positions.length }),
             color: 'var(--text-primary)',
             border: 'transparent',
           },
           {
-            label: 'EXACTITUD',
+            label: t('profile.exactness'),
             value: `${user.accuracy}%`,
-            sub: `${user.correct_predictions} / ${user.total_predictions} correctas`,
+            sub: t('profile.correctRatio', { correct: user.correct_predictions, total: user.total_predictions }),
             color: 'var(--green)',
             border: 'var(--green-border)',
           },
@@ -334,7 +338,7 @@ export function Profile() {
       {/* P&L chart */}
       <div className="anim-3 card" style={{ padding: '24px', marginBottom: 24 }}>
         <div className="exchange-header" style={{ marginBottom: 20 }}>
-          Historial de puntos — 30 días
+          {t('profile.pointsHistory')}
         </div>
         <FullChart data={pointsHistory} height={160} color="var(--gold)" />
       </div>
@@ -356,7 +360,7 @@ export function Profile() {
               transition: 'color 0.15s', marginBottom: -1,
             }}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === 'posiciones' ? t('profile.tabPositions') : t('profile.tabHistory')}
           </button>
         ))}
       </div>
@@ -396,10 +400,10 @@ export function Profile() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {pos.shares.toFixed(2)} acc.
+                      {t('profile.sharesAbbr', { value: pos.shares.toFixed(2) })}
                     </div>
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
-                      costo prom. {pos.avg_cost.toFixed(1)} PT
+                      {t('profile.avgCost', { value: pos.avg_cost.toFixed(1) })}
                     </div>
                   </div>
                 </div>
@@ -414,9 +418,9 @@ export function Profile() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 18px', fontSize: '1.4rem',
             }}>📊</div>
-            <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Sin posiciones abiertas</p>
+            <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>{t('profile.noPositions')}</p>
             <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
-              Explorar mercados →
+              {t('profile.explore')}
             </Link>
           </div>
         )
@@ -431,8 +435,8 @@ export function Profile() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 18px', fontSize: '1.4rem',
           }}>📋</div>
-          <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Historial completo próximamente</p>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>Estamos preparando esta sección.</p>
+          <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>{t('profile.historySoon')}</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>{t('profile.historyPreparing')}</p>
         </div>
       )}
     </div>

@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { track } from '../lib/analytics'
 
 // "Invita y gana PT" card for the profile page. Shares a /?ref=CODE link that
 // the auth flow reads at signup. Both inviter and invitee get PT after the
 // invitee's first trade.
 export function ReferralCard({ code }: { code: string | null }) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
   if (!code) return null
 
   const link = `${window.location.origin}/?ref=${code}`
-  const text = '🔮 Únete a VEREDIKT, el mercado de predicción. Si te registras con mi link, ganamos 200 PT cada uno cuando hagas tu primera predicción:'
+  const text = t('referral.shareText')
 
   const iconBtn: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -22,10 +24,10 @@ export function ReferralCard({ code }: { code: string | null }) {
     <div className="card" style={{ padding: '18px 20px', marginBottom: 20, border: '1px solid var(--oro-glow)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <span aria-hidden style={{ fontSize: '1rem' }}>🎁</span>
-        <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>Invita y ganen 200 PT cada uno</div>
+        <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>{t('referral.title')}</div>
       </div>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: 14 }}>
-        Comparte tu link. Cuando tu invitado haga su primera predicción, ambos reciben 200 PT.
+        {t('referral.sub')}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -37,7 +39,7 @@ export function ReferralCard({ code }: { code: string | null }) {
 
         <a
           href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + link)}`}
-          target="_blank" rel="noopener noreferrer" aria-label="Compartir en WhatsApp"
+          target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareWhatsApp')}
           onClick={() => track('Share', { channel: 'whatsapp', context: 'referral' })}
           style={iconBtn}
         >
@@ -47,7 +49,7 @@ export function ReferralCard({ code }: { code: string | null }) {
         </a>
         <a
           href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`}
-          target="_blank" rel="noopener noreferrer" aria-label="Compartir en X"
+          target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareX')}
           onClick={() => track('Share', { channel: 'x', context: 'referral' })}
           style={iconBtn}
         >
@@ -70,7 +72,7 @@ export function ReferralCard({ code }: { code: string | null }) {
             fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
           }}
         >
-          {copied ? '✓ ¡Copiado!' : 'Copiar'}
+          {copied ? t('common.copied') : t('common.copy')}
         </button>
       </div>
     </div>

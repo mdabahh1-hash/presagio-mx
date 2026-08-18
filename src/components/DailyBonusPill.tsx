@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { usersApi } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
@@ -8,6 +9,7 @@ const mxDay = (d: Date | string) =>
   new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' }) // YYYY-MM-DD
 
 export function DailyBonusPill() {
+  const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
   const [claiming, setClaiming] = useState(false)
 
@@ -56,7 +58,7 @@ export function DailyBonusPill() {
           fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
         }}
       >
-        {claiming ? '...' : 'Reclamar'}
+        {claiming ? '...' : t('bonus.claim')}
       </button>
     </div>
   )

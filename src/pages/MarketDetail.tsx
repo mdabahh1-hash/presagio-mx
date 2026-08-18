@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { displayPair } from '../lib/prices'
 import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
@@ -9,27 +10,10 @@ import { FullChart, MultiLineChart } from '../components/SparkChart'
 import { BetBox } from '../components/BetBox'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
-
-function formatVolume(v: number) {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M`
-  if (v >= 1_000) return `${(v / 1_000).toFixed(1)}K`
-  return v.toFixed(0)
-}
-
-function daysLeft(endsAt: string, status?: string) {
-  if (status === 'resolved_yes' || status === 'resolved_no' || status === 'resolved') return 'Resuelto'
-  if (status === 'closed') return 'Cerrado'
-  if (status === 'pending_resolution') return 'Pendiente'
-  const diff = new Date(endsAt).getTime() - Date.now()
-  const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
-  if (days < 0) return 'Cerrado'
-  if (days === 0) return 'Hoy'
-  if (days === 1) return '1 día'
-  return `${days} días`
-}
-
+import { formatVolume, formatDate, daysLeft } from '../lib/format'
 
 export function MarketDetail() {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -147,7 +131,7 @@ export function MarketDetail() {
   if (loading) {
     return (
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
-        <div style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>Cargando mercado...</div>
+        <div style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{t('market.loading')}</div>
       </div>
     )
   }
@@ -155,9 +139,9 @@ export function MarketDetail() {
   if (!market) {
     return (
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>Mercado no encontrado.</p>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('market.notFound')}</p>
         <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-          ← Volver a mercados
+          {t('market.backToMarkets')}
         </Link>
       </div>
     )
@@ -179,11 +163,11 @@ export function MarketDetail() {
             display: 'flex', alignItems: 'center', gap: 4, transition: 'color 0.15s',
           }}
         >
-          ← Volver
+          {t('common.back')}
         </button>
         <span style={{ color: 'var(--border-subtle)' }}>·</span>
         <Link to="/mercados" style={{ color: 'var(--text-tertiary)', textDecoration: 'none', transition: 'color 0.15s' }}>
-          Mercados
+          {t('market.breadcrumbMarkets')}
         </Link>
         <span style={{ color: 'var(--border-default)' }}>›</span>
         <Link
@@ -221,12 +205,12 @@ export function MarketDetail() {
                   border: '1px solid var(--oro-glow)',
                   padding: '3px 8px', borderRadius: 99,
                 }}>
-                  ▲ TENDENCIA
+                  {t('common.trendingBadge')}
                 </span>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
                 <div className="live-dot" />
-                <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>EN VIVO</span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>{t('common.live')}</span>
               </div>
             </div>
 
@@ -239,7 +223,7 @@ export function MarketDetail() {
                 fontSize: '0.875rem', fontWeight: 700,
                 color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)',
               }}>
-                Resultado oficial: {market.status === 'resolved_yes' ? 'SÍ ✓' : 'NO ✗'}
+                {market.status === 'resolved_yes' ? t('market.resolvedYes') : t('market.resolvedNo')}
               </div>
             )}
             {market.status === 'resolved' && market.resolved_outcome_key && (
@@ -249,7 +233,7 @@ export function MarketDetail() {
                 borderRadius: 10, padding: '12px 16px', marginBottom: 20,
                 fontSize: '0.875rem', fontWeight: 700, color: 'var(--green)',
               }}>
-                Ganador: {outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key} ✓
+                {t('market.winner', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key })} ✓
               </div>
             )}
 
@@ -320,19 +304,19 @@ export function MarketDetail() {
                     }}>
                       {pair.yes}%
                     </span>
-                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>SÍ</span>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>{t('common.yes')}</span>
                   </div>
                   <div style={{ paddingBottom: 8, opacity: 0.5 }}>
                     <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
                       {pair.no}%
                     </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>NO</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>{t('common.no')}</span>
                   </div>
                 </div>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
-                    <span style={{ color: 'var(--green)' }}>SÍ · {pair.yes}%</span>
-                    <span style={{ color: 'var(--red)' }}>NO · {pair.no}%</span>
+                    <span style={{ color: 'var(--green)' }}>{t('common.yes')} · {pair.yes}%</span>
+                    <span style={{ color: 'var(--red)' }}>{t('common.no')} · {pair.no}%</span>
                   </div>
                   <div className="prob-bar-dual">
                     <div style={{
@@ -362,14 +346,14 @@ export function MarketDetail() {
               return (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
-                    Compartir
+                    {t('common.share')}
                   </span>
-                  <a className="share-btn" onClick={() => track('Share', { channel: 'whatsapp', market: id ?? '' })} href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en WhatsApp" style={iconBtn}>
+                  <a className="share-btn" onClick={() => track('Share', { channel: 'whatsapp', market: id ?? '' })} href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareWhatsApp')} style={iconBtn}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.358.101 11.892c0 2.096.549 4.142 1.595 5.945L0 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.582 0 11.94-5.358 11.944-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
                   </a>
-                  <a className="share-btn" onClick={() => track('Share', { channel: 'x', market: id ?? '' })} href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label="Compartir en X" style={iconBtn}>
+                  <a className="share-btn" onClick={() => track('Share', { channel: 'x', market: id ?? '' })} href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareX')} style={iconBtn}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
@@ -385,7 +369,7 @@ export function MarketDetail() {
                       fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
                     }}
                   >
-                    {copied ? '✓ ¡Copiado!' : 'Copiar enlace'}
+                    {copied ? t('common.copied') : t('common.copyLink')}
                   </button>
                 </div>
               )
@@ -395,7 +379,7 @@ export function MarketDetail() {
           {/* Chart */}
           <div className="anim-2 card" style={{ padding: '24px 24px 20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div className="exchange-header">Probabilidad histórica</div>
+              <div className="exchange-header">{t('market.historyTitle')}</div>
               <div style={{ display: 'flex', gap: 4 }}>
                 {(['7d', '30d', 'all'] as const).map(p => (
                   <button
@@ -411,7 +395,7 @@ export function MarketDetail() {
                       transition: 'all 0.15s',
                     }}
                   >
-                    {p === 'all' ? 'TODO' : p.toUpperCase()}
+                    {p === 'all' ? t('market.periodAll') : p.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -433,7 +417,7 @@ export function MarketDetail() {
               <FullChart data={chartData} height={200} />
             ) : (
               <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
-                Sin suficientes datos de historial aún
+                {t('common.noHistory')}
               </div>
             )}
           </div>
@@ -441,10 +425,10 @@ export function MarketDetail() {
           {/* Stats grid */}
           <div className="anim-3 market-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
             {[
-              { label: 'Volumen', value: formatVolume(volume), unit: 'PT', color: 'var(--text-primary)' },
-              { label: 'Operaciones', value: market.num_trades.toString(), unit: '', color: 'var(--text-primary)' },
-              { label: 'Cierre', value: daysLeft(market.ends_at, market.status), unit: '', color: 'var(--gold)' },
-              { label: 'Comentarios', value: comments.length.toString(), unit: '', color: 'var(--text-primary)' },
+              { label: t('market.statsVolume'), value: formatVolume(volume), unit: 'PT', color: 'var(--text-primary)' },
+              { label: t('market.statsTrades'), value: market.num_trades.toString(), unit: '', color: 'var(--text-primary)' },
+              { label: t('market.statsClose'), value: daysLeft(market.ends_at, market.status), unit: '', color: 'var(--gold)' },
+              { label: t('market.statsComments'), value: comments.length.toString(), unit: '', color: 'var(--text-primary)' },
             ].map(stat => (
               <div key={stat.label} className="stat-card" style={{ textAlign: 'center' }}>
                 <div className="font-mono" style={{ fontSize: '1.3rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
@@ -458,14 +442,14 @@ export function MarketDetail() {
 
           {/* Resolution criteria */}
           <div className="anim-4 card" style={{ padding: '22px 26px' }}>
-            <div className="exchange-header" style={{ marginBottom: 14 }}>Criterios de resolución</div>
+            <div className="exchange-header" style={{ marginBottom: 14 }}>{t('market.resolutionTitle')}</div>
             <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
               {market.resolution_criteria}
             </p>
             <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>Fecha de cierre:</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{t('market.closeDate')}</span>
               <span className="font-mono" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                {new Date(market.ends_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {formatDate(market.ends_at, { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
           </div>
@@ -473,7 +457,7 @@ export function MarketDetail() {
           {/* Comments */}
           <div className="anim-5 card" style={{ padding: '24px 26px' }}>
             <div className="exchange-header" style={{ marginBottom: 20 }}>
-              Discusión
+              {t('market.discussion')}
               <span style={{
                 marginLeft: 8, background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-subtle)',
@@ -493,7 +477,7 @@ export function MarketDetail() {
                   <textarea
                     value={comment}
                     onChange={e => setComment(e.target.value)}
-                    placeholder="Comparte tu análisis..."
+                    placeholder={t('market.commentPlaceholder')}
                     rows={3}
                     style={{
                       width: '100%',
@@ -518,15 +502,15 @@ export function MarketDetail() {
                       letterSpacing: '0.04em', transition: 'all 0.15s',
                     }}
                   >
-                    Publicar
+                    {t('market.publish')}
                   </button>
                 </div>
               </div>
             ) : (
               <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: 24 }}>
                 <a href={authApi.googleUrl()} style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-                  Inicia sesión
-                </a>{' '}para comentar
+                  {t('market.loginLink')}
+                </a>{' '}{t('market.toComment')}
               </p>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -539,7 +523,7 @@ export function MarketDetail() {
                     <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6 }}>
                       <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{c.user.display_name}</span>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-                        {new Date(c.created_at).toLocaleDateString('es-MX')}
+                        {formatDate(c.created_at)}
                       </span>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -579,10 +563,10 @@ export function MarketDetail() {
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>🏆</div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--green)', margin: '0 0 10px' }}>
-                    Ganador: {outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key}
+                    {t('market.winnerTitle', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key })}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    Los puntos ya fueron distribuidos a los ganadores.
+                    {t('market.pointsDistributed')}
                   </p>
                 </>
               )}
@@ -596,10 +580,10 @@ export function MarketDetail() {
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>⏳</div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold)', margin: '0 0 10px' }}>
-                    Pendiente de resolución
+                    {t('market.pendingTitle')}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    Este mercado cerró. En breve se declarará el resultado y se distribuirán los puntos.
+                    {t('market.pendingBody')}
                   </p>
                 </>
               )}
@@ -618,10 +602,10 @@ export function MarketDetail() {
                     fontSize: '1rem', fontWeight: 700, margin: '0 0 10px',
                     color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)',
                   }}>
-                    Resuelto: {market.status === 'resolved_yes' ? 'SÍ ganó' : 'NO ganó'}
+                    {market.status === 'resolved_yes' ? t('market.resolvedYesWon') : t('market.resolvedNoWon')}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    Los puntos ya fueron distribuidos a los ganadores.
+                    {t('market.pointsDistributed')}
                   </p>
                 </>
               )}
@@ -634,10 +618,10 @@ export function MarketDetail() {
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>🔒</div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 10px' }}>
-                    Mercado cerrado
+                    {t('market.closedTitle')}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
-                    Este mercado ya no acepta operaciones.
+                    {t('market.closedBody')}
                   </p>
                 </>
               )}
@@ -650,10 +634,10 @@ export function MarketDetail() {
                     margin: '0 auto 16px', fontSize: '1.4rem',
                   }}>🚫</div>
                   <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-tertiary)', margin: '0 0 10px' }}>
-                    Mercado cancelado
+                    {t('market.cancelledTitle')}
                   </h3>
                   <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
-                    Este mercado fue cancelado.
+                    {t('market.cancelledBody')}
                   </p>
                 </>
               )}
