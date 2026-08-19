@@ -651,6 +651,19 @@ input[type='range']::-webkit-slider-thumb {
   .navbar-howitworks { display: none !important; }
 }
 
+/* Altura unificada hero ↔ Temas populares (solo desktop real: >1024 la
+   featured-row es de 2 columnas). También elimina el brinco de altura del
+   carrusel entre slides binario (380) y multi (~450). */
+@media (min-width: 1025px) {
+  .featured-slide-grid { height: 420px; }
+  .featured-outcome-row { padding: 7px 0 !important; }
+  .featured-outcomes { margin-bottom: 8px !important; }
+  .featured-title.featured-title-multi { -webkit-line-clamp: 2; }
+  .popular-card { height: 420px; display: flex; flex-direction: column; overflow: hidden; }
+  .popular-list { flex: 1 1 auto; min-height: 0; }
+  .popular-row { flex: 1 1 auto; min-height: 0; max-height: 84px; }
+}
+
 /* Featured row + leaderboard collapse on smaller desktops/tablets */
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }

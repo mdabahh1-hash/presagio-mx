@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LogoFull } from './Logo'
 import { useAuth } from '../lib/AuthContext'
 import { useTheme } from '../lib/ThemeContext'
-import { authApi } from '../lib/api'
+import { authApi, marketsApi, type ApiMarket } from '../lib/api'
+import { useDebouncedValue } from '../lib/useDebouncedValue'
+import { displayPair } from '../lib/prices'
+import { getCategoryColor } from '../lib/categoryColors'
 import { AuthModal } from './AuthModal'
 import { DailyBonusPill } from './DailyBonusPill'
 import { formatNum } from '../lib/format'
@@ -123,11 +126,49 @@ export function Navbar() {
   const [deskMenu, setDeskMenu] = useState(false)
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null)
   const [q, setQ] = useState('')
+  const [results, setResults] = useState<ApiMarket[] | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [highlighted, setHighlighted] = useState(-1)
+  const searchRef = useRef<HTMLFormElement>(null)
+  const dq = useDebouncedValue(q, 300)
   const { user, logout } = useAuth()
+
+  // Autocompletado: busca con debounce y abre el panel al llegar la respuesta.
+  // Sin estado de loading: mientras tecleas se muestran los resultados previos.
+  useEffect(() => {
+    const term = dq.trim()
+    if (term.length < 2) { setResults(null); setSearchOpen(false); return }
+    let cancelled = false
+    marketsApi.list({ q: term, limit: 6 })
+      .then(r => { if (!cancelled) { setResults(r); setHighlighted(-1); setSearchOpen(true) } })
+      .catch(() => { if (!cancelled) { setResults(null); setSearchOpen(false) } })
+    return () => { cancelled = true }
+  }, [dq])
+
+  // Cerrar al hacer click FUERA del form. mousedown (no blur): las filas del
+  // panel viven dentro del form, así que su click navega antes de cerrar.
+  useEffect(() => {
+    if (!searchOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false)
+        setHighlighted(-1)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [searchOpen])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    if (q.trim()) navigate(`/mercados?q=${encodeURIComponent(q)}`)
+    if (searchOpen && results && highlighted >= 0) {
+      if (highlighted < results.length) navigate(`/mercado/${results[highlighted].id}`)
+      else navigate(`/mercados?q=${encodeURIComponent(q.trim())}`)
+    } else if (q.trim()) {
+      navigate(`/mercados?q=${encodeURIComponent(q)}`)
+    }
+    setSearchOpen(false)
+    setHighlighted(-1)
   }
 
   useEffect(() => {
@@ -136,7 +177,7 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMenuOpen(false); setDeskMenu(false) }, [location.pathname])
+  useEffect(() => { setMenuOpen(false); setDeskMenu(false); setSearchOpen(false); setHighlighted(-1) }, [location.pathname])
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
@@ -173,7 +214,7 @@ export function Navbar() {
           </Link>
 
           {/* Búsqueda global (desktop) — navega a /mercados?q= */}
-          <form className="navbar-search" onSubmit={handleSearch} style={{ flex: '1 1 0%', minWidth: 120, maxWidth: 480 }}>
+          <form className="navbar-search" ref={searchRef} onSubmit={handleSearch} style={{ position: 'relative', flex: '1 1 0%', minWidth: 120, maxWidth: 480 }}>
             <div style={{
               display: 'flex', alignItems: 'center', height: 38,
               background: 'var(--bg-card)',
@@ -189,9 +230,25 @@ export function Navbar() {
               <input
                 type="text"
                 value={q}
-                onChange={e => setQ(e.target.value)}
+                onChange={e => {
+                  setQ(e.target.value)
+                  if (e.target.value.trim().length < 2) { setSearchOpen(false); setHighlighted(-1) }
+                }}
+                onFocus={() => { if (results && q.trim().length >= 2) setSearchOpen(true) }}
+                onKeyDown={e => {
+                  if (e.key === 'Escape') { setSearchOpen(false); setHighlighted(-1); return }
+                  if (!searchOpen || !results || results.length === 0) return
+                  const total = results.length + 1  // + fila "ver todos"
+                  if (e.key === 'ArrowDown') { e.preventDefault(); setHighlighted(h => (h + 1) % total) }
+                  else if (e.key === 'ArrowUp') { e.preventDefault(); setHighlighted(h => h < 0 ? total - 1 : (h - 1 + total) % total) }
+                }}
                 placeholder={t('home.searchPlaceholderDesktop')}
                 aria-label={t('nav.searchAria')}
+                role="combobox"
+                aria-expanded={searchOpen}
+                aria-controls="navbar-search-listbox"
+                aria-autocomplete="list"
+                aria-activedescendant={highlighted >= 0 ? `search-opt-${highlighted}` : undefined}
                 style={{
                   flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
                   padding: '9px 10px', fontSize: '0.85rem',
@@ -199,9 +256,97 @@ export function Navbar() {
                 }}
               />
               {q && (
-                <button type="button" onClick={() => setQ('')} aria-label={t('common.close')} style={{ background: 'none', border: 'none', padding: '0 10px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>×</button>
+                <button type="button" onClick={() => { setQ(''); setResults(null); setSearchOpen(false); setHighlighted(-1) }} aria-label={t('common.close')} style={{ background: 'none', border: 'none', padding: '0 10px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>×</button>
               )}
             </div>
+
+            {/* Panel de autocompletado */}
+            {searchOpen && results && (
+              <div
+                className="anim-1"
+                id="navbar-search-listbox"
+                role="listbox"
+                style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 8, zIndex: 200,
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 14, padding: 8,
+                  boxShadow: '0 16px 48px var(--shadow-menu)',
+                }}
+              >
+                {results.length === 0 ? (
+                  <div style={{ padding: '14px 12px', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>
+                    {t('search.noResults', { q: dq.trim() })}
+                  </div>
+                ) : (
+                  <>
+                    {results.map((m, i) => {
+                      const isMulti = m.market_type === 'multi'
+                      const leader = isMulti ? [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)[0] : null
+                      const yesColor = m.yes_price >= 65 ? 'var(--green)' : m.yes_price <= 35 ? 'var(--red)' : 'var(--gold)'
+                      return (
+                        <Link
+                          key={m.id}
+                          id={`search-opt-${i}`}
+                          role="option"
+                          aria-selected={highlighted === i}
+                          to={`/mercado/${m.id}`}
+                          onClick={() => { setSearchOpen(false); setHighlighted(-1) }}
+                          onMouseEnter={() => setHighlighted(i)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '10px 12px', borderRadius: 9, textDecoration: 'none',
+                            background: highlighted === i ? 'var(--oro-dim)' : 'transparent',
+                          }}
+                        >
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: getCategoryColor(m.category), flexShrink: 0 }} />
+                          <span style={{
+                            flex: 1, minWidth: 0, fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)',
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}>
+                            {m.question}
+                          </span>
+                          {isMulti ? (leader && (
+                            <span style={{ textAlign: 'right', flexShrink: 0, maxWidth: 110 }}>
+                              <span className="font-mono" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                                {Math.round(leader.price)}%
+                              </span>
+                              <span style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {leader.label}
+                              </span>
+                            </span>
+                          )) : (
+                            <span className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 800, color: yesColor, flexShrink: 0 }}>
+                              {displayPair(m.yes_price).yes}%
+                            </span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                    <div style={{ height: 1, background: 'var(--border-subtle)', margin: '6px 8px' }} />
+                    <Link
+                      id={`search-opt-${results.length}`}
+                      role="option"
+                      aria-selected={highlighted === results.length}
+                      to={`/mercados?q=${encodeURIComponent(q.trim())}`}
+                      onClick={() => { setSearchOpen(false); setHighlighted(-1) }}
+                      onMouseEnter={() => setHighlighted(results.length)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '10px 12px', borderRadius: 9, textDecoration: 'none',
+                        fontSize: '0.82rem', fontWeight: 700, color: 'var(--blue)',
+                        background: highlighted === results.length ? 'var(--oro-dim)' : 'transparent',
+                      }}
+                    >
+                      {t('search.viewAll')}
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
           </form>
 
           {/* Cómo funciona (desktop) */}

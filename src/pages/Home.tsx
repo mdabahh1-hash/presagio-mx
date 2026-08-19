@@ -234,13 +234,13 @@ export function Home() {
           {/* Featured carousel + Temas populares */}
           <section className="featured-row" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start', marginBottom: 48 }}>
             {loading ? (
-              <div className="card" style={{ height: 400, animation: 'livePulse 1.8s ease infinite' }} />
+              <div className="card" style={{ height: 420, animation: 'livePulse 1.8s ease infinite' }} />
             ) : (
               <FeaturedCarousel markets={apiMarkets} />
             )}
             <div className="featured-side">
               {loading ? (
-                <div className="card" style={{ height: 400, animation: 'livePulse 1.8s ease infinite' }} />
+                <div className="card" style={{ height: 420, animation: 'livePulse 1.8s ease infinite' }} />
               ) : (
                 <PopularTopics markets={markets} />
               )}

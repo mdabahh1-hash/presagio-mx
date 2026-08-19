@@ -147,6 +147,10 @@
     "slideAria": "Market {{num}}",
     "moreOutcomes": "+{{count}} more"
   },
+  "search": {
+    "viewAll": "View all results",
+    "noResults": "No results for \"{{q}}\""
+  },
   "popular": {
     "title": "Popular topics",
     "volumeLine": "{{vol}} PT in volume",

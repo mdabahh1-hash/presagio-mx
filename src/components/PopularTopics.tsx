@@ -7,23 +7,26 @@ import { formatVolume } from '../lib/format'
 // "Temas populares" — real data: the markets with the most actual betting volume.
 // Reuses the markets already loaded on Home (no extra request). Falls back to
 // trending markets if nothing has volume yet, so it's never empty.
+// 6 filas llenan exactos los 420px que comparte con el hero en desktop; 7 no caben.
+const TOP_N = 6
+
 export function PopularTopics({ markets }: { markets: Market[] }) {
   const { t } = useTranslation()
   const top = (() => {
     const withVol = markets.filter(m => m.volume > 0).sort((a, b) => b.volume - a.volume)
-    if (withVol.length >= 3) return withVol.slice(0, 7)
+    if (withVol.length >= 3) return withVol.slice(0, TOP_N)
     // Low activity → rank by trending first, then volume, so the widget still shows something.
     return [...markets]
       .sort((a, b) => Number(b.trending) - Number(a.trending) || b.volume - a.volume)
-      .slice(0, 7)
+      .slice(0, TOP_N)
   })()
 
   if (top.length === 0) return null
 
   return (
-    <div className="card" style={{ padding: '18px 18px 10px' }}>
+    <div className="card popular-card" style={{ padding: '18px 18px 10px' }}>
       <div className="exchange-header" style={{ marginBottom: 14 }}>{t('popular.title')}</div>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="popular-list" style={{ display: 'flex', flexDirection: 'column' }}>
         {top.map((m, i) => (
           <Link
             key={m.id}

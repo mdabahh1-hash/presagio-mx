@@ -137,7 +137,9 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
               }}>
                 {m.category}
               </span>
-              {m.trending && (
+              {/* En multi se omite TENDENCIA: junto a categoría+MULTI la fila
+                  envolvería a 2 líneas y el contenido ya no cabe en los 420px */}
+              {m.trending && !isMulti && (
                 <span style={{
                   fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
                   textTransform: 'uppercase', color: 'var(--gold)',
@@ -190,7 +192,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
             </div>
 
             <Link to={`/mercado/${m.id}`} style={{ textDecoration: 'none' }}>
-              <h2 className="font-display featured-title" style={{
+              <h2 className={`font-display featured-title${isMulti ? ' featured-title-multi' : ''}`} style={{
                 fontSize: 'clamp(1.25rem, 1.6vw, 1.6rem)',
                 fontWeight: 700, letterSpacing: '-0.025em',
                 margin: '0 0 14px', lineHeight: 1.25,
@@ -202,9 +204,9 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
 
             {isMulti ? (
               /* Top outcomes — orden y colores idénticos a las series del chart */
-              <div style={{ marginBottom: 12 }}>
+              <div className="featured-outcomes" style={{ marginBottom: 12 }}>
                 {multiOutcomes.slice(0, 4).map((o, i) => (
-                  <div key={o.outcome_key} style={{
+                  <div key={o.outcome_key} className="featured-outcome-row" style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '9px 0',
                     borderTop: i > 0 ? '1px solid var(--border-subtle)' : 'none',
