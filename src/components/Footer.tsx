@@ -24,7 +24,7 @@ export function Footer() {
   const { t } = useTranslation()
   return (
     <footer style={{ borderTop: '1px solid var(--border-subtle)', marginTop: 56, background: 'var(--bg-surface)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 24px 28px' }}>
+      <div className="page-container" style={{ paddingTop: 48, paddingBottom: 28 }}>
 
         {/* Brand */}
         <div style={{ marginBottom: 40 }}>

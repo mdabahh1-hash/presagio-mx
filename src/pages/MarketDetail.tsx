@@ -130,7 +130,7 @@ export function MarketDetail() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
+      <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
         <div style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{t('market.loading')}</div>
       </div>
     )
@@ -138,7 +138,7 @@ export function MarketDetail() {
 
   if (!market) {
     return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
+      <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('market.notFound')}</p>
         <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
           {t('market.backToMarkets')}
@@ -152,7 +152,7 @@ export function MarketDetail() {
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
 
   return (
-    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
       {/* Breadcrumb */}
       <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 28, fontSize: '0.78rem', flexWrap: 'wrap' }}>
         <button

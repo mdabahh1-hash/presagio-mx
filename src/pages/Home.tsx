@@ -7,7 +7,6 @@ import { MarketCard } from '../components/MarketCard'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
-import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 
@@ -52,7 +51,6 @@ export function Home() {
   const [usingMock, setUsingMock] = useState(false)
   const [loading, setLoading] = useState(true)
   const [mobileTab, setMobileTab] = useState<MobileTab>('Tendencia')
-  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null)
   const [visibleTrending, setVisibleTrending] = useState(12)
   const navigate = useNavigate()
   const isMobile = useMobile()
@@ -75,8 +73,6 @@ export function Home() {
     e.preventDefault()
     if (search.trim()) navigate(`/mercados?q=${encodeURIComponent(search)}`)
   }
-
-  const requireAuth = () => setAuthModal('register')
 
   const filtered = (() => {
     if (mobileTab === 'Tendencia') return markets.filter(m => m.trending)
@@ -166,7 +162,7 @@ export function Home() {
             {!loading && (
               <div style={{ padding: '14px 14px 4px' }}>
                 <div className="exchange-header" style={{ marginBottom: 12 }}>{t('home.featuredMarket')}</div>
-                <FeaturedCarousel markets={apiMarkets} onRequireAuth={requireAuth} />
+                <FeaturedCarousel markets={apiMarkets} />
               </div>
             )}
 
@@ -198,65 +194,16 @@ export function Home() {
           </div>
         )}
 
-        {authModal && <AuthModal initialMode={authModal} onClose={() => setAuthModal(null)} />}
       </div>
     )
   }
 
   // ─── DESKTOP LAYOUT ─────────────────────────────────────────────────────────
   return (
-    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-
-      {/* Search + Propose CTA */}
-      <section className="anim-1" style={{ padding: '28px 0 18px', display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-        <form onSubmit={handleSearch} style={{ display: 'flex', flex: '1 1 320px', maxWidth: 560 }}>
-          <div style={{
-            display: 'flex', width: '100%',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-default)',
-            borderRadius: 12, overflow: 'hidden',
-          }}>
-            <span style={{ display: 'flex', alignItems: 'center', paddingLeft: 16, color: 'var(--text-tertiary)', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
-                <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={t('home.searchPlaceholderDesktop')}
-              style={{
-                flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                padding: '13px 14px', fontSize: '0.9rem',
-                color: 'var(--text-primary)', fontFamily: 'DM Sans',
-              }}
-            />
-            <button type="submit" style={{
-              background: 'var(--oro-fill)', border: 'none',
-              padding: '13px 20px', color: '#07071A',
-              fontFamily: 'DM Sans', fontWeight: 700,
-              fontSize: '0.78rem', letterSpacing: '0.08em',
-              cursor: 'pointer', flexShrink: 0,
-            }}>
-              {t('home.searchBtn')}
-            </button>
-          </div>
-        </form>
-        <Link to="/proponer" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
-          border: '1px solid var(--gold)', color: 'var(--gold)',
-          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
-          fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
-        }}>
-          {t('home.proposeCta')}
-        </Link>
-      </section>
+    <div className="page-container" style={{ paddingTop: 20 }}>
 
       {/* One-line category tabs */}
-      <div className="cat-tabs tabs-scroll anim-2" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 24 }}>
+      <div className="cat-tabs tabs-scroll anim-1" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 24 }}>
         {MOBILE_TABS.map(tab => {
           const isActive = tab === mobileTab
           const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
@@ -287,13 +234,13 @@ export function Home() {
           {/* Featured carousel + Temas populares */}
           <section className="featured-row" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start', marginBottom: 48 }}>
             {loading ? (
-              <div className="card" style={{ height: 380, animation: 'livePulse 1.8s ease infinite' }} />
+              <div className="card" style={{ height: 400, animation: 'livePulse 1.8s ease infinite' }} />
             ) : (
-              <FeaturedCarousel markets={apiMarkets} onRequireAuth={requireAuth} />
+              <FeaturedCarousel markets={apiMarkets} />
             )}
             <div className="featured-side">
               {loading ? (
-                <div className="card" style={{ height: 380, animation: 'livePulse 1.8s ease infinite' }} />
+                <div className="card" style={{ height: 400, animation: 'livePulse 1.8s ease infinite' }} />
               ) : (
                 <PopularTopics markets={markets} />
               )}
@@ -366,8 +313,6 @@ export function Home() {
           <CategoryBrowse category={mobileTab} markets={markets} loading={loading} />
         </section>
       )}
-
-      {authModal && <AuthModal initialMode={authModal} onClose={() => setAuthModal(null)} />}
     </div>
   )
 }

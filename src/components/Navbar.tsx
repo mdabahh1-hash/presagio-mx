@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LogoFull } from './Logo'
 import { useAuth } from '../lib/AuthContext'
@@ -117,11 +117,18 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
 export function Navbar() {
   const { t } = useTranslation()
   const location = useLocation()
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [deskMenu, setDeskMenu] = useState(false)
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null)
+  const [q, setQ] = useState('')
   const { user, logout } = useAuth()
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (q.trim()) navigate(`/mercados?q=${encodeURIComponent(q)}`)
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -159,14 +166,79 @@ export function Navbar() {
         transition: 'all 0.3s ease',
       }}>
         <div className="navbar-inner" style={{
-          maxWidth: 1200, margin: '0 auto', padding: '0 24px',
-          height: 62, display: 'flex', alignItems: 'center', gap: 28,
+          height: 62, display: 'flex', alignItems: 'center', gap: 16,
         }}>
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <LogoFull />
           </Link>
 
-          <DailyBonusPill />
+          {/* Búsqueda global (desktop) — navega a /mercados?q= */}
+          <form className="navbar-search" onSubmit={handleSearch} style={{ flex: '1 1 0%', minWidth: 120, maxWidth: 480 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', height: 38,
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 10, overflow: 'hidden',
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', paddingLeft: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}>
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+                  <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
+                  <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                placeholder={t('home.searchPlaceholderDesktop')}
+                aria-label={t('nav.searchAria')}
+                style={{
+                  flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
+                  padding: '9px 10px', fontSize: '0.85rem',
+                  color: 'var(--text-primary)', fontFamily: 'DM Sans',
+                }}
+              />
+              {q && (
+                <button type="button" onClick={() => setQ('')} aria-label={t('common.close')} style={{ background: 'none', border: 'none', padding: '0 10px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>×</button>
+              )}
+            </div>
+          </form>
+
+          {/* Cómo funciona (desktop) */}
+          <Link
+            className="navbar-howitworks"
+            to="/como-funciona"
+            style={{
+              textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
+              fontSize: '0.82rem', fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+              color: isActive('/como-funciona') ? 'var(--text-primary)' : 'var(--text-secondary)',
+              transition: 'color 0.15s',
+            }}
+          >
+            {t('nav.howItWorks')}
+          </Link>
+
+          {/* Proponer mercado (desktop) */}
+          <Link
+            className="navbar-propose"
+            to="/proponer"
+            aria-label={t('nav.propose')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '8px 14px', borderRadius: 10, textDecoration: 'none',
+              border: '1px solid var(--gold)', color: 'var(--gold)',
+              background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.8rem',
+              fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', flexShrink: 0,
+            }}
+          >
+            <span style={{ fontSize: '0.95rem', lineHeight: 1, fontWeight: 800 }}>+</span>
+            <span className="navbar-propose-label">{t('nav.propose')}</span>
+          </Link>
+
+          {/* Bonus diario — solo visible en móvil (en desktop vive en navbar-user) */}
+          <div className="navbar-bonus-mobile">
+            <DailyBonusPill />
+          </div>
 
           {/* Hamburger — hidden on desktop, shown via CSS */}
           <button
@@ -203,7 +275,7 @@ export function Navbar() {
           <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {user ? (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div className="navbar-live" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div className="live-dot" />
                   <span style={{ fontSize: '0.65rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.1em' }}>{t('common.live')}</span>
                 </div>
@@ -218,6 +290,7 @@ export function Navbar() {
                     {formatNum(Math.floor(user.points))}
                   </span>
                 </div>
+                <DailyBonusPill />
                 <Link to="/perfil" style={{ textDecoration: 'none' }}>
                   <div style={{
                     width: 36, height: 36, borderRadius: '50%',

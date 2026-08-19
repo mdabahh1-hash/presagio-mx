@@ -66,7 +66,7 @@ export function Leaderboard() {
   }, [users, search, sort])
 
   return (
-    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '44px 24px 24px' }}>
+    <div className="page-container" style={{ paddingTop: 44, paddingBottom: 24 }}>
       <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
         {t('leaderboard.title')}
       </h1>

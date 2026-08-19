@@ -79,7 +79,7 @@ export function Profile() {
 
   if (!user) {
     return (
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
+      <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
         <div style={{
           width: 64, height: 64, borderRadius: '50%',
           background: 'var(--bg-elevated)',
@@ -114,7 +114,7 @@ export function Profile() {
   const totalInvested = positions.reduce((s, p) => s + p.avg_cost * p.shares, 0)
 
   return (
-    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
 
       {/* Profile header card */}
       <div className="anim-1 card" style={{ padding: '32px 32px 28px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>

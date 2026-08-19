@@ -24,11 +24,11 @@ interface MultiSeries {
   data: PricePoint[]
 }
 
-export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]; height?: number }) {
+export function MultiLineChart({ series, height = 220, viewW = 700 }: { series: MultiSeries[]; height?: number; viewW?: number }) {
   const { t } = useTranslation()
   const chart = useMemo(() => {
     const padL = 44, padR = 16, padT = 16, padB = 44
-    const W = 700, H = height
+    const W = viewW, H = height
     const cW = W - padL - padR
     const cH = H - padT - padB
 
@@ -91,7 +91,7 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
       .slice(0, 7)
 
     return { paths, yTicks, xTicks, W, H }
-  }, [series, height])
+  }, [series, height, viewW])
 
   if (!chart) {
     return (
@@ -109,7 +109,7 @@ export function MultiLineChart({ series, height = 220 }: { series: MultiSeries[]
         <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block' }}>
           {/* Grid lines */}
           {yTicks.map(t => (
-            <line key={t.label} x1="44" y1={t.y} x2="684" y2={t.y}
+            <line key={t.label} x1="44" y1={t.y} x2={W - 16} y2={t.y}
               stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4,6" />
           ))}
           {/* Lines */}
@@ -231,9 +231,10 @@ interface FullChartProps {
   data: PricePoint[]
   height?: number
   color?: string
+  viewW?: number
 }
 
-export function FullChart({ data, height = 200, color }: FullChartProps) {
+export function FullChart({ data, height = 200, color, viewW = 700 }: FullChartProps) {
   const { path, area, lineColor, ticks } = useMemo(() => {
     if (data.length < 2) return { path: '', area: '', lineColor: 'var(--green)', isUp: true, ticks: [] }
     const prices = data.map(d => d.price)
@@ -245,7 +246,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
     const padR = 16
     const padT = 16
     const padB = 28
-    const w = 700 - padL - padR
+    const w = viewW - padL - padR
     const h = height - padT - padB
 
     const toX = (i: number) => padL + (i / (data.length - 1)) * w
@@ -276,7 +277,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
       .slice(0, 7)
 
     return { path, area, lineColor, isUp, ticks: { y: tickValues, x: xTicks } }
-  }, [data, height, color])
+  }, [data, height, color, viewW])
 
   const gradientId = useId()
 
@@ -284,7 +285,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
     <div style={{ width: '100%', overflowX: 'auto' }}>
       <svg
         width="100%"
-        viewBox={`0 0 700 ${height}`}
+        viewBox={`0 0 ${viewW} ${height}`}
         preserveAspectRatio="xMidYMid meet"
         style={{ display: 'block' }}
       >
@@ -299,7 +300,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
         {(ticks as any)?.y?.map((t: any) => (
           <line
             key={t.label}
-            x1="40" y1={t.y} x2="684" y2={t.y}
+            x1="40" y1={t.y} x2={viewW - 16} y2={t.y}
             stroke="var(--border-subtle)"
             strokeWidth="1"
             strokeDasharray="4,6"
@@ -326,7 +327,7 @@ export function FullChart({ data, height = 200, color }: FullChartProps) {
           const maxP = Math.min(100, Math.max(...prices) + 5)
           const range = maxP - minP || 1
           const padL = 40, padR = 16, padT = 16, padB = 28
-          const w = 700 - padL - padR
+          const w = viewW - padL - padR
           const h = height - padT - padB
           const x = (padL + w).toFixed(1)
           const y = (padT + h - ((data[data.length - 1].price - minP) / range) * h).toFixed(1)

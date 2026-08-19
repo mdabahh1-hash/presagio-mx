@@ -91,6 +91,11 @@
   --cat-coral:   #ff7849;  --cat-coral-bg:   rgba(255, 120, 73, 0.09);   --cat-coral-border:   rgba(255, 120, 73, 0.21);
   --cat-default: #8888cc;  --cat-default-bg: rgba(136, 136, 204, 0.09);  --cat-default-border: rgba(136, 136, 204, 0.21);
 
+  /* ── Layout (ancho fluido tipo Polymarket) ── */
+  --page-max: 1760px;
+  --page-pad: 32px;
+  --nav-h: 62px;
+
   /* Legacy aliases so componentes existentes no se rompen */
   --gold:       #FFD700;
   --brand:      #FFD700;
@@ -236,6 +241,21 @@ body::before {
 }
 .font-mono {
   font-family: 'DM Mono', monospace;
+}
+
+/* Layout containers — max-width fluido; las páginas angostas lo pisan con
+   maxWidth inline (inline gana a la clase) */
+.page-container {
+  max-width: var(--page-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--page-pad);
+  padding-right: var(--page-pad);
+}
+.navbar-inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
 }
 
 /* Card */
@@ -603,10 +623,40 @@ input[type='range']::-webkit-slider-thumb {
 .share-btn { transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .share-btn:hover { border-color: var(--gold) !important; color: var(--text-primary) !important; }
 
+/* Global navbar (header de una línea) */
+.navbar-bonus-mobile { display: none; }
+.navbar-howitworks:hover { color: var(--text-primary) !important; }
+.navbar-propose { transition: box-shadow 0.15s; }
+.navbar-propose:hover { box-shadow: 0 2px 12px var(--oro-glow); }
+
+/* Featured hero (estilo Polymarket) */
+.featured-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.featured-slide-chart { min-width: 0; }
+
+/* Colapso progresivo del header en anchos medios */
+@media (max-width: 1280px) {
+  .navbar-search { max-width: 360px !important; }
+  .navbar-live   { display: none !important; }
+}
+@media (max-width: 1180px) {
+  .navbar-propose-label { display: none !important; }
+  .navbar-propose      { padding: 8px 12px !important; }
+}
+@media (max-width: 1080px) {
+  .navbar-howitworks { display: none !important; }
+}
+
 /* Featured row + leaderboard collapse on smaller desktops/tablets */
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }
   .leaderboard-grid { grid-template-columns: 1fr !important; }
+  .bonus-amount { display: none !important; }
+  .bonus-pill   { padding: 4px 5px 4px 9px !important; }
 }
 
 /* Hide the volume column on narrow phones to keep the row readable */
@@ -624,9 +674,9 @@ input[type='range']::-webkit-slider-thumb {
     padding-right: 16px !important;
   }
 
-  .navbar-ticker    { display: none !important; }
   .navbar-inner     { gap: 0 !important; padding: 0 16px !important; }
-  .navbar-links     { display: none !important; }
+  .navbar-search, .navbar-howitworks, .navbar-propose { display: none !important; }
+  .navbar-bonus-mobile { display: flex !important; }
   .navbar-user      { display: none !important; }
   .navbar-hamburger {
     display: flex !important;
@@ -646,8 +696,7 @@ input[type='range']::-webkit-slider-thumb {
   .market-stats-grid    { grid-template-columns: repeat(2, 1fr) !important; }
 
   .featured-slide-grid { grid-template-columns: 1fr !important; }
-  .featured-slide-bet  {
-    border-left: none !important;
+  .featured-slide-chart {
     border-top: 1px solid var(--border-subtle) !important;
   }
 

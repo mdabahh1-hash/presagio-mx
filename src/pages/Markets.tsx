@@ -88,7 +88,7 @@ export function Markets() {
   }
 
   return (
-    <div className="page-container" style={{ maxWidth: 1200, margin: '0 auto', padding: '36px 24px' }}>
+    <div className="page-container" style={{ paddingTop: 36, paddingBottom: 36 }}>
 
       {/* Page header */}
       <div className="anim-1" style={{

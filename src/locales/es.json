@@ -34,6 +34,7 @@
     "leaderboard": "Clasificación",
     "howItWorks": "Cómo funciona",
     "propose": "Proponer mercado",
+    "searchAria": "Buscar mercados",
     "following": "Siguiendo",
     "myProfile": "Mi perfil",
     "logout": "Cerrar sesión",
@@ -143,7 +144,8 @@
     "viewFull": "Ver mercado completo",
     "volumeLabel": "VOLUMEN",
     "closeLabel": "CIERRE",
-    "slideAria": "Mercado {{num}}"
+    "slideAria": "Mercado {{num}}",
+    "moreOutcomes": "+{{count}} más"
   },
   "popular": {
     "title": "Temas populares",
