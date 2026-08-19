@@ -4,7 +4,7 @@ import { proposalsApi } from '../lib/api'
 import { track } from '../lib/analytics'
 import { translateApiError } from '../lib/errors'
 
-const CATEGORIES = ['Mundial 2026', 'Banxico', 'Crypto', 'Liga MX', 'Clima', 'Boxeo', 'Motor', 'Otro']
+const CATEGORIES = ['Deportes', 'Política', 'Economía', 'Crypto', 'Tech', 'Clima', 'Otro']
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'var(--bg-surface)',

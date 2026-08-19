@@ -4,19 +4,17 @@
 // se mapea a su color de display.
 
 const CATEGORY_TOKEN: Record<string, string> = {
-  'Política MX': 'gold',
+  'Política': 'gold',
   'Economía': 'gold',
   'México': 'gold',
   'Deportes': 'green',
-  'Mundial 2026': 'green',
+  'Mundial 2026': 'green', // legado: mercados ya resueltos siguen usándola
   'Global': 'blue',
   'Mercados Globales': 'blue',
   'Tech': 'purple',
   'Entretenimiento': 'pink',
   'Crypto': 'orange',
   'Clima': 'sky',
-  'Boxeo': 'rose',
-  'Motor': 'coral',
 }
 
 export function getCategoryColor(category: string): string {

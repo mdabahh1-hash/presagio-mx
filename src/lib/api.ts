@@ -57,6 +57,7 @@ export interface ApiMarket {
   question: string
   description: string
   category: string
+  subcategory?: string | null
   resolution_criteria: string
   yes_price: number
   volume: number
@@ -115,9 +116,10 @@ export const marketsApi = {
     if (opts.outcome_key) qs.set('outcome_key', opts.outcome_key)
     return request<ApiQuote>(`/markets/${id}/quote?${qs}`)
   },
-  list: (params?: { category?: string; q?: string; sort?: string; limit?: number }) => {
+  list: (params?: { category?: string; subcategory?: string; q?: string; sort?: string; limit?: number }) => {
     const qs = new URLSearchParams()
     if (params?.category) qs.set('category', params.category)
+    if (params?.subcategory) qs.set('subcategory', params.subcategory)
     if (params?.q) qs.set('q', params.q)
     if (params?.sort) qs.set('sort', params.sort)
     if (params?.limit) qs.set('limit', String(params.limit))

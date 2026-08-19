@@ -122,6 +122,9 @@
     "emptySubtitle": "Intenta con otra categoría o búsqueda"
   },
   "categoryBrowse": {
+    "railSubcats": "Subcategorías",
+    "railClosing": "Cierre",
+    "subcatAll": "Todas",
     "bucketAll": "Todos",
     "bucketNow": "Cierran ya",
     "bucketToday": "Hoy",

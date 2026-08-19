@@ -7,17 +7,16 @@ import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
+import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
 
-const ALL_CATEGORIES: (Category | 'Todos')[] = [
-  'Todos', 'Mundial 2026', 'Economía', 'Crypto', 'Mercados Globales',
-  'Política MX', 'Deportes', 'Boxeo', 'Motor', 'México', 'Global', 'Tech', 'Clima', 'Entretenimiento',
-]
+const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
 function apiToMarket(m: ApiMarket): Market {
   return {
     id: m.id,
     question: m.question,
     description: m.description,
     category: m.category as Category,
+    subcategory: m.subcategory ?? null,
     yesPrice: Math.round(m.yes_price),
     volume: m.volume,
     liquidity: m.volume * 0.1,
@@ -46,13 +45,16 @@ export function Markets() {
 
   const queryParam = searchParams.get('q') || ''
   const catParam = (searchParams.get('cat') || 'Todos') as Category | 'Todos'
+  const subParam = searchParams.get('sub')
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
+  const [activeSub, setActiveSub] = useState<string | null>(subParam)
 
   useEffect(() => {
     setSearchInput(queryParam)
     setActiveCategory(catParam)
-  }, [queryParam, catParam])
+    setActiveSub(subParam)
+  }, [queryParam, catParam, subParam])
 
   useEffect(() => {
     let active = true
@@ -80,9 +82,20 @@ export function Markets() {
 
   const handleCategoryClick = (cat: Category | 'Todos') => {
     setActiveCategory(cat)
+    setActiveSub(null)
     setSearchParams(p => {
       if (cat === 'Todos') p.delete('cat')
       else p.set('cat', cat)
+      p.delete('sub')
+      return p
+    })
+  }
+
+  const handleSubChange = (sub: string | null) => {
+    setActiveSub(sub)
+    setSearchParams(p => {
+      if (sub) p.set('sub', sub)
+      else p.delete('sub')
       return p
     })
   }
@@ -221,7 +234,14 @@ export function Markets() {
 
       {activeCategory !== 'Todos' ? (
         /* Category view — same sidebar layout as the home page */
-        <CategoryBrowse category={activeCategory} markets={markets} loading={loading} />
+        <CategoryBrowse
+          category={activeCategory}
+          markets={markets}
+          loading={loading}
+          subcats={SUBCATEGORIES[activeCategory]}
+          activeSub={activeSub}
+          onSubChange={handleSubChange}
+        />
       ) : (
         <>
           {/* Results count */}

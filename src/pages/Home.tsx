@@ -9,9 +9,10 @@ import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
+import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
 
-const MOBILE_TABS = ['Tendencia', 'Política MX', 'Economía', 'Deportes', 'Boxeo', 'Motor', 'Mundial 2026', 'Crypto', 'Tech', 'Global', 'Clima', 'Entretenimiento'] as const
-type MobileTab = typeof MOBILE_TABS[number]
+const MOBILE_TABS = ['Tendencia', ...CATEGORIES] as const
+type MobileTab = Category | 'Tendencia'
 
 
 function apiToMarket(m: ApiMarket): Market {
@@ -20,6 +21,7 @@ function apiToMarket(m: ApiMarket): Market {
     question: m.question,
     description: m.description,
     category: m.category as Category,
+    subcategory: m.subcategory ?? null,
     yesPrice: Math.round(m.yes_price),
     volume: m.volume,
     liquidity: m.volume * 0.1,
@@ -190,7 +192,7 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            <CategoryBrowse category={mobileTab} markets={markets} loading={loading} />
+            <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
           </div>
         )}
 
@@ -310,7 +312,7 @@ export function Home() {
         </>
       ) : (
         <section style={{ marginBottom: 56 }}>
-          <CategoryBrowse category={mobileTab} markets={markets} loading={loading} />
+          <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
         </section>
       )}
     </div>

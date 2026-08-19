@@ -1,7 +1,6 @@
 export type Category =
-  | 'Política MX' | 'Economía' | 'Deportes' | 'Global' | 'Tech' | 'Entretenimiento'
-  | 'Mundial 2026' | 'Crypto' | 'Mercados Globales' | 'México'
-  | 'Clima' | 'Boxeo' | 'Motor'
+  | 'Política' | 'Economía' | 'Deportes' | 'Global' | 'Tech' | 'Entretenimiento'
+  | 'Crypto' | 'Mercados Globales' | 'México' | 'Clima'
 
 export type MarketStatus =
   | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'resolved' | 'cancelled'
@@ -17,6 +16,7 @@ export interface Market {
   question: string
   description: string
   category: Category
+  subcategory?: string | null
   yesPrice: number
   volume: number
   liquidity: number

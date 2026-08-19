@@ -176,6 +176,17 @@ export function MarketDetail() {
         >
           {market.category}
         </Link>
+        {market.subcategory && (
+          <>
+            <span style={{ color: 'var(--border-default)' }}>›</span>
+            <Link
+              to={`/mercados?cat=${encodeURIComponent(market.category)}&sub=${encodeURIComponent(market.subcategory)}`}
+              style={{ color: catColor, textDecoration: 'none', transition: 'opacity 0.15s' }}
+            >
+              {market.subcategory}
+            </Link>
+          </>
+        )}
         <span style={{ color: 'var(--border-default)' }}>›</span>
         <span style={{ color: 'var(--text-secondary)' }}>{market.question.slice(0, 42)}…</span>
       </div>

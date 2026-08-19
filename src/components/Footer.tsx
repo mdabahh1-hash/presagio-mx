@@ -2,12 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LogoFull } from './Logo'
-
-const CATEGORIES = [
-  'Política MX', 'Economía', 'Deportes', 'Mundial 2026', 'Crypto',
-  'Tech', 'Global', 'Entretenimiento', 'México', 'Mercados Globales',
-  'Boxeo', 'Motor', 'Clima',
-]
+import { CATEGORIES } from '../lib/categories'
 
 const colLink: React.CSSProperties = {
   display: 'block', textDecoration: 'none',
