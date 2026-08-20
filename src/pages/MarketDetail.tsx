@@ -457,6 +457,28 @@ export function MarketDetail() {
             <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
               {market.resolution_criteria}
             </p>
+            {market.resolution_source_url && (
+              <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{t('market.resolutionSource')}</span>
+                <a
+                  href={market.resolution_source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    fontSize: '0.8rem', fontWeight: 600, color: 'var(--blue)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  {(() => { try { return new URL(market.resolution_source_url).hostname.replace(/^www\./, '') } catch { return market.resolution_source_url } })()}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+            )}
             <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{t('market.closeDate')}</span>
               <span className="font-mono" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
