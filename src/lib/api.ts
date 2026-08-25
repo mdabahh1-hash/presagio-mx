@@ -347,7 +347,17 @@ export const authApi = {
 // ── Admin ──────────────────────────────────────────────────────────────────
 
 export const adminApi = {
-  listAllMarkets: () => request<ApiMarket[]>('/markets?status=all&limit=100'),
+  // El backend capea limit a 100 y ya hay más mercados que eso: paginar
+  // con offset hasta recibir una página incompleta.
+  listAllMarkets: async (): Promise<ApiMarket[]> => {
+    const PAGE = 100
+    const all: ApiMarket[] = []
+    for (let offset = 0; ; offset += PAGE) {
+      const page = await request<ApiMarket[]>(`/markets?status=all&limit=${PAGE}&offset=${offset}`)
+      all.push(...page)
+      if (page.length < PAGE) return all
+    }
+  },
   resolveMarket: (marketId: string, opts: { resolution?: string; outcome_key?: string }) =>
     request<{ ok: boolean; resolution: string; positions_settled: number }>(
       `/admin/markets/${marketId}/resolve`,
