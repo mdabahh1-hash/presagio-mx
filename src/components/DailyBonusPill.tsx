@@ -23,7 +23,8 @@ export function DailyBonusPill() {
 
   const yesterday = mxDay(new Date(Date.now() - 86_400_000))
   const nextStreak = lastDay === yesterday ? user.streak + 1 : 1
-  const amount = Math.min(100 + (nextStreak - 1) * 20, 300)
+  // Must mirror the backend formula in app/api/users.py (claim_daily_bonus).
+  const amount = Math.min(1000 + (nextStreak - 1) * 200, 3000)
 
   const claim = async () => {
     setClaiming(true)

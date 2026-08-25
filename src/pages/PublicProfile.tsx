@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { usersApi, type ApiProfilePublic, type ApiPosition } from '../lib/api'
+import { usersApi, type ApiProfilePublic, type ApiPosition, type ApiHistoryEvent } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { AuthModal } from '../components/AuthModal'
+import { HistoryList } from '../components/HistoryList'
 import { track } from '../lib/analytics'
 import { formatPnl, formatNum, formatDate } from '../lib/format'
 
@@ -17,6 +18,7 @@ export function PublicProfile() {
   const { user } = useAuth()
   const [profile, setProfile] = useState<ApiProfilePublic | null>(null)
   const [positions, setPositions] = useState<ApiPosition[]>([])
+  const [history, setHistory] = useState<ApiHistoryEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [isFollowing, setIsFollowing] = useState(false)
@@ -33,6 +35,7 @@ export function PublicProfile() {
         setProfile(p)
         setIsFollowing(p.is_following === true)
         setFollowersCount(p.followers_count)
+        usersApi.publicHistory(username).then(setHistory).catch(() => {})
         return usersApi.publicPositions(username).then(setPositions).catch(() => {})
       })
       .catch(() => setNotFound(true))
@@ -184,6 +187,10 @@ export function PublicProfile() {
           })}
         </div>
       )}
+
+      {/* Actividad (trades + resoluciones; sin bonos — son privados del dueño) */}
+      <div className="exchange-header" style={{ margin: '28px 0 14px' }}>{t('profile.tabHistory')}</div>
+      <HistoryList events={history} variant="public" />
 
       {authModal && <AuthModal initialMode="login" onClose={() => setAuthModal(false)} />}
     </div>

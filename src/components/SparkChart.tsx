@@ -235,8 +235,8 @@ interface FullChartProps {
 }
 
 export function FullChart({ data, height = 200, color, viewW = 700 }: FullChartProps) {
-  const { path, area, lineColor, ticks } = useMemo(() => {
-    if (data.length < 2) return { path: '', area: '', lineColor: 'var(--green)', isUp: true, ticks: [] }
+  const { path, area, lineColor, ticks, dot } = useMemo(() => {
+    if (data.length < 2) return { path: '', area: '', lineColor: 'var(--green)', isUp: true, ticks: [], dot: null }
     const prices = data.map(d => d.price)
     const minP = Math.max(0, Math.min(...prices) * 0.95)
     const maxP = Math.max(...prices) * 1.05
@@ -269,14 +269,15 @@ export function FullChart({ data, height = 200, color, viewW = 700 }: FullChartP
 
     const step = Math.max(1, Math.floor(data.length / 6))
     const xTicks = data
-      .filter((_, i) => i % step === 0 || i === data.length - 1)
-      .map(d => ({
-        x: toX(data.indexOf(d)).toFixed(1),
-        label: d.date.slice(5),
-      }))
+      .map((d, i) => ({ x: toX(i).toFixed(1), label: d.date.slice(5), i }))
+      .filter(({ i }) => i % step === 0 || i === data.length - 1)
       .slice(0, 7)
 
-    return { path, area, lineColor, isUp, ticks: { y: tickValues, x: xTicks } }
+    // Last-point dot on the SAME scale as the line (the old inline version
+    // assumed a 0-100 domain and flew off-viewBox with PT-denominated data).
+    const dot = { x: lastX, y: toY(data[data.length - 1].price).toFixed(1) }
+
+    return { path, area, lineColor, isUp, ticks: { y: tickValues, x: xTicks }, dot }
   }, [data, height, color, viewW])
 
   const gradientId = useId()
@@ -321,23 +322,12 @@ export function FullChart({ data, height = 200, color, viewW = 700 }: FullChartP
         />
 
         {/* Last point dot */}
-        {data.length > 0 && (() => {
-          const prices = data.map(d => d.price)
-          const minP = Math.max(0, Math.min(...prices) - 5)
-          const maxP = Math.min(100, Math.max(...prices) + 5)
-          const range = maxP - minP || 1
-          const padL = 40, padR = 16, padT = 16, padB = 28
-          const w = viewW - padL - padR
-          const h = height - padT - padB
-          const x = (padL + w).toFixed(1)
-          const y = (padT + h - ((data[data.length - 1].price - minP) / range) * h).toFixed(1)
-          return (
-            <>
-              <circle cx={x} cy={y} r="6" style={{ fill: lineColor }} opacity="0.2" />
-              <circle cx={x} cy={y} r="3.5" style={{ fill: lineColor }} />
-            </>
-          )
-        })()}
+        {dot && (
+          <>
+            <circle cx={dot.x} cy={dot.y} r="6" style={{ fill: lineColor }} opacity="0.2" />
+            <circle cx={dot.x} cy={dot.y} r="3.5" style={{ fill: lineColor }} />
+          </>
+        )}
 
         {/* Y axis labels */}
         {(ticks as any)?.y?.map((t: any) => (

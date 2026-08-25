@@ -255,10 +255,26 @@ export interface ApiFeedTrade {
   market_type: 'binary' | 'multi'
 }
 
+export interface ApiHistoryEvent {
+  type: 'trade' | 'win' | 'loss' | 'daily_bonus' | 'referral' | 'adjustment'
+  created_at: string
+  amount: number                 // signed PT: trade −cost · win +shares · loss −cost · credits +delta
+  market_id: string | null
+  market_question: string | null
+  side: 'YES' | 'NO' | null
+  outcome_key: string | null
+  outcome_label: string | null
+  shares: number | null
+  price_after: number | null     // buys only; YES price 0-100 after the trade
+}
+
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
   pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
+  history: (limit = 50) => request<ApiHistoryEvent[]>(`/users/me/history?limit=${limit}`),
+  publicHistory: (username: string, limit = 50) =>
+    request<ApiHistoryEvent[]>(`/users/${username}/history?limit=${limit}`),
   leaderboard: (limit = 50, period: LeaderboardPeriod = 'all') => {
     const qs = new URLSearchParams({ limit: String(limit), period })
     return request<ApiLeaderboardEntry[]>(`/users/leaderboard?${qs}`)

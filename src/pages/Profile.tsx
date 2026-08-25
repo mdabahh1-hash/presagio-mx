@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { usersApi, authApi, type ApiPosition, type ApiPointsHistory } from '../lib/api'
+import { usersApi, authApi, type ApiPosition, type ApiPointsHistory, type ApiHistoryEvent } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart } from '../components/SparkChart'
+import { HistoryList } from '../components/HistoryList'
 import { ReferralCard } from '../components/ReferralCard'
 import { registerPasskey, supportsPasskeys, isPasskeyCancel } from '../lib/webauthn'
 import { track } from '../lib/analytics'
@@ -17,6 +18,7 @@ export function Profile() {
   const navigate = useNavigate()
   const [positions, setPositions] = useState<ApiPosition[]>([])
   const [pointsHistory, setPointsHistory] = useState<PricePoint[]>([])
+  const [history, setHistory] = useState<ApiHistoryEvent[]>([])
   const [activeTab, setActiveTab] = useState<'posiciones' | 'historial'>('posiciones')
   const [emailNotif, setEmailNotif] = useState(true)
 
@@ -70,6 +72,7 @@ export function Profile() {
   useEffect(() => {
     if (!user) return
     usersApi.myPositions().then(setPositions).catch(() => {})
+    usersApi.history().then(setHistory).catch(() => {})
     usersApi.pointsHistory()
       .then(data => {
         setPointsHistory(data.map(d => ({ date: d.date, price: d.price })))
@@ -428,16 +431,7 @@ export function Profile() {
 
       {/* Historial */}
       {activeTab === 'historial' && (
-        <div style={{ color: 'var(--text-secondary)', padding: '60px 0', textAlign: 'center' }}>
-          <div style={{
-            width: 60, height: 60, borderRadius: '50%',
-            background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 18px', fontSize: '1.4rem',
-          }}>📋</div>
-          <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>{t('profile.historySoon')}</p>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>{t('profile.historyPreparing')}</p>
-        </div>
+        <HistoryList events={history} variant="own" />
       )}
     </div>
   )

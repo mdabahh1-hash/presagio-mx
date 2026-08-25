@@ -38,7 +38,7 @@ export function BetBox({
   const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
   const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
-  const [amount, setAmount] = useState(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 100)
+  const [amount, setAmount] = useState(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 1000)
   const [trading, setTrading] = useState(false)
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
@@ -216,7 +216,7 @@ export function BetBox({
         }}>
           <button
             className="amount-adjust-btn"
-            onClick={() => setAmount(a => Math.max(10, a - 50))}
+            onClick={() => setAmount(a => Math.max(100, a - 500))}
             style={{
               background: 'transparent', border: 'none',
               padding: '12px 16px', color: 'var(--text-secondary)',
@@ -226,7 +226,7 @@ export function BetBox({
           <input
             type="number"
             value={amount}
-            onChange={e => setAmount(Math.max(10, parseInt(e.target.value) || 10))}
+            onChange={e => setAmount(Math.max(100, parseInt(e.target.value) || 100))}
             style={{
               flex: 1, background: 'transparent', border: 'none',
               outline: 'none', textAlign: 'center',
@@ -242,7 +242,7 @@ export function BetBox({
           }}>PT</span>
           <button
             className="amount-adjust-btn"
-            onClick={() => setAmount(a => a + 50)}
+            onClick={() => setAmount(a => a + 500)}
             style={{
               background: 'transparent', border: 'none',
               padding: '12px 16px', color: 'var(--text-secondary)',
@@ -251,7 +251,7 @@ export function BetBox({
           >+</button>
         </div>
         <input
-          type="range" min={10} max={1000} step={10}
+          type="range" min={100} max={10000} step={100}
           value={amount}
           onChange={e => setAmount(parseInt(e.target.value))}
           style={{ width: '100%', marginTop: 10 }}
@@ -260,7 +260,7 @@ export function BetBox({
 
       {/* Preset amounts */}
       <div className="amount-presets" style={{ display: 'flex', gap: 6, marginBottom: compact ? 16 : 20 }}>
-        {[50, 100, 250, 500].map(v => (
+        {[500, 1000, 2500, 5000].map(v => (
           <button
             key={v}
             onClick={() => setAmount(v)}
