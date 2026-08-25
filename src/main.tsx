@@ -6,7 +6,9 @@ import './index.css'
 import './i18n'
 import { initAnalytics } from './lib/analytics'
 import { captureRefFromUrl } from './lib/referral'
+import { redirectPathToHash } from './lib/pathToHash'
 
+redirectPathToHash()
 initAnalytics()
 captureRefFromUrl()
 
