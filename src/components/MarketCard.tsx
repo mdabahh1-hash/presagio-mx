@@ -16,7 +16,7 @@ function useCountdown(endsAt: string) {
 }
 
 interface MarketCardProps {
-  market: Market & { status?: string }
+  market: Market
   animClass?: string
 }
 

@@ -1,35 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { marketsApi, type ApiMarket } from '../lib/api'
+import { marketsApi } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
+import { apiToMarket } from '../lib/mapMarket'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
-function apiToMarket(m: ApiMarket): Market {
-  return {
-    id: m.id,
-    question: m.question,
-    description: m.description,
-    category: m.category as Category,
-    subcategory: m.subcategory ?? null,
-    yesPrice: Math.round(m.yes_price),
-    volume: m.volume,
-    liquidity: m.volume * 0.1,
-    endsAt: m.ends_at,
-    resolutionCriteria: '',
-    trending: m.trending,
-    marketType: m.market_type ?? 'binary',
-    outcomes: m.outcomes ?? [],
-    resolvedOutcomeKey: m.resolved_outcome_key,
-    history: [],
-    comments: [],
-  }
-}
 
 export function Markets() {
   const { t } = useTranslation()

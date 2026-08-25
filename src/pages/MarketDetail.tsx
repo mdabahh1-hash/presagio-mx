@@ -219,10 +219,12 @@ export function MarketDetail() {
                   {t('common.trendingBadge')}
                 </span>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                <div className="live-dot" />
-                <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>{t('common.live')}</span>
-              </div>
+              {market.status === 'open' && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+                  <div className="live-dot" />
+                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>{t('common.live')}</span>
+                </div>
+              )}
             </div>
 
             {/* Resolved banner */}

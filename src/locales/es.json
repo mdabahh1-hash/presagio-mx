@@ -11,7 +11,7 @@
     "live": "EN VIVO",
     "trendingBadge": "▲ TENDENCIA",
     "multiBadge": "MULTI",
-    "pendingBadge": "PENDIENTE",
+    "pendingBadge": "POR RESOLVERSE",
     "noHistory": "Sin suficientes datos de historial aún",
     "close": "Cerrar",
     "countdown": {
@@ -25,7 +25,7 @@
       "day_one": "1 día",
       "day_other": "{{count}} días",
       "resolved": "Resuelto",
-      "pending": "Pendiente"
+      "pending": "Por resolverse"
     }
   },
   "nav": {
@@ -131,6 +131,7 @@
     "bucketWeek": "Esta semana",
     "bucketMonth": "Este mes",
     "bucketLater": "Más adelante",
+    "bucketPending": "Por resolverse",
     "marketCount_one": "{{count}} mercado",
     "marketCount_other": "{{count}} mercados",
     "emptyFilter": "Sin mercados en este filtro"
@@ -138,7 +139,7 @@
   "card": {
     "vol": "Vol",
     "liq": "Liq",
-    "waitingResolution": "Esperando resolución",
+    "waitingResolution": "Por resolverse",
     "more": "+ {{count}} más →"
   },
   "carousel": {
@@ -183,7 +184,7 @@
     "toComment": "para comentar",
     "winnerTitle": "Ganador: {{label}}",
     "pointsDistributed": "Los puntos ya fueron distribuidos a los ganadores.",
-    "pendingTitle": "Pendiente de resolución",
+    "pendingTitle": "Por resolverse",
     "pendingBody": "Este mercado cerró. En breve se declarará el resultado y se distribuirán los puntos.",
     "resolvedYesWon": "Resuelto: SÍ ganó",
     "resolvedNoWon": "Resuelto: NO ganó",

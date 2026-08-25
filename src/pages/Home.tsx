@@ -10,31 +10,10 @@ import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
+import { apiToMarket } from '../lib/mapMarket'
 
 const MOBILE_TABS = ['Tendencia', ...CATEGORIES] as const
 type MobileTab = Category | 'Tendencia'
-
-
-function apiToMarket(m: ApiMarket): Market {
-  return {
-    id: m.id,
-    question: m.question,
-    description: m.description,
-    category: m.category as Category,
-    subcategory: m.subcategory ?? null,
-    yesPrice: Math.round(m.yes_price),
-    volume: m.volume,
-    liquidity: m.volume * 0.1,
-    endsAt: m.ends_at,
-    resolutionCriteria: '',
-    trending: m.trending,
-    marketType: m.market_type ?? 'binary',
-    outcomes: m.outcomes ?? [],
-    resolvedOutcomeKey: m.resolved_outcome_key,
-    history: [],
-    comments: [],
-  }
-}
 
 function useMobile() {
   const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)

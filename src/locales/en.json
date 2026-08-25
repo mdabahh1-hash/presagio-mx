@@ -11,7 +11,7 @@
     "live": "LIVE",
     "trendingBadge": "▲ TRENDING",
     "multiBadge": "MULTI",
-    "pendingBadge": "PENDING",
+    "pendingBadge": "PENDING RESULT",
     "noHistory": "Not enough price history yet",
     "close": "Close",
     "countdown": {
@@ -25,7 +25,7 @@
       "day_one": "1 day",
       "day_other": "{{count}} days",
       "resolved": "Resolved",
-      "pending": "Pending"
+      "pending": "Pending result"
     }
   },
   "nav": {
@@ -131,6 +131,7 @@
     "bucketWeek": "This week",
     "bucketMonth": "This month",
     "bucketLater": "Later",
+    "bucketPending": "Pending result",
     "marketCount_one": "{{count}} market",
     "marketCount_other": "{{count}} markets",
     "emptyFilter": "No markets match this filter"
@@ -183,7 +184,7 @@
     "toComment": "to comment",
     "winnerTitle": "Winner: {{label}}",
     "pointsDistributed": "Points have been distributed to the winners.",
-    "pendingTitle": "Pending resolution",
+    "pendingTitle": "Pending result",
     "pendingBody": "This market has closed. The result will be declared shortly and points will be distributed.",
     "resolvedYesWon": "Resolved: YES won",
     "resolvedNoWon": "Resolved: NO won",

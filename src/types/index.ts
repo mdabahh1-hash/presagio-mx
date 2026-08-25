@@ -23,6 +23,7 @@ export interface Market {
   endsAt: string
   resolutionCriteria: string
   trending: boolean
+  status?: MarketStatus
   marketType?: 'binary' | 'multi'
   outcomes?: Outcome[]
   resolvedOutcomeKey?: string | null

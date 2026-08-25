@@ -278,7 +278,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
               </div>
               <div>
                 <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--gold)', lineHeight: 1 }}>
-                  {daysLeft(m.ends_at)}
+                  {daysLeft(m.ends_at, m.status)}
                 </div>
                 <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 5, fontWeight: 600, letterSpacing: '0.04em' }}>{t('carousel.closeLabel')}</div>
               </div>

@@ -306,6 +306,15 @@ export function Navbar() {
                           }}>
                             {m.question}
                           </span>
+                          {m.status === 'pending_resolution' && (
+                            <span style={{
+                              fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase',
+                              color: 'var(--gold)', background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
+                              padding: '2px 7px', borderRadius: 99, flexShrink: 0,
+                            }}>
+                              {t('common.days.pending')}
+                            </span>
+                          )}
                           {isMulti ? (leader && (
                             <span style={{ textAlign: 'right', flexShrink: 0, maxWidth: 110 }}>
                               <span className="font-mono" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>

@@ -3,13 +3,16 @@ import { useTranslation } from 'react-i18next'
 import { MarketCard } from './MarketCard'
 import type { Category, Market } from '../types'
 
-type BucketKey = 'all' | 'now' | 'today' | 'week' | 'month' | 'later'
+type BucketKey = 'all' | 'now' | 'today' | 'week' | 'month' | 'later' | 'pending'
 
-const BUCKET_KEYS: BucketKey[] = ['all', 'now', 'today', 'week', 'month', 'later']
+const BUCKET_KEYS: BucketKey[] = ['all', 'now', 'today', 'week', 'month', 'later', 'pending']
 
-// Bucket a market by hours-until-close (future-proof: minute/hour markets land in "now").
-function bucketOf(endsAt: string): Exclude<BucketKey, 'all'> {
-  const h = (new Date(endsAt).getTime() - Date.now()) / 3_600_000
+// Bucket a market by hours-until-close (future-proof: minute/hour markets land
+// in "now"). Expired-but-unresolved markets get their own terminal bucket so
+// they don't inflate "Cierran ya" (their ends_at is already in the past).
+function bucketOf(m: Market): Exclude<BucketKey, 'all'> {
+  if (m.status === 'pending_resolution') return 'pending'
+  const h = (new Date(m.endsAt).getTime() - Date.now()) / 3_600_000
   if (h <= 1) return 'now'
   if (h <= 24) return 'today'
   if (h <= 24 * 7) return 'week'
@@ -95,6 +98,7 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
     week: t('categoryBrowse.bucketWeek'),
     month: t('categoryBrowse.bucketMonth'),
     later: t('categoryBrowse.bucketLater'),
+    pending: t('categoryBrowse.bucketPending'),
   }
 
   const inCat = useMemo(() => markets.filter(m => m.category === category), [markets, category])
@@ -117,13 +121,13 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
   )
 
   const counts = useMemo(() => {
-    const c: Record<BucketKey, number> = { all: inSub.length, now: 0, today: 0, week: 0, month: 0, later: 0 }
-    for (const m of inSub) c[bucketOf(m.endsAt)]++
+    const c: Record<BucketKey, number> = { all: inSub.length, now: 0, today: 0, week: 0, month: 0, later: 0, pending: 0 }
+    for (const m of inSub) c[bucketOf(m)]++
     return c
   }, [inSub])
 
   const shown = useMemo(() => {
-    const list = bucket === 'all' ? inSub : inSub.filter(m => bucketOf(m.endsAt) === bucket)
+    const list = bucket === 'all' ? inSub : inSub.filter(m => bucketOf(m) === bucket)
     return [...list].sort((a, b) => b.volume - a.volume)
   }, [inSub, bucket])
 
@@ -168,7 +172,7 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
             <RailHeader>{t('categoryBrowse.railClosing')}</RailHeader>
           </>
         )}
-        {BUCKET_KEYS.map(key => (
+        {BUCKET_KEYS.filter(key => key !== 'pending' || counts.pending > 0).map(key => (
           <RailButton
             key={key}
             active={key === bucket}
