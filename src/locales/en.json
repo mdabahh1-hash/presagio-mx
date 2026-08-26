@@ -175,6 +175,8 @@
     "embedTitle": "Embed on your site",
     "embedHint": "Copy this code and paste it into your page, blog or newsletter. It shows live odds and links to the market with your referral code.",
     "embedCopy": "Copy code",
+    "embedPreview": "Widget preview",
+    "embedCode": "Code",
     "statsVolume": "Volume",
     "statsTrades": "Trades",
     "statsClose": "Closes",

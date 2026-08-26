@@ -175,6 +175,8 @@
     "embedTitle": "Insertar en tu sitio",
     "embedHint": "Copia este código y pégalo en tu página, blog o newsletter. Muestra las probabilidades en vivo y enlaza al mercado con tu código de referido.",
     "embedCopy": "Copiar código",
+    "embedPreview": "Vista previa del widget",
+    "embedCode": "Código",
     "statsVolume": "Volumen",
     "statsTrades": "Operaciones",
     "statsClose": "Cierre",

@@ -482,7 +482,18 @@ export function MarketDetail() {
                       {embedCopied ? t('common.copied') : t('market.embedCopy')}
                     </button>
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', margin: '0 0 10px', lineHeight: 1.4 }}>{t('market.embedHint')}</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', margin: '0 0 12px', lineHeight: 1.4 }}>{t('market.embedHint')}</p>
+                  {/* Vista previa: el mismo widget que verá quien pegue el código. */}
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+                    <iframe
+                      title={t('market.embedPreview')}
+                      src={`${window.location.origin}/#/embed/${encodeURIComponent(market.id)}`}
+                      width={400}
+                      height={320}
+                      style={{ border: '1px solid var(--border-default)', borderRadius: 16, maxWidth: '100%', background: 'var(--bg-base)' }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>{t('market.embedCode')}</div>
                   <textarea
                     readOnly
                     value={snippet}
