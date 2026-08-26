@@ -11,6 +11,7 @@ import { BetBox } from '../components/BetBox'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 import { formatVolume, formatDate, daysLeft } from '../lib/format'
+import { buildEmbedSnippet } from '../lib/embed'
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
 const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
@@ -63,6 +64,8 @@ export function MarketDetail() {
   const [showChartMenu, setShowChartMenu] = useState(false)
   const chartMenuRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
+  const [showEmbed, setShowEmbed] = useState(false)
+  const [embedCopied, setEmbedCopied] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -443,6 +446,55 @@ export function MarketDetail() {
                   >
                     {copied ? t('common.copied') : t('common.copyLink')}
                   </button>
+                  <button
+                    className="share-btn"
+                    onClick={() => { setShowEmbed(v => !v); track('Share', { channel: 'embed', market: id ?? '' }) }}
+                    aria-expanded={showEmbed}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
+                      borderRadius: 99, background: showEmbed ? 'var(--bg-elevated-hover, var(--bg-elevated))' : 'var(--bg-elevated)',
+                      border: `1px solid ${showEmbed ? 'var(--gold)' : 'var(--border-default)'}`,
+                      color: showEmbed ? 'var(--gold)' : 'var(--text-secondary)', cursor: 'pointer',
+                      fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
+                    }}
+                  >
+                    <span style={{ fontFamily: 'DM Mono', fontSize: '0.8rem' }}>&lt;/&gt;</span>
+                    {t('market.embedBtn')}
+                  </button>
+                </div>
+              )
+            })()}
+
+            {showEmbed && (() => {
+              const snippet = buildEmbedSnippet(market, yesPrice, { ref: user?.referral_code ?? null })
+              return (
+                <div style={{ marginTop: 14, padding: 14, borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{t('market.embedTitle')}</span>
+                    <button
+                      onClick={() => { navigator.clipboard?.writeText(snippet); setEmbedCopied(true); setTimeout(() => setEmbedCopied(false), 2000) }}
+                      style={{
+                        height: 30, padding: '0 12px', borderRadius: 99, cursor: 'pointer',
+                        background: embedCopied ? 'var(--green)' : 'var(--gold)', color: '#0b0b0d',
+                        border: 'none', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'DM Sans',
+                      }}
+                    >
+                      {embedCopied ? t('common.copied') : t('market.embedCopy')}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', margin: '0 0 10px', lineHeight: 1.4 }}>{t('market.embedHint')}</p>
+                  <textarea
+                    readOnly
+                    value={snippet}
+                    onFocus={e => e.currentTarget.select()}
+                    spellCheck={false}
+                    style={{
+                      width: '100%', boxSizing: 'border-box', height: 150, resize: 'vertical',
+                      fontFamily: 'DM Mono, monospace', fontSize: '0.68rem', lineHeight: 1.4,
+                      background: 'var(--bg-base)', color: 'var(--text-secondary)',
+                      border: '1px solid var(--border-subtle)', borderRadius: 8, padding: 10,
+                    }}
+                  />
                 </div>
               )
             })()}

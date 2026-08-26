@@ -171,6 +171,10 @@
     "historyTitle": "Price history",
     "periodAll": "ALL",
     "showOnChart": "Show on chart",
+    "embedBtn": "Embed",
+    "embedTitle": "Embed on your site",
+    "embedHint": "Copy this code and paste it into your page, blog or newsletter. It shows live odds and links to the market with your referral code.",
+    "embedCopy": "Copy code",
     "statsVolume": "Volume",
     "statsTrades": "Trades",
     "statsClose": "Closes",
@@ -370,6 +374,9 @@
     "shareText": "🔮 Join VEREDIKT, the prediction market. If you sign up with my link, we each earn 2,000 PT when you make your first prediction:",
     "shareWhatsApp": "Share on WhatsApp",
     "shareX": "Share on X"
+  },
+  "embed": {
+    "cta": "Predict on VEREDIKT"
   },
   "errors": {
     "unknown": "Unknown error",

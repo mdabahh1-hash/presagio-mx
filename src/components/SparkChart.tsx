@@ -142,8 +142,8 @@ export interface MultiSeries {
   color?: string
 }
 
-export function MultiLineChart({ series, height = 220, viewW = 700, interactive = true }: {
-  series: MultiSeries[]; height?: number; viewW?: number; interactive?: boolean
+export function MultiLineChart({ series, height = 220, viewW = 700, interactive = true, showLegend = true }: {
+  series: MultiSeries[]; height?: number; viewW?: number; interactive?: boolean; showLegend?: boolean
 }) {
   const { t } = useTranslation()
   const padL = 44, padR = 16, padT = 16, padB = 44
@@ -268,7 +268,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
         {hover && <ChartTooltip xView={hover.x} viewW={W} title={hover.title} rows={hover.rows} />}
       </div>
       {/* Legend */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--border-subtle)' }}>
+      {showLegend && <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px', marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--border-subtle)' }}>
         {prepared.map((s, i) => {
           const last = paths[i].lastPrice
           return (
@@ -283,7 +283,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
             </div>
           )
         })}
-      </div>
+      </div>}
     </div>
   )
 }

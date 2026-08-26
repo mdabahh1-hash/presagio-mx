@@ -1,5 +1,6 @@
 import React from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { Embed } from './pages/Embed'
 import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { Home } from './pages/Home'
@@ -18,6 +19,19 @@ import { setToken } from './lib/api'
 import { useTranslation } from 'react-i18next'
 
 export default function App() {
+  // /embed/:id se incrusta en iframes de terceros: sin navbar ni footer.
+  const isEmbed = useLocation().pathname.startsWith('/embed/')
+  if (isEmbed) {
+    return (
+      <ThemeProvider>
+      <AuthProvider>
+        <Routes>
+          <Route path="/embed/:id" element={<Embed />} />
+        </Routes>
+      </AuthProvider>
+      </ThemeProvider>
+    )
+  }
   return (
     <ThemeProvider>
     <AuthProvider>
