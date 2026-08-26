@@ -170,6 +170,7 @@
     "winner": "Ganador: {{label}}",
     "historyTitle": "Probabilidad histórica",
     "periodAll": "TODO",
+    "showOnChart": "Mostrar en el gráfico",
     "statsVolume": "Volumen",
     "statsTrades": "Operaciones",
     "statsClose": "Cierre",

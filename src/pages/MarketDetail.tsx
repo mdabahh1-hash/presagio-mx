@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { displayPair } from '../lib/prices'
@@ -6,11 +6,34 @@ import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categ
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
-import { FullChart, MultiLineChart } from '../components/SparkChart'
+import { FullChart, MultiLineChart, outcomeColor } from '../components/SparkChart'
 import { BetBox } from '../components/BetBox'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 import { formatVolume, formatDate, daysLeft } from '../lib/format'
+
+type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
+const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
+const RANGE_LABELS: Record<ChartRange, string> = { '1h': '1H', '6h': '6H', '1d': '1D', '1w': '1S', '1m': '1M', all: '' }
+const RANGE_MS: Record<ChartRange, number> = {
+  '1h': 3_600_000, '6h': 6 * 3_600_000, '1d': 86_400_000, '1w': 7 * 86_400_000, '1m': 30 * 86_400_000, all: Infinity,
+}
+
+/** Recorta la serie al rango; antepone el último punto previo al corte
+ *  (carry-forward) para que la línea no arranque "en el aire". */
+function filterRange(data: PricePoint[], range: ChartRange): PricePoint[] {
+  if (range === 'all' || data.length === 0) return data
+  const now = Date.now()
+  const cutoff = now - RANGE_MS[range]
+  const last = data[data.length - 1]
+  const firstIdx = data.findIndex(p => Date.parse(p.date) >= cutoff)
+  const out = firstIdx === -1 ? [] : data.slice(firstIdx)
+  const prev = firstIdx === -1 ? last : firstIdx > 0 ? data[firstIdx - 1] : null
+  if (prev) out.unshift({ date: new Date(cutoff).toISOString(), price: prev.price })
+  // El precio vigente se extiende hasta ahora para que la gráfica cubra todo el rango.
+  out.push({ date: new Date(now).toISOString(), price: last.price })
+  return out
+}
 
 export function MarketDetail() {
   const { t } = useTranslation()
@@ -34,7 +57,11 @@ export function MarketDetail() {
   const [loading, setLoading] = useState(true)
 
   const [comment, setComment] = useState('')
-  const [chartPeriod, setChartPeriod] = useState<'7d' | '30d' | 'all'>('all')
+  const [chartRange, setChartRange] = useState<ChartRange>('all')
+  // Multi: outcomes dibujados en la gráfica (default top 4 por precio).
+  const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set())
+  const [showChartMenu, setShowChartMenu] = useState(false)
+  const chartMenuRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -50,10 +77,13 @@ export function MarketDetail() {
         setOutcomes(sorted)
         const preselected = copyOutcome && sorted.some(o => o.outcome_key === copyOutcome) ? copyOutcome : null
         setSelectedOutcomeKey(preselected ?? sorted[0]?.outcome_key ?? null)
+        setVisibleKeys(new Set(sorted.slice(0, 4).map(o => o.outcome_key)))
       }
 
-      marketsApi.history(id, 90).then((hist) => {
-        setHistory(hist.map((p: ApiPricePoint) => ({ date: p.recorded_at.slice(0, 10), price: p.yes_price })))
+      // Timestamp completo (no truncado a día) para que los rangos 1H/6H/1D
+      // y el tooltip con hora funcionen; los rangos se filtran en cliente.
+      marketsApi.history(id, 365).then((hist) => {
+        setHistory(hist.filter((p: ApiPricePoint) => !p.outcome_key).map((p: ApiPricePoint) => ({ date: p.recorded_at, price: p.yes_price })))
         if (m.market_type === 'multi') {
           const series: Record<string, PricePoint[]> = {}
           for (const pt of hist) {
@@ -100,7 +130,7 @@ export function MarketDetail() {
           })
         } else if (typeof data.yes_price === 'number') {
           // Guard: comment broadcasts also carry type 'price_update' but no yes_price.
-          setHistory(prev => [...prev, { date: new Date().toISOString().slice(0, 10), price: data.yes_price as number }])
+          setHistory(prev => [...prev, { date: new Date().toISOString(), price: data.yes_price as number }])
         }
       }
       if (data.event === 'new_comment' && data.market_id === id) {
@@ -113,11 +143,40 @@ export function MarketDetail() {
     }
   }, [id])
 
-  const chartData = (() => {
-    if (chartPeriod === '7d') return history.slice(-7)
-    if (chartPeriod === '30d') return history.slice(-30)
-    return history
-  })()
+  const chartData = useMemo(() => filterRange(history, chartRange), [history, chartRange])
+
+  // Series multi visibles, con color estable por posición en la lista completa.
+  const multiSeries = useMemo(() => outcomes
+    .map((o, i) => ({
+      outcome_key: o.outcome_key,
+      label: o.label,
+      color: outcomeColor(i),
+      data: filterRange(outcomeSeries[o.outcome_key] ?? [], chartRange),
+    }))
+    .filter(s => visibleKeys.has(s.outcome_key)), [outcomes, outcomeSeries, chartRange, visibleKeys])
+
+  const toggleOutcome = (key: string) => {
+    setVisibleKeys(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) {
+        if (next.size === 1) return prev // mínimo una línea
+        next.delete(key)
+      } else next.add(key)
+      return next
+    })
+  }
+
+  // Cerrar el menú "Mostrar en el gráfico" con click fuera / Escape
+  useEffect(() => {
+    if (!showChartMenu) return
+    const onDown = (e: MouseEvent) => {
+      if (chartMenuRef.current && !chartMenuRef.current.contains(e.target as Node)) setShowChartMenu(false)
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowChartMenu(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
+  }, [showChartMenu])
 
   const handlePostComment = async () => {
     if (!user || !comment.trim() || !id) return
@@ -393,41 +452,97 @@ export function MarketDetail() {
           <div className="anim-2 card" style={{ padding: '24px 24px 20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div className="exchange-header">{t('market.historyTitle')}</div>
-              <div style={{ display: 'flex', gap: 4 }}>
-                {(['7d', '30d', 'all'] as const).map(p => (
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+                {CHART_RANGES.map(p => (
                   <button
                     key={p}
-                    onClick={() => setChartPeriod(p)}
+                    onClick={() => setChartRange(p)}
                     style={{
-                      background: chartPeriod === p ? 'var(--bg-elevated)' : 'transparent',
-                      border: `1px solid ${chartPeriod === p ? 'var(--border-default)' : 'transparent'}`,
-                      borderRadius: 6, padding: '4px 12px',
+                      background: chartRange === p ? 'var(--bg-elevated)' : 'transparent',
+                      border: `1px solid ${chartRange === p ? 'var(--border-default)' : 'transparent'}`,
+                      borderRadius: 6, padding: '4px 10px',
                       fontSize: '0.72rem', fontWeight: 700,
-                      color: chartPeriod === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                      color: chartRange === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
                       cursor: 'pointer', fontFamily: 'DM Mono',
                       transition: 'all 0.15s',
                     }}
                   >
-                    {p === 'all' ? t('market.periodAll') : p.toUpperCase()}
+                    {p === 'all' ? t('market.periodAll') : RANGE_LABELS[p]}
                   </button>
                 ))}
+                {market.market_type === 'multi' && (
+                  <div ref={chartMenuRef} style={{ position: 'relative', marginLeft: 4 }}>
+                    <button
+                      onClick={() => setShowChartMenu(v => !v)}
+                      aria-label={t('market.showOnChart')}
+                      aria-expanded={showChartMenu}
+                      title={t('market.showOnChart')}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 28, height: 28, borderRadius: 6, cursor: 'pointer',
+                        background: showChartMenu ? 'var(--bg-elevated)' : 'transparent',
+                        border: `1px solid ${showChartMenu ? 'var(--border-default)' : 'transparent'}`,
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="14" y2="12" /><line x1="4" y1="18" x2="9" y2="18" />
+                        <circle cx="17" cy="12" r="2" /><circle cx="12" cy="18" r="2" />
+                      </svg>
+                    </button>
+                    {showChartMenu && (
+                      <div style={{
+                        position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 20, minWidth: 260,
+                        background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
+                        borderRadius: 12, boxShadow: '0 12px 32px var(--shadow-menu)', padding: '12px 14px',
+                      }}>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginBottom: 8 }}>
+                          {t('market.showOnChart')}
+                        </div>
+                        {outcomes.map((o, i) => {
+                          const on = visibleKeys.has(o.outcome_key)
+                          const lastOn = on && visibleKeys.size === 1
+                          return (
+                            <label key={o.outcome_key} style={{
+                              display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0',
+                              cursor: lastOn ? 'default' : 'pointer', opacity: lastOn ? 0.7 : 1,
+                            }}>
+                              <span style={{ width: 8, height: 8, borderRadius: '50%', background: on ? outcomeColor(i) : 'var(--border-default)', flexShrink: 0 }} />
+                              <span style={{ flex: 1, fontSize: '0.85rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {o.label}
+                              </span>
+                              <button
+                                role="switch"
+                                aria-checked={on}
+                                aria-label={o.label}
+                                disabled={lastOn}
+                                onClick={() => toggleOutcome(o.outcome_key)}
+                                style={{
+                                  width: 36, height: 20, borderRadius: 10, border: 'none', padding: 2, flexShrink: 0,
+                                  background: on ? 'var(--chart-1)' : 'var(--border-default)',
+                                  cursor: lastOn ? 'default' : 'pointer', transition: 'background 0.15s',
+                                  display: 'flex', alignItems: 'center',
+                                }}
+                              >
+                                <span style={{
+                                  width: 16, height: 16, borderRadius: '50%', background: '#fff',
+                                  transform: on ? 'translateX(16px)' : 'translateX(0)', transition: 'transform 0.15s',
+                                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                }} />
+                              </button>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             {market.market_type === 'multi' ? (
-              <MultiLineChart
-                series={outcomes.map(o => ({
-                  outcome_key: o.outcome_key,
-                  label: o.label,
-                  data: chartPeriod === '7d'
-                    ? (outcomeSeries[o.outcome_key] ?? []).slice(-7)
-                    : chartPeriod === '30d'
-                    ? (outcomeSeries[o.outcome_key] ?? []).slice(-30)
-                    : (outcomeSeries[o.outcome_key] ?? []),
-                }))}
-                height={220}
-              />
+              <MultiLineChart series={multiSeries} height={220} />
             ) : chartData.length > 1 ? (
-              <FullChart data={chartData} height={200} />
+              <FullChart data={chartData} height={200} label={t('common.yes')} />
             ) : (
               <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
                 {t('common.noHistory')}

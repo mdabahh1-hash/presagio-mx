@@ -170,6 +170,7 @@
     "winner": "Winner: {{label}}",
     "historyTitle": "Price history",
     "periodAll": "ALL",
+    "showOnChart": "Show on chart",
     "statsVolume": "Volume",
     "statsTrades": "Trades",
     "statsClose": "Closes",

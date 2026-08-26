@@ -343,7 +343,7 @@ export function Profile() {
         <div className="exchange-header" style={{ marginBottom: 20 }}>
           {t('profile.pointsHistory')}
         </div>
-        <FullChart data={pointsHistory} height={160} color="var(--gold)" />
+        <FullChart data={pointsHistory} height={160} color="var(--gold)" valueSuffix=" PT" label="PT" />
       </div>
 
       {/* Tabs */}

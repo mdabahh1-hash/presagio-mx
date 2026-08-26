@@ -303,9 +303,9 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
             {historyLoading ? (
               <div style={{ height: chartH, borderRadius: 10, background: 'var(--bg-surface)', animation: 'livePulse 1.8s ease infinite' }} />
             ) : isMulti ? (
-              <MultiLineChart series={multiSeries} height={chartH} viewW={chartW || 700} />
+              <MultiLineChart series={multiSeries} height={chartH} viewW={chartW || 700} interactive={false} />
             ) : chartData.length > 1 ? (
-              <FullChart data={chartData} height={chartH} viewW={chartW || 700} />
+              <FullChart data={chartData} height={chartH} viewW={chartW || 700} interactive={false} />
             ) : (
               <div style={{ height: chartH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
                 {t('common.noHistory')}
