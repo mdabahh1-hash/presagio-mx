@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MarketCard } from './MarketCard'
+import { MarketRow } from './MarketRow'
+import { SPORT_GROUPS, sportOfSub } from '../lib/categories'
 import type { Category, Market } from '../types'
 
 type BucketKey = 'all' | 'now' | 'today' | 'week' | 'month' | 'later' | 'pending'
@@ -20,27 +21,38 @@ function bucketOf(m: Market): Exclude<BucketKey, 'all'> {
   return 'later'
 }
 
+// Dentro de cada sección: cierre más próximo primero, pendientes al final.
+function byClosing(a: Market, b: Market): number {
+  const pa = a.status === 'pending_resolution' ? 1 : 0
+  const pb = b.status === 'pending_resolution' ? 1 : 0
+  if (pa !== pb) return pa - pb
+  return new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime()
+}
+
 interface CategoryBrowseProps {
   category: Category
   markets: Market[]
   loading: boolean
   // Subcategorías a listar en el rail (solo categorías que las tienen).
   subcats?: string[]
-  // Controlado (Markets sincroniza con ?sub=). Sin onSubChange, el estado es interno (Home).
+  // Controlado (Markets sincroniza con ?sport= y ?sub=). Sin onChange, el estado es interno (Home).
   activeSub?: string | null
   onSubChange?: (sub: string | null) => void
+  activeSport?: string | null
+  onSportChange?: (sport: string | null) => void
 }
 
-function RailButton({ active, label, count, onClick }: {
+function RailButton({ active, label, count, onClick, nested = false }: {
   active: boolean
   label: string
   count: number
   onClick: () => void
+  nested?: boolean
 }) {
   return (
     <button
       onClick={onClick}
-      className="cat-rail-item"
+      className={`cat-rail-item${nested ? ' cat-rail-sub' : ''}`}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
         width: '100%', textAlign: 'left', cursor: 'pointer',
@@ -78,16 +90,46 @@ function RailHeader({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function CategoryBrowse({ category, markets, loading, subcats, activeSub, onSubChange }: CategoryBrowseProps) {
+function SectionHeader({ title, count }: { title: string; count: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 12px' }}>
+      <h3 className="font-display" style={{
+        margin: 0, fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em',
+        color: 'var(--text-primary)',
+      }}>
+        {title}
+      </h3>
+      <span className="font-mono" style={{
+        fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)',
+        background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+        borderRadius: 99, padding: '1px 8px',
+      }}>
+        {count}
+      </span>
+    </div>
+  )
+}
+
+export function CategoryBrowse({
+  category, markets, loading, subcats,
+  activeSub, onSubChange, activeSport, onSportChange,
+}: CategoryBrowseProps) {
   const { t } = useTranslation()
+  const isSports = category === 'Deportes'
   const [bucket, setBucket] = useState<BucketKey>('all')
-  // Fallback no controlado (Home no sincroniza la subcategoría con la URL)
+  // Fallback no controlado (Home no sincroniza con la URL)
   const [innerSub, setInnerSub] = useState<string | null>(null)
+  const [innerSport, setInnerSport] = useState<string | null>(null)
   const sub = onSubChange ? (activeSub ?? null) : innerSub
   const setSub = onSubChange ?? setInnerSub
+  const sportState = onSportChange ? (activeSport ?? null) : innerSport
+  const setSport = onSportChange ?? setInnerSport
+  // Una liga activa implica su deporte (deep links viejos ?sub=Liga MX siguen funcionando)
+  const sport = isSports ? ((sub && sportOfSub(sub)) || sportState) : null
 
   useEffect(() => {
     setInnerSub(null)
+    setInnerSport(null)
     setBucket('all')
   }, [category])
 
@@ -115,10 +157,33 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
     [subcats, subCounts],
   )
 
-  const inSub = useMemo(
-    () => (sub ? inCat.filter(m => m.subcategory === sub) : inCat),
-    [inCat, sub],
+  // Deporte → ligas visibles. Ligas presentes en datos pero fuera de SPORT_GROUPS
+  // se muestran como deporte propio (fallback).
+  const sportTree = useMemo(() => {
+    if (!isSports) return []
+    const tree: { sport: string; leagues: string[]; count: number }[] = []
+    const grouped = new Set<string>()
+    for (const [s, leagues] of Object.entries(SPORT_GROUPS)) {
+      const vis = leagues.filter(l => (subCounts[l] ?? 0) > 0)
+      leagues.forEach(l => grouped.add(l))
+      if (vis.length > 0) tree.push({ sport: s, leagues: vis, count: vis.reduce((n, l) => n + (subCounts[l] ?? 0), 0) })
+    }
+    for (const s of visibleSubcats) {
+      if (!grouped.has(s)) tree.push({ sport: s, leagues: [s], count: subCounts[s] ?? 0 })
+    }
+    return tree
+  }, [isSports, subCounts, visibleSubcats])
+
+  const sportLeagues = useMemo(
+    () => (sport ? (SPORT_GROUPS[sport] ?? [sport]) : null),
+    [sport],
   )
+
+  const inSub = useMemo(() => {
+    if (sub) return inCat.filter(m => m.subcategory === sub)
+    if (sportLeagues) return inCat.filter(m => m.subcategory && sportLeagues.includes(m.subcategory))
+    return inCat
+  }, [inCat, sub, sportLeagues])
 
   const counts = useMemo(() => {
     const c: Record<BucketKey, number> = { all: inSub.length, now: 0, today: 0, week: 0, month: 0, later: 0, pending: 0 }
@@ -126,29 +191,94 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
     return c
   }, [inSub])
 
-  const shown = useMemo(() => {
-    const list = bucket === 'all' ? inSub : inSub.filter(m => bucketOf(m) === bucket)
-    return [...list].sort((a, b) => b.volume - a.volume)
-  }, [inSub, bucket])
+  const shown = useMemo(
+    () => (bucket === 'all' ? inSub : inSub.filter(m => bucketOf(m) === bucket)),
+    [inSub, bucket],
+  )
+
+  // Secciones por subcategoría en orden de display; sin subcategoría al final ("Otros").
+  // Categorías sin subcategorías: una sola lista sin encabezado.
+  const sections = useMemo(() => {
+    const order = sportLeagues ?? subcats ?? []
+    if (order.length === 0) return [{ title: null as string | null, items: [...shown].sort(byClosing) }]
+    const byKey = new Map<string | null, Market[]>()
+    for (const m of shown) {
+      const key = m.subcategory && order.includes(m.subcategory) ? m.subcategory : null
+      byKey.set(key, [...(byKey.get(key) ?? []), m])
+    }
+    const out: { title: string | null; items: Market[] }[] = []
+    for (const s of order) {
+      const items = byKey.get(s)
+      if (items?.length) out.push({ title: s, items: items.sort(byClosing) })
+    }
+    const rest = byKey.get(null)
+    if (rest?.length) out.push({ title: t('categoryBrowse.otherSection'), items: rest.sort(byClosing) })
+    return out
+  }, [shown, sportLeagues, subcats, t])
+
+  const selectSport = (s: string | null) => {
+    setSub(null)
+    setSport(s)
+  }
+  const selectSub = (s: string | null) => {
+    if (s && isSports) setSport(sportOfSub(s) ?? s)
+    setSub(s)
+  }
 
   if (loading) {
     return (
       <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start' }}>
         <div className="card" style={{ height: 280, animation: 'livePulse 1.8s ease infinite' }} />
-        <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14, height: 210 }} />
+            <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14, height: 96 }} />
           ))}
         </div>
       </div>
     )
   }
 
+  // "Deportes · Fútbol · Liga MX"; no repetir cuando deporte y liga coinciden (F1, Boxeo)
+  const headParts = [category, sport, sub && sub !== sport ? sub : null].filter((p): p is string => !!p)
+
   return (
     <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start', marginBottom: 48 }}>
       {/* Left rail */}
       <div className="cat-rail">
-        {visibleSubcats.length > 0 && (
+        {isSports && sportTree.length > 0 && (
+          <>
+            <RailHeader>{t('categoryBrowse.allSports')}</RailHeader>
+            <RailButton
+              active={!sport && !sub}
+              label={t('categoryBrowse.subcatAll')}
+              count={inCat.length}
+              onClick={() => selectSport(null)}
+            />
+            {sportTree.map(node => (
+              <React.Fragment key={node.sport}>
+                <RailButton
+                  active={sport === node.sport && !sub}
+                  label={node.sport}
+                  count={node.count}
+                  onClick={() => selectSport(sport === node.sport ? null : node.sport)}
+                />
+                {sport === node.sport && node.leagues.length > 1 && node.leagues.map(l => (
+                  <RailButton
+                    key={l}
+                    nested
+                    active={sub === l}
+                    label={l}
+                    count={subCounts[l] ?? 0}
+                    onClick={() => selectSub(sub === l ? null : l)}
+                  />
+                ))}
+              </React.Fragment>
+            ))}
+            <div className="cat-rail-divider" style={{ height: 1, background: 'var(--border-subtle)', margin: '10px 8px' }} />
+            <RailHeader>{t('categoryBrowse.railClosing')}</RailHeader>
+          </>
+        )}
+        {!isSports && visibleSubcats.length > 0 && (
           <>
             <RailHeader>{t('categoryBrowse.railSubcats')}</RailHeader>
             <RailButton
@@ -166,9 +296,7 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
                 onClick={() => setSub(sub === s ? null : s)}
               />
             ))}
-            <div className="cat-rail-divider" style={{
-              height: 1, background: 'var(--border-subtle)', margin: '10px 8px',
-            }} />
+            <div className="cat-rail-divider" style={{ height: 1, background: 'var(--border-subtle)', margin: '10px 8px' }} />
             <RailHeader>{t('categoryBrowse.railClosing')}</RailHeader>
           </>
         )}
@@ -184,17 +312,24 @@ export function CategoryBrowse({ category, markets, loading, subcats, activeSub,
       </div>
 
       {/* Content */}
-      <div>
+      <div style={{ minWidth: 0 }}>
         <div className="cat-browse-head" style={{ marginBottom: 18 }}>
           <div className="exchange-header" style={{ margin: 0 }}>
-            {category}{sub ? ` · ${sub}` : ''} · {t('categoryBrowse.marketCount', { count: shown.length })}
+            {headParts.join(' · ')} · {t('categoryBrowse.marketCount', { count: shown.length })}
           </div>
         </div>
 
         {shown.length > 0 ? (
-          <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-            {shown.map((m, i) => (
-              <MarketCard key={m.id} market={m} animClass={`anim-${Math.min(i + 1, 6)}`} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+            {sections.map((sec, si) => (
+              <section key={sec.title ?? '__all'}>
+                {sec.title && <SectionHeader title={sec.title} count={sec.items.length} />}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {sec.items.map((m, i) => (
+                    <MarketRow key={m.id} market={m} animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''} />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         ) : (

@@ -127,6 +127,25 @@ export const marketsApi = {
     if (params?.status) qs.set('status', params.status)
     return request<ApiMarket[]>(`/markets?${qs}`)
   },
+  // El backend capea limit a 100; una categoría (Deportes) puede rebasarlo.
+  // Pagina con offset hasta recibir una página incompleta.
+  listAll: async (params?: { category?: string; subcategory?: string; q?: string; sort?: string; status?: string }): Promise<ApiMarket[]> => {
+    const PAGE = 100
+    const all: ApiMarket[] = []
+    for (let offset = 0; ; offset += PAGE) {
+      const qs = new URLSearchParams()
+      if (params?.category) qs.set('category', params.category)
+      if (params?.subcategory) qs.set('subcategory', params.subcategory)
+      if (params?.q) qs.set('q', params.q)
+      if (params?.sort) qs.set('sort', params.sort)
+      if (params?.status) qs.set('status', params.status)
+      qs.set('limit', String(PAGE))
+      qs.set('offset', String(offset))
+      const page = await request<ApiMarket[]>(`/markets?${qs}`)
+      all.push(...page)
+      if (page.length < PAGE) return all
+    }
+  },
   get: (id: string) =>
     request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
   outcomes: (id: string) => request<ApiOutcome[]>(`/markets/${id}/outcomes`),

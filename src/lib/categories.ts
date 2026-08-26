@@ -17,3 +17,20 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
   ],
   'Política': ['Elecciones'],
 }
+
+// Deporte → ligas (rail "Todos los deportes" en CategoryBrowse). Solo Deportes
+// tiene dos niveles. Al agregar una liga nueva a SUBCATEGORIES.Deportes hay que
+// agregarla también a su deporte aquí; si no está en ningún grupo, el rail la
+// muestra como deporte propio (fallback, no rompe). Identificadores: no se traducen.
+export const SPORT_GROUPS: Record<string, string[]> = {
+  'Fútbol': ['Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS'],
+  'F1': ['F1'],
+  'Boxeo': ['Boxeo'],
+}
+
+export function sportOfSub(sub: string): string | undefined {
+  for (const [sport, leagues] of Object.entries(SPORT_GROUPS)) {
+    if (leagues.includes(sub)) return sport
+  }
+  return undefined
+}

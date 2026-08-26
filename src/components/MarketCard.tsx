@@ -1,19 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Market, Outcome } from '../types'
 import { SparkChart } from './SparkChart'
 import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
 import { formatVolume, formatCountdown } from '../lib/format'
-
-function useCountdown(endsAt: string) {
-  const [diff, setDiff] = useState(() => new Date(endsAt).getTime() - Date.now())
-  useEffect(() => {
-    const id = setInterval(() => setDiff(new Date(endsAt).getTime() - Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [endsAt])
-  return diff
-}
+import { useCountdown } from '../lib/useCountdown'
 
 interface MarketCardProps {
   market: Market

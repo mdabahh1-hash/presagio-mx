@@ -134,6 +134,8 @@
     "bucketPending": "Por resolverse",
     "marketCount_one": "{{count}} mercado",
     "marketCount_other": "{{count}} mercados",
+    "allSports": "Todos los deportes",
+    "otherSection": "Otros",
     "emptyFilter": "Sin mercados en este filtro"
   },
   "card": {

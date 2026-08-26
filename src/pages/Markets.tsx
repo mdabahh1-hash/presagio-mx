@@ -7,7 +7,7 @@ import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
-import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES, sportOfSub } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
@@ -27,25 +27,32 @@ export function Markets() {
   const queryParam = searchParams.get('q') || ''
   const catParam = (searchParams.get('cat') || 'Todos') as Category | 'Todos'
   const subParam = searchParams.get('sub')
+  const sportParam = searchParams.get('sport')
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
+  const [activeSport, setActiveSport] = useState<string | null>(sportParam)
 
   useEffect(() => {
     setSearchInput(queryParam)
     setActiveCategory(catParam)
     setActiveSub(subParam)
-  }, [queryParam, catParam, subParam])
+    setActiveSport(sportParam)
+  }, [queryParam, catParam, subParam, sportParam])
 
   useEffect(() => {
     let active = true
     setLoading(true)
-    marketsApi.list({
+    const params = {
       category: activeCategory !== 'Todos' ? activeCategory : undefined,
       q: searchInput || undefined,
       sort: sortBy,
-      limit: 100,
-    })
+    }
+    // Una categoría se lista completa (paginado); "Todos" conserva el top-100 por volumen.
+    const req = activeCategory !== 'Todos'
+      ? marketsApi.listAll(params)
+      : marketsApi.list({ ...params, limit: 100 })
+    req
       .then(data => { if (active) setMarkets(data.map(apiToMarket)) })
       .catch(() => { if (active) setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))) })
       .finally(() => { if (active) setLoading(false) })
@@ -64,19 +71,37 @@ export function Markets() {
   const handleCategoryClick = (cat: Category | 'Todos') => {
     setActiveCategory(cat)
     setActiveSub(null)
+    setActiveSport(null)
     setSearchParams(p => {
       if (cat === 'Todos') p.delete('cat')
       else p.set('cat', cat)
       p.delete('sub')
+      p.delete('sport')
       return p
     })
   }
 
   const handleSubChange = (sub: string | null) => {
+    // Una liga implica su deporte (Deportes); en otras categorías no hay deporte.
+    const sport = sub && activeCategory === 'Deportes' ? (sportOfSub(sub) ?? sub) : activeSport
     setActiveSub(sub)
+    setActiveSport(sport)
     setSearchParams(p => {
       if (sub) p.set('sub', sub)
       else p.delete('sub')
+      if (sport) p.set('sport', sport)
+      else p.delete('sport')
+      return p
+    })
+  }
+
+  const handleSportChange = (sport: string | null) => {
+    setActiveSport(sport)
+    setActiveSub(null)
+    setSearchParams(p => {
+      if (sport) p.set('sport', sport)
+      else p.delete('sport')
+      p.delete('sub')
       return p
     })
   }
@@ -222,6 +247,8 @@ export function Markets() {
           subcats={SUBCATEGORIES[activeCategory]}
           activeSub={activeSub}
           onSubChange={handleSubChange}
+          activeSport={activeSport}
+          onSportChange={handleSportChange}
         />
       ) : (
         <>
