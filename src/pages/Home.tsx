@@ -39,7 +39,9 @@ export function Home() {
   useEffect(() => { setVisibleTrending(12) }, [mobileTab])
 
   useEffect(() => {
-    marketsApi.list({ limit: 100 })
+    // Paginado completo: el top-100 por volumen dejaba fuera ligas enteras
+    // (con volumen 0 el desempate es por id, y nfl-*/pl-* caían del corte).
+    marketsApi.listAll()
       .then(data => setApiMarkets(data))
       .catch(() => setUsingMock(true))
       .finally(() => setLoading(false))
