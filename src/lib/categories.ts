@@ -13,7 +13,7 @@ export const CATEGORIES: Category[] = [
 export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
   'Deportes': [
     'Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A',
-    'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'F1', 'Boxeo',
+    'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'NFL', 'F1', 'Boxeo',
   ],
   'Política': ['Elecciones'],
 }
@@ -24,6 +24,7 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
 // muestra como deporte propio (fallback, no rompe). Identificadores: no se traducen.
 export const SPORT_GROUPS: Record<string, string[]> = {
   'Fútbol': ['Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS'],
+  'NFL': ['NFL'],
   'F1': ['F1'],
   'Boxeo': ['Boxeo'],
 }
