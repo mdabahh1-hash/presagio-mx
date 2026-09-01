@@ -235,6 +235,10 @@ export interface ApiPosition {
   shares: number
   avg_cost: number
   updated_at: string
+  // Live LMSR mark: price 0-1 (same scale as avg_cost), value in PT.
+  // null when the market is no longer tradeable.
+  current_price: number | null
+  current_value: number | null
 }
 
 export interface ApiPointsHistory {
@@ -294,7 +298,7 @@ export interface ApiHistoryEvent {
 export const usersApi = {
   me: () => request<ApiUser>('/users/me'),
   myPositions: () => request<ApiPosition[]>('/users/me/positions'),
-  pointsHistory: () => request<ApiPointsHistory[]>('/users/me/points-history'),
+  pointsHistory: (days = 30) => request<ApiPointsHistory[]>(`/users/me/points-history?days=${days}`),
   history: (limit = 50) => request<ApiHistoryEvent[]>(`/users/me/history?limit=${limit}`),
   publicHistory: (username: string, limit = 50) =>
     request<ApiHistoryEvent[]>(`/users/${username}/history?limit=${limit}`),
