@@ -14,6 +14,9 @@ export function redirectPathToHash(): void {
     let route = pathname.replace(/\/+$/, '')
     const share = route.match(/^\/(?:api\/)?m\/(.+)$/)
     if (share) route = `/mercado/${share[1]}`
+    // Invitaciones de liga: /l/:code (y /api/l/:code) → misma ruta hash /l/:code
+    const invite = route.match(/^\/(?:api\/)?l\/(.+)$/)
+    if (invite) route = `/l/${invite[1]}`
 
     window.history.replaceState({}, '', `/${search}#${route}`)
   } catch {

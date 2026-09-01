@@ -14,6 +14,8 @@
     "pendingBadge": "POR RESOLVERSE",
     "noHistory": "Sin suficientes datos de historial aún",
     "close": "Cerrar",
+    "continue": "Continuar",
+    "error": "Algo salió mal, intenta de nuevo",
     "countdown": {
       "closed": "Cerrado",
       "month_one": "{{count}} mes",
@@ -31,6 +33,7 @@
   "nav": {
     "home": "Inicio",
     "markets": "Mercados",
+    "leagues": "Ligas",
     "leaderboard": "Clasificación",
     "howItWorks": "Cómo funciona",
     "propose": "Proponer mercado",
@@ -381,6 +384,94 @@
   },
   "embed": {
     "cta": "Predice en VEREDIKT"
+  },
+  "leagues": {
+    "invite": {
+      "badge": "Liga privada",
+      "createdBy": "Creada por {{name}}",
+      "members": "{{n}} dentro",
+      "cta": "Unirme a la liga",
+      "free": "Gratis, con puntos. Entras en 20 segundos.",
+      "notFound": "Esta liga no existe o el link está mal"
+    },
+    "welcome": "Ya estás dentro. Tienes {{stack}} puntos para esta jornada",
+    "pending": {
+      "counter": "{{have}} de {{need}} para arrancar",
+      "share": "Invitar por WhatsApp",
+      "hint": "La liga arranca cuando se completen los lugares"
+    },
+    "scoring": "Resolviendo mercados… faltan {{n}}. Resultados hoy en la noche.",
+    "tabs": {
+      "picks": "Picks",
+      "table": "Tabla"
+    },
+    "progress": {
+      "pending": "Te faltan {{n}} picks",
+      "done": "Jornada completa 🎯"
+    },
+    "myRank": "Vas {{pos}}° de {{total}}",
+    "market": {
+      "predict": "Predecir",
+      "predicted": "{{n}} de {{m}} ya predijeron",
+      "closed": "Cerrado",
+      "missed": "No jugaste",
+      "seePicks": "Ver picks",
+      "hidePicks": "Ocultar picks"
+    },
+    "checklist": {
+      "empty": "Aún no hay mercados en este ciclo"
+    },
+    "sheet": {
+      "closes": "Cierra {{when}}",
+      "stakeAria": "Puntos a jugar",
+      "balance": "Te quedan {{n}} pts",
+      "minStake": "El mínimo es 100 pts",
+      "maxStake": "No te alcanzan los puntos",
+      "ifYouWin": "Si aciertas ganas",
+      "cap": "pago máximo 20x",
+      "pickFirst": "Elige una opción",
+      "confirm": "Confirmar pick",
+      "noChanges": "Los picks no se pueden cambiar"
+    },
+    "table": {
+      "member": "Miembro",
+      "points": "Puntos",
+      "hits": "Aciertos",
+      "provisional": "Tabla provisional, faltan {{n}} mercados por resolverse"
+    },
+    "result": {
+      "title": "Resultados · {{cycle}}",
+      "share": "Compartir resultado",
+      "nextCycle": "Arrancar siguiente ciclo",
+      "shareText": "{{winner}} se llevó {{cycle}} en nuestra liga \"{{league}}\" de Veredikt 🏆 Éntrale al siguiente ciclo:"
+    },
+    "list": {
+      "title": "Mis ligas",
+      "create": "Crear liga",
+      "createFirst": "Crear mi primera liga",
+      "emptyTitle": "Arma una liga con tus amigos",
+      "emptyBody": "Como una quiniela, pero con probabilidades en vivo. Gratis, con puntos.",
+      "pendingPicks": "Te faltan {{n}} picks",
+      "members": "{{n}} miembros",
+      "rank": "Vas {{pos}}°"
+    },
+    "create": {
+      "nameTitle": "Ponle nombre a tu liga",
+      "namePlaceholder": "Los compas del futbol",
+      "cycleTitle": "Elige la primera jornada",
+      "cycleHint": "Los mercados se agregan solos según la categoría y las fechas",
+      "cyclePlaceholder": "Jornada 8 Liga MX",
+      "allSubcats": "Todas las categorías",
+      "from": "Desde",
+      "to": "Hasta",
+      "cta": "Crear liga e invitar"
+    },
+    "countdown": {
+      "closed": "Cerrado",
+      "days": "Cierra en {{n}} días",
+      "hours": "Cierra en {{n}} h",
+      "minutes": "Cierra en {{n}} min"
+    }
   },
   "errors": {
     "unknown": "Error desconocido",

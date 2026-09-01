@@ -182,6 +182,7 @@ export function Navbar() {
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/mercados', label: t('nav.markets') },
+    { to: '/ligas', label: t('nav.leagues') },
     { to: '/clasificacion', label: t('nav.leaderboard') },
     { to: '/como-funciona', label: t('nav.howItWorks') },
     { to: '/proponer', label: t('nav.propose') },

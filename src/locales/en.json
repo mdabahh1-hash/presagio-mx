@@ -26,11 +26,14 @@
       "day_other": "{{count}} days",
       "resolved": "Resolved",
       "pending": "Pending result"
-    }
+    },
+    "continue": "Continue",
+    "error": "Something went wrong, try again"
   },
   "nav": {
     "home": "Home",
     "markets": "Markets",
+    "leagues": "Leagues",
     "leaderboard": "Leaderboard",
     "howItWorks": "How it works",
     "propose": "Propose a market",
@@ -381,6 +384,94 @@
   },
   "embed": {
     "cta": "Predict on VEREDIKT"
+  },
+  "leagues": {
+    "invite": {
+      "badge": "Private league",
+      "createdBy": "Created by {{name}}",
+      "members": "{{n}} in",
+      "cta": "Join the league",
+      "free": "Free, points only. Takes 20 seconds.",
+      "notFound": "This league doesn't exist or the link is wrong"
+    },
+    "welcome": "You're in. You have {{stack}} points for this round",
+    "pending": {
+      "counter": "{{have}} of {{need}} to kick off",
+      "share": "Invite via WhatsApp",
+      "hint": "The league starts once the spots are filled"
+    },
+    "scoring": "Resolving markets… {{n}} left. Results tonight.",
+    "tabs": {
+      "picks": "Picks",
+      "table": "Standings"
+    },
+    "progress": {
+      "pending": "{{n}} picks left",
+      "done": "Round complete 🎯"
+    },
+    "myRank": "You're {{pos}} of {{total}}",
+    "market": {
+      "predict": "Predict",
+      "predicted": "{{n}} of {{m}} already predicted",
+      "closed": "Closed",
+      "missed": "You sat this one out",
+      "seePicks": "See picks",
+      "hidePicks": "Hide picks"
+    },
+    "checklist": {
+      "empty": "No markets in this round yet"
+    },
+    "sheet": {
+      "closes": "Closes {{when}}",
+      "stakeAria": "Points to play",
+      "balance": "{{n}} pts left",
+      "minStake": "Minimum is 100 pts",
+      "maxStake": "Not enough points",
+      "ifYouWin": "If you're right you win",
+      "cap": "max payout 20x",
+      "pickFirst": "Pick an option",
+      "confirm": "Confirm pick",
+      "noChanges": "Picks are final"
+    },
+    "table": {
+      "member": "Member",
+      "points": "Points",
+      "hits": "Hits",
+      "provisional": "Provisional standings, {{n}} markets left to resolve"
+    },
+    "result": {
+      "title": "Results · {{cycle}}",
+      "share": "Share result",
+      "nextCycle": "Start next round",
+      "shareText": "{{winner}} took {{cycle}} in our Veredikt league \"{{league}}\" 🏆 Join the next round:"
+    },
+    "list": {
+      "title": "My leagues",
+      "create": "Create league",
+      "createFirst": "Create my first league",
+      "emptyTitle": "Start a league with your friends",
+      "emptyBody": "Like a pick'em pool, but with live probabilities. Free, points only.",
+      "pendingPicks": "{{n}} picks left",
+      "members": "{{n}} members",
+      "rank": "You're {{pos}}"
+    },
+    "create": {
+      "nameTitle": "Name your league",
+      "namePlaceholder": "The football crew",
+      "cycleTitle": "Pick the first round",
+      "cycleHint": "Markets are added automatically from the category and dates",
+      "cyclePlaceholder": "Liga MX Matchday 8",
+      "allSubcats": "All categories",
+      "from": "From",
+      "to": "To",
+      "cta": "Create league and invite"
+    },
+    "countdown": {
+      "closed": "Closed",
+      "days": "Closes in {{n}} days",
+      "hours": "Closes in {{n}} h",
+      "minutes": "Closes in {{n}} min"
+    }
   },
   "errors": {
     "unknown": "Unknown error",

@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { authApi, setToken } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { loginPasskey, supportsPasskeys, isPasskeyCancel } from '../lib/webauthn'
 import { translateApiError } from '../lib/errors'
+import { consumeReturnTo } from '../lib/returnTo'
 
 interface AuthModalProps {
   onClose: () => void
   initialMode?: 'login' | 'register'
+  // Flujos donde la passkey no va (landing de invitación de ligas: el login
+  // llega después del antojo y passkey se ofrece al final del onboarding).
+  hidePasskey?: boolean
 }
 
-export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
+export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false }: AuthModalProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [mode, setMode] = useState<'login' | 'register'>(initialMode)
   const [step, setStep] = useState<'form' | 'verify'>('form')
   const [name, setName] = useState('')
@@ -24,6 +30,14 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
   const [passkeyLoading, setPasskeyLoading] = useState(false)
   const [error, setError] = useState('')
   const { refreshUser } = useAuth()
+
+  // Si otra pantalla dejó un returnTo (p. ej. /l/:code?join=1), navegar ahí
+  // al terminar el login en vez de quedarse donde estaba el modal.
+  const finish = () => {
+    const dest = consumeReturnTo()
+    onClose()
+    if (dest) navigate(dest)
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -44,7 +58,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
         const result = await authApi.emailLogin(email, password)
         setToken(result.token)
         await refreshUser()
-        onClose()
+        finish()
       } else {
         await authApi.emailRegister(email, password, name)
         setPendingEmail(email)
@@ -66,7 +80,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
       setToken(result.token)
       track('Signup', { method: 'email' })
       await refreshUser()
-      onClose()
+      finish()
     } catch (err: unknown) {
       setError(translateApiError(err))
     } finally {
@@ -81,7 +95,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
       await loginPasskey()
       track('Login', { method: 'passkey' })
       await refreshUser()
-      onClose()
+      finish()
     } catch (err: unknown) {
       // User cancelled the browser prompt → stay quiet
       if (!isPasskeyCancel(err) && err instanceof Error && err.message) setError(translateApiError(err))
@@ -382,7 +396,7 @@ export function AuthModal({ onClose, initialMode = 'login' }: AuthModalProps) {
             </form>
 
             {/* Passkey login (solo modo login, si el navegador lo soporta) */}
-            {mode === 'login' && supportsPasskeys() && (
+            {!hidePasskey && mode === 'login' && supportsPasskeys() && (
               <>
                 <div style={{ height: 1, background: 'var(--border-subtle)', margin: '16px 0' }} />
                 <button

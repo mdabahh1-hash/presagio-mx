@@ -14,7 +14,10 @@ export function clearToken() {
   localStorage.removeItem('veredikt_token')
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+// Exported for feature-specific clients (leaguesApi). Attaches the token when
+// present and normalizes {code, message} errors; callers get e.message already
+// localized via errors.ts codes or the backend's Spanish message.
+export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken()
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
