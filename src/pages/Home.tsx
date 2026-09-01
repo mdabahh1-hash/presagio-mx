@@ -7,6 +7,7 @@ import { MarketCard } from '../components/MarketCard'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
+import { CategoryBar } from '../components/CategoryBar'
 import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
@@ -186,31 +187,7 @@ export function Home() {
     <div className="page-container" style={{ paddingTop: 20 }}>
 
       {/* One-line category tabs */}
-      <div className="cat-tabs tabs-scroll anim-1" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginBottom: 24 }}>
-        {MOBILE_TABS.map(tab => {
-          const isActive = tab === mobileTab
-          const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
-          const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
-          return (
-            <button
-              key={tab}
-              onClick={() => setMobileTab(tab)}
-              style={{
-                flexShrink: 0,
-                background: isActive ? activeBg : 'var(--bg-card)',
-                border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
-                borderRadius: 99, padding: '8px 16px',
-                fontSize: '0.82rem', fontWeight: 700,
-                color: isActive ? color : 'var(--text-secondary)',
-                cursor: 'pointer', fontFamily: 'DM Sans', whiteSpace: 'nowrap',
-                transition: 'all 0.15s',
-              }}
-            >
-              {tab === 'Tendencia' ? t('home.tabTrending') : tab}
-            </button>
-          )
-        })}
-      </div>
+      <CategoryBar active={mobileTab} onChange={setMobileTab} />
 
       {mobileTab === 'Tendencia' ? (
         <>

@@ -7,6 +7,7 @@ import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard'
 import { PnlChartCard } from '../components/profile/PnlChartCard'
 import { PositionsTable } from '../components/profile/PositionsTable'
 import { SettingsSection } from '../components/profile/SettingsSection'
+import { CategoryBar } from '../components/CategoryBar'
 import type { PricePoint } from '../types'
 
 const STARTING_POINTS = 10_000
@@ -39,7 +40,9 @@ export function Profile() {
 
   if (!user) {
     return (
-      <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
+      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 100 }}>
+        <CategoryBar />
+        <div style={{ paddingTop: 60, textAlign: 'center' }}>
         <div style={{
           width: 64, height: 64, borderRadius: '50%',
           background: 'var(--bg-elevated)',
@@ -64,6 +67,7 @@ export function Profile() {
             {t('profile.loginGoogle')}
           </button>
         </a>
+        </div>
       </div>
     )
   }
@@ -77,7 +81,8 @@ export function Profile() {
   const biggestWin = wins.length ? Math.max(...wins.map(e => e.amount)) : null
 
   return (
-    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
+    <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
+      <CategoryBar />
 
       {/* Fila superior: perfil + P&L */}
       <div className="anim-1 profile-top-grid">

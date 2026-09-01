@@ -8,6 +8,7 @@ import { HistoryList } from '../components/HistoryList'
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard'
 import { PnlChartCard } from '../components/profile/PnlChartCard'
 import { PositionsTable } from '../components/profile/PositionsTable'
+import { CategoryBar } from '../components/CategoryBar'
 import { track } from '../lib/analytics'
 import { formatNum } from '../lib/format'
 
@@ -67,7 +68,8 @@ export function PublicProfile() {
 
   if (loading) {
     return (
-      <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
+      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
+        <CategoryBar />
         <div className="profile-top-grid">
           <div className="card" style={{ height: 260, animation: 'livePulse 1.8s ease infinite' }} />
           <div className="card" style={{ height: 260, animation: 'livePulse 1.8s ease infinite' }} />
@@ -78,11 +80,14 @@ export function PublicProfile() {
 
   if (notFound || !profile) {
     return (
-      <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '100px 24px', textAlign: 'center' }}>
+      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 100 }}>
+        <CategoryBar />
+        <div style={{ paddingTop: 80, textAlign: 'center' }}>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('publicProfile.notFound')}</p>
         <Link to="/clasificacion" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
           {t('publicProfile.seeLeaderboard')}
         </Link>
+        </div>
       </div>
     )
   }
@@ -93,7 +98,8 @@ export function PublicProfile() {
   const biggestWin = wins.length ? Math.max(...wins.map(e => e.amount)) : null
 
   return (
-    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
+    <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
+      <CategoryBar />
       {/* Fila superior: perfil + P&L (sin chart — el ledger ajeno es privado) */}
       <div className="anim-1 profile-top-grid">
         <ProfileHeaderCard
