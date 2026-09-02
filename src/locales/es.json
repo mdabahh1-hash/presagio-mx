@@ -3,15 +3,15 @@
     "yes": "Sí",
     "no": "No",
     "loading": "Cargando...",
-    "back": "← Volver",
+    "back": "Volver",
     "share": "Compartir",
-    "copied": "✓ ¡Copiado!",
+    "copied": "¡Copiado!",
     "copyLink": "Copiar enlace",
     "copy": "Copiar",
     "live": "En vivo",
-    "trendingBadge": "▲ TENDENCIA",
-    "multiBadge": "MULTI",
-    "pendingBadge": "POR RESOLVERSE",
+    "trendingBadge": "Tendencia",
+    "multiBadge": "Multi",
+    "pendingBadge": "Por resolverse",
     "noHistory": "Sin suficientes datos de historial aún",
     "close": "Cerrar",
     "continue": "Continuar",
@@ -70,7 +70,7 @@
     "terms": "Términos",
     "privacy": "Privacidad",
     "integrity": "Integridad del mercado",
-    "languageTag": "🌐 Español",
+    "languageTag": "Español",
     "disclaimer": "VEREDIKT es un mercado de predicciones que opera con puntos virtuales. No involucra dinero real ni apuestas con dinero real. Solo con fines de entretenimiento."
   },
   "auth": {
@@ -145,7 +145,7 @@
     "vol": "Vol",
     "liq": "Liq",
     "waitingResolution": "Por resolverse",
-    "more": "+ {{count}} más →"
+    "more": "+ {{count}} más"
   },
   "carousel": {
     "prevMarket": "Mercado anterior",
@@ -168,10 +168,10 @@
   "market": {
     "loading": "Cargando mercado...",
     "notFound": "Mercado no encontrado.",
-    "backToMarkets": "← Volver a mercados",
+    "backToMarkets": "Volver a mercados",
     "breadcrumbMarkets": "Mercados",
-    "resolvedYes": "Resultado oficial: SÍ ✓",
-    "resolvedNo": "Resultado oficial: NO ✗",
+    "resolvedYes": "Resultado oficial: Sí",
+    "resolvedNo": "Resultado oficial: No",
     "winner": "Ganador: {{label}}",
     "historyTitle": "Probabilidad histórica",
     "periodAll": "Todo",
@@ -224,7 +224,7 @@
     "buyBtn": "COMPRAR {{side}} · {{amount}} PT",
     "betBtn": "APOSTAR \"{{label}}\" · {{amount}} PT",
     "loginToTrade": "Inicia sesión para operar",
-    "loginToTradeLink": "Inicia sesión para operar →",
+    "loginToTradeLink": "Inicia sesión para operar",
     "disclaimer": "VEREDIKT opera con puntos virtuales. No se involucra dinero real.",
     "successBinary": "Compraste {{shares}} acciones {{side}} por {{cost}} PT",
     "successMulti": "Compraste {{shares}} acciones de \"{{label}}\" por {{cost}} PT",
@@ -239,18 +239,18 @@
     "emailNotifSub": "Te avisamos cuando tus mercados se resuelven",
     "securityTitle": "Seguridad",
     "securitySub": "Passkey: entra con Face ID, Touch ID o tu llave de seguridad",
-    "passkeyConfigured": "Configurada ✓",
+    "passkeyConfigured": "Configurada",
     "passkeyDelete": "Eliminar",
     "passkeyAdd": "Agregar passkey",
     "passkeyWaiting": "Esperando...",
-    "passkeyAdded": "Passkey agregada ✓",
+    "passkeyAdded": "Passkey agregada",
     "passkeyRemoved": "Passkey eliminada",
     "passkeyAddError": "No se pudo agregar la passkey",
     "tabPositions": "Posiciones",
     "tabHistory": "Historial",
     "sharesAbbr": "{{value}} acc.",
     "noPositions": "Sin posiciones abiertas",
-    "explore": "Explorar mercados →",
+    "explore": "Explorar mercados",
     "historyBadgeBuy": "Compra",
     "historyBadgeWin": "Acierto",
     "historyBadgeLoss": "Fallo",
@@ -294,11 +294,11 @@
     "inviteFriends": "Invitar amigos",
     "settingsTitle": "Configuración",
     "shareProfile": "Compartir perfil",
-    "copiedLink": "Enlace copiado ✓"
+    "copiedLink": "Enlace copiado"
   },
   "publicProfile": {
     "notFound": "Usuario no encontrado.",
-    "seeLeaderboard": "← Ver clasificación",
+    "seeLeaderboard": "Ver clasificación",
     "memberSince": "Miembro desde {{date}}",
     "followers_one": "1 seguidor",
     "followers_other": "{{count}} seguidores",
@@ -309,7 +309,7 @@
     "invested": "Invertido",
     "openPositions": "Posiciones abiertas",
     "noOpenPositions": "Sin posiciones abiertas.",
-    "followingBtn": "Siguiendo ✓",
+    "followingBtn": "Siguiendo",
     "follow": "Seguir"
   },
   "following": {
@@ -317,9 +317,9 @@
     "tabActivity": "Actividad",
     "tabUsers": "Usuarios",
     "loginPrompt": "Inicia sesión para seguir a otros usuarios.",
-    "backHome": "← Volver al inicio",
+    "backHome": "Volver al inicio",
     "emptyFollow": "Aún no sigues a nadie.",
-    "seeLeaderboard": "Ver clasificación →",
+    "seeLeaderboard": "Ver clasificación",
     "loadError": "No se pudo cargar la lista. Intenta más tarde.",
     "noActivity": "Los usuarios que sigues todavía no hacen ninguna jugada.",
     "bought": "compró",
@@ -330,7 +330,7 @@
     "balanceLabel": "Saldo",
     "investedLabel": "Invertido",
     "precisionLabel": "Precisión",
-    "followingBtn": "Siguiendo ✓",
+    "followingBtn": "Siguiendo",
     "positions_one": "{{count}} posición",
     "positions_other": "{{count}} posiciones",
     "noPositionsShort": "Sin posiciones abiertas",
@@ -373,7 +373,7 @@
     "faq2A": "El precio de SÍ es la probabilidad estimada por el mercado (de 1% a 99%). Cuando la gente compra SÍ, sube; cuando compra NO, baja.",
     "faq3Q": "¿Cuánto puedo ganar?",
     "faq3A": "Cada acción que aciertas paga 100 PT. Si compras SÍ a 40% (40 PT por acción) y aciertas, ganas 100 PT por acción: una ganancia de 60 PT.",
-    "cta": "EXPLORAR MERCADOS →"
+    "cta": "Explorar mercados"
   },
   "propose": {
     "title": "Proponer mercado",
@@ -392,7 +392,7 @@
   "referral": {
     "title": "Invita y ganen 2,000 PT cada uno",
     "sub": "Comparte tu link. Cuando tu invitado haga su primera predicción, ambos reciben 2,000 PT.",
-    "shareText": "🔮 Únete a VEREDIKT, el mercado de predicción. Si te registras con mi link, ganamos 2,000 PT cada uno cuando hagas tu primera predicción:",
+    "shareText": "Únete a VEREDIKT, el mercado de predicción. Si te registras con mi link, ganamos 2,000 PT cada uno cuando hagas tu primera predicción:",
     "shareWhatsApp": "Compartir en WhatsApp",
     "shareX": "Compartir en X"
   },
@@ -421,7 +421,7 @@
     },
     "progress": {
       "pending": "Te faltan {{n}} picks",
-      "done": "Jornada completa 🎯"
+      "done": "Jornada completa"
     },
     "myRank": "Vas {{pos}}° de {{total}}",
     "market": {
@@ -457,7 +457,7 @@
       "title": "Resultados · {{cycle}}",
       "share": "Compartir resultado",
       "nextCycle": "Arrancar siguiente ciclo",
-      "shareText": "{{winner}} se llevó {{cycle}} en nuestra liga \"{{league}}\" de Veredikt 🏆 Éntrale al siguiente ciclo:"
+      "shareText": "{{winner}} se llevó {{cycle}} en nuestra liga \"{{league}}\" de Veredikt Éntrale al siguiente ciclo:"
     },
     "list": {
       "title": "Mis ligas",

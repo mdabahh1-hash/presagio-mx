@@ -126,7 +126,7 @@ export function Markets() {
               <span style={{ color: 'var(--text-tertiary)' }}>{t('common.loading')}</span>
             ) : (
               <>
-                <span style={{ color: 'var(--green)', fontWeight: 700, fontFamily: 'DM Mono' }}>{markets.length}</span>
+                <span style={{ color: 'var(--green)', fontWeight: 700 }}>{markets.length}</span>
                 {' '}{t('markets.activeCount')}
               </>
             )}
@@ -136,8 +136,7 @@ export function Markets() {
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
           border: '1px solid var(--gold)', color: 'var(--gold)',
-          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem',
-          fontFamily: 'DM Sans', whiteSpace: 'nowrap', flexShrink: 0,
+          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem', whiteSpace: 'nowrap', flexShrink: 0,
         }}>
           {t('home.proposeCta')}
         </Link>
@@ -173,7 +172,6 @@ export function Markets() {
                 flex: 1, background: 'transparent', border: 'none',
                 outline: 'none', padding: '13px 14px',
                 fontSize: '0.875rem', color: 'var(--text-primary)',
-                fontFamily: 'DM Sans',
               }}
             />
             {searchInput && (
@@ -209,7 +207,6 @@ export function Markets() {
                     fontSize: '0.78rem', fontWeight: 600,
                     color: isActive ? color : 'var(--text-tertiary)',
                     cursor: 'pointer', transition: 'all 0.15s',
-                    fontFamily: 'DM Sans',
                   }}
                 >
                   {cat === 'Todos' ? t('markets.allCategory') : cat}
@@ -227,7 +224,6 @@ export function Markets() {
                 borderRadius: 10, padding: '9px 14px',
                 fontSize: '0.8rem', color: 'var(--text-secondary)',
                 outline: 'none', cursor: 'pointer',
-                fontFamily: 'DM Sans',
               }}
             >
               {sortOptions.map(opt => (
@@ -261,7 +257,6 @@ export function Markets() {
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 99, padding: '3px 10px',
-                fontFamily: 'DM Mono',
               }}>
                 {t('markets.resultCount', { count: markets.length })}
               </span>

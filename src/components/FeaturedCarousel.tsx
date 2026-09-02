@@ -237,7 +237,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                   <div>
                     <span style={{
                       fontSize: 'clamp(2.4rem, 3vw, 3.2rem)',
-                      fontWeight: 800, fontFamily: 'DM Mono',
+                      fontWeight: 700,
                       color: yesColor, lineHeight: 1, letterSpacing: '-0.04em',
                     }}>
                       {pair.yes}%
@@ -245,7 +245,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                     <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 500 }}>{t('common.yes')}</span>
                   </div>
                   <div style={{ paddingBottom: 5, opacity: 0.5 }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 600, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                       {pair.no}%
                     </span>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 500 }}>{t('common.no')}</span>

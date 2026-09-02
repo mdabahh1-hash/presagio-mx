@@ -3,15 +3,15 @@
     "yes": "Yes",
     "no": "No",
     "loading": "Loading...",
-    "back": "← Back",
+    "back": "Back",
     "share": "Share",
-    "copied": "✓ Copied!",
+    "copied": "Copied!",
     "copyLink": "Copy link",
     "copy": "Copy",
     "live": "Live",
-    "trendingBadge": "▲ TRENDING",
-    "multiBadge": "MULTI",
-    "pendingBadge": "PENDING RESULT",
+    "trendingBadge": "Trending",
+    "multiBadge": "Multi",
+    "pendingBadge": "Pending result",
     "noHistory": "Not enough price history yet",
     "close": "Close",
     "countdown": {
@@ -70,7 +70,7 @@
     "terms": "Terms",
     "privacy": "Privacy",
     "integrity": "Market integrity",
-    "languageTag": "🌐 English",
+    "languageTag": "English",
     "disclaimer": "VEREDIKT is a prediction market that runs on virtual points. It involves no real money and no real-money betting. For entertainment purposes only."
   },
   "auth": {
@@ -145,7 +145,7 @@
     "vol": "Vol",
     "liq": "Liq",
     "waitingResolution": "Awaiting resolution",
-    "more": "+ {{count}} more →"
+    "more": "+ {{count}} more"
   },
   "carousel": {
     "prevMarket": "Previous market",
@@ -168,10 +168,10 @@
   "market": {
     "loading": "Loading market...",
     "notFound": "Market not found.",
-    "backToMarkets": "← Back to markets",
+    "backToMarkets": "Back to markets",
     "breadcrumbMarkets": "Markets",
-    "resolvedYes": "Official result: YES ✓",
-    "resolvedNo": "Official result: NO ✗",
+    "resolvedYes": "Official result: Yes",
+    "resolvedNo": "Official result: No",
     "winner": "Winner: {{label}}",
     "historyTitle": "Price history",
     "periodAll": "All",
@@ -224,7 +224,7 @@
     "buyBtn": "BUY {{side}} · {{amount}} PT",
     "betBtn": "BET \"{{label}}\" · {{amount}} PT",
     "loginToTrade": "Log in to trade",
-    "loginToTradeLink": "Log in to trade →",
+    "loginToTradeLink": "Log in to trade",
     "disclaimer": "VEREDIKT runs on virtual points. No real money is involved.",
     "successBinary": "You bought {{shares}} {{side}} shares for {{cost}} PT",
     "successMulti": "You bought {{shares}} shares of \"{{label}}\" for {{cost}} PT",
@@ -239,18 +239,18 @@
     "emailNotifSub": "We'll let you know when your markets resolve",
     "securityTitle": "Security",
     "securitySub": "Passkey: sign in with Face ID, Touch ID or your security key",
-    "passkeyConfigured": "Set up ✓",
+    "passkeyConfigured": "Set up",
     "passkeyDelete": "Remove",
     "passkeyAdd": "Add passkey",
     "passkeyWaiting": "Waiting...",
-    "passkeyAdded": "Passkey added ✓",
+    "passkeyAdded": "Passkey added",
     "passkeyRemoved": "Passkey removed",
     "passkeyAddError": "Couldn't add the passkey",
     "tabPositions": "Positions",
     "tabHistory": "History",
     "sharesAbbr": "{{value}} sh.",
     "noPositions": "No open positions",
-    "explore": "Explore markets →",
+    "explore": "Explore markets",
     "historyBadgeBuy": "Buy",
     "historyBadgeWin": "Win",
     "historyBadgeLoss": "Loss",
@@ -294,11 +294,11 @@
     "inviteFriends": "Invite friends",
     "settingsTitle": "Settings",
     "shareProfile": "Share profile",
-    "copiedLink": "Link copied ✓"
+    "copiedLink": "Link copied"
   },
   "publicProfile": {
     "notFound": "User not found.",
-    "seeLeaderboard": "← See leaderboard",
+    "seeLeaderboard": "See leaderboard",
     "memberSince": "Member since {{date}}",
     "followers_one": "1 follower",
     "followers_other": "{{count}} followers",
@@ -309,7 +309,7 @@
     "invested": "Invested",
     "openPositions": "Open positions",
     "noOpenPositions": "No open positions.",
-    "followingBtn": "Following ✓",
+    "followingBtn": "Following",
     "follow": "Follow"
   },
   "following": {
@@ -317,9 +317,9 @@
     "tabActivity": "Activity",
     "tabUsers": "Users",
     "loginPrompt": "Log in to follow other users.",
-    "backHome": "← Back to home",
+    "backHome": "Back to home",
     "emptyFollow": "You're not following anyone yet.",
-    "seeLeaderboard": "See leaderboard →",
+    "seeLeaderboard": "See leaderboard",
     "loadError": "Couldn't load the list. Try again later.",
     "noActivity": "The users you follow haven't made any trades yet.",
     "bought": "bought",
@@ -330,7 +330,7 @@
     "balanceLabel": "Balance",
     "investedLabel": "Invested",
     "precisionLabel": "Accuracy",
-    "followingBtn": "Following ✓",
+    "followingBtn": "Following",
     "positions_one": "{{count}} position",
     "positions_other": "{{count}} positions",
     "noPositionsShort": "No open positions",
@@ -373,7 +373,7 @@
     "faq2A": "The YES price is the market's estimated probability (from 1% to 99%). When people buy YES it goes up; when they buy NO it goes down.",
     "faq3Q": "How much can I win?",
     "faq3A": "Each winning share pays 100 PT. If you buy YES at 40% (40 PT per share) and you're right, you earn 100 PT per share: a 60 PT gain.",
-    "cta": "EXPLORE MARKETS →"
+    "cta": "Explore markets"
   },
   "propose": {
     "title": "Propose a market",
@@ -392,7 +392,7 @@
   "referral": {
     "title": "Invite a friend, you each earn 2,000 PT",
     "sub": "Share your link. When your invitee makes their first prediction, you both get 2,000 PT.",
-    "shareText": "🔮 Join VEREDIKT, the prediction market. If you sign up with my link, we each earn 2,000 PT when you make your first prediction:",
+    "shareText": "Join VEREDIKT, the prediction market. If you sign up with my link, we each earn 2,000 PT when you make your first prediction:",
     "shareWhatsApp": "Share on WhatsApp",
     "shareX": "Share on X"
   },
@@ -421,7 +421,7 @@
     },
     "progress": {
       "pending": "{{n}} picks left",
-      "done": "Round complete 🎯"
+      "done": "Round complete"
     },
     "myRank": "You're {{pos}} of {{total}}",
     "market": {
@@ -457,7 +457,7 @@
       "title": "Results · {{cycle}}",
       "share": "Share result",
       "nextCycle": "Start next round",
-      "shareText": "{{winner}} took {{cycle}} in our Veredikt league \"{{league}}\" 🏆 Join the next round:"
+      "shareText": "{{winner}} took {{cycle}} in our Veredikt league \"{{league}}\" Join the next round:"
     },
     "list": {
       "title": "My leagues",

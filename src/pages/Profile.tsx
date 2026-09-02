@@ -59,8 +59,7 @@ export function Profile() {
         <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
           <button style={{
             background: 'linear-gradient(135deg, var(--brand), #b03018)',
-            border: 'none', padding: '14px 32px', color: '#fff',
-            fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.9rem',
+            border: 'none', padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: '0.9rem',
             borderRadius: 12, cursor: 'pointer',
             boxShadow: '0 6px 24px var(--oro-glow)',
           }}>
@@ -113,7 +112,7 @@ export function Profile() {
               padding: '10px 18px',
               fontSize: '0.85rem', fontWeight: 700,
               color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-              cursor: 'pointer', fontFamily: 'DM Sans',
+              cursor: 'pointer',
               letterSpacing: '0.05em', textTransform: 'capitalize',
               transition: 'color 0.15s', marginBottom: -1,
             }}

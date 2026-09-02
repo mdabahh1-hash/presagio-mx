@@ -114,7 +114,7 @@ export function SettingsSection({ open }: { open: boolean }) {
                   style={{
                     background: 'transparent', border: '1px solid var(--border-default)',
                     borderRadius: 8, padding: '7px 12px', fontSize: '0.75rem',
-                    color: 'var(--text-tertiary)', cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 600,
+                    color: 'var(--text-tertiary)', cursor: 'pointer', fontWeight: 600,
                     opacity: passkeyBusy ? 0.6 : 1,
                   }}
                 >
@@ -128,7 +128,7 @@ export function SettingsSection({ open }: { open: boolean }) {
                 style={{
                   background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
                   borderRadius: 10, padding: '9px 16px', fontSize: '0.8rem',
-                  color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'DM Sans', fontWeight: 700,
+                  color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700,
                   flexShrink: 0, opacity: passkeyBusy ? 0.6 : 1,
                 }}
               >
@@ -155,7 +155,7 @@ export function SettingsSection({ open }: { open: boolean }) {
           border: '1px solid var(--red-border)',
           borderRadius: 10, padding: '10px 20px',
           fontSize: '0.8rem', color: 'var(--red)', fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'DM Sans',
+          cursor: 'pointer',
         }}
       >
         {t('profile.logout')}

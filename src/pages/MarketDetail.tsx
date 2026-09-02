@@ -278,7 +278,7 @@ export function MarketDetail() {
           onClick={() => navigate(-1)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-            color: 'var(--text-tertiary)', fontSize: '0.78rem', fontFamily: 'DM Sans',
+            color: 'var(--text-tertiary)', fontSize: '0.78rem',
             display: 'flex', alignItems: 'center', gap: 4, transition: 'color 0.15s',
           }}
         >
@@ -401,7 +401,7 @@ export function MarketDetail() {
                       }}
                     >
                       <span style={{
-                        fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 600, width: 28, flexShrink: 0,
+                        fontSize: '0.72rem', fontWeight: 600, width: 28, flexShrink: 0,
                         color: i === 0 ? 'var(--gold)' : 'var(--text-tertiary)',
                       }}>
                         #{i + 1}
@@ -415,7 +415,7 @@ export function MarketDetail() {
                       </div>
                       <span style={{
                         width: 48, textAlign: 'right', flexShrink: 0,
-                        fontSize: '0.88rem', fontFamily: 'DM Mono', fontWeight: 700,
+                        fontSize: '0.88rem', fontWeight: 700,
                         color: isWinner ? 'var(--green)' : 'var(--gold)',
                       }}>
                         {o.price.toFixed(1)}%
@@ -430,7 +430,7 @@ export function MarketDetail() {
                   <div>
                     <span style={{
                       fontSize: 'clamp(3rem, 6vw, 4.5rem)',
-                      fontWeight: 800, fontFamily: 'DM Mono',
+                      fontWeight: 700,
                       color: yesColor, lineHeight: 1,
                       letterSpacing: '-0.04em',
                     }}>
@@ -439,7 +439,7 @@ export function MarketDetail() {
                     <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 500 }}>{t('common.yes')}</span>
                   </div>
                   <div style={{ paddingBottom: 8, opacity: 0.5 }}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 600, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
                       {pair.no}%
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 500 }}>{t('common.no')}</span>
@@ -498,7 +498,7 @@ export function MarketDetail() {
                       borderRadius: 99, background: 'var(--bg-elevated)',
                       border: `1px solid ${copied ? 'var(--green)' : 'var(--border-default)'}`,
                       color: copied ? 'var(--green)' : 'var(--text-secondary)', cursor: 'pointer',
-                      fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
+                      fontSize: '0.78rem', fontWeight: 600,
                     }}
                   >
                     {copied ? t('common.copied') : t('common.copyLink')}
@@ -512,10 +512,10 @@ export function MarketDetail() {
                       borderRadius: 99, background: showEmbed ? 'var(--bg-elevated-hover, var(--bg-elevated))' : 'var(--bg-elevated)',
                       border: `1px solid ${showEmbed ? 'var(--gold)' : 'var(--border-default)'}`,
                       color: showEmbed ? 'var(--gold)' : 'var(--text-secondary)', cursor: 'pointer',
-                      fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
+                      fontSize: '0.78rem', fontWeight: 600,
                     }}
                   >
-                    <span style={{ fontFamily: 'DM Mono', fontSize: '0.8rem' }}>&lt;/&gt;</span>
+                    <span style={{ fontSize: '0.8rem' }}>&lt;/&gt;</span>
                     {t('market.embedBtn')}
                   </button>
                 </div>
@@ -533,7 +533,7 @@ export function MarketDetail() {
                       style={{
                         height: 30, padding: '0 12px', borderRadius: 99, cursor: 'pointer',
                         background: embedCopied ? 'var(--green)' : 'var(--gold)', color: '#0b0b0d',
-                        border: 'none', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'DM Sans',
+                        border: 'none', fontSize: '0.75rem', fontWeight: 700,
                       }}
                     >
                       {embedCopied ? t('common.copied') : t('market.embedCopy')}
@@ -557,8 +557,7 @@ export function MarketDetail() {
                     onFocus={e => e.currentTarget.select()}
                     spellCheck={false}
                     style={{
-                      width: '100%', boxSizing: 'border-box', height: 150, resize: 'vertical',
-                      fontFamily: 'DM Mono, monospace', fontSize: '0.68rem', lineHeight: 1.4,
+                      width: '100%', boxSizing: 'border-box', height: 150, resize: 'vertical', fontSize: '0.68rem', lineHeight: 1.4,
                       background: 'var(--bg-base)', color: 'var(--text-secondary)',
                       border: '1px solid var(--border-subtle)', borderRadius: 8, padding: 10,
                     }}
@@ -583,7 +582,7 @@ export function MarketDetail() {
                       borderRadius: 6, padding: '4px 10px',
                       fontSize: '0.72rem', fontWeight: 600,
                       color: chartRange === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                      cursor: 'pointer', fontFamily: 'DM Mono',
+                      cursor: 'pointer',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -734,8 +733,7 @@ export function MarketDetail() {
                 marginLeft: 8, background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 99, padding: '1px 8px',
-                fontSize: '0.68rem', color: 'var(--text-tertiary)',
-                fontFamily: 'DM Mono', fontWeight: 600,
+                fontSize: '0.68rem', color: 'var(--text-tertiary)', fontWeight: 600,
               }}>
                 {comments.length}
               </span>
@@ -756,8 +754,7 @@ export function MarketDetail() {
                       background: 'var(--bg-surface)',
                       border: '1px solid var(--border-default)',
                       borderRadius: 10, padding: '12px 14px',
-                      fontSize: '0.875rem', color: 'var(--text-primary)',
-                      fontFamily: 'DM Sans', resize: 'vertical', outline: 'none',
+                      fontSize: '0.875rem', color: 'var(--text-primary)', resize: 'vertical', outline: 'none',
                       transition: 'border-color 0.15s',
                     }}
                   />
@@ -770,7 +767,7 @@ export function MarketDetail() {
                       border: '1px solid var(--border-default)',
                       borderRadius: 8, padding: '9px 18px',
                       fontSize: '0.78rem', color: 'var(--text-primary)',
-                      fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans',
+                      fontWeight: 600, cursor: 'pointer',
                       transition: 'all 0.15s',
                     }}
                   >

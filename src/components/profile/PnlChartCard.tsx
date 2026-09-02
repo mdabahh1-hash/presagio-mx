@@ -47,7 +47,7 @@ export function PnlChartCard({ pointsHistory, pnl, subStats }: Props) {
             </span>
           </div>
           <div className="font-mono" style={{
-            fontSize: '2.4rem', fontWeight: 800, color: pnlColor,
+            fontSize: '2.4rem', fontWeight: 700, color: pnlColor,
             letterSpacing: '-0.04em', lineHeight: 1.15, marginTop: 6,
           }}>
             {formatPnl(pnl)}

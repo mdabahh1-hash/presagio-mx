@@ -118,14 +118,14 @@ function ChartTooltip({ xView, viewW, title, rows }: { xView: number; viewW: num
       boxShadow: '0 8px 24px var(--shadow-menu)', borderRadius: 8,
       padding: '8px 10px', pointerEvents: 'none', zIndex: 2, minWidth: 120,
     }}>
-      <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', fontFamily: 'DM Mono', marginBottom: rows.length ? 6 : 0, whiteSpace: 'nowrap' }}>
+      <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginBottom: rows.length ? 6 : 0, whiteSpace: 'nowrap' }}>
         {title}
       </div>
       {rows.map(r => (
         <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.75rem', lineHeight: 1.6, whiteSpace: 'nowrap' }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: r.color, flexShrink: 0 }} />
           <span style={{ color: 'var(--text-secondary)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 180 }}>{r.label}</span>
-          <span style={{ fontFamily: 'DM Mono', fontWeight: 700, color: 'var(--text-primary)' }}>{r.value}</span>
+          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{r.value}</span>
         </div>
       ))}
     </div>
@@ -259,12 +259,12 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
           {/* Y labels */}
           {yTicks.map(tk => (
             <text key={tk.label} x={padL - 4} y={Number(tk.y) + 4} textAnchor="end"
-              fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">{tk.label}</text>
+              fill="var(--text-tertiary)" fontSize="10" fontFamily="Inter, system-ui, sans-serif" style={{ fontVariantNumeric: "tabular-nums" }}>{tk.label}</text>
           ))}
           {/* X labels */}
           {xTicks.map(tk => (
             <text key={tk.key} x={tk.x} y={H - 6} textAnchor={tk.key === 0 ? 'start' : tk.key === xTicks.length - 1 ? 'end' : 'middle'}
-              fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">{tk.label}</text>
+              fill="var(--text-tertiary)" fontSize="10" fontFamily="Inter, system-ui, sans-serif" style={{ fontVariantNumeric: "tabular-nums" }}>{tk.label}</text>
           ))}
         </svg>
         {hover && <ChartTooltip xView={hover.x} viewW={W} title={hover.title} rows={hover.rows} />}
@@ -279,7 +279,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
               <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                 {s.label}
               </span>
-              <span style={{ fontSize: '0.7rem', fontFamily: 'DM Mono', fontWeight: 700, color: s.color }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: s.color }}>
                 {last !== null && last !== undefined ? `${last.toFixed(1)}%` : '—'}
               </span>
             </div>
@@ -491,7 +491,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
         {/* Y axis labels */}
         {yTicks.map(tk => (
           <text key={tk.label} x={padL - 4} y={Number(tk.y) + 4} textAnchor="end"
-            fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="Inter, system-ui, sans-serif" style={{ fontVariantNumeric: "tabular-nums" }}>
             {tk.label}
           </text>
         ))}
@@ -500,7 +500,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
         {xTicks.map(tk => (
           <text key={tk.key} x={tk.x} y={height - 6}
             textAnchor={tk.key === 0 ? 'start' : tk.key === xTicks[xTicks.length - 1].key ? 'end' : 'middle'}
-            fill="var(--text-tertiary)" fontSize="10" fontFamily="DM Mono">
+            fill="var(--text-tertiary)" fontSize="10" fontFamily="Inter, system-ui, sans-serif" style={{ fontVariantNumeric: "tabular-nums" }}>
             {tk.label}
           </text>
         ))}

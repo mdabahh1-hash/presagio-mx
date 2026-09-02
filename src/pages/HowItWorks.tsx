@@ -33,8 +33,7 @@ export function HowItWorks() {
             <div style={{
               flexShrink: 0, width: 42, height: 42, borderRadius: 12,
               background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'DM Mono', fontWeight: 700, fontSize: '1.1rem', color: 'var(--gold)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem', color: 'var(--gold)',
             }}>
               {s.n}
             </div>
@@ -68,7 +67,7 @@ export function HowItWorks() {
         <Link to="/mercados" style={{ textDecoration: 'none' }}>
           <button style={{
             background: 'var(--oro-fill)', border: 'none', padding: '15px 36px',
-            color: '#07071A', fontFamily: 'DM Sans', fontWeight: 700,
+            color: '#07071A', fontWeight: 700,
             fontSize: '0.9rem', letterSpacing: '0.02em', borderRadius: 12, cursor: 'pointer',
             boxShadow: '0 8px 32px var(--oro-glow)',
           }}>

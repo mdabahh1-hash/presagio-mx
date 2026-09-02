@@ -65,7 +65,7 @@ html[data-theme='light'] {
 }
 .lg-invite--error { color: var(--lg-muted); }
 .lg-invite__badge { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lg-muted); }
-.lg-invite__name { font-size: 28px; font-weight: 800; margin: 0; }
+.lg-invite__name { font-size: 28px; font-weight: 700; margin: 0; }
 .lg-invite__creator { color: var(--lg-muted); margin: 0; }
 .lg-invite__members { display: flex; align-items: center; margin: 8px 0; }
 .lg-invite__count { margin-left: 12px; font-size: 14px; color: var(--lg-muted); }
@@ -82,7 +82,7 @@ html[data-theme='light'] {
 
 /* ---------------------------------------------------------------- header y tabs */
 .lg-header { margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
-.lg-header__name { font-size: 22px; font-weight: 800; margin: 0 0 6px; }
+.lg-header__name { font-size: 22px; font-weight: 700; margin: 0 0 6px; }
 .lg-header__cycle { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .lg-tabs { display: flex; border-bottom: 1px solid var(--lg-border); margin: 12px 0; }
@@ -172,7 +172,7 @@ html[data-theme='light'] {
   display: flex; flex-direction: column; gap: 2px;
 }
 .lg-payout__label { font-size: 13px; color: var(--lg-muted); }
-.lg-payout__value { font-size: 26px; font-weight: 800; color: var(--lg-success); }
+.lg-payout__value { font-size: 26px; font-weight: 700; color: var(--lg-success); }
 .lg-payout__cap { font-size: 12px; color: var(--lg-muted); }
 
 /* ---------------------------------------------------------------- tabla */
@@ -191,7 +191,7 @@ html[data-theme='light'] {
 .lg-podium__slot--2 { border-color: #94a3b8; }
 .lg-podium__slot--3 { border-color: #b45309; }
 .lg-podium__name { font-weight: 700; font-size: 14px; }
-.lg-podium__pts { font-size: 15px; font-weight: 800; }
+.lg-podium__pts { font-size: 15px; font-weight: 700; }
 .lg-podium__hits { font-size: 12px; color: var(--lg-muted); }
 
 /* ---------------------------------------------------------------- pending */

@@ -17,6 +17,8 @@ export interface Market {
   description: string
   category: Category
   subcategory?: string | null
+  // Imagen cuadrada (https:// o /img/...); null → fallback por liga/categoría
+  imageUrl?: string | null
   yesPrice: number
   volume: number
   liquidity: number

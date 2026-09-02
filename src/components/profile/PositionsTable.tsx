@@ -82,8 +82,7 @@ export function PositionsTable({ positions, history }: Props) {
   }, [history, q, sortDesc])
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
-    padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-    fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 600,
+    padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
     background: active ? 'var(--bg-elevated)' : 'transparent',
     color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
     transition: 'all 0.15s',

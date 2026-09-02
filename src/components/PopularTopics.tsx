@@ -51,7 +51,7 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
               }}>
                 {m.question}
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontFamily: 'DM Mono', marginTop: 2 }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
                 {m.volume > 0 ? t('popular.volumeLine', { vol: formatVolume(m.volume) }) : t('popular.trending')}
               </div>
             </div>

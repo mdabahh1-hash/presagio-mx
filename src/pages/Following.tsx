@@ -21,7 +21,7 @@ function Avatar({ name, url, size = 48 }: { name: string; url?: string | null; s
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.34, fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
+      fontSize: size * 0.34, fontWeight: 700, color: '#07071A',
     }}>
       {initials(name)}
     </div>
@@ -131,8 +131,7 @@ export function Following() {
                 borderRadius: 99, padding: '8px 18px',
                 fontSize: '0.82rem', fontWeight: 700,
                 color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-                cursor: 'pointer',
-                fontFamily: 'DM Sans', transition: 'all 0.15s',
+                cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
               {t2 === 'Actividad' ? t('following.tabActivity') : t('following.tabUsers')}
@@ -235,7 +234,7 @@ export function Following() {
                     style={{
                       cursor: 'pointer', background: 'var(--bg-elevated)', color: 'var(--text-secondary)',
                       border: '1px solid var(--border-default)', borderRadius: 10,
-                      padding: '8px 14px', fontSize: '0.78rem', fontWeight: 700, fontFamily: 'DM Sans',
+                      padding: '8px 14px', fontSize: '0.78rem', fontWeight: 700,
                     }}
                   >
                     {t('following.followingBtn')}

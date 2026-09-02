@@ -96,7 +96,7 @@ export function ProfileHeaderCard({
           background: avatarUrl ? 'transparent' : 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
           border: '2px solid var(--oro-glow)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.7rem', fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
+          fontSize: '1.7rem', fontWeight: 700, color: '#07071A',
         }}>
           {avatarUrl
             ? <img src={avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -146,8 +146,7 @@ export function ProfileHeaderCard({
             <Link to="/mercados" style={{ textDecoration: 'none' }}>
               <button style={{
                 width: '100%', padding: '12px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-                background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+                background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A', fontWeight: 700, fontSize: '0.88rem',
               }}>
                 {t('profile.exploreMarkets')}
               </button>
@@ -155,7 +154,7 @@ export function ProfileHeaderCard({
             <button onClick={onOpenSettings} style={{
               width: '100%', padding: '12px 0', borderRadius: 10, cursor: 'pointer',
               background: 'transparent', border: '1px solid var(--border-default)',
-              color: 'var(--text-primary)', fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+              color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.88rem',
             }}>
               {t('profile.inviteFriends')}
             </button>
@@ -169,13 +168,11 @@ export function ProfileHeaderCard({
                 style={isFollowing ? {
                   width: '100%', padding: '12px 0', borderRadius: 10, cursor: 'pointer',
                   background: 'var(--bg-elevated)', color: 'var(--text-secondary)',
-                  border: '1px solid var(--border-default)',
-                  fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+                  border: '1px solid var(--border-default)', fontWeight: 700, fontSize: '0.88rem',
                   opacity: followBusy ? 0.6 : 1,
                 } : {
                   width: '100%', padding: '12px 0', borderRadius: 10, cursor: 'pointer', border: 'none',
-                  background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                  fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+                  background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A', fontWeight: 700, fontSize: '0.88rem',
                   opacity: followBusy ? 0.6 : 1,
                 }}
               >
@@ -185,8 +182,7 @@ export function ProfileHeaderCard({
               <Link to="/mercados" style={{ textDecoration: 'none' }}>
                 <button style={{
                   width: '100%', padding: '12px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                  fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+                  background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A', fontWeight: 700, fontSize: '0.88rem',
                 }}>
                   {t('profile.exploreMarkets')}
                 </button>
@@ -195,7 +191,7 @@ export function ProfileHeaderCard({
             <button onClick={share} style={{
               width: '100%', padding: '12px 0', borderRadius: 10, cursor: 'pointer',
               background: 'transparent', border: '1px solid var(--border-default)',
-              color: 'var(--text-primary)', fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
+              color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.88rem',
             }}>
               {copied ? t('profile.copiedLink') : t('profile.shareProfile')}
             </button>

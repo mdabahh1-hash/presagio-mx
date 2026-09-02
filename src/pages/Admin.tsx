@@ -97,7 +97,7 @@ export function Admin() {
 
   return (
     <div className="page-container" style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>
+      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
         Panel Admin
       </h1>
       <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem', marginBottom: 32 }}>
@@ -166,7 +166,7 @@ export function Admin() {
                       style={{
                         background: 'var(--bg-surface)', border: '1px solid var(--border-default)',
                         borderRadius: 8, padding: '8px 12px', color: 'var(--text-primary)',
-                        fontSize: '0.8rem', fontFamily: 'DM Sans', cursor: 'pointer',
+                        fontSize: '0.8rem', cursor: 'pointer',
                       }}
                     >
                       {(m.outcomes ?? []).map(o => (

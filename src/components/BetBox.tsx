@@ -151,7 +151,7 @@ export function BetBox({
                 <span style={{ flex: 1, fontSize: '0.82rem', fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                   {o.label}
                 </span>
-                <span style={{ fontSize: '0.78rem', fontFamily: 'DM Mono', fontWeight: 700, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
+                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
                   {o.price.toFixed(1)}%
                 </span>
               </button>
@@ -203,7 +203,7 @@ export function BetBox({
         <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{t('bet.amount')}</span>
           {user && (
-            <span style={{ color: 'var(--gold)', fontFamily: 'DM Mono', fontWeight: 600, fontSize: '0.75rem' }}>
+            <span style={{ color: 'var(--gold)', fontWeight: 600, fontSize: '0.75rem' }}>
               {formatNum(Math.floor(user.points))} PT
             </span>
           )}
@@ -230,8 +230,7 @@ export function BetBox({
             style={{
               flex: 1, background: 'transparent', border: 'none',
               outline: 'none', textAlign: 'center',
-              fontSize: '1.05rem', fontWeight: 700,
-              fontFamily: 'DM Mono', color: 'var(--text-primary)',
+              fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)',
               minWidth: 0,
             }}
           />
@@ -271,7 +270,7 @@ export function BetBox({
               borderRadius: 8, padding: '7px 4px',
               fontSize: '0.72rem',
               color: amount === v ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              cursor: 'pointer', fontFamily: 'DM Mono', fontWeight: 600,
+              cursor: 'pointer', fontWeight: 600,
               transition: 'all 0.15s',
             }}
           >
@@ -318,8 +317,7 @@ export function BetBox({
               onClick={() => setDetailsOpen(o => !o)}
               style={{
                 background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700,
-                fontFamily: 'DM Sans', display: 'flex', alignItems: 'center', gap: 4,
+                fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4,
               }}
             >
               {t('bet.priceDetails')} {detailsOpen ? '▴' : '▾'}
@@ -391,8 +389,7 @@ export function BetBox({
             ? 'linear-gradient(135deg, #00e87d, #00ba64)'
             : 'linear-gradient(135deg, #ff2d55, #cc1a40)',
           border: 'none', borderRadius: 12,
-          color: isMulti ? '#07071A' : side === 'YES' ? '#001a0d' : '#fff',
-          fontFamily: 'DM Sans', fontWeight: 700,
+          color: isMulti ? '#07071A' : side === 'YES' ? '#001a0d' : '#fff', fontWeight: 700,
           fontSize: '0.92rem', letterSpacing: '0.02em',
           cursor: (trading || (isMulti && !selectedOutcome)) ? 'not-allowed' : 'pointer',
           opacity: (trading || (isMulti && !selectedOutcome)) ? 0.6 : 1,

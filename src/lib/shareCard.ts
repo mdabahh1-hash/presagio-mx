@@ -1,6 +1,6 @@
 // Generador de cards de resultado para Ligas Privadas (Canvas, sin deps).
-// Formatos: 'feed' 1080x1350 (Instagram/WhatsApp) y 'og' 1200x630. Dark por
-// default, con el look VEREDIKT (fondo #07071A, acentos oro).
+// Formatos: 'feed' 1080x1350 (Instagram/WhatsApp) y 'og' 1200x630. Look
+// neutro (fondo casi negro, acento oro solo en cifras clave), tipografía Inter.
 
 export interface PodiumEntry {
   name: string
@@ -15,18 +15,21 @@ export interface ResultCardData {
   footer: string // p. ej. "veredikt.mx"
 }
 
-const BG = '#07071A'
-const SURFACE = '#0f0f28'
-const BORDER = 'rgba(255,215,0,0.18)'
-const TEXT = '#F5F0E8'
-const MUTED = 'rgba(245,240,232,0.6)'
-const GOLD = '#FFD700'
-const MEDALS = ['#eab308', '#94a3b8', '#b45309']
+const BG = '#0B0B0C'
+const SURFACE = '#1C1C1F'
+const BORDER = 'rgba(255,255,255,0.12)'
+const TEXT = '#F2F2F2'
+const MUTED = 'rgba(255,255,255,0.62)'
+const GOLD = '#F5C518'
+const MEDALS = ['#F5C518', '#B8BCC6', '#C98A4B']
 
 export async function generateResultCard(
   data: ResultCardData,
   format: 'feed' | 'og' = 'feed',
 ): Promise<Blob> {
+  // La fuente debe estar cargada antes de dibujar; si no, el canvas cae a system-ui.
+  try { await Promise.all([document.fonts.load('700 40px Inter'), document.fonts.load('600 30px Inter')]) } catch { /* sin FontFace API */ }
+
   const W = format === 'feed' ? 1080 : 1200
   const H = format === 'feed' ? 1350 : 630
   const canvas = document.createElement('canvas')
@@ -35,30 +38,24 @@ export async function generateResultCard(
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('canvas 2d unsupported')
 
-  // fondo + glow superior discreto
   ctx.fillStyle = BG
-  ctx.fillRect(0, 0, W, H)
-  const glow = ctx.createRadialGradient(W / 2, 0, 0, W / 2, 0, H * 0.7)
-  glow.addColorStop(0, 'rgba(255,215,0,0.10)')
-  glow.addColorStop(1, 'rgba(255,215,0,0)')
-  ctx.fillStyle = glow
   ctx.fillRect(0, 0, W, H)
 
   const cx = W / 2
   const scale = format === 'feed' ? 1 : 0.72
   const font = (weight: number, px: number) =>
-    `${weight} ${Math.round(px * scale)}px 'DM Sans', system-ui, sans-serif`
+    `${weight} ${Math.round(px * scale)}px Inter, system-ui, sans-serif`
 
   // encabezado: liga + ciclo
   ctx.textAlign = 'center'
   ctx.fillStyle = MUTED
-  ctx.font = font(700, 34)
-  ctx.fillText('LIGA PRIVADA', cx, (format === 'feed' ? 120 : 80))
+  ctx.font = font(600, 30)
+  ctx.fillText('Liga privada', cx, (format === 'feed' ? 120 : 80))
   ctx.fillStyle = TEXT
-  ctx.font = font(800, 64)
+  ctx.font = font(700, 64)
   ctx.fillText(clip(ctx, data.leagueName, W - 120), cx, (format === 'feed' ? 200 : 150))
-  ctx.fillStyle = GOLD
-  ctx.font = font(700, 42)
+  ctx.fillStyle = MUTED
+  ctx.font = font(500, 40)
   ctx.fillText(clip(ctx, data.cycleName, W - 160), cx, (format === 'feed' ? 268 : 210))
 
   // podio 2-1-3
@@ -75,35 +72,35 @@ export async function generateResultCard(
     const h = heights[col]
     const y = baseY - h
 
-    roundRect(ctx, x, y, slotW, h, 20 * scale)
+    roundRect(ctx, x, y, slotW, h, 16 * scale)
     ctx.fillStyle = SURFACE
     ctx.fill()
-    ctx.strokeStyle = s ? MEDALS[podiumIdx] : BORDER
-    ctx.lineWidth = 3
+    ctx.strokeStyle = BORDER
+    ctx.lineWidth = 2
     ctx.stroke()
     if (!s) return
 
     const mx = x + slotW / 2
     ctx.fillStyle = MEDALS[podiumIdx]
-    ctx.font = font(800, 44)
+    ctx.font = font(700, 40)
     ctx.fillText(`${podiumIdx + 1}º`, mx, y + 64 * scale)
     ctx.fillStyle = TEXT
-    ctx.font = font(700, 34)
+    ctx.font = font(600, 34)
     ctx.fillText(clip(ctx, s.name, slotW - 32), mx, y + 124 * scale)
-    ctx.fillStyle = GOLD
-    ctx.font = font(800, 40)
+    ctx.fillStyle = podiumIdx === 0 ? GOLD : TEXT
+    ctx.font = font(700, 40)
     ctx.fillText(`${s.points} pts`, mx, y + 182 * scale)
     ctx.fillStyle = MUTED
-    ctx.font = font(600, 28)
+    ctx.font = font(500, 28)
     ctx.fillText(s.hits, mx, y + 228 * scale)
   })
 
   // branding discreto
   ctx.fillStyle = TEXT
-  ctx.font = font(800, 44)
+  ctx.font = font(700, 40)
   ctx.fillText('VEREDIKT', cx, H - (format === 'feed' ? 160 : 60) + 40 * scale)
   ctx.fillStyle = MUTED
-  ctx.font = font(600, 30)
+  ctx.font = font(500, 28)
   ctx.fillText(data.footer, cx, H - (format === 'feed' ? 100 : 60) + 40 * scale)
 
   return await new Promise<Blob>((resolve, reject) => {

@@ -82,7 +82,7 @@ export function Embed() {
 
   const wrap: React.CSSProperties = {
     minHeight: '100vh', boxSizing: 'border-box', padding: 14,
-    background: 'var(--bg-base)', color: 'var(--text-primary)', fontFamily: 'DM Sans, sans-serif',
+    background: 'var(--bg-base)', color: 'var(--text-primary)',
     display: 'flex', flexDirection: 'column', gap: 10,
   }
 
@@ -105,7 +105,7 @@ export function Embed() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <a href={marketUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
           <Logo size={22} />
-          <span style={{ fontWeight: 800, letterSpacing: '0.08em', fontSize: '0.8rem', color: 'var(--text-primary)' }}>VEREDIKT</span>
+          <span style={{ fontWeight: 700, letterSpacing: '0.08em', fontSize: '0.8rem', color: 'var(--text-primary)' }}>VEREDIKT</span>
         </a>
         <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: catColor, background: getCategoryBg(market.category), padding: '3px 8px', borderRadius: 99 }}>
           {market.category}
@@ -125,7 +125,7 @@ export function Embed() {
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: outcomeColor(i), flexShrink: 0 }} />
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.label}</span>
                 </span>
-                <span style={{ fontFamily: 'DM Mono', fontWeight: 700 }}>{Math.round(o.price)}%</span>
+                <span style={{ fontWeight: 700 }}>{Math.round(o.price)}%</span>
               </div>
             ))}
           </div>
@@ -136,7 +136,7 @@ export function Embed() {
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ fontFamily: 'DM Mono', fontWeight: 700, fontSize: '1.7rem', color: 'var(--green)' }}>{pair.yes}%</span>
+            <span style={{ fontWeight: 700, fontSize: '1.7rem', color: 'var(--green)' }}>{pair.yes}%</span>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--green)' }}>{t('common.yes')}</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 'auto' }}>{t('common.no')} · {pair.no}%</span>
           </div>

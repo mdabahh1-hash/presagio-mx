@@ -16,17 +16,17 @@ export function Logo({ size = 28, className = '' }: LogoProps) {
   )
 }
 
+// Marca + wordmark. El logo es (junto al CTA primario) el único sitio con oro.
 export function LogoFull({ className = '' }: { className?: string }) {
   return (
-    <div className={className} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <Logo size={28} />
+    <div className={className} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+      <Logo size={26} />
       <span
         style={{
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: '1.2rem',
-          fontWeight: 800,
-          letterSpacing: '0.08em',
-          color: 'var(--cream)',
+          fontSize: '1.05rem',
+          fontWeight: 700,
+          letterSpacing: '0.04em',
+          color: 'var(--text-primary)',
           lineHeight: 1,
         }}
       >

@@ -216,14 +216,3 @@ export const CURRENT_USER: User = {
     },
   ],
 }
-
-export const TICKER_ITEMS = [
-  { label: 'Morena 2027', price: 72, change: +3 },
-  { label: 'Dólar >$22', price: 34, change: -2 },
-  { label: 'México Mundial', price: 88, change: +1 },
-  { label: 'BTC $100k', price: 67, change: +5 },
-  { label: 'Fed Recorte', price: 55, change: -1 },
-  { label: 'NVDA $1000', price: 42, change: +2 },
-  { label: 'CDMX Oposición', price: 28, change: 0 },
-  { label: 'Banxico <8%', price: 61, change: +4 },
-]

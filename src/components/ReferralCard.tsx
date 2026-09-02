@@ -34,7 +34,7 @@ export function ReferralCard({ code }: { code: string | null }) {
         <code style={{
           flex: '1 1 220px', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 8,
-          padding: '9px 12px', fontFamily: 'DM Mono', fontSize: '0.78rem', color: 'var(--text-secondary)',
+          padding: '9px 12px', fontSize: '0.78rem', color: 'var(--text-secondary)',
         }}>{link}</code>
 
         <a
@@ -69,7 +69,7 @@ export function ReferralCard({ code }: { code: string | null }) {
             borderRadius: 99, background: 'var(--bg-elevated)',
             border: `1px solid ${copied ? 'var(--green)' : 'var(--border-default)'}`,
             color: copied ? 'var(--green)' : 'var(--text-secondary)', cursor: 'pointer',
-            fontSize: '0.78rem', fontWeight: 600, fontFamily: 'DM Sans',
+            fontSize: '0.78rem', fontWeight: 600,
           }}
         >
           {copied ? t('common.copied') : t('common.copy')}

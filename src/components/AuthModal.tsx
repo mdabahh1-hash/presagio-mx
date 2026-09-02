@@ -107,8 +107,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
   const inputStyle: React.CSSProperties = {
     width: '100%', background: 'var(--bg-surface)',
     border: '1px solid var(--border-default)', borderRadius: 10,
-    padding: '11px 14px', fontSize: '0.9rem', color: 'var(--text-primary)',
-    fontFamily: 'DM Sans', outline: 'none', boxSizing: 'border-box',
+    padding: '11px 14px', fontSize: '0.9rem', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
   }
 
   const labelStyle: React.CSSProperties = {
@@ -187,7 +186,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
               <div style={{ marginBottom: 14 }}>
                 <label style={labelStyle}>{t('auth.codeLabel')}</label>
                 <input
-                  style={{ ...inputStyle, fontSize: '1.6rem', letterSpacing: '0.3em', textAlign: 'center', fontFamily: 'DM Mono' }}
+                  style={{ ...inputStyle, fontSize: '1.6rem', letterSpacing: '0.3em', textAlign: 'center' }}
                   type="text"
                   inputMode="numeric"
                   maxLength={6}
@@ -221,7 +220,6 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
                   fontSize: '0.9rem', fontWeight: 700,
                   color: (loading || code.length < 6) ? 'var(--text-tertiary)' : '#07071A',
                   cursor: (loading || code.length < 6) ? 'not-allowed' : 'pointer',
-                  fontFamily: 'DM Sans',
                   transition: 'all 0.15s',
                   boxShadow: (loading || code.length < 6) ? 'none' : '0 4px 20px var(--oro-glow)',
                 }}
@@ -236,7 +234,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
                   width: '100%', marginTop: 10,
                   background: 'transparent', border: 'none',
                   fontSize: '0.8rem', color: 'var(--text-tertiary)',
-                  cursor: 'pointer', fontFamily: 'DM Sans', padding: '8px',
+                  cursor: 'pointer', padding: '8px',
                 }}
               >
                 {t('common.back')}
@@ -275,8 +273,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
                     border: mode === m ? '1px solid var(--border-default)' : '1px solid transparent',
                     borderRadius: 9, cursor: 'pointer',
                     fontSize: '0.8rem', fontWeight: 700,
-                    color: mode === m ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                    fontFamily: 'DM Sans', letterSpacing: '0.02em',
+                    color: mode === m ? 'var(--text-primary)' : 'var(--text-tertiary)', letterSpacing: '0.02em',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -386,8 +383,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
                   borderRadius: 12, padding: '13px',
                   fontSize: '0.9rem', fontWeight: 700,
                   color: loading ? 'var(--text-tertiary)' : '#07071A',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontFamily: 'DM Sans', letterSpacing: '0.03em',
+                  cursor: loading ? 'not-allowed' : 'pointer', letterSpacing: '0.03em',
                   transition: 'all 0.15s',
                   boxShadow: loading ? 'none' : '0 4px 20px var(--oro-glow)',
                 }}
@@ -410,8 +406,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
                     width: '100%', background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-default)', borderRadius: 12,
                     padding: '13px 14px', fontSize: '0.85rem', color: 'var(--text-primary)',
-                    cursor: passkeyLoading ? 'not-allowed' : 'pointer',
-                    fontFamily: 'DM Sans', fontWeight: 700,
+                    cursor: passkeyLoading ? 'not-allowed' : 'pointer', fontWeight: 700,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
                     opacity: passkeyLoading ? 0.6 : 1, transition: 'all 0.15s',
                   }}

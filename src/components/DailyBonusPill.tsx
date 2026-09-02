@@ -55,8 +55,7 @@ export function DailyBonusPill() {
         style={{
           background: 'var(--oro-fill)', border: 'none', borderRadius: 99,
           padding: '5px 13px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.01em',
-          color: '#07071A', cursor: claiming ? 'wait' : 'pointer', opacity: claiming ? 0.7 : 1,
-          fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap',
+          color: '#07071A', cursor: claiming ? 'wait' : 'pointer', opacity: claiming ? 0.7 : 1, whiteSpace: 'nowrap',
         }}
       >
         {claiming ? '...' : t('bonus.claim')}

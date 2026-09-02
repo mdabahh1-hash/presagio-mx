@@ -9,8 +9,7 @@ const CATEGORIES = ['Deportes', 'Política', 'Economía', 'Crypto', 'Tech', 'Cli
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'var(--bg-surface)',
   border: '1px solid var(--border-default)', borderRadius: 10,
-  padding: '11px 14px', fontSize: '0.9rem', color: 'var(--text-primary)',
-  fontFamily: 'DM Sans', outline: 'none', boxSizing: 'border-box',
+  padding: '11px 14px', fontSize: '0.9rem', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
 }
 
 const labelStyle: React.CSSProperties = {
@@ -88,7 +87,7 @@ export function Propose() {
         <div>
           <label style={labelStyle}>
             {t('propose.questionLabel')}
-            <span style={{ float: 'right', fontFamily: 'DM Mono', textTransform: 'none', letterSpacing: 0 }}>
+            <span style={{ float: 'right', textTransform: 'none', letterSpacing: 0 }}>
               {question.length}/200
             </span>
           </label>
@@ -142,8 +141,7 @@ export function Propose() {
           style={{
             width: '100%', padding: '15px',
             background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
-            border: 'none', borderRadius: 12, color: '#07071A',
-            fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.92rem',
+            border: 'none', borderRadius: 12, color: '#07071A', fontWeight: 700, fontSize: '0.92rem',
             letterSpacing: '0.02em',
             cursor: (submitting || !question.trim()) ? 'not-allowed' : 'pointer',
             opacity: (submitting || !question.trim()) ? 0.6 : 1,

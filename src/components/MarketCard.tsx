@@ -35,7 +35,7 @@ function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
             }} />
           </div>
           <span style={{
-            fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 700,
+            fontSize: '0.72rem', fontWeight: 700,
             color: 'var(--gold)', width: 36, textAlign: 'right', flexShrink: 0,
           }}>
             {o.price.toFixed(1)}%
@@ -156,8 +156,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
                 <span style={{
-                  fontSize: '1.6rem', fontWeight: 700,
-                  fontFamily: 'DM Mono', color: yesColor,
+                  fontSize: '1.6rem', fontWeight: 700, color: yesColor,
                   lineHeight: 1, letterSpacing: '-0.02em',
                 }}>
                   {market.yesPrice}%
@@ -171,8 +170,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
                   {t('common.no')}
                 </span>
                 <span style={{
-                  fontSize: '0.95rem', fontWeight: 600,
-                  fontFamily: 'DM Mono', color: 'var(--text-secondary)',
+                  fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-secondary)',
                 }}>
                   {100 - market.yesPrice}%
                 </span>
@@ -189,14 +187,14 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
           <div style={{ display: 'flex', gap: 14 }}>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
               {t('card.vol')}{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
+              <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>
                 {formatVolume(market.volume)}
               </span>
             </span>
             {!isMulti && (
               <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
                 {t('card.liq')}{' '}
-                <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
+                <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>
                   {formatVolume(market.liquidity)}
                 </span>
               </span>
@@ -211,7 +209,6 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               fontSize: '0.68rem',
               color: urgent ? 'var(--red)' : 'var(--text-tertiary)',
               fontWeight: urgent ? 700 : 400,
-              fontFamily: urgent ? 'DM Mono' : undefined,
             }}>
               {countdownText}
             </span>

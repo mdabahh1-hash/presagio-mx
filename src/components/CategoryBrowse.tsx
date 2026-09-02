@@ -59,8 +59,7 @@ function RailButton({ active, label, count, onClick, nested = false }: {
         padding: '11px 14px', borderRadius: 10,
         border: `1px solid ${active ? 'var(--oro-glow)' : 'transparent'}`,
         background: active ? 'var(--oro-dim)' : 'transparent',
-        color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-        fontFamily: 'DM Sans', fontWeight: 600, fontSize: '0.86rem',
+        color: active ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600, fontSize: '0.86rem',
         transition: 'all 0.15s', whiteSpace: 'nowrap',
       }}
     >
@@ -83,7 +82,7 @@ function RailHeader({ children }: { children: React.ReactNode }) {
     <div className="cat-rail-header" style={{
       fontSize: '0.66rem', fontWeight: 600, letterSpacing: '0.08em',
       textTransform: 'uppercase', color: 'var(--text-tertiary)',
-      padding: '6px 14px 4px', fontFamily: 'DM Sans',
+      padding: '6px 14px 4px',
     }}>
       {children}
     </div>

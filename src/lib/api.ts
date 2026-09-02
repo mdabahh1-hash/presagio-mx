@@ -63,6 +63,7 @@ export interface ApiMarket {
   subcategory?: string | null
   resolution_criteria: string
   resolution_source_url?: string | null
+  image_url?: string | null
   yes_price: number
   volume: number
   num_trades: number

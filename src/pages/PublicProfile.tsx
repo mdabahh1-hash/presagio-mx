@@ -140,7 +140,7 @@ export function PublicProfile() {
               padding: '10px 18px',
               fontSize: '0.85rem', fontWeight: 700,
               color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-              cursor: 'pointer', fontFamily: 'DM Sans',
+              cursor: 'pointer',
               letterSpacing: '0.05em', textTransform: 'capitalize',
               transition: 'color 0.15s', marginBottom: -1,
             }}

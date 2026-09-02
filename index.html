@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" id="meta-theme-color" content="#07071A" />
+    <meta name="theme-color" id="meta-theme-color" content="#0B0B0C" />
     <script>
       // Anti-FOUC: resuelve el tema ANTES del primer paint. 'system' (o
       // ausencia de preferencia) sigue prefers-color-scheme; sin señal de
@@ -20,7 +20,7 @@
               : 'dark'
         document.documentElement.dataset.theme = resolved
         var meta = document.getElementById('meta-theme-color')
-        if (meta) meta.setAttribute('content', resolved === 'light' ? '#F7F3EA' : '#07071A')
+        if (meta) meta.setAttribute('content', resolved === 'light' ? '#FFFFFF' : '#0B0B0C')
       })()
     </script>
     <title>VEREDIKT — El veredicto del mercado.</title>
@@ -37,8 +37,7 @@
     <meta name="twitter:image" content="https://veredikt.mx/og-default.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Solo los pesos en uso (300 e itálica no se usaban): menos descarga en la primera carga -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

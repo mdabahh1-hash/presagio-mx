@@ -61,7 +61,7 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
             <div className="row-outcome-btn" style={{
               minWidth: 0, justifyContent: 'center',
               background: 'transparent', border: '1px dashed var(--border-subtle)',
-              color: 'var(--text-tertiary)', fontSize: '0.72rem', fontWeight: 700, fontFamily: 'DM Mono',
+              color: 'var(--text-tertiary)', fontSize: '0.72rem', fontWeight: 700,
             }}>
               +{restOutcomes}
             </div>
@@ -133,7 +133,7 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
           <div className="meta-label" style={{ display: 'flex', gap: 14, alignItems: 'center', fontSize: '0.72rem' }}>
             <span>
               {t('card.vol')}{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 500 }}>
+              <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
                 {formatVolume(market.volume)}
               </span>
             </span>
@@ -143,7 +143,6 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
               <span style={{
                 color: urgent ? 'var(--red)' : 'var(--text-tertiary)',
                 fontWeight: urgent ? 600 : 500,
-                fontFamily: urgent ? 'DM Mono' : undefined,
               }}>
                 {countdownText}
               </span>

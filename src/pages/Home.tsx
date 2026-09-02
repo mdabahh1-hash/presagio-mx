@@ -8,13 +8,12 @@ import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { CategoryBar } from '../components/CategoryBar'
+import { Icon } from '../components/Icon'
 import type { Category, Market } from '../types'
-import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
-import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
+import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 
-const MOBILE_TABS = ['Tendencia', ...CATEGORIES] as const
 type MobileTab = Category | 'Tendencia'
 
 const PAGE_SIZE = 12
@@ -23,25 +22,7 @@ function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () 
   const { t } = useTranslation()
   return (
     <div style={{ textAlign: 'center', marginTop: 24 }}>
-      <button
-        onClick={onClick}
-        style={{
-          background: 'transparent',
-          border: '1px solid var(--border-default)',
-          borderRadius: 99, padding: '12px 28px', minHeight: 44,
-          color: 'var(--text-secondary)',
-          fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.84rem',
-          cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.borderColor = 'var(--oro)'
-          e.currentTarget.style.color = 'var(--oro)'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.borderColor = 'var(--border-default)'
-          e.currentTarget.style.color = 'var(--text-secondary)'
-        }}
-      >
+      <button className="btn btn-secondary" onClick={onClick} style={{ minHeight: 44, padding: '0 24px' }}>
         {t('home.seeMore', { count: remaining })}
       </button>
     </div>
@@ -90,85 +71,34 @@ export function Home() {
     return (
       <div style={{ minHeight: '100vh' }}>
 
-        {/* Sticky search + tabs */}
-        <div style={{
-          position: 'sticky', top: 62, zIndex: 50,
-          background: 'var(--bg-base)',
-          borderBottom: '1px solid var(--border-subtle)',
-          padding: '10px 14px 0',
-        }}>
-          {/* Search */}
-          <form onSubmit={handleSearch} style={{ marginBottom: 10 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 10, overflow: 'hidden',
-            }}>
-              <span style={{ paddingLeft: 12, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
-                  <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </span>
+        {/* Buscador + tabs de categoría, pegados bajo el navbar (mismo
+            componente que en desktop; la línea inferior no se mueve) */}
+        <CategoryBar active={mobileTab} onChange={setMobileTab}>
+          <form onSubmit={handleSearch} style={{ padding: '10px 0 4px' }}>
+            <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px' }}>
+              <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
               <input
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={t('home.searchPlaceholder')}
-                style={{
-                  flex: 1, background: 'transparent', border: 'none',
-                  outline: 'none', padding: '11px 12px',
-                  fontSize: '0.9rem', color: 'var(--text-primary)',
-                  fontFamily: 'DM Sans',
-                }}
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: 'var(--text-primary)', fontFamily: 'inherit' }}
               />
               {search && (
-                <button type="button" onClick={() => setSearch('')} style={{ background: 'none', border: 'none', padding: '0 12px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1.1rem' }}>×</button>
+                <button type="button" onClick={() => setSearch('')} aria-label={t('common.close')} className="icon-btn" style={{ width: 28, height: 28 }}>
+                  <Icon name="x" size={14} />
+                </button>
               )}
             </div>
           </form>
-
-          {/* Category tabs — horizontal scroll */}
-          <div style={{
-            display: 'flex', gap: 8,
-            overflowX: 'auto', paddingBottom: 10,
-            scrollbarWidth: 'none',
-          }}>
-            {MOBILE_TABS.map(tab => {
-              const isActive = tab === mobileTab
-              const color = tab === 'Tendencia' ? 'var(--oro)' : getCategoryColor(tab)
-          const activeBg = tab === 'Tendencia' ? 'var(--oro-dim)' : getCategoryBg(tab)
-              return (
-                <button
-                  key={tab}
-                  className="mobile-cat-tab"
-                  onClick={() => setMobileTab(tab)}
-                  style={{
-                    flexShrink: 0,
-                    background: isActive ? activeBg : 'transparent',
-                    border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
-                    borderRadius: 99, padding: '7px 14px',
-                    fontSize: '0.8rem', fontWeight: 700,
-                    color: isActive ? color : 'var(--text-secondary)',
-                    cursor: 'pointer', fontFamily: 'DM Sans',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {tab === 'Tendencia' ? t('home.tabTrending') : tab}
-                </button>
-              )
-            })}
-          </div>
-        </div>
+        </CategoryBar>
 
         {mobileTab === 'Tendencia' ? (
           <>
             {/* Featured carousel */}
             {!loading && (
-              <div style={{ padding: '14px 14px 4px' }}>
-                <div className="exchange-header" style={{ marginBottom: 12 }}>{t('home.featuredMarket')}</div>
+              <div style={{ padding: '16px 16px 4px' }}>
+                <h2 className="section-title" style={{ fontSize: 16, marginBottom: 12 }}>{t('home.featuredMarket')}</h2>
                 <FeaturedCarousel markets={apiMarkets} />
               </div>
             )}
@@ -208,10 +138,10 @@ export function Home() {
 
   // ─── DESKTOP LAYOUT ─────────────────────────────────────────────────────────
   return (
-    <div className="page-container" style={{ paddingTop: 20 }}>
-
-      {/* One-line category tabs */}
-      <CategoryBar active={mobileTab} onChange={setMobileTab} />
+    <>
+    {/* Barra de categorías full-bleed y sticky (fuera del container) */}
+    <CategoryBar active={mobileTab} onChange={setMobileTab} />
+    <div className="page-container" style={{ paddingTop: 24 }}>
 
       {mobileTab === 'Tendencia' ? (
         <>
@@ -233,17 +163,15 @@ export function Home() {
 
           {/* Trending markets grid */}
           <section style={{ marginBottom: 56 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <div className="exchange-header">{t('home.trendingMarkets')}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h2 className="section-title">{t('home.trendingMarkets')}</h2>
               <Link to="/mercados" style={{
-                textDecoration: 'none', fontSize: '0.8rem',
-                color: 'var(--blue)', fontWeight: 600,
+                textDecoration: 'none', fontSize: 13,
+                color: 'var(--text-secondary)', fontWeight: 500,
                 display: 'flex', alignItems: 'center', gap: 4,
               }}>
                 {t('home.viewAll')}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <Icon name="arrow-right" size={14} />
               </Link>
             </div>
             {loading ? (
@@ -276,5 +204,6 @@ export function Home() {
         </section>
       )}
     </div>
+    </>
   )
 }

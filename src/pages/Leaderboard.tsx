@@ -20,7 +20,7 @@ function Avatar({ name, size = 40 }: { name: string; size?: number }) {
       width: size, height: size, borderRadius: '50%', flexShrink: 0,
       background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.34, fontWeight: 800, color: '#07071A', fontFamily: 'DM Sans',
+      fontSize: size * 0.34, fontWeight: 700, color: '#07071A',
     }}>
       {initials(name)}
     </div>
@@ -85,8 +85,7 @@ export function Leaderboard() {
                 borderRadius: 99, padding: '8px 18px',
                 fontSize: '0.82rem', fontWeight: 700,
                 color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-                cursor: 'pointer',
-                fontFamily: 'DM Sans', transition: 'all 0.15s',
+                cursor: 'pointer', transition: 'all 0.15s',
               }}
             >
               {periodLabels[p]}
@@ -113,7 +112,7 @@ export function Leaderboard() {
           placeholder={t('leaderboard.searchPlaceholder')}
           style={{
             flex: 1, background: 'transparent', border: 'none', outline: 'none',
-            padding: '11px 12px', fontSize: '0.875rem', color: 'var(--text-primary)', fontFamily: 'DM Sans',
+            padding: '11px 12px', fontSize: '0.875rem', color: 'var(--text-primary)',
           }}
         />
       </div>
@@ -134,8 +133,7 @@ export function Leaderboard() {
                 onClick={() => setSort(key)}
                 style={{
                   width: key === 'pnl' ? 140 : 120, textAlign: 'right',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 600,
+                  background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
                   color: sort === key ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   paddingBottom: 4,
                   borderBottom: `2px solid ${sort === key ? 'var(--gold)' : 'transparent'}`,

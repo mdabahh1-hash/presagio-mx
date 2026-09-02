@@ -7,7 +7,12 @@ import { useTheme } from '../lib/ThemeContext'
 import { authApi, marketsApi, type ApiMarket } from '../lib/api'
 import { useDebouncedValue } from '../lib/useDebouncedValue'
 import { displayPair } from '../lib/prices'
-import { getCategoryColor } from '../lib/categoryColors'
+import { cleanLabel } from '../lib/mapMarket'
+import type { Category } from '../types'
+import { Icon } from './Icon'
+import { Badge } from './Badge'
+import { Avatar } from './Avatar'
+import { MarketThumb } from './MarketThumb'
 import { AuthModal } from './AuthModal'
 import { DailyBonusPill } from './DailyBonusPill'
 import { formatNum } from '../lib/format'
@@ -32,7 +37,6 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
         <span style={{
           display: 'flex', alignItems: 'center', gap: 10,
           fontSize, fontWeight: 600, color: 'var(--text-secondary)',
-          fontFamily: "'DM Sans', sans-serif",
         }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
@@ -65,8 +69,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 10, width: '100%',
           textAlign: 'left', padding: pad, borderRadius: radius,
-          border: 'none', cursor: 'pointer',
-          fontFamily: "'DM Sans', sans-serif", fontSize, fontWeight: 600,
+          border: 'none', cursor: 'pointer', fontSize, fontWeight: 600,
           color: preference === 'system' ? 'var(--text-primary)' : 'var(--text-tertiary)',
           background: preference === 'system' ? 'var(--oro-dim)' : 'transparent',
           transition: 'background 0.15s, color 0.15s',
@@ -84,7 +87,6 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
         <span style={{
           display: 'flex', alignItems: 'center', gap: 10,
           fontSize, fontWeight: 600, color: 'var(--text-secondary)',
-          fontFamily: "'DM Sans', sans-serif",
         }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
@@ -103,8 +105,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
                   background: active ? 'var(--oro-dim)' : 'transparent',
                   color: active ? 'var(--gold)' : 'var(--text-tertiary)',
                   borderRadius: 8, padding: '4px 10px', cursor: 'pointer',
-                  fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em',
-                  fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
+                  fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', transition: 'all 0.15s',
                 }}
               >
                 {lng.toUpperCase()}
@@ -179,6 +180,19 @@ export function Navbar() {
 
   useEffect(() => { setMenuOpen(false); setDeskMenu(false); setSearchOpen(false); setHighlighted(-1) }, [location.pathname])
 
+  // Menú de escritorio: abre por click y cierra al hacer click fuera o con Escape
+  const menuRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!deskMenu) return
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setDeskMenu(false)
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDeskMenu(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
+  }, [deskMenu])
+
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/mercados', label: t('nav.markets') },
@@ -210,7 +224,7 @@ export function Navbar() {
         transition: 'background 0.2s ease, border-color 0.2s ease',
       }}>
         <div className="navbar-inner" style={{
-          height: 62, display: 'flex', alignItems: 'center', gap: 16,
+          height: 'var(--nav-h)', display: 'flex', alignItems: 'center', gap: 16,
         }}>
           <Link to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <LogoFull />
@@ -218,18 +232,11 @@ export function Navbar() {
 
           {/* Búsqueda global (desktop) — navega a /mercados?q= */}
           <form className="navbar-search" ref={searchRef} onSubmit={handleSearch} style={{ position: 'relative', flex: '1 1 0%', minWidth: 120, maxWidth: 480 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', height: 38,
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 10, overflow: 'hidden',
+            <div className="input" style={{
+              display: 'flex', alignItems: 'center', height: 38, gap: 8, padding: '0 10px 0 12px',
+              background: 'var(--bg-surface)',
             }}>
-              <span style={{ display: 'flex', alignItems: 'center', paddingLeft: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}>
-                <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                  <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
-                  <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              </span>
+              <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
               <input
                 type="text"
                 value={q}
@@ -254,12 +261,14 @@ export function Navbar() {
                 aria-activedescendant={highlighted >= 0 ? `search-opt-${highlighted}` : undefined}
                 style={{
                   flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
-                  padding: '9px 10px', fontSize: '0.85rem',
-                  color: 'var(--text-primary)', fontFamily: 'DM Sans',
+                  padding: 0, fontSize: 14, fontFamily: 'inherit',
+                  color: 'var(--text-primary)',
                 }}
               />
               {q && (
-                <button type="button" onClick={() => { setQ(''); setResults(null); setSearchOpen(false); setHighlighted(-1) }} aria-label={t('common.close')} style={{ background: 'none', border: 'none', padding: '0 10px', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1 }}>×</button>
+                <button type="button" onClick={() => { setQ(''); setResults(null); setSearchOpen(false); setHighlighted(-1) }} aria-label={t('common.close')} className="icon-btn" style={{ width: 26, height: 26 }}>
+                  <Icon name="x" size={14} />
+                </button>
               )}
             </div>
 
@@ -274,8 +283,8 @@ export function Navbar() {
                   transformOrigin: 'top left',
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-default)',
-                  borderRadius: 14, padding: 8,
-                  boxShadow: '0 16px 48px var(--shadow-menu)',
+                  borderRadius: 12, padding: 6,
+                  boxShadow: 'var(--shadow-pop)',
                 }}
               >
                 {results.length === 0 ? (
@@ -287,7 +296,7 @@ export function Navbar() {
                     {results.map((m, i) => {
                       const isMulti = m.market_type === 'multi'
                       const leader = isMulti ? [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)[0] : null
-                      const yesColor = m.yes_price >= 65 ? 'var(--green)' : m.yes_price <= 35 ? 'var(--red)' : 'var(--gold)'
+                      const yesColor = m.yes_price >= 65 ? 'var(--green)' : m.yes_price <= 35 ? 'var(--red)' : 'var(--text-primary)'
                       return (
                         <Link
                           key={m.id}
@@ -299,37 +308,31 @@ export function Navbar() {
                           onMouseEnter={() => setHighlighted(i)}
                           style={{
                             display: 'flex', alignItems: 'center', gap: 10,
-                            padding: '10px 12px', borderRadius: 9, textDecoration: 'none',
-                            background: highlighted === i ? 'var(--oro-dim)' : 'transparent',
+                            padding: '8px 10px', borderRadius: 8, textDecoration: 'none',
+                            background: highlighted === i ? 'var(--bg-hover)' : 'transparent',
                           }}
                         >
-                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: getCategoryColor(m.category), flexShrink: 0 }} />
+                          <MarketThumb market={{ imageUrl: m.image_url, subcategory: m.subcategory, category: m.category as Category }} size={32} radius={6} />
                           <span style={{
-                            flex: 1, minWidth: 0, fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)',
+                            flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                           }}>
-                            {m.question}
+                            {cleanLabel(m.question)}
                           </span>
                           {m.status === 'pending_resolution' && (
-                            <span style={{
-                              fontSize: '0.6rem', fontWeight: 700, textTransform: 'uppercase',
-                              color: 'var(--gold)', background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
-                              padding: '2px 7px', borderRadius: 99, flexShrink: 0,
-                            }}>
-                              {t('common.days.pending')}
-                            </span>
+                            <Badge tone="accent">{t('common.days.pending')}</Badge>
                           )}
                           {isMulti ? (leader && (
                             <span style={{ textAlign: 'right', flexShrink: 0, maxWidth: 110 }}>
-                              <span className="font-mono" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                              <span className="num" style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                                 {Math.round(leader.price)}%
                               </span>
-                              <span style={{ display: 'block', fontSize: '0.65rem', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {leader.label}
+                              <span style={{ display: 'block', fontSize: 11, color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {cleanLabel(leader.label)}
                               </span>
                             </span>
                           )) : (
-                            <span className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 800, color: yesColor, flexShrink: 0 }}>
+                            <span className="num" style={{ fontSize: 14, fontWeight: 600, color: yesColor, flexShrink: 0 }}>
                               {displayPair(m.yes_price).yes}%
                             </span>
                           )}
@@ -346,15 +349,13 @@ export function Navbar() {
                       onMouseEnter={() => setHighlighted(results.length)}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '10px 12px', borderRadius: 9, textDecoration: 'none',
-                        fontSize: '0.82rem', fontWeight: 700, color: 'var(--blue)',
-                        background: highlighted === results.length ? 'var(--oro-dim)' : 'transparent',
+                        padding: '8px 10px', borderRadius: 8, textDecoration: 'none',
+                        fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
+                        background: highlighted === results.length ? 'var(--bg-hover)' : 'transparent',
                       }}
                     >
                       {t('search.viewAll')}
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <Icon name="arrow-right" size={14} />
                     </Link>
                   </>
                 )}
@@ -368,7 +369,7 @@ export function Navbar() {
             to="/como-funciona"
             style={{
               textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0,
-              fontSize: '0.82rem', fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+              fontSize: 14, fontWeight: 500,
               color: isActive('/como-funciona') ? 'var(--text-primary)' : 'var(--text-secondary)',
               transition: 'color 0.15s',
             }}
@@ -378,18 +379,12 @@ export function Navbar() {
 
           {/* Proponer mercado (desktop) */}
           <Link
-            className="navbar-propose"
+            className="navbar-propose btn btn-secondary"
             to="/proponer"
             aria-label={t('nav.propose')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '8px 14px', borderRadius: 10, textDecoration: 'none',
-              border: '1px solid var(--gold)', color: 'var(--gold)',
-              background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.8rem',
-              fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap', flexShrink: 0,
-            }}
+            style={{ height: 36, flexShrink: 0 }}
           >
-            <span style={{ fontSize: '0.95rem', lineHeight: 1, fontWeight: 800 }}>+</span>
+            <Icon name="plus" size={14} strokeWidth={2} />
             <span className="navbar-propose-label">{t('nav.propose')}</span>
           </Link>
 
@@ -404,26 +399,15 @@ export function Navbar() {
             onClick={() => setMenuOpen(o => !o)}
             aria-label={t('nav.menu')}
             style={{
-              background: menuOpen ? 'var(--oro-dim)' : 'none',
-              border: menuOpen ? '1px solid var(--border-hover)' : '1px solid transparent',
+              background: menuOpen ? 'var(--bg-hover)' : 'none',
+              border: '1px solid transparent',
               borderRadius: 8,
               cursor: 'pointer',
               padding: '8px', color: 'var(--text-primary)', display: 'none',
               transition: 'all 0.15s',
             }}
           >
-            {menuOpen ? (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <line x1="4" y1="4" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="18" y1="4" x2="4" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            )}
+            <Icon name={menuOpen ? 'x' : 'menu'} size={22} strokeWidth={2} />
           </button>
 
           {/* Spacer pushes the user section to the right */}
@@ -433,105 +417,64 @@ export function Navbar() {
           <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {user ? (
               <>
-                <div className="navbar-live" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div className="live-dot" />
-                  <span style={{ fontSize: '0.65rem', color: 'var(--green)', fontWeight: 600, letterSpacing: '0.04em' }}>{t('common.live')}</span>
-                </div>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: 10, padding: '7px 14px',
-                }}>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 600, letterSpacing: '0.04em' }}>PT</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {formatNum(Math.floor(user.points))}
-                  </span>
-                </div>
-                <DailyBonusPill />
-                <Link to="/perfil" style={{ textDecoration: 'none' }}>
+                <Link to="/perfil" style={{ textDecoration: 'none' }} title={t('nav.myProfile')}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.75rem', fontWeight: 800, color: '#07071A',
-                    fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
-                    border: location.pathname === '/perfil' ? '2px solid var(--oro)' : '2px solid var(--border-hover)',
-                    transition: 'border-color 0.15s, box-shadow 0.15s',
-                    boxShadow: location.pathname === '/perfil' ? '0 0 12px var(--oro-glow)' : 'none',
+                    display: 'flex', alignItems: 'baseline', gap: 5,
+                    background: 'var(--bg-elevated)', borderRadius: 8, padding: '7px 12px',
                   }}>
-                    {initials}
+                    <span className="num" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {formatNum(Math.floor(user.points))}
+                    </span>
+                    <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 500 }}>PT</span>
                   </div>
+                </Link>
+                <DailyBonusPill />
+                <Link to="/perfil" style={{ textDecoration: 'none', display: 'flex' }} aria-label={t('nav.myProfile')}>
+                  <Avatar
+                    name={user.display_name}
+                    size={34}
+                    style={{ boxShadow: location.pathname === '/perfil' ? '0 0 0 2px var(--text-primary)' : '0 0 0 1px var(--border-default)', cursor: 'pointer' }}
+                  />
                 </Link>
               </>
             ) : (
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <button
-                  onClick={() => setAuthModal('login')}
-                  style={{
-                    background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
-                    color: 'var(--text-secondary)', cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif", fontWeight: 600, letterSpacing: '0.03em',
-                    transition: 'all 0.15s',
-                  }}
-                >
+                <button className="btn btn-secondary" onClick={() => setAuthModal('login')}>
                   {t('nav.login')}
                 </button>
-                <button
-                  onClick={() => setAuthModal('register')}
-                  style={{
-                    background: 'var(--oro-fill)',
-                    border: 'none',
-                    borderRadius: 10, padding: '8px 16px', fontSize: '0.8rem',
-                    color: '#07071A', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: 700, letterSpacing: '0.03em',
-                    boxShadow: '0 2px 12px var(--oro-glow)',
-                    transition: 'opacity 0.15s',
-                  }}
-                >
+                <button className="btn btn-primary" onClick={() => setAuthModal('register')}>
                   {t('nav.register')}
                 </button>
               </div>
             )}
 
-            {/* Desktop dropdown menu (hover) */}
-            <div
-              className="nav-menu-wrap"
-              style={{ position: 'relative' }}
-              onMouseEnter={() => setDeskMenu(true)}
-              onMouseLeave={() => setDeskMenu(false)}
-            >
+            {/* Desktop dropdown menu (click) */}
+            <div className="nav-menu-wrap" ref={menuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setDeskMenu(o => !o)}
                 aria-label={t('nav.menu')}
+                aria-expanded={deskMenu}
+                className="icon-btn"
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  width: 40, height: 40, borderRadius: 10,
-                  background: deskMenu ? 'var(--oro-dim)' : 'var(--bg-elevated)',
-                  border: `1px solid ${deskMenu ? 'var(--oro-glow)' : 'var(--border-default)'}`,
-                  color: 'var(--text-primary)', cursor: 'pointer',
-                  transition: 'all 0.15s',
+                  width: 36, height: 36,
+                  background: deskMenu ? 'var(--bg-hover)' : 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-                  <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
+                <Icon name="menu" size={18} strokeWidth={2} />
               </button>
 
               {deskMenu && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, paddingTop: 10, zIndex: 200 }}>
+                <div style={{ position: 'absolute', top: '100%', right: 0, paddingTop: 8, zIndex: 200 }}>
                 <div
                   className="nav-menu-dropdown dropdown-panel"
                   style={{
-                    minWidth: 210, padding: 8,
+                    minWidth: 220, padding: 6,
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-default)',
-                    borderRadius: 14,
-                    boxShadow: '0 16px 48px var(--shadow-menu)',
+                    borderRadius: 12,
+                    boxShadow: 'var(--shadow-pop)',
                   }}
                 >
                   {navLinks.slice(1).map(item => (
@@ -541,10 +484,10 @@ export function Navbar() {
                       onClick={() => setDeskMenu(false)}
                       style={{
                         display: 'block', textDecoration: 'none',
-                        padding: '11px 14px', borderRadius: 9,
-                        fontSize: '0.875rem', fontWeight: 600,
+                        padding: '9px 12px', borderRadius: 8,
+                        fontSize: 14, fontWeight: 500,
                         color: isActive(item.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                        background: isActive(item.to) ? 'var(--oro-dim)' : 'transparent',
+                        background: isActive(item.to) ? 'var(--bg-hover)' : 'transparent',
                       }}
                     >
                       {item.label}
@@ -560,10 +503,10 @@ export function Navbar() {
                         onClick={() => setDeskMenu(false)}
                         style={{
                           display: 'block', textDecoration: 'none',
-                          padding: '11px 14px', borderRadius: 9,
-                          fontSize: '0.875rem', fontWeight: 600,
+                          padding: '9px 12px', borderRadius: 8,
+                          fontSize: 14, fontWeight: 500,
                           color: isActive('/siguiendo') ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          background: isActive('/siguiendo') ? 'var(--oro-dim)' : 'transparent',
+                          background: isActive('/siguiendo') ? 'var(--bg-hover)' : 'transparent',
                         }}
                       >
                         {t('nav.following')}
@@ -573,10 +516,10 @@ export function Navbar() {
                         onClick={() => setDeskMenu(false)}
                         style={{
                           display: 'block', textDecoration: 'none',
-                          padding: '11px 14px', borderRadius: 9,
-                          fontSize: '0.875rem', fontWeight: 600,
+                          padding: '9px 12px', borderRadius: 8,
+                          fontSize: 14, fontWeight: 500,
                           color: isActive('/perfil') ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          background: isActive('/perfil') ? 'var(--oro-dim)' : 'transparent',
+                          background: isActive('/perfil') ? 'var(--bg-hover)' : 'transparent',
                         }}
                       >
                         {t('nav.myProfile')}
@@ -585,8 +528,8 @@ export function Navbar() {
                         onClick={() => { setDeskMenu(false); logout() }}
                         style={{
                           display: 'block', width: '100%', textAlign: 'left',
-                          padding: '11px 14px', borderRadius: 9, border: 'none',
-                          fontSize: '0.875rem', fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                          padding: '9px 12px', borderRadius: 8, border: 'none',
+                          fontSize: 14, fontWeight: 500, fontFamily: 'inherit',
                           color: 'var(--text-tertiary)', background: 'transparent', cursor: 'pointer',
                         }}
                       >
@@ -606,7 +549,7 @@ export function Navbar() {
       {menuOpen && (
         <div className="mobile-drawer" style={{
           position: 'fixed',
-          top: 62,
+          top: 'var(--nav-h)',
           left: 0, right: 0, bottom: 0,
           background: 'var(--bg-base)',
           zIndex: 99,
@@ -616,8 +559,8 @@ export function Navbar() {
           {/* Navigation links */}
           <div style={{ padding: '12px 16px 0' }}>
             <div style={{
-              fontSize: '0.62rem', color: 'var(--text-tertiary)',
-              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+              fontSize: 12, color: 'var(--text-tertiary)',
+              fontWeight: 500,
               padding: '12px 4px 8px',
             }}>
               {t('nav.navigation')}
@@ -630,26 +573,14 @@ export function Navbar() {
                 style={{
                   textDecoration: 'none',
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '14px 16px', borderRadius: 12, marginBottom: 4,
-                  fontSize: '1rem', fontWeight: 700, fontFamily: "'DM Sans', sans-serif",
+                  padding: '13px 14px', borderRadius: 10, marginBottom: 2,
+                  fontSize: 15, fontWeight: isActive(link.to) ? 600 : 500,
                   color: isActive(link.to) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  background: isActive(link.to) ? 'var(--oro-dim)' : 'transparent',
-                  border: `1px solid ${isActive(link.to) ? 'var(--border-hover)' : 'transparent'}`,
+                  background: isActive(link.to) ? 'var(--bg-hover)' : 'transparent',
                 }}
               >
-                {link.to === '/' ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-                  </svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
-                  </svg>
-                )}
+                <Icon name={link.to === '/' ? 'home' : link.to === '/ligas' ? 'users' : link.to === '/clasificacion' ? 'trophy' : link.to === '/proponer' ? 'plus' : link.to === '/como-funciona' ? 'list' : 'chart'} size={18} style={{ color: 'var(--text-tertiary)' }} />
                 {link.label}
-                {isActive(link.to) && (
-                  <div style={{ marginLeft: 'auto', width: 6, height: 6, borderRadius: '50%', background: 'var(--blue)' }} />
-                )}
               </Link>
             ))}
           </div>
@@ -662,8 +593,8 @@ export function Navbar() {
             {user ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{
-                  fontSize: '0.62rem', color: 'var(--text-tertiary)',
-                  fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+                  fontSize: 12, color: 'var(--text-tertiary)',
+                  fontWeight: 500,
                   padding: '4px 4px 8px',
                 }}>
                   {t('nav.account')}
@@ -671,28 +602,19 @@ export function Navbar() {
                 {/* User card */}
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 14,
-                  padding: '16px', borderRadius: 14,
+                  padding: '14px', borderRadius: 12,
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-subtle)',
                 }}>
-                  <div style={{
-                    width: 46, height: 46, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.9rem', fontWeight: 800, color: '#07071A', fontFamily: "'DM Sans', sans-serif",
-                    border: '2px solid var(--oro-glow)',
-                  }}>
-                    {initials}
-                  </div>
+                  <Avatar name={user.display_name} size={44} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'DM Sans', sans-serif", marginBottom: 3 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>
                       {user.display_name}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--gold)', fontFamily: "'DM Mono', monospace", fontWeight: 700 }}>
+                    <div className="num" style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>
                       {formatNum(Math.floor(user.points))} PT
                     </div>
                   </div>
-                  <div className="live-dot" />
                 </div>
 
                 <Link
@@ -701,10 +623,9 @@ export function Navbar() {
                   style={{
                     textDecoration: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    padding: '15px', borderRadius: 12,
-                    fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)',
-                    background: 'var(--bg-card)', border: '1px solid var(--border-default)',
-                    fontFamily: "'DM Sans', sans-serif",
+                    padding: '14px', borderRadius: 10,
+                    fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
+                    background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -718,10 +639,9 @@ export function Navbar() {
                   style={{
                     textDecoration: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    padding: '15px', borderRadius: 12,
-                    fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)',
-                    background: 'var(--bg-card)', border: '1px solid var(--border-default)',
-                    fontFamily: "'DM Sans', sans-serif",
+                    padding: '14px', borderRadius: 10,
+                    fontSize: 15, fontWeight: 600, color: 'var(--text-primary)',
+                    background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -734,8 +654,7 @@ export function Navbar() {
                   style={{
                     background: 'transparent', border: '1px solid var(--border-subtle)',
                     borderRadius: 12, padding: '14px', fontSize: '0.875rem',
-                    color: 'var(--text-tertiary)', cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
+                    color: 'var(--text-tertiary)', cursor: 'pointer', fontWeight: 600,
                   }}
                 >
                   {t('nav.logout')}
@@ -744,42 +663,21 @@ export function Navbar() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{
-                  fontSize: '0.62rem', color: 'var(--text-tertiary)',
-                  fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
+                  fontSize: 12, color: 'var(--text-tertiary)',
+                  fontWeight: 500,
                   padding: '4px 4px 8px',
                 }}>
                   {t('nav.access')}
                 </div>
 
                 {/* Email/password CTA — primary */}
-                <button
-                  onClick={() => { setMenuOpen(false); setAuthModal('register') }}
-                  style={{
-                    background: 'var(--oro-fill)', border: 'none',
-                    borderRadius: 14, padding: '16px',
-                    fontSize: '0.95rem', fontWeight: 700, color: '#07071A',
-                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    boxShadow: '0 4px 20px var(--oro-glow)',
-                  }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                  </svg>
+                <button className="btn btn-primary btn-lg" onClick={() => { setMenuOpen(false); setAuthModal('register') }}>
+                  <Icon name="mail" size={18} />
                   {t('nav.registerEmail')}
                 </button>
 
                 {/* Login link */}
-                <button
-                  onClick={() => { setMenuOpen(false); setAuthModal('login') }}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: 14, padding: '15px',
-                    fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)',
-                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
+                <button className="btn btn-secondary btn-lg" onClick={() => { setMenuOpen(false); setAuthModal('login') }}>
                   {t('nav.haveAccount')}
                 </button>
 
@@ -792,13 +690,7 @@ export function Navbar() {
 
                 {/* OAuth options */}
                 <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
-                  <button style={{
-                    width: '100%', background: 'var(--bg-card)',
-                    border: '1px solid var(--border-default)', borderRadius: 14,
-                    padding: '15px', fontSize: '0.9rem', color: 'var(--text-primary)',
-                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  }}>
+                  <button className="btn btn-secondary btn-lg" style={{ width: '100%' }}>
                     <svg viewBox="0 0 24 24" width="18" height="18">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -809,13 +701,7 @@ export function Navbar() {
                   </button>
                 </a>
                 <a href={authApi.githubUrl()} style={{ textDecoration: 'none' }}>
-                  <button style={{
-                    width: '100%', background: 'var(--bg-card)',
-                    border: '1px solid var(--border-default)', borderRadius: 14,
-                    padding: '15px', fontSize: '0.9rem', color: 'var(--text-primary)',
-                    cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  }}>
+                  <button className="btn btn-secondary btn-lg" style={{ width: '100%' }}>
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
@@ -827,11 +713,7 @@ export function Navbar() {
 
             {/* Preferencias (tema) */}
             <div style={{ height: 1, background: 'var(--border-subtle)', margin: '20px 0 12px' }} />
-            <div style={{
-              fontSize: '0.62rem', color: 'var(--text-tertiary)',
-              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
-              padding: '4px 4px 8px',
-            }}>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, padding: '4px 4px 8px' }}>
               {t('nav.preferences')}
             </div>
             <ThemeControls variant="drawer" />
