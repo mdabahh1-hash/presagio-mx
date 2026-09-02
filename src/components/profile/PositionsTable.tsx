@@ -6,6 +6,8 @@ import { formatNum, formatPnl, formatDate } from '../../lib/format'
 import { Badge } from '../Badge'
 import { Icon } from '../Icon'
 import { Tabs } from '../Tabs'
+import { TeamMark } from '../TeamMark'
+import { cleanLabel } from '../../lib/mapMarket'
 
 interface Props {
   positions: ApiPosition[]
@@ -16,13 +18,15 @@ function positionValue(p: ApiPosition): number {
   return p.current_value ?? p.avg_cost * p.shares
 }
 
-function OutcomeBadge({ side, outcomeKey, outcomeLabel }: { side: string | null; outcomeKey: string | null; outcomeLabel?: string | null }) {
+function OutcomeBadge({ side, outcomeKey, outcomeLabel, marketId }: { side: string | null; outcomeKey: string | null; outcomeLabel?: string | null; marketId?: string | null }) {
   const { t } = useTranslation()
   const isYes = side === 'YES'
   const isNo = side === 'NO'
-  const label = isYes ? t('common.yes') : isNo ? t('common.no') : (outcomeLabel ?? outcomeKey ?? '—')
+  const raw = outcomeLabel ?? outcomeKey ?? '—'
+  const label = isYes ? t('common.yes') : isNo ? t('common.no') : cleanLabel(raw)
   return (
-    <Badge tone={isYes ? 'green' : isNo ? 'red' : 'neutral'} style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+    <Badge tone={isYes ? 'green' : isNo ? 'red' : 'neutral'} style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      {!isYes && !isNo && <TeamMark label={raw} outcomeKey={outcomeKey ?? ''} marketId={marketId} size={14} />}
       {label}
     </Badge>
   )
@@ -130,7 +134,7 @@ export function PositionsTable({ positions, history }: Props) {
                     borderBottom: '1px solid var(--border-subtle)', borderRadius: 8,
                   }}>
                     <div style={{ minWidth: 0 }}>
-                      <OutcomeBadge side={p.side} outcomeKey={p.outcome_key} />
+                      <OutcomeBadge side={p.side} outcomeKey={p.outcome_key} marketId={p.market_id} />
                       <div style={{
                         fontSize: '0.87rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: 6,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -172,7 +176,7 @@ export function PositionsTable({ positions, history }: Props) {
                   borderBottom: '1px solid var(--border-subtle)', borderRadius: 8,
                 }}>
                   <div style={{ minWidth: 0 }}>
-                    <OutcomeBadge side={e.side} outcomeKey={e.outcome_key} outcomeLabel={e.outcome_label} />
+                    <OutcomeBadge side={e.side} outcomeKey={e.outcome_key} outcomeLabel={e.outcome_label} marketId={e.market_id} />
                     <div style={{
                       fontSize: '0.87rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: 6,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',

@@ -8,6 +8,7 @@ import { useDebouncedValue, useThrottledValue } from '../lib/useDebouncedValue'
 import { formatNum } from '../lib/format'
 import { translateApiError } from '../lib/errors'
 import { Icon } from './Icon'
+import { TeamMark } from './TeamMark'
 
 interface BetBoxProps {
   marketId: string
@@ -16,6 +17,8 @@ interface BetBoxProps {
   outcomes?: ApiOutcome[]
   selectedOutcomeKey?: string | null
   onOutcomeSelect?: (key: string) => void
+  // Para resolver escudos junto a cada resultado
+  subcategory?: string | null
   onTraded?: (newYesPrice: number) => void
   onRequireAuth?: () => void
   compact?: boolean
@@ -30,6 +33,7 @@ export function BetBox({
   outcomes = [],
   selectedOutcomeKey,
   onOutcomeSelect,
+  subcategory,
   onTraded,
   onRequireAuth,
   compact = false,
@@ -152,6 +156,7 @@ export function BetBox({
                 <span style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isSelected ? 'var(--text-primary)' : 'var(--border-default)'}`, background: isSelected ? 'var(--text-primary)' : 'transparent', color: 'var(--bg-base)' }}>
                   {isSelected && <Icon name="check" size={11} strokeWidth={3} />}
                 </span>
+                <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={subcategory} marketId={marketId} size={20} />
                 <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                   {o.label}
                 </span>

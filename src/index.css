@@ -339,6 +339,14 @@ select.input { padding-right: 32px; appearance: none; }
   box-shadow: inset 0 0 0 1px var(--border-subtle);
 }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Composite "A vs B": dos escudos en diagonal (local arriba-izq, visitante abajo-der) */
+.thumb-vs { position: relative; }
+.thumb-vs img { position: absolute; width: 70%; height: 70%; object-fit: contain; padding: 2%; }
+.thumb-vs img:first-child { left: 0; top: 0; }
+.thumb-vs img:last-child  { right: 0; bottom: 0; }
+.thumb-vs--solo img { position: static; width: 78%; height: 78%; }
+/* Escudo pequeño junto a un resultado */
+.team-mark { flex-shrink: 0; object-fit: contain; display: block; }
 
 /* Avatar */
 .avatar {
@@ -475,6 +483,9 @@ input[type='range']::-webkit-slider-thumb {
   transition: background 0.15s;
 }
 .row-outcome-label { font-size: 11px; font-weight: 500; letter-spacing: 0; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.85; }
+/* Chip con escudo: [escudo][label][precio] en una fila */
+.row-outcome-btn--mark { flex-direction: row; gap: 7px; min-width: 96px; padding: 0 10px; }
+.row-outcome-btn--mark .row-outcome-label { max-width: 90px; font-size: 12px; }
 .row-outcome-price { font-size: 14px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
 
 .lb-row { transition: background 0.15s; }

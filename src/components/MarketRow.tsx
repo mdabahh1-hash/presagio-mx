@@ -5,7 +5,9 @@ import type { Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
+import { outcomeLogo } from '../lib/teamLogos'
 import { MarketThumb } from './MarketThumb'
+import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
 
 interface MarketRowProps {
@@ -34,13 +36,17 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
     : []
   const topOutcomes = sortedOutcomes.slice(0, 3)
   const restOutcomes = sortedOutcomes.length - topOutcomes.length
+  // Si algún resultado tiene escudo, toda la fila usa el chip horizontal
+  const hasMarks = isMulti && sortedOutcomes.some(o => outcomeLogo(o, market.subcategory, market.id))
+  const chipCls = `row-outcome-btn${hasMarks ? ' row-outcome-btn--mark' : ''}`
 
   const outcomesBlock = (
     <div className="market-row-outcomes">
       {isMulti ? (
         <>
           {topOutcomes.map(o => (
-            <div key={o.outcome_key} className="row-outcome-btn" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
+            <div key={o.outcome_key} className={chipCls} style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
+              {hasMarks && <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={18} />}
               <span className="row-outcome-label" title={o.label}>{o.label}</span>
               <span className="row-outcome-price">{Math.round(o.price)}%</span>
             </div>

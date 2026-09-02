@@ -5,6 +5,7 @@ import type { Market, Outcome } from '../types'
 import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
 import { MarketThumb } from './MarketThumb'
+import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
 
 interface MarketCardProps {
@@ -12,7 +13,7 @@ interface MarketCardProps {
   animClass?: string
 }
 
-function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
+function MultiOutcomeList({ outcomes, sub, marketId }: { outcomes: Outcome[]; sub?: string | null; marketId: string }) {
   const { t } = useTranslation()
   const sorted = [...outcomes].sort((a, b) => b.price - a.price)
   const top = sorted.slice(0, 3)
@@ -21,7 +22,8 @@ function MultiOutcomeList({ outcomes }: { outcomes: Outcome[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {top.map(o => (
-        <div key={o.outcome_key} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div key={o.outcome_key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={sub} marketId={marketId} size={18} />
           <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {o.label}
           </span>
@@ -71,7 +73,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
 
         {/* Probabilidad */}
         {isMulti ? (
-          <MultiOutcomeList outcomes={market.outcomes ?? []} />
+          <MultiOutcomeList outcomes={market.outcomes ?? []} sub={market.subcategory} marketId={market.id} />
         ) : (
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>

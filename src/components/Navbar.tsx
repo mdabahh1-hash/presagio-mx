@@ -13,6 +13,7 @@ import { Icon } from './Icon'
 import { Badge } from './Badge'
 import { Avatar } from './Avatar'
 import { MarketThumb } from './MarketThumb'
+import { TeamMark } from './TeamMark'
 import { AuthModal } from './AuthModal'
 import { DailyBonusPill } from './DailyBonusPill'
 import { formatNum } from '../lib/format'
@@ -312,7 +313,7 @@ export function Navbar() {
                             background: highlighted === i ? 'var(--bg-hover)' : 'transparent',
                           }}
                         >
-                          <MarketThumb market={{ imageUrl: m.image_url, subcategory: m.subcategory, category: m.category as Category }} size={32} radius={6} />
+                          <MarketThumb market={{ id: m.id, question: m.question, outcomes: m.outcomes, imageUrl: m.image_url, subcategory: m.subcategory, category: m.category as Category }} size={32} radius={6} />
                           <span style={{
                             flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -327,8 +328,9 @@ export function Navbar() {
                               <span className="num" style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                                 {Math.round(leader.price)}%
                               </span>
-                              <span style={{ display: 'block', fontSize: 11, color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                {cleanLabel(leader.label)}
+                              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, fontSize: 11, color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                                <TeamMark label={leader.label} outcomeKey={leader.outcome_key} sub={m.subcategory} marketId={m.id} size={14} />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{cleanLabel(leader.label)}</span>
                               </span>
                             </span>
                           )) : (

@@ -8,6 +8,8 @@ import { Logo } from '../components/Logo'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { displayPair } from '../lib/prices'
 import { SITE } from '../lib/embed'
+import { cleanLabel } from '../lib/mapMarket'
+import { TeamMark } from '../components/TeamMark'
 import type { PricePoint } from '../types'
 
 /** Widget incrustable: /embed/:id?ref=CODE — sin navbar/footer, solo el mercado. */
@@ -29,7 +31,7 @@ export function Embed() {
     marketsApi.get(id).then(m => {
       setMarket(m)
       setYesPrice(m.yes_price)
-      setOutcomes([...(m.outcomes ?? [])].sort((a, b) => b.price - a.price))
+      setOutcomes([...(m.outcomes ?? [])].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price))
       marketsApi.history(id, 365).then(hist => {
         setHistory(hist.filter((p: ApiPricePoint) => !p.outcome_key).map(p => ({ date: p.recorded_at, price: p.yes_price })))
         const series: Record<string, PricePoint[]> = {}
@@ -122,7 +124,8 @@ export function Embed() {
             {outcomes.slice(0, 3).map((o, i) => (
               <div key={o.outcome_key} style={{ display: 'contents' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: outcomeColor(i), flexShrink: 0 }} />
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: outcomeColor(i), flexShrink: 0 }} />
+                  <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={14} />
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.label}</span>
                 </span>
                 <span style={{ fontWeight: 700 }}>{Math.round(o.price)}%</span>

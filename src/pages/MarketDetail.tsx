@@ -19,6 +19,9 @@ import { Icon, type IconName } from '../components/Icon'
 import { Avatar } from '../components/Avatar'
 import { MarketThumb } from '../components/MarketThumb'
 import { Tabs } from '../components/Tabs'
+import { TeamMark } from '../components/TeamMark'
+import { outcomeLogo } from '../lib/teamLogos'
+import { cleanLabel } from '../lib/mapMarket'
 import type { Category } from '../types'
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
@@ -103,7 +106,7 @@ export function MarketDetail() {
       setYesPrice(m.yes_price)
       setVolume(m.volume)
       if (m.market_type === 'multi') {
-        const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
+        const sorted = [...(m.outcomes ?? [])].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price)
         setOutcomes(sorted)
         const preselected = copyOutcome && sorted.some(o => o.outcome_key === copyOutcome) ? copyOutcome : null
         setSelectedOutcomeKey(preselected ?? sorted[0]?.outcome_key ?? null)
@@ -254,7 +257,7 @@ export function MarketDetail() {
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--text-primary)'
   const hasMobileBar = isMobile && market.status === 'open'
   const leader = outcomes[0]
-  const thumbMarket = { imageUrl: market.image_url, subcategory: market.subcategory, category: market.category as Category }
+  const thumbMarket = { id: market.id, question: market.question, outcomes, imageUrl: market.image_url, subcategory: market.subcategory, category: market.category as Category }
   const statusPanel: Record<string, { icon: IconName; color: string; title: string; body: string }> = {
     resolved: { icon: 'trophy', color: 'var(--green)', title: t('market.winnerTitle', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key ?? '' }), body: t('market.pointsDistributed') },
     pending_resolution: { icon: 'hourglass', color: 'var(--accent)', title: t('market.pendingTitle'), body: t('market.pendingBody') },
@@ -272,6 +275,7 @@ export function MarketDetail() {
       outcomes={outcomes}
       selectedOutcomeKey={selectedOutcomeKey}
       onOutcomeSelect={setSelectedOutcomeKey}
+      subcategory={market.subcategory}
       initialSide={sheetSide ?? copySide}
       initialAmount={copyAmount}
       compact={hasMobileBar}
@@ -279,7 +283,7 @@ export function MarketDetail() {
         setYesPrice(p)
         if (market.market_type === 'multi') {
           marketsApi.outcomes(market.id).then(updated => {
-            setOutcomes([...updated].sort((a, b) => b.price - a.price))
+            setOutcomes([...updated].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price))
           }).catch(() => {})
         }
       }}
@@ -386,8 +390,10 @@ export function MarketDetail() {
                         transition: 'all 0.15s',
                       }}
                     >
-                      <span className="num" style={{ fontSize: 12, fontWeight: 500, width: 22, flexShrink: 0, color: 'var(--text-tertiary)' }}>
-                        {i + 1}
+                      <span className="num" style={{ fontSize: 12, fontWeight: 500, width: 22, height: 22, flexShrink: 0, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {outcomeLogo(o, market.subcategory, market.id)
+                          ? <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={22} />
+                          : i + 1}
                       </span>
                       <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {o.label}

@@ -8,6 +8,7 @@ import type { Market, PricePoint } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { formatVolume, daysLeft } from '../lib/format'
 import { MarketThumb } from './MarketThumb'
+import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
 
@@ -164,7 +165,8 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                     display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0',
                     borderTop: i > 0 ? '1px solid var(--border-subtle)' : 'none',
                   }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: `var(--chart-${i + 1})`, flexShrink: 0 }} />
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: `var(--chart-${i + 1})`, flexShrink: 0 }} />
+                    <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={m.subcategory} marketId={m.id} size={20} />
                     <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
                       {o.label}
                     </span>
