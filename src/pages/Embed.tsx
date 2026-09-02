@@ -105,9 +105,9 @@ export function Embed() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
         <a href={marketUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
           <Logo size={22} />
-          <span style={{ fontWeight: 700, letterSpacing: '0.08em', fontSize: '0.8rem', color: 'var(--text-primary)' }}>VEREDIKT</span>
+          <span style={{ fontWeight: 700, letterSpacing: '0.04em', fontSize: '0.8rem', color: 'var(--text-primary)' }}>VEREDIKT</span>
         </a>
-        <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: catColor, background: getCategoryBg(market.category), padding: '3px 8px', borderRadius: 99 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: catColor, background: getCategoryBg(market.category), padding: '3px 7px', borderRadius: 6 }}>
           {market.category}
         </span>
       </div>
@@ -152,11 +152,11 @@ export function Embed() {
         rel="noopener noreferrer"
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          height: 34, borderRadius: 99, textDecoration: 'none',
-          background: 'var(--gold)', color: '#0b0b0d', fontWeight: 700, fontSize: '0.8rem',
+          height: 34, borderRadius: 8, textDecoration: 'none',
+          background: 'var(--accent-fill)', color: 'var(--text-on-accent)', fontWeight: 600, fontSize: 13,
         }}
       >
-        {t('embed.cta')} →
+        {t('embed.cta')}
       </a>
     </div>
   )

@@ -56,21 +56,15 @@ function RailButton({ active, label, count, onClick, nested = false }: {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
         width: '100%', textAlign: 'left', cursor: 'pointer',
-        padding: '11px 14px', borderRadius: 10,
-        border: `1px solid ${active ? 'var(--oro-glow)' : 'transparent'}`,
-        background: active ? 'var(--oro-dim)' : 'transparent',
-        color: active ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600, fontSize: '0.86rem',
-        transition: 'all 0.15s', whiteSpace: 'nowrap',
+        padding: '8px 10px', borderRadius: 8, border: 'none',
+        background: active ? 'var(--bg-elevated)' : 'transparent',
+        color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+        fontWeight: active ? 600 : 500, fontSize: 14, fontFamily: 'inherit',
+        transition: 'background 0.15s, color 0.15s', whiteSpace: 'nowrap',
       }}
     >
       <span>{label}</span>
-      <span className="font-mono" style={{
-        fontSize: '0.72rem', fontWeight: 700,
-        color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-        background: active ? 'var(--oro-dim)' : 'var(--bg-elevated)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 99, padding: '1px 8px', minWidth: 22, textAlign: 'center',
-      }}>
+      <span className="num" style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)' }}>
         {count}
       </span>
     </button>
@@ -80,9 +74,8 @@ function RailButton({ active, label, count, onClick, nested = false }: {
 function RailHeader({ children }: { children: React.ReactNode }) {
   return (
     <div className="cat-rail-header" style={{
-      fontSize: '0.66rem', fontWeight: 600, letterSpacing: '0.08em',
-      textTransform: 'uppercase', color: 'var(--text-tertiary)',
-      padding: '6px 14px 4px',
+      fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)',
+      padding: '8px 10px 4px',
     }}>
       {children}
     </div>
@@ -91,20 +84,9 @@ function RailHeader({ children }: { children: React.ReactNode }) {
 
 function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 12px' }}>
-      <h3 className="font-display" style={{
-        margin: 0, fontSize: '1.05rem', fontWeight: 700, letterSpacing: '-0.02em',
-        color: 'var(--text-primary)',
-      }}>
-        {title}
-      </h3>
-      <span className="font-mono" style={{
-        fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)',
-        background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
-        borderRadius: 99, padding: '1px 8px',
-      }}>
-        {count}
-      </span>
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '0 0 2px', paddingBottom: 8, borderBottom: '1px solid var(--border-subtle)' }}>
+      <h3 className="section-title" style={{ fontSize: 16 }}>{title}</h3>
+      <span className="num" style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)' }}>{count}</span>
     </div>
   )
 }
@@ -227,10 +209,10 @@ export function CategoryBrowse({
   if (loading) {
     return (
       <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start' }}>
-        <div className="skeleton" style={{ height: 280 }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="skeleton" style={{ height: 280, background: 'transparent', border: 'none' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 96 }} />
+            <div key={i} className="skeleton" style={{ height: 72, background: 'var(--bg-surface)', border: 'none' }} />
           ))}
         </div>
       </div>
@@ -312,8 +294,8 @@ export function CategoryBrowse({
 
       {/* Content */}
       <div style={{ minWidth: 0 }}>
-        <div className="cat-browse-head" style={{ marginBottom: 18 }}>
-          <div className="exchange-header" style={{ margin: 0 }}>
+        <div className="cat-browse-head" style={{ marginBottom: 12 }}>
+          <div className="meta-label">
             {headParts.join(' · ')} · {t('categoryBrowse.marketCount', { count: shown.length })}
           </div>
         </div>
@@ -323,7 +305,7 @@ export function CategoryBrowse({
             {sections.map(sec => (
               <section key={sec.title ?? '__all'}>
                 {sec.title && <SectionHeader title={sec.title} count={sec.items.length} />}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {sec.items.map(m => (
                     <MarketRow key={m.id} market={m} hideSubcategory={!!sec.title && sec.title === m.subcategory} />
                   ))}

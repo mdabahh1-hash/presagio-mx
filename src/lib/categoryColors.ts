@@ -24,7 +24,3 @@ export function getCategoryColor(category: string): string {
 export function getCategoryBg(category: string): string {
   return `var(--cat-${CATEGORY_TOKEN[category] ?? 'default'}-bg)`
 }
-
-export function getCategoryBorder(category: string): string {
-  return `var(--cat-${CATEGORY_TOKEN[category] ?? 'default'}-border)`
-}

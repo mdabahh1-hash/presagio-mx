@@ -6,7 +6,8 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
-import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
+import { Tabs } from '../components/Tabs'
+import { Icon } from '../components/Icon'
 import { CATEGORIES, SUBCATEGORIES, sportOfSub } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 
@@ -115,29 +116,17 @@ export function Markets() {
         alignItems: 'flex-start', flexWrap: 'wrap', gap: 16,
       }}>
         <div>
-          <h1 className="font-display" style={{
-            fontSize: '2.2rem', fontWeight: 700,
-            letterSpacing: '-0.04em', margin: '0 0 8px',
-          }}>
+          <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
             {t('markets.title')}
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', margin: 0 }}>
-            {loading ? (
-              <span style={{ color: 'var(--text-tertiary)' }}>{t('common.loading')}</span>
-            ) : (
-              <>
-                <span style={{ color: 'var(--green)', fontWeight: 700 }}>{markets.length}</span>
-                {' '}{t('markets.activeCount')}
-              </>
+          <p className="meta-label" style={{ margin: 0 }}>
+            {loading ? t('common.loading') : (
+              <><span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{markets.length}</span>{' '}{t('markets.activeCount')}</>
             )}
           </p>
         </div>
-        <Link to="/proponer" className="markets-page-cta" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
-          border: '1px solid var(--gold)', color: 'var(--gold)',
-          background: 'var(--oro-dim)', fontWeight: 700, fontSize: '0.85rem', whiteSpace: 'nowrap', flexShrink: 0,
-        }}>
+        <Link to="/proponer" className="markets-page-cta btn btn-secondary">
+          <Icon name="plus" size={14} strokeWidth={2} />
           {t('home.proposeCta')}
         </Link>
       </div>
@@ -146,85 +135,43 @@ export function Markets() {
       <div className="anim-2" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 36 }}>
         {/* Search bar — solo móvil (en desktop el navbar ya busca) */}
         <form onSubmit={handleSearch} className="markets-page-search">
-          <div style={{
-            display: 'flex',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-default)',
-            borderRadius: 12, overflow: 'hidden',
-            maxWidth: 560,
-            transition: 'border-color 0.15s',
-          }}>
-            <span style={{
-              display: 'flex', alignItems: 'center',
-              paddingLeft: 16, color: 'var(--text-tertiary)',
-            }}>
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
-                <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </span>
+          <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 560, padding: '0 8px 0 12px', height: 44 }}>
+            <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
             <input
               type="text"
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
               placeholder={t('home.searchPlaceholder')}
-              style={{
-                flex: 1, background: 'transparent', border: 'none',
-                outline: 'none', padding: '13px 14px',
-                fontSize: '0.875rem', color: 'var(--text-primary)',
-              }}
+              style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: 'var(--text-primary)', fontFamily: 'inherit' }}
             />
             {searchInput && (
               <button
                 type="button"
                 onClick={() => { setSearchInput(''); setSearchParams(p => { p.delete('q'); return p }) }}
-                style={{
-                  background: 'transparent', border: 'none',
-                  padding: '0 14px', color: 'var(--text-tertiary)',
-                  cursor: 'pointer', fontSize: '1.1rem',
-                }}
-              >×</button>
+                className="icon-btn"
+                style={{ width: 28, height: 28 }}
+                aria-label={t('common.close')}
+              >
+                <Icon name="x" size={14} />
+              </button>
             )}
           </div>
         </form>
 
-        {/* Category pills + sort */}
-        <div className="markets-controls" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {ALL_CATEGORIES.map(cat => {
-              const isActive = cat === activeCategory
-              const color = cat === 'Todos' ? 'var(--blue)' : getCategoryColor(cat)
-              return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryClick(cat)}
-                  style={{
-                    background: isActive
-                      ? cat === 'Todos' ? 'var(--oro-dim)' : getCategoryBg(cat)
-                      : 'transparent',
-                    border: `1px solid ${isActive ? color : 'var(--border-subtle)'}`,
-                    borderRadius: 99, padding: '7px 14px',
-                    fontSize: '0.78rem', fontWeight: 600,
-                    color: isActive ? color : 'var(--text-tertiary)',
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  {cat === 'Todos' ? t('markets.allCategory') : cat}
-                </button>
-              )
-            })}
-          </div>
+        {/* Tabs de categoría (texto + subrayado, escriben ?cat=) + orden */}
+        <div className="markets-controls tabs-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
+          <Tabs<Category | 'Todos'>
+            items={ALL_CATEGORIES.map(cat => ({ key: cat, label: cat === 'Todos' ? t('markets.allCategory') : cat }))}
+            active={activeCategory}
+            onChange={handleCategoryClick}
+            style={{ minWidth: 0, flex: 1 }}
+          />
           {activeCategory === 'Todos' && (
             <select
+              className="input"
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 10, padding: '9px 14px',
-                fontSize: '0.8rem', color: 'var(--text-secondary)',
-                outline: 'none', cursor: 'pointer',
-              }}
+              style={{ height: 36, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: 6, flexShrink: 0 }}
             >
               {sortOptions.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -250,29 +197,20 @@ export function Markets() {
         <>
           {/* Results count */}
           {!loading && (
-            <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{
-                fontSize: '0.72rem', fontWeight: 700,
-                color: 'var(--text-tertiary)',
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 99, padding: '3px 10px',
-              }}>
-                {t('markets.resultCount', { count: markets.length })}
-              </span>
+            <div className="meta-label" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span className="num">{t('markets.resultCount', { count: markets.length })}</span>
               {searchInput && (
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   {t('markets.searchLabel')} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
                   <button
                     type="button"
                     aria-label={t('common.close')}
                     onClick={() => { setSearchInput(''); setSearchParams(p => { p.delete('q'); return p }) }}
-                    style={{
-                      background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 99,
-                      width: 22, height: 22, lineHeight: 1, cursor: 'pointer', color: 'var(--text-tertiary)',
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', padding: 0,
-                    }}
-                  >×</button>
+                    className="icon-btn"
+                    style={{ width: 22, height: 22 }}
+                  >
+                    <Icon name="x" size={12} />
+                  </button>
                 </span>
               )}
             </div>
@@ -294,19 +232,14 @@ export function Markets() {
           ) : (
             <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--text-secondary)' }}>
               <div style={{
-                width: 64, height: 64, borderRadius: '50%',
+                width: 56, height: 56, borderRadius: '50%',
                 background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-subtle)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto 20px',
-                fontSize: '1.5rem',
+                margin: '0 auto 16px', color: 'var(--text-tertiary)',
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <circle cx="11" cy="11" r="8" stroke="var(--text-tertiary)" strokeWidth="1.5"/>
-                  <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
+                <Icon name="search" size={22} />
               </div>
-              <p style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>
+              <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
                 {t('markets.emptyTitle')}
               </p>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>

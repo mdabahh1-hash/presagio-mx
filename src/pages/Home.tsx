@@ -99,7 +99,7 @@ export function Home() {
             {!loading && (
               <div style={{ padding: '16px 16px 4px' }}>
                 <h2 className="section-title" style={{ fontSize: 16, marginBottom: 12 }}>{t('home.featuredMarket')}</h2>
-                <FeaturedCarousel markets={apiMarkets} />
+                <FeaturedCarousel markets={markets} />
               </div>
             )}
 
@@ -150,7 +150,7 @@ export function Home() {
             {loading ? (
               <div className="skeleton" style={{ height: 420 }} />
             ) : (
-              <FeaturedCarousel markets={apiMarkets} />
+              <FeaturedCarousel markets={markets} />
             )}
             <div className="featured-side">
               {loading ? (

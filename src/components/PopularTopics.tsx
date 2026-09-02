@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Market } from '../types'
 import { formatVolume } from '../lib/format'
+import { MarketThumb } from './MarketThumb'
 
 // "Temas populares" — real data: the markets with the most actual betting volume.
 // Reuses the markets already loaded on Home (no extra request). Falls back to
@@ -24,38 +25,23 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
   if (top.length === 0) return null
 
   return (
-    <div className="card popular-card" style={{ padding: '18px 18px 10px' }}>
-      <div className="exchange-header" style={{ marginBottom: 14 }}>{t('popular.title')}</div>
+    <div className="card popular-card" style={{ padding: '16px 16px 8px' }}>
+      <h3 className="section-title" style={{ fontSize: 16, marginBottom: 6 }}>{t('popular.title')}</h3>
       <div className="popular-list" style={{ display: 'flex', flexDirection: 'column' }}>
         {top.map((m, i) => (
-          <Link
-            key={m.id}
-            to={`/mercado/${m.id}`}
-            className="popular-row"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              textDecoration: 'none', padding: '12px 8px',
-              borderTop: i === 0 ? 'none' : '1px solid var(--border-subtle)',
-            }}
-          >
-            <span className="font-mono" style={{
-              fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-tertiary)',
-              width: 16, flexShrink: 0, textAlign: 'center',
-            }}>
+          <Link key={m.id} to={`/mercado/${m.id}`} className="list-row is-link popular-row" style={{ padding: '10px 4px', gap: 10 }}>
+            <span className="num" style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)', width: 14, flexShrink: 0, textAlign: 'center' }}>
               {i + 1}
             </span>
+            <MarketThumb market={m} size={32} radius={6} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)',
-                lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {m.question}
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 2 }}>
-                {m.volume > 0 ? t('popular.volumeLine', { vol: formatVolume(m.volume) }) : t('popular.trending')}
-              </div>
             </div>
-            <span style={{ fontSize: '1rem', flexShrink: 0 }} aria-hidden>🔥</span>
+            <span className="meta-label num" style={{ flexShrink: 0 }}>
+              {m.volume > 0 ? `${formatVolume(m.volume)} PT` : t('popular.trending')}
+            </span>
           </Link>
         ))}
       </div>

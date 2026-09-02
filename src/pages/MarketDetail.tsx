@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { displayPair } from '../lib/prices'
-import { getCategoryColor, getCategoryBg, getCategoryBorder } from '../lib/categoryColors'
+import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -14,6 +14,12 @@ import { formatVolume, formatDate, daysLeft } from '../lib/format'
 import { buildEmbedSnippet } from '../lib/embed'
 import { useMobile } from '../lib/useMobile'
 import { useElementWidth } from '../lib/useElementWidth'
+import { Badge } from '../components/Badge'
+import { Icon, type IconName } from '../components/Icon'
+import { Avatar } from '../components/Avatar'
+import { MarketThumb } from '../components/MarketThumb'
+import { Tabs } from '../components/Tabs'
+import type { Category } from '../types'
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
 const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
@@ -235,7 +241,8 @@ export function MarketDetail() {
     return (
       <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
         <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('market.notFound')}</p>
-        <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+        <Link to="/mercados" className="btn btn-secondary">
+          <Icon name="arrow-left" size={14} />
           {t('market.backToMarkets')}
         </Link>
       </div>
@@ -244,9 +251,18 @@ export function MarketDetail() {
 
   const catColor = getCategoryColor(market.category)
   const pair = displayPair(yesPrice)  // NO derived from rounded YES: always sums to 100
-  const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
+  const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--text-primary)'
   const hasMobileBar = isMobile && market.status === 'open'
   const leader = outcomes[0]
+  const thumbMarket = { imageUrl: market.image_url, subcategory: market.subcategory, category: market.category as Category }
+  const statusPanel: Record<string, { icon: IconName; color: string; title: string; body: string }> = {
+    resolved: { icon: 'trophy', color: 'var(--green)', title: t('market.winnerTitle', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key ?? '' }), body: t('market.pointsDistributed') },
+    pending_resolution: { icon: 'hourglass', color: 'var(--accent)', title: t('market.pendingTitle'), body: t('market.pendingBody') },
+    resolved_yes: { icon: 'check', color: 'var(--green)', title: t('market.resolvedYesWon'), body: t('market.pointsDistributed') },
+    resolved_no: { icon: 'x', color: 'var(--red)', title: t('market.resolvedNoWon'), body: t('market.pointsDistributed') },
+    closed: { icon: 'lock', color: 'var(--text-secondary)', title: t('market.closedTitle'), body: t('market.closedBody') },
+    cancelled: { icon: 'ban', color: 'var(--text-tertiary)', title: t('market.cancelledTitle'), body: t('market.cancelledBody') },
+  }
 
   const betBox = (
     <BetBox
@@ -273,41 +289,33 @@ export function MarketDetail() {
   return (
     <div className={`page-container market-detail-page${hasMobileBar ? ' has-mobile-bar' : ''}`} style={{ paddingTop: 32, paddingBottom: 24 }}>
       {/* Breadcrumb */}
-      <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 28, fontSize: '0.78rem', flexWrap: 'wrap' }}>
+      <div className="anim-1 meta-label" style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', fontSize: 13 }}>
         <button
           onClick={() => navigate(-1)}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-            color: 'var(--text-tertiary)', fontSize: '0.78rem',
-            display: 'flex', alignItems: 'center', gap: 4, transition: 'color 0.15s',
-          }}
+          className="btn btn-ghost btn-sm"
+          style={{ padding: '0 8px 0 4px', height: 28, marginLeft: -4 }}
         >
+          <Icon name="arrow-left" size={14} />
           {t('common.back')}
         </button>
-        <span style={{ color: 'var(--border-subtle)' }}>·</span>
-        <Link to="/mercados" style={{ color: 'var(--text-tertiary)', textDecoration: 'none', transition: 'color 0.15s' }}>
+        <Link to="/mercados" style={{ color: 'var(--text-tertiary)', textDecoration: 'none' }}>
           {t('market.breadcrumbMarkets')}
         </Link>
-        <span style={{ color: 'var(--border-default)' }}>›</span>
-        <Link
-          to={`/mercados?cat=${encodeURIComponent(market.category)}`}
-          style={{ color: catColor, textDecoration: 'none', transition: 'opacity 0.15s' }}
-        >
+        <Icon name="chevron-right" size={12} style={{ color: 'var(--text-tertiary)' }} />
+        <Link to={`/mercados?cat=${encodeURIComponent(market.category)}`} style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>
           {market.category}
         </Link>
         {market.subcategory && (
           <>
-            <span style={{ color: 'var(--border-default)' }}>›</span>
+            <Icon name="chevron-right" size={12} style={{ color: 'var(--text-tertiary)' }} />
             <Link
               to={`/mercados?cat=${encodeURIComponent(market.category)}&sub=${encodeURIComponent(market.subcategory)}`}
-              style={{ color: catColor, textDecoration: 'none', transition: 'opacity 0.15s' }}
+              style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}
             >
               {market.subcategory}
             </Link>
           </>
         )}
-        <span style={{ color: 'var(--border-default)' }}>›</span>
-        <span style={{ color: 'var(--text-secondary)' }}>{market.question.slice(0, 42)}…</span>
       </div>
 
       <div className="market-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 28, alignItems: 'start' }}>
@@ -316,69 +324,47 @@ export function MarketDetail() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* Market header */}
-          <div className="anim-1 card" style={{ padding: '28px 30px 26px' }}>
-            {/* Badges row */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'center' }}>
-              <span style={{
-                fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
-                textTransform: 'uppercase', color: catColor,
-                background: getCategoryBg(market.category), border: `1px solid ${getCategoryBorder(market.category)}`,
-                padding: '3px 10px', borderRadius: 99,
-              }}>
-                {market.category}
-              </span>
-              {market.trending && (
-                <span style={{
-                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
-                  textTransform: 'uppercase', color: 'var(--gold)',
-                  background: 'var(--oro-dim)',
-                  border: '1px solid var(--oro-glow)',
-                  padding: '3px 8px', borderRadius: 99,
-                }}>
-                  {t('common.trendingBadge')}
-                </span>
-              )}
-              {market.status === 'open' && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                  <div className="live-dot" />
-                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 600, letterSpacing: '0.04em' }}>{t('common.live')}</span>
+          <div className="anim-1">
+            {/* Cabecera: thumbnail + badges + pregunta */}
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 16 }}>
+              <MarketThumb market={thumbMarket} size={64} />
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Badge tone="category" color={catColor} bg={getCategoryBg(market.category)}>{market.subcategory ?? market.category}</Badge>
+                  {market.trending && <Badge icon="trending">{t('common.trendingBadge')}</Badge>}
+                  {market.status === 'pending_resolution' && <Badge tone="accent">{t('common.pendingBadge')}</Badge>}
                 </div>
-              )}
+                <h1 style={{ fontSize: 'clamp(1.2rem, 2.2vw, 1.5rem)', fontWeight: 600, letterSpacing: '-0.015em', margin: 0, lineHeight: 1.25 }}>
+                  {market.question}
+                </h1>
+              </div>
             </div>
 
             {/* Resolved banner */}
             {(market.status === 'resolved_yes' || market.status === 'resolved_no') && (
               <div style={{
+                display: 'flex', alignItems: 'center', gap: 8,
                 background: market.status === 'resolved_yes' ? 'var(--green-soft)' : 'var(--red-soft)',
-                border: `1px solid ${market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)'}`,
-                borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-                fontSize: '0.875rem', fontWeight: 700,
+                borderRadius: 8, padding: '10px 14px', marginBottom: 16,
+                fontSize: 14, fontWeight: 600,
                 color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)',
               }}>
+                <Icon name={market.status === 'resolved_yes' ? 'check' : 'x'} size={16} strokeWidth={2.2} />
                 {market.status === 'resolved_yes' ? t('market.resolvedYes') : t('market.resolvedNo')}
               </div>
             )}
             {market.status === 'resolved' && market.resolved_outcome_key && (
               <div style={{
-                background: 'var(--green-soft)',
-                border: '1px solid var(--green)',
-                borderRadius: 10, padding: '12px 16px', marginBottom: 20,
-                fontSize: '0.875rem', fontWeight: 700, color: 'var(--green)',
+                display: 'flex', alignItems: 'center', gap: 8,
+                background: 'var(--green-soft)', borderRadius: 8, padding: '10px 14px', marginBottom: 16,
+                fontSize: 14, fontWeight: 600, color: 'var(--green)',
               }}>
-                {t('market.winner', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key })} ✓
+                <Icon name="trophy" size={16} />
+                {t('market.winner', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key })}
               </div>
             )}
 
-            {/* Question */}
-            <h1 className="font-display" style={{
-              fontSize: 'clamp(1.25rem, 3vw, 1.85rem)',
-              fontWeight: 700, letterSpacing: '-0.025em',
-              margin: '0 0 18px', lineHeight: 1.25,
-            }}>
-              {market.question}
-            </h1>
-
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0 0 28px', lineHeight: 1.7 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: '0 0 20px', lineHeight: 1.65 }}>
               {market.description}
             </p>
 
@@ -394,30 +380,23 @@ export function MarketDetail() {
                       onClick={() => setSelectedOutcomeKey(o.outcome_key)}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 12,
-                        padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
-                        border: `1.5px solid ${isWinner ? 'var(--green)' : isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
-                        background: isWinner ? 'var(--green-soft)' : isSelected ? 'var(--oro-dim)' : 'transparent',
+                        padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                        border: `1px solid ${isWinner ? 'var(--green-border)' : isSelected ? 'var(--border-hover)' : 'var(--border-subtle)'}`,
+                        background: isWinner ? 'var(--green-soft)' : isSelected ? 'var(--bg-elevated)' : 'transparent',
                         transition: 'all 0.15s',
                       }}
                     >
-                      <span style={{
-                        fontSize: '0.72rem', fontWeight: 600, width: 28, flexShrink: 0,
-                        color: i === 0 ? 'var(--gold)' : 'var(--text-tertiary)',
-                      }}>
-                        #{i + 1}
+                      <span className="num" style={{ fontSize: 12, fontWeight: 500, width: 22, flexShrink: 0, color: 'var(--text-tertiary)' }}>
+                        {i + 1}
                       </span>
-                      <span style={{ flex: 1, fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-primary)' }}>
+                      <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {o.label}
-                        {isWinner && <span style={{ marginLeft: 8, color: 'var(--green)' }}>✓</span>}
+                        {isWinner && <Icon name="check" size={14} strokeWidth={2.2} style={{ color: 'var(--green)' }} />}
                       </span>
-                      <div style={{ width: 80, background: 'var(--border-subtle)', borderRadius: 3, height: 5, flexShrink: 0 }}>
-                        <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--gold)', borderRadius: 3 }} />
+                      <div style={{ width: 80, background: 'var(--border-subtle)', borderRadius: 2, height: 4, flexShrink: 0 }}>
+                        <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--text-secondary)', borderRadius: 2 }} />
                       </div>
-                      <span style={{
-                        width: 48, textAlign: 'right', flexShrink: 0,
-                        fontSize: '0.88rem', fontWeight: 700,
-                        color: isWinner ? 'var(--green)' : 'var(--gold)',
-                      }}>
+                      <span className="num" style={{ width: 52, textAlign: 'right', flexShrink: 0, fontSize: 14, fontWeight: 600, color: isWinner ? 'var(--green)' : 'var(--text-primary)' }}>
                         {o.price.toFixed(1)}%
                       </span>
                     </div>
@@ -426,41 +405,18 @@ export function MarketDetail() {
               </div>
             ) : (
               <>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 20 }}>
-                  <div>
-                    <span style={{
-                      fontSize: 'clamp(3rem, 6vw, 4.5rem)',
-                      fontWeight: 700,
-                      color: yesColor, lineHeight: 1,
-                      letterSpacing: '-0.04em',
-                    }}>
-                      {pair.yes}%
-                    </span>
-                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 500 }}>{t('common.yes')}</span>
-                  </div>
-                  <div style={{ paddingBottom: 8, opacity: 0.5 }}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      {pair.no}%
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 500 }}>{t('common.no')}</span>
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
+                  <span className="num" style={{ fontSize: 'clamp(2.2rem, 4vw, 2.8rem)', fontWeight: 700, color: yesColor, lineHeight: 1, letterSpacing: '-0.02em' }}>
+                    {pair.yes}%
+                  </span>
+                  <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{t('carousel.chance')}</span>
                 </div>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>
-                    <span style={{ color: 'var(--green)' }}>{t('common.yes')} · {pair.yes}%</span>
-                    <span style={{ color: 'var(--red)' }}>{t('common.no')} · {pair.no}%</span>
-                  </div>
-                  <div className="prob-bar-dual">
-                    <div style={{
-                      width: `${yesPrice}%`,
-                      background: 'linear-gradient(90deg, var(--green), var(--green-grad-2))',
-                      transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }} />
-                    <div style={{
-                      flex: 1,
-                      background: 'linear-gradient(90deg, var(--red-grad-2), var(--red))',
-                    }} />
-                  </div>
+                <div className="prob-bar-track" style={{ height: 6, marginBottom: 6 }}>
+                  <div className="prob-bar-fill" style={{ width: `${yesPrice}%`, background: yesColor === 'var(--text-primary)' ? 'var(--text-secondary)' : yesColor }} />
+                </div>
+                <div className="meta-label num" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: 'var(--green)' }}>{t('common.yes')} {pair.yes}%</span>
+                  <span style={{ color: 'var(--red)' }}>{t('common.no')} {pair.no}%</span>
                 </div>
               </>
             )}
@@ -469,53 +425,37 @@ export function MarketDetail() {
             {(() => {
               const url = `${window.location.origin}/m/${id}`
               const text = `${market.question} — Predice en VEREDIKT`
-              const iconBtn: React.CSSProperties = {
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 34, height: 34, borderRadius: '50%',
-                background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-                color: 'var(--text-secondary)', cursor: 'pointer', textDecoration: 'none',
-              }
+              const iconBtn: React.CSSProperties = { width: 34, height: 34, border: '1px solid var(--border-subtle)' }
               return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
-                  <span className="meta-label" style={{ fontSize: '0.78rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
+                  <span className="meta-label" style={{ marginRight: 4 }}>
                     {t('common.share')}
                   </span>
-                  <a className="share-btn" onClick={() => track('Share', { channel: 'whatsapp', market: id ?? '' })} href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareWhatsApp')} style={iconBtn}>
+                  <a className="icon-btn" onClick={() => track('Share', { channel: 'whatsapp', market: id ?? '' })} href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareWhatsApp')} style={iconBtn}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.358.101 11.892c0 2.096.549 4.142 1.595 5.945L0 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.582 0 11.94-5.358 11.944-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
                   </a>
-                  <a className="share-btn" onClick={() => track('Share', { channel: 'x', market: id ?? '' })} href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareX')} style={iconBtn}>
+                  <a className="icon-btn" onClick={() => track('Share', { channel: 'x', market: id ?? '' })} href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareX')} style={iconBtn}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                   </a>
                   <button
-                    className="share-btn"
+                    className="btn btn-secondary btn-sm"
                     onClick={() => { navigator.clipboard?.writeText(url); setCopied(true); track('Share', { channel: 'copy', market: id ?? '' }); setTimeout(() => setCopied(false), 2000) }}
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
-                      borderRadius: 99, background: 'var(--bg-elevated)',
-                      border: `1px solid ${copied ? 'var(--green)' : 'var(--border-default)'}`,
-                      color: copied ? 'var(--green)' : 'var(--text-secondary)', cursor: 'pointer',
-                      fontSize: '0.78rem', fontWeight: 600,
-                    }}
+                    style={{ height: 34, color: copied ? 'var(--green)' : undefined }}
                   >
+                    <Icon name={copied ? 'check' : 'copy'} size={14} />
                     {copied ? t('common.copied') : t('common.copyLink')}
                   </button>
                   <button
-                    className="share-btn"
+                    className="btn btn-secondary btn-sm"
                     onClick={() => { setShowEmbed(v => !v); track('Share', { channel: 'embed', market: id ?? '' }) }}
                     aria-expanded={showEmbed}
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 6, height: 34, padding: '0 14px',
-                      borderRadius: 99, background: showEmbed ? 'var(--bg-elevated-hover, var(--bg-elevated))' : 'var(--bg-elevated)',
-                      border: `1px solid ${showEmbed ? 'var(--gold)' : 'var(--border-default)'}`,
-                      color: showEmbed ? 'var(--gold)' : 'var(--text-secondary)', cursor: 'pointer',
-                      fontSize: '0.78rem', fontWeight: 600,
-                    }}
+                    style={{ height: 34, borderColor: showEmbed ? 'var(--border-hover)' : undefined }}
                   >
-                    <span style={{ fontSize: '0.8rem' }}>&lt;/&gt;</span>
+                    <Icon name="code" size={14} />
                     {t('market.embedBtn')}
                   </button>
                 </div>
@@ -525,17 +465,14 @@ export function MarketDetail() {
             {showEmbed && (() => {
               const snippet = buildEmbedSnippet(market, yesPrice, { ref: user?.referral_code ?? null })
               return (
-                <div style={{ marginTop: 14, padding: 14, borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border-default)' }}>
+                <div style={{ marginTop: 14, padding: 14, borderRadius: 12, background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{t('market.embedTitle')}</span>
+                    <span style={{ fontSize: 14, fontWeight: 600 }}>{t('market.embedTitle')}</span>
                     <button
+                      className="btn btn-primary btn-sm"
                       onClick={() => { navigator.clipboard?.writeText(snippet); setEmbedCopied(true); setTimeout(() => setEmbedCopied(false), 2000) }}
-                      style={{
-                        height: 30, padding: '0 12px', borderRadius: 99, cursor: 'pointer',
-                        background: embedCopied ? 'var(--green)' : 'var(--gold)', color: '#0b0b0d',
-                        border: 'none', fontSize: '0.75rem', fontWeight: 700,
-                      }}
                     >
+                      <Icon name={embedCopied ? 'check' : 'copy'} size={14} />
                       {embedCopied ? t('common.copied') : t('market.embedCopy')}
                     </button>
                   </div>
@@ -547,10 +484,10 @@ export function MarketDetail() {
                       src={`${window.location.origin}/#/embed/${encodeURIComponent(market.id)}`}
                       width={400}
                       height={320}
-                      style={{ border: '1px solid var(--border-default)', borderRadius: 16, maxWidth: '100%', background: 'var(--bg-base)' }}
+                      style={{ border: '1px solid var(--border-default)', borderRadius: 12, maxWidth: '100%', background: 'var(--bg-base)' }}
                     />
                   </div>
-                  <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 6 }}>{t('market.embedCode')}</div>
+                  <div className="meta-label" style={{ marginBottom: 6 }}>{t('market.embedCode')}</div>
                   <textarea
                     readOnly
                     value={snippet}
@@ -568,27 +505,16 @@ export function MarketDetail() {
           </div>
 
           {/* Chart */}
-          <div className="anim-2 card" style={{ padding: '24px 24px 20px' }}>
-            <div className="chart-head">
-              <div className="exchange-header">{t('market.historyTitle')}</div>
-              <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
-                {CHART_RANGES.map(p => (
-                  <button
-                    key={p}
-                    onClick={() => setChartRange(p)}
-                    style={{
-                      background: chartRange === p ? 'var(--bg-elevated)' : 'transparent',
-                      border: `1px solid ${chartRange === p ? 'var(--border-default)' : 'transparent'}`,
-                      borderRadius: 6, padding: '4px 10px',
-                      fontSize: '0.72rem', fontWeight: 600,
-                      color: chartRange === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {p === 'all' ? t('market.periodAll') : RANGE_LABELS[p]}
-                  </button>
-                ))}
+          <div className="anim-2" style={{ paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
+            <div className="chart-head" style={{ marginBottom: 8 }}>
+              <h3 className="section-title" style={{ fontSize: 16 }}>{t('market.historyTitle')}</h3>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Tabs<ChartRange>
+                  size="sm"
+                  items={CHART_RANGES.map(p => ({ key: p, label: p === 'all' ? t('market.periodAll') : RANGE_LABELS[p] }))}
+                  active={chartRange}
+                  onChange={setChartRange}
+                />
                 {market.market_type === 'multi' && (
                   <div ref={chartMenuRef} style={{ position: 'relative', marginLeft: 4 }}>
                     <button
@@ -596,24 +522,16 @@ export function MarketDetail() {
                       aria-label={t('market.showOnChart')}
                       aria-expanded={showChartMenu}
                       title={t('market.showOnChart')}
-                      style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 28, height: 28, borderRadius: 6, cursor: 'pointer',
-                        background: showChartMenu ? 'var(--bg-elevated)' : 'transparent',
-                        border: `1px solid ${showChartMenu ? 'var(--border-default)' : 'transparent'}`,
-                        color: 'var(--text-secondary)',
-                      }}
+                      className="icon-btn"
+                      style={{ width: 30, height: 30, background: showChartMenu ? 'var(--bg-hover)' : undefined }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="14" y2="12" /><line x1="4" y1="18" x2="9" y2="18" />
-                        <circle cx="17" cy="12" r="2" /><circle cx="12" cy="18" r="2" />
-                      </svg>
+                      <Icon name="sliders" size={15} />
                     </button>
                     {showChartMenu && (
-                      <div style={{
+                      <div className="dropdown-panel" style={{
                         position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 20, minWidth: 260,
-                        background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-                        borderRadius: 12, boxShadow: '0 12px 32px var(--shadow-menu)', padding: '12px 14px',
+                        background: 'var(--bg-card)', border: '1px solid var(--border-default)',
+                        borderRadius: 12, boxShadow: 'var(--shadow-pop)', padding: '12px 14px',
                       }}>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginBottom: 8 }}>
                           {t('market.showOnChart')}
@@ -638,15 +556,14 @@ export function MarketDetail() {
                                 onClick={() => toggleOutcome(o.outcome_key)}
                                 style={{
                                   width: 36, height: 20, borderRadius: 10, border: 'none', padding: 2, flexShrink: 0,
-                                  background: on ? 'var(--chart-1)' : 'var(--border-default)',
+                                  background: on ? 'var(--text-primary)' : 'var(--border-default)',
                                   cursor: lastOn ? 'default' : 'pointer', transition: 'background 0.15s',
                                   display: 'flex', alignItems: 'center',
                                 }}
                               >
                                 <span style={{
-                                  width: 16, height: 16, borderRadius: '50%', background: '#fff',
+                                  width: 16, height: 16, borderRadius: '50%', background: on ? 'var(--bg-base)' : 'var(--text-tertiary)',
                                   transform: on ? 'translateX(16px)' : 'translateX(0)', transition: 'transform 0.15s',
-                                  boxShadow: '0 1px 2px rgba(0,0,0,0.3)',
                                 }} />
                               </button>
                             </label>
@@ -672,130 +589,93 @@ export function MarketDetail() {
           </div>
 
           {/* Stats grid */}
-          <div className="anim-3 market-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+          <div className="anim-3 stat-row">
             {[
-              { label: t('market.statsVolume'), value: formatVolume(volume), unit: 'PT', color: 'var(--text-primary)' },
-              { label: t('market.statsTrades'), value: market.num_trades.toString(), unit: '', color: 'var(--text-primary)' },
-              { label: t('market.statsClose'), value: daysLeft(market.ends_at, market.status), unit: '', color: 'var(--gold)' },
-              { label: t('market.statsComments'), value: comments.length.toString(), unit: '', color: 'var(--text-primary)' },
+              { label: t('market.statsVolume'), value: formatVolume(volume), unit: 'PT' },
+              { label: t('market.statsTrades'), value: market.num_trades.toString(), unit: '' },
+              { label: t('market.statsClose'), value: daysLeft(market.ends_at, market.status), unit: '' },
+              { label: t('market.statsComments'), value: comments.length.toString(), unit: '' },
             ].map(stat => (
-              <div key={stat.label} className="stat-card" style={{ textAlign: 'center' }}>
-                <div className="font-mono" style={{ fontSize: '1.3rem', fontWeight: 700, color: stat.color, lineHeight: 1 }}>
+              <div key={stat.label}>
+                <div className="stat-label">{stat.label}</div>
+                <div className="stat-value">
                   {stat.value}
-                  {stat.unit && <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginLeft: 3, fontWeight: 500 }}>{stat.unit}</span>}
+                  {stat.unit && <span className="meta-label" style={{ marginLeft: 4 }}>{stat.unit}</span>}
                 </div>
-                <div className="meta-label" style={{ marginTop: 6 }}>{stat.label}</div>
               </div>
             ))}
           </div>
 
           {/* Resolution criteria */}
-          <div className="anim-4 card" style={{ padding: '22px 26px' }}>
-            <div className="exchange-header" style={{ marginBottom: 14 }}>{t('market.resolutionTitle')}</div>
-            <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          <div className="anim-4" style={{ paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
+            <h3 className="section-title" style={{ fontSize: 16, marginBottom: 10 }}>{t('market.resolutionTitle')}</h3>
+            <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
               {market.resolution_criteria}
             </p>
-            {market.resolution_source_url && (
-              <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{t('market.resolutionSource')}</span>
-                <a
-                  href={market.resolution_source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 5,
-                    fontSize: '0.8rem', fontWeight: 600, color: 'var(--blue)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  {(() => { try { return new URL(market.resolution_source_url).hostname.replace(/^www\./, '') } catch { return market.resolution_source_url } })()}
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </div>
-            )}
-            <div style={{ marginTop: 14, display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{t('market.closeDate')}</span>
-              <span className="font-mono" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                {formatDate(market.ends_at, { day: 'numeric', month: 'long', year: 'numeric' })}
+            <div className="meta-label" style={{ marginTop: 12, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+              {market.resolution_source_url && (
+                <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                  {t('market.resolutionSource')}
+                  <a
+                    href={market.resolution_source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'none' }}
+                  >
+                    {(() => { try { return new URL(market.resolution_source_url).hostname.replace(/^www\./, '') } catch { return market.resolution_source_url } })()}
+                    <Icon name="external" size={12} />
+                  </a>
+                </span>
+              )}
+              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                {t('market.closeDate')}
+                <span className="num" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {formatDate(market.ends_at, { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
               </span>
             </div>
           </div>
 
           {/* Comments */}
-          <div className="anim-5 card" style={{ padding: '24px 26px' }}>
-            <div className="exchange-header" style={{ marginBottom: 20 }}>
+          <div className="anim-5" style={{ paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
+            <h3 className="section-title" style={{ fontSize: 16, marginBottom: 16, display: 'flex', alignItems: 'baseline', gap: 8 }}>
               {t('market.discussion')}
-              <span style={{
-                marginLeft: 8, background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 99, padding: '1px 8px',
-                fontSize: '0.68rem', color: 'var(--text-tertiary)', fontWeight: 600,
-              }}>
-                {comments.length}
-              </span>
-            </div>
+              <span className="num" style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)' }}>{comments.length}</span>
+            </h3>
             {user ? (
-              <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
-                <div className="avatar" style={{ flexShrink: 0, marginTop: 3 }}>
-                  {user.display_name.slice(0, 2).toUpperCase()}
-                </div>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+                <Avatar name={user.display_name} size={32} style={{ marginTop: 3 }} />
                 <div style={{ flex: 1 }}>
                   <textarea
+                    className="input"
                     value={comment}
                     onChange={e => setComment(e.target.value)}
                     placeholder={t('market.commentPlaceholder')}
                     rows={3}
-                    style={{
-                      width: '100%',
-                      background: 'var(--bg-surface)',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: 10, padding: '12px 14px',
-                      fontSize: '0.875rem', color: 'var(--text-primary)', resize: 'vertical', outline: 'none',
-                      transition: 'border-color 0.15s',
-                    }}
+                    style={{ width: '100%', display: 'block' }}
                   />
-                  <button
-                    className="btn-comment-submit"
-                    onClick={handlePostComment}
-                    style={{
-                      marginTop: 10,
-                      background: 'var(--bg-elevated)',
-                      border: '1px solid var(--border-default)',
-                      borderRadius: 8, padding: '9px 18px',
-                      fontSize: '0.78rem', color: 'var(--text-primary)',
-                      fontWeight: 600, cursor: 'pointer',
-                      transition: 'all 0.15s',
-                    }}
-                  >
+                  <button className="btn btn-secondary btn-sm btn-comment-submit" onClick={handlePostComment} style={{ marginTop: 8 }}>
                     {t('market.publish')}
                   </button>
                 </div>
               </div>
             ) : (
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: 24 }}>
-                <a href={authApi.googleUrl()} style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 20 }}>
+                <a href={authApi.googleUrl()} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
                   {t('market.loginLink')}
                 </a>{' '}{t('market.toComment')}
               </p>
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               {comments.map(c => (
-                <div key={c.id} style={{ display: 'flex', gap: 12 }}>
-                  <div className="avatar" style={{ flexShrink: 0, marginTop: 2 }}>
-                    {c.user.display_name.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', marginBottom: 6 }}>
-                      <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{c.user.display_name}</span>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>
-                        {formatDate(c.created_at)}
-                      </span>
+                <div key={c.id} className="list-row" style={{ alignItems: 'flex-start', padding: '14px 0' }}>
+                  <Avatar name={c.user.display_name} size={28} style={{ marginTop: 2 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', marginBottom: 4 }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{c.user.display_name}</span>
+                      <span className="meta-label">{formatDate(c.created_at)}</span>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                       {c.text}
                     </p>
                     <button
@@ -804,13 +684,11 @@ export function MarketDetail() {
                           .then(updated => setComments(prev => prev.map(x => x.id === updated.id ? updated : x)))
                           .catch(() => {})
                       }
-                      style={{
-                        marginTop: 8, background: 'none', border: 'none',
-                        fontSize: '0.7rem', color: 'var(--text-tertiary)',
-                        cursor: 'pointer', padding: 0, transition: 'color 0.15s',
-                      }}
+                      className="btn btn-ghost btn-sm"
+                      style={{ marginTop: 6, marginLeft: -8, height: 26, padding: '0 8px', fontSize: 12, color: 'var(--text-tertiary)' }}
                     >
-                      ♥ {c.likes}
+                      <Icon name="heart" size={13} />
+                      <span className="num">{c.likes}</span>
                     </button>
                   </div>
                 </div>
@@ -820,99 +698,24 @@ export function MarketDetail() {
         </div>
 
         {/* ── Right: Trading panel ── */}
-        <div className={`market-trading-panel${hasMobileBar ? ' has-mobile-bar' : ''}`} style={{ position: 'sticky', top: 80 }}>
-          {market.status !== 'open' ? (
-            <div className="anim-2 card" style={{ padding: '32px 26px', textAlign: 'center' }}>
-              {market.status === 'resolved' && (
-                <>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: 'var(--green-soft)', border: '1px solid var(--green)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', fontSize: '1.4rem',
-                  }}>🏆</div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--green)', margin: '0 0 10px' }}>
-                    {t('market.winnerTitle', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key })}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    {t('market.pointsDistributed')}
-                  </p>
-                </>
-              )}
-              {market.status === 'pending_resolution' && (
-                <>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: 'var(--oro-dim)',
-                    border: '1px solid var(--oro-glow)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', fontSize: '1.4rem',
-                  }}>⏳</div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold)', margin: '0 0 10px' }}>
-                    {t('market.pendingTitle')}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    {t('market.pendingBody')}
-                  </p>
-                </>
-              )}
-              {(market.status === 'resolved_yes' || market.status === 'resolved_no') && (
-                <>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: market.status === 'resolved_yes' ? 'var(--green-soft)' : 'var(--red-soft)',
-                    border: `1px solid ${market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', fontSize: '1.4rem',
-                  }}>
-                    {market.status === 'resolved_yes' ? '✓' : '✕'}
-                  </div>
-                  <h3 style={{
-                    fontSize: '1rem', fontWeight: 700, margin: '0 0 10px',
-                    color: market.status === 'resolved_yes' ? 'var(--green)' : 'var(--red)',
-                  }}>
-                    {market.status === 'resolved_yes' ? t('market.resolvedYesWon') : t('market.resolvedNoWon')}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.65 }}>
-                    {t('market.pointsDistributed')}
-                  </p>
-                </>
-              )}
-              {market.status === 'closed' && (
-                <>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', fontSize: '1.4rem',
-                  }}>🔒</div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 10px' }}>
-                    {t('market.closedTitle')}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
-                    {t('market.closedBody')}
-                  </p>
-                </>
-              )}
-              {market.status === 'cancelled' && (
-                <>
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%',
-                    background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', fontSize: '1.4rem',
-                  }}>🚫</div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-tertiary)', margin: '0 0 10px' }}>
-                    {t('market.cancelledTitle')}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', margin: 0 }}>
-                    {t('market.cancelledBody')}
-                  </p>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="anim-2 card" style={{ padding: '24px 22px' }}>
+        <div className={`market-trading-panel${hasMobileBar ? ' has-mobile-bar' : ''}`} style={{ position: 'sticky', top: 'calc(var(--nav-h) + 16px)' }}>
+          {market.status !== 'open' ? (() => {
+            const s = statusPanel[market.status] ?? statusPanel.closed
+            return (
+              <div className="anim-2 card" style={{ padding: '28px 24px', textAlign: 'center' }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: '50%', background: 'var(--bg-elevated)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 14px', color: s.color,
+                }}>
+                  <Icon name={s.icon} size={20} strokeWidth={2} />
+                </div>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 6px' }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.6 }}>{s.body}</p>
+              </div>
+            )
+          })() : (
+            <div className="anim-2 card" style={{ padding: '20px' }}>
               {!hasMobileBar && betBox}
             </div>
           )}

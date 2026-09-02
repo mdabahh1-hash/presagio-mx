@@ -115,7 +115,7 @@ function ChartTooltip({ xView, viewW, title, rows }: { xView: number; viewW: num
       left: flip ? undefined : `calc(${pct}% + 12px)`,
       right: flip ? `calc(${100 - pct}% + 12px)` : undefined,
       background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-      boxShadow: '0 8px 24px var(--shadow-menu)', borderRadius: 8,
+      boxShadow: 'var(--shadow-pop)', borderRadius: 8,
       padding: '8px 10px', pointerEvents: 'none', zIndex: 2, minWidth: 120,
     }}>
       <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginBottom: rows.length ? 6 : 0, whiteSpace: 'nowrap' }}>
@@ -233,7 +233,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
           {/* Grid lines */}
           {yTicks.map(tk => (
             <line key={tk.label} x1={padL} y1={tk.y} x2={W - padR} y2={tk.y}
-              stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4,6" />
+              stroke="var(--chart-grid)" strokeWidth="1" />
           ))}
           {/* Lines */}
           {paths.map((p, i) => (
@@ -459,7 +459,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" style={{ stopColor: lineColor }} stopOpacity="0.25" />
+            <stop offset="0%" style={{ stopColor: lineColor }} stopOpacity="0.14" />
             <stop offset="100%" style={{ stopColor: lineColor }} stopOpacity="0.02" />
           </linearGradient>
         </defs>
@@ -467,7 +467,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
         {/* Grid lines */}
         {yTicks.map(tk => (
           <line key={tk.label} x1={padL} y1={tk.y} x2={viewW - padR} y2={tk.y}
-            stroke="var(--border-subtle)" strokeWidth="1" strokeDasharray="4,6" />
+            stroke="var(--chart-grid)" strokeWidth="1" />
         ))}
 
         {/* Area with gradient */}

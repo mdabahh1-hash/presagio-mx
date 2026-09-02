@@ -630,7 +630,8 @@ input[type='range']::-webkit-slider-thumb {
   .cat-rail-divider { width: 1px; height: auto !important; align-self: stretch; margin: 4px 6px !important; flex-shrink: 0; }
   .cat-rail-sub { padding-left: 14px !important; }
 
-  .market-row { grid-template-columns: 44px minmax(0, 1fr) !important; gap: 12px !important; }
+  .market-row { grid-template-columns: 44px minmax(0, 1fr) !important; gap: 10px 12px !important; }
+  .market-row .market-row-thumb { width: 44px !important; height: 44px !important; }
   .market-row-outcomes { grid-column: 2; flex-wrap: wrap; }
   .row-outcome-btn { flex: 1 1 100px; min-width: 0 !important; }
 

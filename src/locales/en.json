@@ -71,7 +71,7 @@
     "privacy": "Privacy",
     "integrity": "Market integrity",
     "languageTag": "English",
-    "disclaimer": "VEREDIKT is a prediction market that runs on virtual points. It involves no real money and no real-money betting. For entertainment purposes only."
+    "disclaimer": "VEREDIKT runs on virtual points. No real money or gambling is involved. For entertainment only."
   },
   "auth": {
     "verifyTitle": "Verify your email",
@@ -145,7 +145,8 @@
     "vol": "Vol",
     "liq": "Liq",
     "waitingResolution": "Awaiting resolution",
-    "more": "+ {{count}} more"
+    "more": "+ {{count}} more",
+    "chance": "Yes"
   },
   "carousel": {
     "prevMarket": "Previous market",
@@ -154,7 +155,8 @@
     "volumeLabel": "Volume",
     "closeLabel": "Closes",
     "slideAria": "Market {{num}}",
-    "moreOutcomes": "+{{count}} more"
+    "moreOutcomes": "+{{count}} more",
+    "chance": "chance"
   },
   "search": {
     "viewAll": "View all results",

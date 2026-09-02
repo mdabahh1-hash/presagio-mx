@@ -7,6 +7,7 @@ import { displayPair } from '../lib/prices'
 import { useDebouncedValue, useThrottledValue } from '../lib/useDebouncedValue'
 import { formatNum } from '../lib/format'
 import { translateApiError } from '../lib/errors'
+import { Icon } from './Icon'
 
 interface BetBoxProps {
   marketId: string
@@ -128,11 +129,11 @@ export function BetBox({
 
   return (
     <div>
-      <div className="exchange-header" style={{ marginBottom: compact ? 16 : 20 }}>{t('bet.title')}</div>
+      <h3 className="section-title" style={{ fontSize: 16, marginBottom: compact ? 12 : 16 }}>{t('bet.title')}</h3>
 
       {isMulti ? (
         /* ── Multi-outcome: outcome selector ── */
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: compact ? 16 : 22 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: compact ? 14 : 18 }}>
           {outcomes.map(o => {
             const isSelected = selectedOutcomeKey === o.outcome_key
               || (!selectedOutcomeKey && outcomes[0]?.outcome_key === o.outcome_key)
@@ -142,16 +143,19 @@ export function BetBox({
                 onClick={() => onOutcomeSelect?.(o.outcome_key)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
-                  border: `2px solid ${isSelected ? 'var(--gold)' : 'var(--border-subtle)'}`,
-                  background: isSelected ? 'var(--oro-dim)' : 'transparent',
-                  transition: 'all 0.15s', textAlign: 'left',
+                  padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: `1px solid ${isSelected ? 'var(--border-hover)' : 'transparent'}`,
+                  background: isSelected ? 'var(--bg-elevated)' : 'transparent',
+                  transition: 'all 0.15s', textAlign: 'left', fontFamily: 'inherit',
                 }}
               >
-                <span style={{ flex: 1, fontSize: '0.82rem', fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                <span style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isSelected ? 'var(--text-primary)' : 'var(--border-default)'}`, background: isSelected ? 'var(--text-primary)' : 'transparent', color: 'var(--bg-base)' }}>
+                  {isSelected && <Icon name="check" size={11} strokeWidth={3} />}
+                </span>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                   {o.label}
                 </span>
-                <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
+                <span className="num" style={{ fontSize: 14, fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
                   {o.price.toFixed(1)}%
                 </span>
               </button>
@@ -160,38 +164,28 @@ export function BetBox({
         </div>
       ) : (
         /* ── Binary: YES / NO selector ── */
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: compact ? 16 : 22 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: compact ? 14 : 18 }}>
           {(['YES', 'NO'] as const).map(s => {
             const isSelected = side === s
             const color = s === 'YES' ? 'var(--green)' : 'var(--red)'
+            const soft = s === 'YES' ? 'var(--green-soft)' : 'var(--red-soft)'
+            const border = s === 'YES' ? 'var(--green-border)' : 'var(--red-border)'
             const price = s === 'YES' ? pair.yes : pair.no
             return (
               <button
                 key={s}
                 onClick={() => setSide(s)}
                 style={{
-                  padding: compact ? '13px 10px' : '16px 12px', borderRadius: 12, cursor: 'pointer',
-                  border: `2px solid ${isSelected ? color : 'var(--border-subtle)'}`,
-                  background: isSelected
-                    ? s === 'YES' ? 'var(--green-soft)' : 'var(--red-soft)'
-                    : 'transparent',
-                  transition: 'all 0.15s', textAlign: 'center',
+                  height: 48, borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
+                  border: `1px solid ${isSelected ? border : 'transparent'}`,
+                  background: isSelected ? soft : 'var(--bg-elevated)',
+                  color: isSelected ? color : 'var(--text-secondary)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  fontSize: 14, fontWeight: 600, transition: 'all 0.15s',
                 }}
               >
-                <div style={{
-                  fontSize: '0.7rem', fontWeight: 600,
-                  color: isSelected ? color : 'var(--text-tertiary)',
-                  letterSpacing: '0.04em', marginBottom: 6,
-                }}>
-                  {s === 'YES' ? t('common.yes') : t('common.no')}
-                </div>
-                <div className="font-mono" style={{
-                  fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 700,
-                  color: isSelected ? color : 'var(--text-secondary)',
-                  lineHeight: 1, letterSpacing: '-0.02em',
-                }}>
-                  {price}%
-                </div>
+                {s === 'YES' ? t('common.yes') : t('common.no')}
+                <span className="num" style={{ fontSize: 15, fontWeight: 700 }}>{price}%</span>
               </button>
             )
           })}
@@ -199,113 +193,85 @@ export function BetBox({
       )}
 
       {/* Amount input */}
-      <div style={{ marginBottom: 16 }}>
-        <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{t('bet.amount')}</span>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13 }}>
+          <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{t('bet.amount')}</span>
           {user && (
-            <span style={{ color: 'var(--gold)', fontWeight: 600, fontSize: '0.75rem' }}>
+            <span className="num" style={{ color: 'var(--text-tertiary)', fontWeight: 500 }}>
               {formatNum(Math.floor(user.points))} PT
             </span>
           )}
         </label>
-        <div style={{
-          display: 'flex',
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border-default)',
-          borderRadius: 10, overflow: 'hidden',
-        }}>
-          <button
-            className="amount-adjust-btn"
-            onClick={() => setAmount(a => Math.max(100, a - 500))}
-            style={{
-              background: 'transparent', border: 'none',
-              padding: '12px 16px', color: 'var(--text-secondary)',
-              cursor: 'pointer', fontSize: '1.2rem', fontWeight: 300,
-            }}
-          >−</button>
+        <div className="input" style={{ display: 'flex', alignItems: 'center', height: 48, padding: '0 4px' }}>
+          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => Math.max(100, a - 500))} aria-label="−" style={{ width: 40, height: 40 }}>
+            <Icon name="minus" size={16} />
+          </button>
           <input
             type="number"
             value={amount}
             onChange={e => setAmount(Math.max(100, parseInt(e.target.value) || 100))}
+            className="num"
             style={{
               flex: 1, background: 'transparent', border: 'none',
-              outline: 'none', textAlign: 'center',
-              fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)',
+              outline: 'none', textAlign: 'center', fontFamily: 'inherit',
+              fontSize: 20, fontWeight: 600, color: 'var(--text-primary)',
               minWidth: 0,
             }}
           />
-          <span style={{
-            display: 'flex', alignItems: 'center',
-            paddingRight: 12, fontSize: '0.72rem',
-            fontWeight: 600, color: 'var(--gold)',
-          }}>PT</span>
-          <button
-            className="amount-adjust-btn"
-            onClick={() => setAmount(a => a + 500)}
-            style={{
-              background: 'transparent', border: 'none',
-              padding: '12px 16px', color: 'var(--text-secondary)',
-              cursor: 'pointer', fontSize: '1.2rem', fontWeight: 300,
-            }}
-          >+</button>
+          <span className="meta-label" style={{ paddingRight: 6 }}>PT</span>
+          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => a + 500)} aria-label="+" style={{ width: 40, height: 40 }}>
+            <Icon name="plus" size={16} />
+          </button>
         </div>
         <input
           type="range" min={100} max={10000} step={100}
           value={amount}
           onChange={e => setAmount(parseInt(e.target.value))}
-          style={{ width: '100%', marginTop: 10 }}
+          style={{ width: '100%', marginTop: 12 }}
         />
       </div>
 
       {/* Preset amounts */}
-      <div className="amount-presets" style={{ display: 'flex', gap: 6, marginBottom: compact ? 16 : 20 }}>
+      <div className="amount-presets" style={{ display: 'flex', gap: 6, marginBottom: compact ? 14 : 18 }}>
         {[500, 1000, 2500, 5000].map(v => (
           <button
             key={v}
             onClick={() => setAmount(v)}
+            className="btn btn-secondary btn-sm num"
             style={{
-              flex: 1,
-              background: amount === v ? 'var(--bg-elevated)' : 'transparent',
-              border: `1px solid ${amount === v ? 'var(--border-default)' : 'var(--border-subtle)'}`,
-              borderRadius: 8, padding: '7px 4px',
-              fontSize: '0.72rem',
+              flex: 1, padding: 0,
+              borderColor: amount === v ? 'var(--border-hover)' : undefined,
               color: amount === v ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              cursor: 'pointer', fontWeight: 600,
-              transition: 'all 0.15s',
             }}
           >
-            {v}
+            {v.toLocaleString('en-US')}
           </button>
         ))}
       </div>
 
       {/* Trade summary — every number comes from the SAME quote (single source of truth) */}
-      <div style={{
-        background: 'var(--bg-surface)',
-        borderRadius: 10, padding: '14px 16px',
-        marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+      <div style={{ borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)', padding: '10px 0', marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.avgPrice')}</span>
-          <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+          <span className="num" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
             {quote ? `${quote.avg_fill_price.toFixed(1)}%` : '—'}
           </span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.receive')}</span>
-          <span className="font-mono" style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+          <span className="num" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
             {quote ? t('bet.sharesValue', { value: quote.shares.toFixed(1) }) : '—'}
           </span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.potentialGain')}</span>
-          <span className="font-mono" style={{ color: 'var(--green)', fontWeight: 700 }}>
+          <span className="num" style={{ color: 'var(--green)', fontWeight: 600 }}>
             {quote ? `+${Math.round(quote.potential_gain)} PT` : '—'}
           </span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.maxLoss')}</span>
-          <span className="font-mono" style={{ color: 'var(--red)', fontWeight: 700 }}>
+          <span className="num" style={{ color: 'var(--red)', fontWeight: 600 }}>
             {quote ? `-${Math.round(quote.max_loss)} PT` : `-${amount} PT`}
           </span>
         </div>
@@ -315,28 +281,27 @@ export function BetBox({
           <div>
             <button
               onClick={() => setDetailsOpen(o => !o)}
-              style={{
-                background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                fontSize: '0.72rem', color: 'var(--text-tertiary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4,
-              }}
+              className="btn btn-ghost btn-sm"
+              style={{ padding: 0, height: 22, fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500 }}
             >
-              {t('bet.priceDetails')} {detailsOpen ? '▴' : '▾'}
+              {t('bet.priceDetails')}
+              <Icon name={detailsOpen ? 'chevron-up' : 'chevron-down'} size={13} />
             </button>
             {detailsOpen && (
-              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border-subtle)', paddingTop: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.bestPrice')}</span>
-                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.mid_price.toFixed(1)}%</span>
+                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.mid_price.toFixed(1)}%</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.orderAvgPrice')}</span>
-                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.avg_fill_price.toFixed(1)}%</span>
+                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.avg_fill_price.toFixed(1)}%</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.slippageCost')}</span>
-                  <span className="font-mono" style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>{quote.slippage_cost.toFixed(1)} PT</span>
+                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.slippage_cost.toFixed(1)} PT</span>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
                   {t('bet.priceImpact', { from: quote.mid_price.toFixed(1), to: quote.price_after.toFixed(1) })}
                 </p>
               </div>
@@ -347,58 +312,32 @@ export function BetBox({
 
       {/* Low-liquidity warning (amber) — informs, never blocks */}
       {quote?.liquidity_warning && (
-        <div style={{
-          margin: '0 0 14px', fontSize: '0.78rem', color: 'var(--warning)',
-          background: 'var(--warning-bg)',
-          border: '1px solid var(--warning-border)',
-          borderRadius: 8, padding: '10px 14px', lineHeight: 1.5,
-        }}>
+        <div style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--warning)', background: 'var(--warning-bg)', borderRadius: 8, padding: '10px 12px', lineHeight: 1.5 }}>
           {t('bet.lowLiquidity', { price: quote.avg_fill_price.toFixed(1) })}
         </div>
       )}
 
       {tradeError && (
-        <div style={{
-          margin: '0 0 14px', fontSize: '0.8rem', color: 'var(--red)',
-          background: 'var(--red-soft)',
-          border: '1px solid var(--red-border)',
-          borderRadius: 8, padding: '10px 14px',
-        }}>
+        <div style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--red)', background: 'var(--red-soft)', borderRadius: 8, padding: '10px 12px' }}>
           {tradeError}
         </div>
       )}
       {tradeSuccess && (
-        <div style={{
-          margin: '0 0 14px', fontSize: '0.8rem', color: 'var(--green)',
-          background: 'var(--green-soft)',
-          border: '1px solid var(--green-border)',
-          borderRadius: 8, padding: '10px 14px',
-        }}>
-          ✓ {tradeSuccess}
+        <div style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--green)', background: 'var(--green-soft)', borderRadius: 8, padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <Icon name="check" size={16} strokeWidth={2.2} style={{ marginTop: 1 }} />
+          <span>{tradeSuccess}</span>
         </div>
       )}
 
       <button
         onClick={handleTrade}
         disabled={trading || (isMulti && !selectedOutcome)}
+        className="btn btn-lg"
         style={{
-          width: '100%', padding: '16px',
-          background: isMulti
-            ? 'linear-gradient(135deg, #c8a000, #a07800)'
-            : side === 'YES'
-            ? 'linear-gradient(135deg, #00e87d, #00ba64)'
-            : 'linear-gradient(135deg, #ff2d55, #cc1a40)',
-          border: 'none', borderRadius: 12,
-          color: isMulti ? '#07071A' : side === 'YES' ? '#001a0d' : '#fff', fontWeight: 700,
-          fontSize: '0.92rem', letterSpacing: '0.02em',
-          cursor: (trading || (isMulti && !selectedOutcome)) ? 'not-allowed' : 'pointer',
-          opacity: (trading || (isMulti && !selectedOutcome)) ? 0.6 : 1,
-          boxShadow: isMulti
-            ? '0 6px 28px rgba(200, 160, 0, 0.3)'
-            : side === 'YES'
-            ? '0 6px 28px rgba(0, 232, 125, 0.3)'
-            : '0 6px 28px rgba(255, 45, 85, 0.3)',
-          transition: 'opacity 0.15s, box-shadow 0.2s',
+          width: '100%',
+          background: isMulti ? 'var(--accent-fill)' : side === 'YES' ? 'var(--green-fill)' : 'var(--red-fill)',
+          color: isMulti ? 'var(--text-on-accent)' : side === 'YES' ? 'var(--text-on-green)' : 'var(--text-on-red)',
+          fontWeight: 600,
         }}
       >
         {trading
@@ -412,14 +351,14 @@ export function BetBox({
       </button>
 
       {!user && !onRequireAuth && (
-        <div style={{ marginTop: 14, textAlign: 'center' }}>
-          <a href={authApi.googleUrl()} style={{ fontSize: '0.82rem', color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
+        <div style={{ marginTop: 12, textAlign: 'center' }}>
+          <a href={authApi.googleUrl()} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
             {t('bet.loginToTradeLink')}
           </a>
         </div>
       )}
 
-      <p style={{ margin: '14px 0 0', fontSize: '0.68rem', color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
+      <p className="meta-label" style={{ margin: '12px 0 0', textAlign: 'center', lineHeight: 1.5 }}>
         {t('bet.disclaimer')}
       </p>
     </div>
