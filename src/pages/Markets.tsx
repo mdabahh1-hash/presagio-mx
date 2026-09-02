@@ -132,7 +132,7 @@ export function Markets() {
             )}
           </p>
         </div>
-        <Link to="/proponer" style={{
+        <Link to="/proponer" className="markets-page-cta" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '11px 20px', borderRadius: 12, textDecoration: 'none',
           border: '1px solid var(--gold)', color: 'var(--gold)',
@@ -145,8 +145,8 @@ export function Markets() {
 
       {/* Search + Controls */}
       <div className="anim-2" style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 36 }}>
-        {/* Search bar */}
-        <form onSubmit={handleSearch}>
+        {/* Search bar — solo móvil (en desktop el navbar ya busca) */}
+        <form onSubmit={handleSearch} className="markets-page-search">
           <div style={{
             display: 'flex',
             background: 'var(--bg-card)',
@@ -266,8 +266,18 @@ export function Markets() {
                 {t('markets.resultCount', { count: markets.length })}
               </span>
               {searchInput && (
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   {t('markets.searchLabel')} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
+                  <button
+                    type="button"
+                    aria-label={t('common.close')}
+                    onClick={() => { setSearchInput(''); setSearchParams(p => { p.delete('q'); return p }) }}
+                    style={{
+                      background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: 99,
+                      width: 22, height: 22, lineHeight: 1, cursor: 'pointer', color: 'var(--text-tertiary)',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', padding: 0,
+                    }}
+                  >×</button>
                 </span>
               )}
             </div>
@@ -277,17 +287,13 @@ export function Markets() {
           {loading ? (
             <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
               {[...Array(6)].map((_, i) => (
-                <div key={i} style={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 14, height: 210,
-                }} />
+                <div key={i} className="skeleton" style={{ height: 210 }} />
               ))}
             </div>
           ) : markets.length > 0 ? (
             <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-              {markets.map((market, i) => (
-                <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
+              {markets.map(market => (
+                <MarketCard key={market.id} market={market} />
               ))}
             </div>
           ) : (

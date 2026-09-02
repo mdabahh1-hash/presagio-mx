@@ -119,16 +119,19 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
 
   return (
     <div
+      className="modal-overlay"
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 200,
         background: 'var(--overlay)',
-        backdropFilter: 'blur(14px)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '16px',
       }}
     >
       <div
+        className="modal-panel"
         onClick={e => e.stopPropagation()}
         style={{
           background: 'var(--bg-card)',

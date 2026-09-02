@@ -213,7 +213,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               fontWeight: urgent ? 700 : 400,
               fontFamily: urgent ? 'DM Mono' : undefined,
             }}>
-              {diff > 0 ? '⏱ ' : ''}{countdownText}
+              {countdownText}
             </span>
           )}
         </div>

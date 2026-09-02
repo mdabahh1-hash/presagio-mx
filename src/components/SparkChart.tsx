@@ -181,7 +181,9 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
 
     const yTicks = [0, 25, 50, 75, 100].map(v => ({ y: toY(v).toFixed(1), label: `${v}%` }))
     const fmt = axisFormatter(span, real)
-    const nTicks = 6
+    // ~1 etiqueta por cada 90px de ancho: en columnas angostas (móvil) 6
+    // etiquetas de fecha se enciman.
+    const nTicks = Math.max(2, Math.min(6, Math.floor(cW / 90)))
     const xTicks = span === 0
       ? []
       : Array.from({ length: nTicks + 1 }, (_, i) => {
@@ -406,7 +408,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
     const yTicks = [minP, (minP + maxP) / 2, maxP].map(v => ({ y: toY(v).toFixed(1), label: `${Math.round(v)}` }))
 
     const fmt = axisFormatter(span, real)
-    const nTicks = 6
+    const nTicks = Math.max(2, Math.min(6, Math.floor(w / 90)))
     const xTicks = span === 0
       ? []
       : real

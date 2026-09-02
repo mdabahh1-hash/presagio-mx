@@ -203,9 +203,11 @@ export function Navbar() {
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: scrolled ? 'var(--nav-bg-scrolled)' : 'var(--nav-bg)',
-        backdropFilter: 'blur(24px)',
+        // 12px: blur(24px) sobre un sticky repintaba en cada frame de scroll
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         borderBottom: scrolled ? '1px solid var(--border-subtle)' : '1px solid transparent',
-        transition: 'all 0.3s ease',
+        transition: 'background 0.2s ease, border-color 0.2s ease',
       }}>
         <div className="navbar-inner" style={{
           height: 62, display: 'flex', alignItems: 'center', gap: 16,
@@ -264,11 +266,12 @@ export function Navbar() {
             {/* Panel de autocompletado */}
             {searchOpen && results && (
               <div
-                className="anim-1"
+                className="dropdown-panel"
                 id="navbar-search-listbox"
                 role="listbox"
                 style={{
                   position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 8, zIndex: 200,
+                  transformOrigin: 'top left',
                   background: 'var(--bg-card)',
                   border: '1px solid var(--border-default)',
                   borderRadius: 14, padding: 8,
@@ -522,7 +525,7 @@ export function Navbar() {
               {deskMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, paddingTop: 10, zIndex: 200 }}>
                 <div
-                  className="nav-menu-dropdown anim-1"
+                  className="nav-menu-dropdown dropdown-panel"
                   style={{
                     minWidth: 210, padding: 8,
                     background: 'var(--bg-card)',
@@ -601,7 +604,7 @@ export function Navbar() {
 
       {/* ── Mobile drawer ──────────────────────────────────────────── */}
       {menuOpen && (
-        <div style={{
+        <div className="mobile-drawer" style={{
           position: 'fixed',
           top: 62,
           left: 0, right: 0, bottom: 0,

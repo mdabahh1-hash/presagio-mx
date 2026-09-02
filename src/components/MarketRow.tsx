@@ -12,6 +12,9 @@ interface MarketRowProps {
   // Variante compacta (checklist de ligas): solo pregunta + probabilidades,
   // sin Link, sin badges ni meta — el contenedor pone su propio contexto.
   compact?: boolean
+  // La fila vive dentro de una sección titulada con su subcategoría: el badge
+  // repetiría el encabezado.
+  hideSubcategory?: boolean
 }
 
 const badgeBase: React.CSSProperties = {
@@ -22,7 +25,10 @@ const badgeBase: React.CSSProperties = {
 // Fila ancha estilo Polymarket: info del mercado a la izquierda, "botones" de
 // resultado a la derecha. Toda la fila es un Link al mercado (los botones son
 // decorativos; quick-bet queda como mejora futura).
-export function MarketRow({ market, animClass = '', compact = false }: MarketRowProps) {
+// Densidad: un solo badge (categoría/subcategoría) como máximo. MULTI ya se
+// lee en los botones de resultado, TENDENCIA es ranking (no contenido) y
+// "por resolverse" vive en la línea de meta + borde dorado.
+export function MarketRow({ market, animClass = '', compact = false, hideSubcategory = false }: MarketRowProps) {
   const { t } = useTranslation()
   const isMulti = market.marketType === 'multi'
   const isPending = market.status === 'pending_resolution'
@@ -90,6 +96,8 @@ export function MarketRow({ market, animClass = '', compact = false }: MarketRow
     )
   }
 
+  const badgeLabel = hideSubcategory && market.subcategory ? null : (market.subcategory ?? market.category)
+
   return (
     <Link to={`/mercado/${market.id}`} style={{ textDecoration: 'none' }} className={animClass}>
       <div
@@ -97,45 +105,23 @@ export function MarketRow({ market, animClass = '', compact = false }: MarketRow
         style={{
           padding: '16px 20px',
           cursor: 'pointer',
-          ...(isPending ? { borderColor: 'var(--oro-glow)' } : {}),
+          ...(isPending ? { borderColor: 'var(--oro-glow)', opacity: 0.85 } : {}),
         }}
       >
-        {/* Izquierda: badges + pregunta + meta */}
+        {/* Izquierda: badge + pregunta + meta */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{
-              ...badgeBase, fontSize: '0.62rem', letterSpacing: '0.07em', padding: '3px 9px',
-              color: getCategoryColor(market.category),
-              background: getCategoryBg(market.category),
-              border: `1px solid ${getCategoryBorder(market.category)}`,
-            }}>
-              {market.subcategory ?? market.category}
-            </span>
-            {isMulti && (
+          {badgeLabel && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span style={{
-                ...badgeBase, color: 'var(--accent-alt)',
-                background: 'var(--accent-alt-bg)', border: '1px solid var(--accent-alt-border)',
+                ...badgeBase, fontSize: '0.62rem', letterSpacing: '0.07em', padding: '3px 9px',
+                color: getCategoryColor(market.category),
+                background: getCategoryBg(market.category),
+                border: `1px solid ${getCategoryBorder(market.category)}`,
               }}>
-                {t('common.multiBadge')}
+                {badgeLabel}
               </span>
-            )}
-            {market.trending && (
-              <span style={{
-                ...badgeBase, color: 'var(--gold)',
-                background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
-              }}>
-                {t('common.trendingBadge')}
-              </span>
-            )}
-            {isPending && (
-              <span style={{
-                ...badgeBase, color: 'var(--gold)',
-                background: 'var(--oro-dim)', border: '1px solid var(--gold)',
-              }}>
-                {t('common.pendingBadge')}
-              </span>
-            )}
-          </div>
+            </div>
+          )}
 
           <p className="font-display market-row-title" style={{
             margin: 0, fontSize: '1rem', fontWeight: 600,
@@ -159,7 +145,7 @@ export function MarketRow({ market, animClass = '', compact = false }: MarketRow
                 fontWeight: urgent ? 700 : 400,
                 fontFamily: urgent ? 'DM Mono' : undefined,
               }}>
-                {diff > 0 ? '⏱ ' : ''}{countdownText}
+                {countdownText}
               </span>
             )}
           </div>

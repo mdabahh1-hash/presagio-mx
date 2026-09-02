@@ -228,10 +228,10 @@ export function CategoryBrowse({
   if (loading) {
     return (
       <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start' }}>
-        <div className="card" style={{ height: 280, animation: 'livePulse 1.8s ease infinite' }} />
+        <div className="skeleton" style={{ height: 280 }} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14, height: 96 }} />
+            <div key={i} className="skeleton" style={{ height: 96 }} />
           ))}
         </div>
       </div>
@@ -321,12 +321,12 @@ export function CategoryBrowse({
 
         {shown.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {sections.map((sec, si) => (
+            {sections.map(sec => (
               <section key={sec.title ?? '__all'}>
                 {sec.title && <SectionHeader title={sec.title} count={sec.items.length} />}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {sec.items.map((m, i) => (
-                    <MarketRow key={m.id} market={m} animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''} />
+                  {sec.items.map(m => (
+                    <MarketRow key={m.id} market={m} hideSubcategory={!!sec.title && sec.title === m.subcategory} />
                   ))}
                 </div>
               </section>

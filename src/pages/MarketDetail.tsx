@@ -12,6 +12,8 @@ import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 import { formatVolume, formatDate, daysLeft } from '../lib/format'
 import { buildEmbedSnippet } from '../lib/embed'
+import { useMobile } from '../lib/useMobile'
+import { useElementWidth } from '../lib/useElementWidth'
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
 const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
@@ -66,6 +68,25 @@ export function MarketDetail() {
   const [copied, setCopied] = useState(false)
   const [showEmbed, setShowEmbed] = useState(false)
   const [embedCopied, setEmbedCopied] = useState(false)
+
+  // Móvil: el panel de operar en flujo quedaba al final de la página; se
+  // sustituye por una barra fija abajo que abre un bottom sheet con el BetBox.
+  const isMobile = useMobile()
+  const [sheetSide, setSheetSide] = useState<'YES' | 'NO' | null>(null)
+  const sheetOpen = sheetSide !== null
+  useEffect(() => {
+    if (!sheetOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSheetSide(null) }
+    document.addEventListener('keydown', onKey)
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey) }
+  }, [sheetOpen])
+  useEffect(() => { setSheetSide(null) }, [id])
+
+  // Ancho real de la columna del chart: el SVG usa viewBox fijo, y sin
+  // medirlo en móvil las etiquetas de los ejes se escalaban a ~5px.
+  const [chartRef, chartW] = useElementWidth()
 
   useEffect(() => {
     if (!id) return
@@ -191,9 +212,21 @@ export function MarketDetail() {
   }
 
   if (loading) {
+    // Skeleton con la misma forma que la página final (breadcrumb, header,
+    // gráfica, stats + panel): sin "Cargando…" centrado y sin salto al llegar.
     return (
-      <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
-        <div style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{t('market.loading')}</div>
+      <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }} aria-busy="true" aria-label={t('market.loading')}>
+        <div className="skeleton" style={{ height: 14, width: 320, maxWidth: '70%', borderRadius: 6, marginBottom: 28 }} />
+        <div className="market-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 28, alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="skeleton" style={{ height: 300 }} />
+            <div className="skeleton" style={{ height: 290 }} />
+            <div className="market-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+              {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 78, borderRadius: 12 }} />)}
+            </div>
+          </div>
+          <div className="market-trading-panel skeleton" style={{ height: 520 }} />
+        </div>
       </div>
     )
   }
@@ -212,9 +245,33 @@ export function MarketDetail() {
   const catColor = getCategoryColor(market.category)
   const pair = displayPair(yesPrice)  // NO derived from rounded YES: always sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--gold)'
+  const hasMobileBar = isMobile && market.status === 'open'
+  const leader = outcomes[0]
+
+  const betBox = (
+    <BetBox
+      marketId={market.id}
+      yesPrice={yesPrice}
+      marketType={market.market_type as 'binary' | 'multi'}
+      outcomes={outcomes}
+      selectedOutcomeKey={selectedOutcomeKey}
+      onOutcomeSelect={setSelectedOutcomeKey}
+      initialSide={sheetSide ?? copySide}
+      initialAmount={copyAmount}
+      compact={hasMobileBar}
+      onTraded={(p) => {
+        setYesPrice(p)
+        if (market.market_type === 'multi') {
+          marketsApi.outcomes(market.id).then(updated => {
+            setOutcomes([...updated].sort((a, b) => b.price - a.price))
+          }).catch(() => {})
+        }
+      }}
+    />
+  )
 
   return (
-    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 24 }}>
+    <div className={`page-container market-detail-page${hasMobileBar ? ' has-mobile-bar' : ''}`} style={{ paddingTop: 32, paddingBottom: 24 }}>
       {/* Breadcrumb */}
       <div className="anim-1" style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 28, fontSize: '0.78rem', flexWrap: 'wrap' }}>
         <button
@@ -513,7 +570,7 @@ export function MarketDetail() {
 
           {/* Chart */}
           <div className="anim-2 card" style={{ padding: '24px 24px 20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div className="chart-head">
               <div className="exchange-header">{t('market.historyTitle')}</div>
               <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
                 {CHART_RANGES.map(p => (
@@ -602,15 +659,17 @@ export function MarketDetail() {
                 )}
               </div>
             </div>
-            {market.market_type === 'multi' ? (
-              <MultiLineChart series={multiSeries} height={220} />
-            ) : chartData.length > 1 ? (
-              <FullChart data={chartData} height={200} label={t('common.yes')} />
-            ) : (
-              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
-                {t('common.noHistory')}
-              </div>
-            )}
+            <div ref={chartRef}>
+              {market.market_type === 'multi' ? (
+                <MultiLineChart series={multiSeries} height={220} viewW={chartW || 700} />
+              ) : chartData.length > 1 ? (
+                <FullChart data={chartData} height={200} viewW={chartW || 700} label={t('common.yes')} />
+              ) : (
+                <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>
+                  {t('common.noHistory')}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Stats grid */}
@@ -764,7 +823,7 @@ export function MarketDetail() {
         </div>
 
         {/* ── Right: Trading panel ── */}
-        <div className="market-trading-panel" style={{ position: 'sticky', top: 80 }}>
+        <div className={`market-trading-panel${hasMobileBar ? ' has-mobile-bar' : ''}`} style={{ position: 'sticky', top: 80 }}>
           {market.status !== 'open' ? (
             <div className="anim-2 card" style={{ padding: '32px 26px', textAlign: 'center' }}>
               {market.status === 'resolved' && (
@@ -857,28 +916,47 @@ export function MarketDetail() {
             </div>
           ) : (
             <div className="anim-2 card" style={{ padding: '24px 22px' }}>
-              <BetBox
-                marketId={market.id}
-                yesPrice={yesPrice}
-                marketType={market.market_type as 'binary' | 'multi'}
-                outcomes={outcomes}
-                selectedOutcomeKey={selectedOutcomeKey}
-                onOutcomeSelect={setSelectedOutcomeKey}
-                initialSide={copySide}
-                initialAmount={copyAmount}
-                onTraded={(p) => {
-                  setYesPrice(p)
-                  if (market.market_type === 'multi') {
-                    marketsApi.outcomes(market.id).then(updated => {
-                      setOutcomes([...updated].sort((a, b) => b.price - a.price))
-                    }).catch(() => {})
-                  }
-                }}
-              />
+              {!hasMobileBar && betBox}
             </div>
           )}
         </div>
       </div>
+
+      {/* ── Móvil: barra fija de operar + bottom sheet ── */}
+      {hasMobileBar && (
+        <>
+          <div className="mobile-trade-bar">
+            {market.market_type === 'multi' ? (
+              <button className="mtb-multi" onClick={() => setSheetSide('YES')}>
+                {t('bet.title')}
+                {leader && (
+                  <span style={{ fontWeight: 600, opacity: 0.8, fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '55%' }}>
+                    · {leader.label} {Math.round(leader.price)}%
+                  </span>
+                )}
+              </button>
+            ) : (
+              <>
+                <button className="mtb-yes" onClick={() => setSheetSide('YES')}>
+                  {t('common.yes')} <span className="font-mono">{pair.yes}%</span>
+                </button>
+                <button className="mtb-no" onClick={() => setSheetSide('NO')}>
+                  {t('common.no')} <span className="font-mono">{pair.no}%</span>
+                </button>
+              </>
+            )}
+          </div>
+          {sheetOpen && (
+            <div className="sheet-overlay" onClick={() => setSheetSide(null)}>
+              <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={t('bet.title')} onClick={e => e.stopPropagation()}>
+                <div className="sheet-handle" />
+                {/* key: el BetBox toma initialSide solo al montar */}
+                <div key={sheetSide}>{betBox}</div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

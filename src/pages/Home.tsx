@@ -12,18 +12,40 @@ import type { Category, Market } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
+import { useMobile } from '../lib/useMobile'
 
 const MOBILE_TABS = ['Tendencia', ...CATEGORIES] as const
 type MobileTab = Category | 'Tendencia'
 
-function useMobile() {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768)
-  useEffect(() => {
-    const fn = () => setIsMobile(window.innerWidth <= 768)
-    window.addEventListener('resize', fn)
-    return () => window.removeEventListener('resize', fn)
-  }, [])
-  return isMobile
+const PAGE_SIZE = 12
+
+function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () => void }) {
+  const { t } = useTranslation()
+  return (
+    <div style={{ textAlign: 'center', marginTop: 24 }}>
+      <button
+        onClick={onClick}
+        style={{
+          background: 'transparent',
+          border: '1px solid var(--border-default)',
+          borderRadius: 99, padding: '12px 28px', minHeight: 44,
+          color: 'var(--text-secondary)',
+          fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.84rem',
+          cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'var(--oro)'
+          e.currentTarget.style.color = 'var(--oro)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'var(--border-default)'
+          e.currentTarget.style.color = 'var(--text-secondary)'
+        }}
+      >
+        {t('home.seeMore', { count: remaining })}
+      </button>
+    </div>
+  )
 }
 
 export function Home() {
@@ -33,11 +55,11 @@ export function Home() {
   const [usingMock, setUsingMock] = useState(false)
   const [loading, setLoading] = useState(true)
   const [mobileTab, setMobileTab] = useState<MobileTab>('Tendencia')
-  const [visibleTrending, setVisibleTrending] = useState(12)
+  const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()
   const isMobile = useMobile()
 
-  useEffect(() => { setVisibleTrending(12) }, [mobileTab])
+  useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
 
   useEffect(() => {
     // Paginado completo: el top-100 por volumen dejaba fuera ligas enteras
@@ -120,6 +142,7 @@ export function Home() {
               return (
                 <button
                   key={tab}
+                  className="mobile-cat-tab"
                   onClick={() => setMobileTab(tab)}
                   style={{
                     flexShrink: 0,
@@ -150,21 +173,22 @@ export function Home() {
               </div>
             )}
 
-            {/* Trending list */}
+            {/* Trending list — paginado como en desktop (antes pintaba las 40+
+                tarjetas de golpe: una página de 11,000px) */}
             <div style={{ padding: '10px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {loading ? (
                 [...Array(5)].map((_, i) => (
-                  <div key={i} style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 14, height: 130,
-                    animation: 'livePulse 1.8s ease infinite',
-                  }} />
+                  <div key={i} className="skeleton" style={{ height: 130 }} />
                 ))
               ) : filtered.length > 0 ? (
-                filtered.map((market, i) => (
-                  <MarketCard key={market.id} market={market} animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''} />
-                ))
+                <>
+                  {filtered.slice(0, visibleTrending).map(market => (
+                    <MarketCard key={market.id} market={market} />
+                  ))}
+                  {filtered.length > visibleTrending && (
+                    <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
+                  )}
+                </>
               ) : (
                 <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
                   <p style={{ fontWeight: 600 }}>{t('home.noTrending')}</p>
@@ -194,13 +218,13 @@ export function Home() {
           {/* Featured carousel + Temas populares */}
           <section className="featured-row" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start', marginBottom: 48 }}>
             {loading ? (
-              <div className="card" style={{ height: 420, animation: 'livePulse 1.8s ease infinite' }} />
+              <div className="skeleton" style={{ height: 420 }} />
             ) : (
               <FeaturedCarousel markets={apiMarkets} />
             )}
             <div className="featured-side">
               {loading ? (
-                <div className="card" style={{ height: 420, animation: 'livePulse 1.8s ease infinite' }} />
+                <div className="skeleton" style={{ height: 420 }} />
               ) : (
                 <PopularTopics markets={markets} />
               )}
@@ -225,40 +249,18 @@ export function Home() {
             {loading ? (
               <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
                 {[...Array(9)].map((_, i) => (
-                  <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 14, height: 210 }} />
+                  <div key={i} className="skeleton" style={{ height: 210 }} />
                 ))}
               </div>
             ) : filtered.length > 0 ? (
               <>
                 <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-                  {filtered.slice(0, visibleTrending).map((market, i) => (
-                    <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
+                  {filtered.slice(0, visibleTrending).map(market => (
+                    <MarketCard key={market.id} market={market} />
                   ))}
                 </div>
                 {filtered.length > visibleTrending && (
-                  <div style={{ textAlign: 'center', marginTop: 24 }}>
-                    <button
-                      onClick={() => setVisibleTrending(v => v + 12)}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid var(--border-default)',
-                        borderRadius: 99, padding: '10px 28px',
-                        color: 'var(--text-secondary)',
-                        fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.84rem',
-                        cursor: 'pointer', transition: 'border-color 0.15s, color 0.15s',
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.borderColor = 'var(--oro)'
-                        e.currentTarget.style.color = 'var(--oro)'
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.borderColor = 'var(--border-default)'
-                        e.currentTarget.style.color = 'var(--text-secondary)'
-                      }}
-                    >
-                      {t('home.seeMore', { count: filtered.length - visibleTrending })}
-                    </button>
-                  </div>
+                  <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
                 )}
               </>
             ) : (

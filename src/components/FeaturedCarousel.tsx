@@ -115,8 +115,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
   return (
     <div style={{ position: 'relative' }}>
       <div
-        key={active}
-        className="anim-1 card featured-slide"
+        className="card featured-slide"
         style={{ padding: 0, overflow: 'hidden', cursor: 'pointer' }}
         onClick={e => {
           // Toda la tarjeta navega, salvo clicks en controles anidados (flechas/links)
@@ -124,7 +123,9 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
           navigate(`/mercado/${m.id}`)
         }}
       >
-        <div className="featured-slide-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 460px) minmax(0, 1fr)', minHeight: 380 }}>
+        {/* La tarjeta se queda; solo su contenido se remonta con un fade corto
+            (antes toda la card hacía fadeUp en cada flecha del carrusel). */}
+        <div key={active} className="featured-slide-grid fade-in" style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 460px) minmax(0, 1fr)', minHeight: 380 }}>
 
           {/* ── Left: market info ── */}
           <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column' }}>
@@ -301,7 +302,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
             {historyLoading ? (
-              <div style={{ height: chartH, borderRadius: 10, background: 'var(--bg-surface)', animation: 'livePulse 1.8s ease infinite' }} />
+              <div className="skeleton" style={{ height: chartH, borderRadius: 10, background: 'var(--bg-surface)', border: 'none' }} />
             ) : isMulti ? (
               <MultiLineChart series={multiSeries} height={chartH} viewW={chartW || 700} interactive={false} />
             ) : chartData.length > 1 ? (

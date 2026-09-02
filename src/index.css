@@ -193,9 +193,9 @@ html[data-theme='light'] {
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/* Sin scroll-behavior:smooth global: afectaba también a los scrolls
+   programáticos (reset al cambiar de ruta). Los anchors que quieran animar
+   usan scrollIntoView({ behavior: 'smooth' }) explícito. */
 
 body {
   background-color: var(--bg-base);
@@ -263,12 +263,28 @@ body::before {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
-.card:hover {
-  border-color: var(--border-hover);
-  box-shadow: 0 8px 48px var(--shadow-card), 0 0 0 1px var(--oro-dim);
-  transform: translateY(-2px);
+/* Hover solo con puntero fino: en touch no existe hover y el "lift" se
+   quedaba pegado tras el tap. Sombra más corta (48px repintaba mucho). */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 6px 24px var(--shadow-card);
+    transform: translateY(-1px);
+  }
+}
+
+/* Skeleton: solo opacidad (livePulse también escalaba y "respiraba") */
+.skeleton {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  animation: skeletonPulse 1.6s ease-in-out infinite;
+}
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
 /* Glow effects */
@@ -492,17 +508,83 @@ body::before {
   50% { opacity: 0.45; transform: scale(0.75); }
 }
 
-/* Staggered fade-up animations */
-.anim-1 { animation: fadeUp 0.5s ease 0.05s both; }
-.anim-2 { animation: fadeUp 0.5s ease 0.1s both; }
-.anim-3 { animation: fadeUp 0.5s ease 0.15s both; }
-.anim-4 { animation: fadeUp 0.5s ease 0.2s both; }
-.anim-5 { animation: fadeUp 0.5s ease 0.25s both; }
-.anim-6 { animation: fadeUp 0.5s ease 0.3s both; }
+/* Entrada de página: corta (220ms, 8px) y con escalonado mínimo. Solo en
+   contenedores de página, nunca en filas/tarjetas de listas filtrables. */
+.anim-1 { animation: fadeUp 0.22s ease-out 0s both; }
+.anim-2 { animation: fadeUp 0.22s ease-out 0.03s both; }
+.anim-3 { animation: fadeUp 0.22s ease-out 0.06s both; }
+.anim-4 { animation: fadeUp 0.22s ease-out 0.09s both; }
+.anim-5 { animation: fadeUp 0.22s ease-out 0.12s both; }
+.anim-6 { animation: fadeUp 0.22s ease-out 0.15s both; }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cambio de contenido en sitio (slide del carrusel): solo opacidad */
+.fade-in { animation: fadeIn 0.18s ease-out both; }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Popovers (menú, autocompletado): fade + scale sutil desde su origen */
+.dropdown-panel { animation: popIn 0.15s ease-out both; transform-origin: top right; }
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Modal */
+.modal-overlay { animation: fadeIn 0.15s ease-out both; }
+.modal-panel { animation: modalIn 0.18s ease-out both; }
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Drawer móvil */
+.mobile-drawer { animation: drawerIn 0.2s ease-out both; }
+@keyframes drawerIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bottom sheet (panel de operar en móvil) */
+.sheet-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: var(--overlay);
+  display: flex; align-items: flex-end;
+  animation: fadeIn 0.15s ease-out both;
+}
+.sheet-panel {
+  width: 100%; max-height: 88vh; overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default); border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  padding: 10px 18px calc(20px + env(safe-area-inset-bottom));
+  animation: sheetIn 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.sheet-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--border-default); margin: 0 auto 14px;
+}
+@keyframes sheetIn {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Barra fija de operar (solo móvil, ver bloque responsive) */
+.mobile-trade-bar { display: none; }
+
+/* Accesibilidad: sin movimiento para quien lo pide */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Gradient text */
@@ -585,8 +667,8 @@ input[type='range']::-webkit-slider-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 99px;
   border: none;
   background: transparent;
@@ -618,7 +700,15 @@ input[type='range']::-webkit-slider-thumb {
 
 /* Market rows (estilo Polymarket: fila ancha + botones de resultado a la derecha) */
 .market-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; }
-.market-row:hover { transform: none !important; }
+.market-row:hover { transform: none !important; box-shadow: none !important; }
+
+/* /mercados: en desktop el navbar ya trae buscador y CTA "Proponer";
+   los de la página solo se muestran en móvil (donde el navbar los oculta). */
+.markets-page-search, .markets-page-cta { display: none !important; }
+
+/* Encabezado de la gráfica: título + rangos */
+.chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
+.chart-head .exchange-header { white-space: nowrap; }
 .market-row-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -742,10 +832,43 @@ input[type='range']::-webkit-slider-thumb {
    ============================================================ */
 @media (max-width: 768px) {
 
+  /* La textura de ruido es una capa fija a pantalla completa que repinta en
+     cada frame de scroll: fuera en móvil. */
+  body::before { display: none; }
+
   .page-container {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
+
+  /* Targets táctiles ≥44px */
+  .cat-tabs button, .cat-tabs a, .mobile-cat-tab { min-height: 44px !important; }
+
+  .markets-page-search { display: block !important; }
+  .markets-page-cta    { display: inline-flex !important; }
+
+  .chart-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* Detalle de mercado: el panel de operar en flujo va hasta el final de la
+     página (2+ pantallas de scroll). En su lugar: barra fija abajo + sheet. */
+  .market-trading-panel.has-mobile-bar { display: none !important; }
+  .market-detail-page.has-mobile-bar { padding-bottom: 96px !important; }
+  .mobile-trade-bar {
+    display: flex; gap: 8px;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--nav-bg-scrolled);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border-subtle);
+  }
+  .mobile-trade-bar button {
+    flex: 1; min-height: 48px; border: none; border-radius: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .mobile-trade-bar .mtb-yes { background: linear-gradient(135deg, var(--green-fill), var(--green-fill-2)); color: #001a0d; }
+  .mobile-trade-bar .mtb-no  { background: linear-gradient(135deg, var(--red-fill), var(--red-fill-2)); color: #fff; }
+  .mobile-trade-bar .mtb-multi { background: linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2)); color: #07071A; }
 
   .navbar-inner     { gap: 0 !important; padding: 0 16px !important; }
   .navbar-search, .navbar-howitworks, .navbar-propose { display: none !important; }
