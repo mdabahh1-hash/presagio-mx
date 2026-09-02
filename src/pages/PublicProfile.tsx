@@ -9,6 +9,7 @@ import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard'
 import { PnlChartCard } from '../components/profile/PnlChartCard'
 import { PositionsTable } from '../components/profile/PositionsTable'
 import { CategoryBar } from '../components/CategoryBar'
+import { Tabs } from '../components/Tabs'
 import { track } from '../lib/analytics'
 import { formatNum } from '../lib/format'
 
@@ -68,27 +69,29 @@ export function PublicProfile() {
 
   if (loading) {
     return (
-      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
+      <>
         <CategoryBar />
-        <div className="profile-top-grid">
-          <div className="card" style={{ height: 260, animation: 'livePulse 1.8s ease infinite' }} />
-          <div className="card" style={{ height: 260, animation: 'livePulse 1.8s ease infinite' }} />
+        <div className="page-container" style={{ paddingTop: 24, paddingBottom: 24 }}>
+          <div className="profile-top-grid">
+            <div className="skeleton" style={{ height: 260 }} />
+            <div className="skeleton" style={{ height: 260 }} />
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (notFound || !profile) {
     return (
-      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 100 }}>
+      <>
         <CategoryBar />
-        <div style={{ paddingTop: 80, textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('publicProfile.notFound')}</p>
-        <Link to="/clasificacion" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: 600 }}>
-          {t('publicProfile.seeLeaderboard')}
-        </Link>
+        <div className="page-container" style={{ paddingTop: 100, paddingBottom: 100, textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>{t('publicProfile.notFound')}</p>
+          <Link to="/clasificacion" className="btn btn-secondary">
+            {t('publicProfile.seeLeaderboard')}
+          </Link>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -98,8 +101,9 @@ export function PublicProfile() {
   const biggestWin = wins.length ? Math.max(...wins.map(e => e.amount)) : null
 
   return (
-    <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
-      <CategoryBar />
+    <>
+    <CategoryBar />
+    <div className="page-container" style={{ paddingTop: 24, paddingBottom: 24 }}>
       {/* Fila superior: perfil + P&L (sin chart — el ledger ajeno es privado) */}
       <div className="anim-1 profile-top-grid">
         <ProfileHeaderCard
@@ -123,31 +127,21 @@ export function PublicProfile() {
           subStats={[
             { label: t('publicProfile.precision'), value: `${profile.accuracy}%` },
             { label: t('publicProfile.markets'), value: formatNum(profile.markets_traded) },
-            { label: t('publicProfile.invested'), value: `${formatNum(profile.volume)} PT`, color: 'var(--gold)' },
+            { label: t('publicProfile.invested'), value: `${formatNum(profile.volume)} PT` },
           ]}
         />
       </div>
 
       {/* Tabs */}
-      <div className="anim-2" style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid var(--border-subtle)' }}>
-        {(['posiciones', 'actividad'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              background: 'transparent', border: 'none',
-              borderBottom: `2px solid ${activeTab === tab ? 'var(--blue)' : 'transparent'}`,
-              padding: '10px 18px',
-              fontSize: '0.85rem', fontWeight: 700,
-              color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-              cursor: 'pointer',
-              letterSpacing: '0.05em', textTransform: 'capitalize',
-              transition: 'color 0.15s', marginBottom: -1,
-            }}
-          >
-            {tab === 'posiciones' ? t('profile.tabPositions') : t('profile.tabActivity')}
-          </button>
-        ))}
+      <div className="anim-2 tabs-line" style={{ marginBottom: 16 }}>
+        <Tabs<'posiciones' | 'actividad'>
+          items={[
+            { key: 'posiciones', label: t('profile.tabPositions') },
+            { key: 'actividad', label: t('profile.tabActivity') },
+          ]}
+          active={activeTab}
+          onChange={setActiveTab}
+        />
       </div>
 
       {activeTab === 'posiciones' && (
@@ -164,5 +158,6 @@ export function PublicProfile() {
 
       {authModal && <AuthModal initialMode="login" onClose={() => setAuthModal(false)} />}
     </div>
+    </>
   )
 }

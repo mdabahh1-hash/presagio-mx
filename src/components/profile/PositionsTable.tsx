@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ApiPosition, ApiHistoryEvent } from '../../lib/api'
 import { formatNum, formatPnl, formatDate } from '../../lib/format'
+import { Badge } from '../Badge'
+import { Icon } from '../Icon'
+import { Tabs } from '../Tabs'
 
 interface Props {
   positions: ApiPosition[]
@@ -18,19 +21,10 @@ function OutcomeBadge({ side, outcomeKey, outcomeLabel }: { side: string | null;
   const isYes = side === 'YES'
   const isNo = side === 'NO'
   const label = isYes ? t('common.yes') : isNo ? t('common.no') : (outcomeLabel ?? outcomeKey ?? '—')
-  const color = isYes ? 'var(--green)' : isNo ? 'var(--red)' : 'var(--gold)'
-  const bg = isYes ? 'var(--green-soft)' : isNo ? 'var(--red-soft)' : 'var(--oro-dim)'
-  const border = isYes ? 'var(--green-border)' : isNo ? 'var(--red-border)' : 'var(--oro-glow)'
   return (
-    <span style={{
-      fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
-      textTransform: 'uppercase', color, background: bg,
-      border: `1px solid ${border}`, padding: '2px 8px', borderRadius: 99,
-      maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      display: 'inline-block', verticalAlign: 'middle',
-    }}>
+    <Badge tone={isYes ? 'green' : isNo ? 'red' : 'neutral'} style={{ maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis' }}>
       {label}
-    </span>
+    </Badge>
   )
 }
 
@@ -39,13 +33,14 @@ function EmptyState({ text }: { text: string }) {
   return (
     <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--text-secondary)' }}>
       <div style={{
-        width: 60, height: 60, borderRadius: '50%',
-        background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+        width: 56, height: 56, borderRadius: '50%', background: 'var(--bg-elevated)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        margin: '0 auto 18px', fontSize: '1.4rem',
-      }}>📊</div>
-      <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>{text}</p>
-      <Link to="/mercados" style={{ color: 'var(--blue)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
+        margin: '0 auto 16px', color: 'var(--text-tertiary)',
+      }}>
+        <Icon name="chart" size={22} />
+      </div>
+      <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 12 }}>{text}</p>
+      <Link to="/mercados" className="btn btn-secondary btn-sm">
         {t('profile.explore')}
       </Link>
     </div>
@@ -81,41 +76,30 @@ export function PositionsTable({ positions, history }: Props) {
       sortDesc ? Math.abs(b.amount) - Math.abs(a.amount) : Math.abs(a.amount) - Math.abs(b.amount))
   }, [history, q, sortDesc])
 
-  const pillStyle = (active: boolean): React.CSSProperties => ({
-    padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
-    background: active ? 'var(--bg-elevated)' : 'transparent',
-    color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
-    transition: 'all 0.15s',
-  })
-
   return (
     <div>
       {/* Controles: sub-tabs + búsqueda + orden */}
-      <div className="profile-controls-row" style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 16 }}>
-        <div className="pill-group" style={{
-          display: 'flex', gap: 2, padding: 3, borderRadius: 99,
-          background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', flexShrink: 0,
-        }}>
-          <button onClick={() => setSubTab('active')} style={pillStyle(subTab === 'active')}>
-            {t('profile.subTabActive')}
-          </button>
-          <button onClick={() => setSubTab('closed')} style={pillStyle(subTab === 'closed')}>
-            {t('profile.subTabClosed')}
-          </button>
-        </div>
+      <div className="profile-controls-row" style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+        <Tabs<'active' | 'closed'>
+          size="sm"
+          items={[
+            { key: 'active', label: t('profile.subTabActive') },
+            { key: 'closed', label: t('profile.subTabClosed') },
+          ]}
+          active={subTab}
+          onChange={setSubTab}
+          style={{ flexShrink: 0 }}
+        />
         <input
-          className="input-dark"
+          className="input"
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder={t('profile.searchPositions')}
-          style={{ flex: 1, minWidth: 160 }}
+          style={{ flex: 1, minWidth: 160, height: 36 }}
         />
-        <button
-          onClick={() => setSortDesc(d => !d)}
-          className="btn-ghost"
-          style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', fontWeight: 700 }}
-        >
-          {t('profile.sortValue')} {sortDesc ? '↓' : '↑'}
+        <button onClick={() => setSortDesc(d => !d)} className="btn btn-ghost btn-sm" style={{ flexShrink: 0 }}>
+          {t('profile.sortValue')}
+          <Icon name={sortDesc ? 'chevron-down' : 'chevron-up'} size={14} />
         </button>
       </div>
 
@@ -199,15 +183,9 @@ export function PositionsTable({ positions, history }: Props) {
                       {formatDate(e.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
                   </div>
-                  <span style={{
-                    fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.03em', textTransform: 'uppercase',
-                    color: won ? 'var(--green)' : 'var(--red)',
-                    background: won ? 'var(--green-soft)' : 'var(--red-soft)',
-                    border: `1px solid ${won ? 'var(--green-border)' : 'var(--red-border)'}`,
-                    padding: '3px 10px', borderRadius: 99, flexShrink: 0,
-                  }}>
+                  <Badge tone={won ? 'green' : 'red'} icon={won ? 'check' : 'x'}>
                     {won ? t('profile.historyBadgeWin') : t('profile.historyBadgeLoss')}
-                  </span>
+                  </Badge>
                   <span className="font-mono" style={{
                     fontSize: '0.95rem', fontWeight: 700, flexShrink: 0, textAlign: 'right', minWidth: 90,
                     color: e.amount >= 0 ? 'var(--green)' : 'var(--red)',

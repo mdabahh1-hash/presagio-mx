@@ -51,7 +51,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
           style={{
             position: 'relative', width: 38, height: 22, borderRadius: 99,
             border: '1px solid var(--border-default)',
-            background: isDark ? 'var(--oro-fill)' : 'var(--bg-elevated)',
+            background: isDark ? 'var(--text-primary)' : 'var(--border-default)',
             cursor: 'pointer', padding: 0, flexShrink: 0,
             transition: 'background 0.15s',
           }}
@@ -59,7 +59,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
           <span style={{
             position: 'absolute', top: 2, left: isDark ? 17 : 2,
             width: 16, height: 16, borderRadius: '50%',
-            background: isDark ? '#07071A' : 'var(--text-tertiary)',
+            background: isDark ? 'var(--bg-base)' : 'var(--text-primary)',
             transition: 'left 0.15s',
           }} />
         </button>
@@ -71,7 +71,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
           textAlign: 'left', padding: pad, borderRadius: radius,
           border: 'none', cursor: 'pointer', fontSize, fontWeight: 600,
           color: preference === 'system' ? 'var(--text-primary)' : 'var(--text-tertiary)',
-          background: preference === 'system' ? 'var(--oro-dim)' : 'transparent',
+          background: preference === 'system' ? 'var(--bg-hover)' : 'transparent',
           transition: 'background 0.15s, color 0.15s',
         }}
       >
@@ -101,9 +101,9 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
                 key={lng}
                 onClick={() => { void i18n.changeLanguage(lng) }}
                 style={{
-                  border: `1px solid ${active ? 'var(--oro-glow)' : 'var(--border-subtle)'}`,
-                  background: active ? 'var(--oro-dim)' : 'transparent',
-                  color: active ? 'var(--gold)' : 'var(--text-tertiary)',
+                  border: `1px solid ${active ? 'var(--border-hover)' : 'var(--border-subtle)'}`,
+                  background: active ? 'var(--bg-elevated)' : 'transparent',
+                  color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   borderRadius: 8, padding: '4px 10px', cursor: 'pointer',
                   fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em', transition: 'all 0.15s',
                 }}

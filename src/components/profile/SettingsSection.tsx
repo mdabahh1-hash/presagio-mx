@@ -7,6 +7,8 @@ import { ReferralCard } from '../ReferralCard'
 import { registerPasskey, supportsPasskeys, isPasskeyCancel } from '../../lib/webauthn'
 import { track } from '../../lib/analytics'
 import { translateApiError } from '../../lib/errors'
+import { Badge } from '../Badge'
+import { Icon } from '../Icon'
 
 // Configuración del perfil propio: email, passkey, referidos y logout.
 // Colapsada por defecto; el engrane / "Invitar amigos" la abren.
@@ -66,14 +68,14 @@ export function SettingsSection({ open }: { open: boolean }) {
   if (!open || !user) return null
 
   return (
-    <div id="settings" className="anim-1" style={{ marginTop: 32 }}>
-      <div className="exchange-header" style={{ marginBottom: 14 }}>{t('profile.settingsTitle')}</div>
+    <div id="settings" className="anim-1" style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
+      <h3 className="section-title" style={{ fontSize: 16, marginBottom: 4 }}>{t('profile.settingsTitle')}</h3>
 
       {/* Email notifications toggle */}
-      <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 20px', marginBottom: 12 }}>
+      <div className="list-row" style={{ justifyContent: 'space-between', gap: 16, padding: '14px 0' }}>
         <div>
-          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('profile.emailNotifTitle')}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{t('profile.emailNotifSub')}</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t('profile.emailNotifTitle')}</div>
+          <div className="meta-label">{t('profile.emailNotifSub')}</div>
         </div>
         <button
           onClick={toggleEmailNotif}
@@ -81,15 +83,15 @@ export function SettingsSection({ open }: { open: boolean }) {
           aria-checked={emailNotif}
           aria-label={t('profile.emailNotifTitle')}
           style={{
-            width: 46, height: 26, borderRadius: 99, border: 'none', cursor: 'pointer',
+            width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer',
             position: 'relative', flexShrink: 0,
-            background: emailNotif ? 'var(--green)' : 'var(--bg-elevated)',
+            background: emailNotif ? 'var(--text-primary)' : 'var(--border-default)',
             transition: 'background 0.15s',
           }}
         >
           <span style={{
-            position: 'absolute', top: 3, left: emailNotif ? 23 : 3,
-            width: 20, height: 20, borderRadius: '50%', background: '#fff',
+            position: 'absolute', top: 3, left: emailNotif ? 21 : 3,
+            width: 16, height: 16, borderRadius: '50%', background: emailNotif ? 'var(--bg-base)' : 'var(--text-tertiary)',
             transition: 'left 0.15s',
           }} />
         </button>
@@ -97,47 +99,28 @@ export function SettingsSection({ open }: { open: boolean }) {
 
       {/* Seguridad: passkey */}
       {supportsPasskeys() && (
-        <div className="card" style={{ padding: '14px 20px', marginBottom: 12 }}>
+        <div className="list-row" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8, padding: '14px 0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
             <div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('profile.securityTitle')}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-                {t('profile.securitySub')}
-              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t('profile.securityTitle')}</div>
+              <div className="meta-label">{t('profile.securitySub')}</div>
             </div>
             {user.has_passkey ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--green)', fontWeight: 700 }}>{t('profile.passkeyConfigured')}</span>
-                <button
-                  onClick={removePasskey}
-                  disabled={passkeyBusy}
-                  style={{
-                    background: 'transparent', border: '1px solid var(--border-default)',
-                    borderRadius: 8, padding: '7px 12px', fontSize: '0.75rem',
-                    color: 'var(--text-tertiary)', cursor: 'pointer', fontWeight: 600,
-                    opacity: passkeyBusy ? 0.6 : 1,
-                  }}
-                >
+                <Badge tone="green" icon="check">{t('profile.passkeyConfigured')}</Badge>
+                <button className="btn btn-ghost btn-sm" onClick={removePasskey} disabled={passkeyBusy}>
                   {t('profile.passkeyDelete')}
                 </button>
               </div>
             ) : (
-              <button
-                onClick={addPasskey}
-                disabled={passkeyBusy}
-                style={{
-                  background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-                  borderRadius: 10, padding: '9px 16px', fontSize: '0.8rem',
-                  color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700,
-                  flexShrink: 0, opacity: passkeyBusy ? 0.6 : 1,
-                }}
-              >
+              <button className="btn btn-secondary btn-sm" onClick={addPasskey} disabled={passkeyBusy} style={{ flexShrink: 0 }}>
+                <Icon name="key" size={14} />
                 {passkeyBusy ? t('profile.passkeyWaiting') : t('profile.passkeyAdd')}
               </button>
             )}
           </div>
           {passkeyMsg && (
-            <div style={{ marginTop: 10, fontSize: '0.78rem', color: passkeyMsg.ok ? 'var(--green)' : 'var(--red)' }}>
+            <div style={{ fontSize: 13, color: passkeyMsg.ok ? 'var(--green)' : 'var(--red)' }}>
               {passkeyMsg.text}
             </div>
           )}
@@ -148,16 +131,8 @@ export function SettingsSection({ open }: { open: boolean }) {
       <ReferralCard code={user.referral_code} />
 
       {/* Logout */}
-      <button
-        onClick={() => { logout(); navigate('/') }}
-        style={{
-          marginTop: 4, background: 'transparent',
-          border: '1px solid var(--red-border)',
-          borderRadius: 10, padding: '10px 20px',
-          fontSize: '0.8rem', color: 'var(--red)', fontWeight: 700,
-          cursor: 'pointer',
-        }}
-      >
+      <button className="btn btn-ghost" onClick={() => { logout(); navigate('/') }} style={{ marginTop: 8, color: 'var(--red)' }}>
+        <Icon name="logout" size={15} />
         {t('profile.logout')}
       </button>
     </div>

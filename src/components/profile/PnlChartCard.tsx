@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FullChart } from '../SparkChart'
+import { Tabs } from '../Tabs'
 import { formatPnl } from '../../lib/format'
 import type { PricePoint } from '../../types'
 
@@ -42,13 +43,13 @@ export function PnlChartCard({ pointsHistory, pnl, subStats }: Props) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: pnlColor, flexShrink: 0 }} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>
               {t('profile.pnlLabel')}
             </span>
           </div>
-          <div className="font-mono" style={{
-            fontSize: '2.4rem', fontWeight: 700, color: pnlColor,
-            letterSpacing: '-0.04em', lineHeight: 1.15, marginTop: 6,
+          <div className="num" style={{
+            fontSize: 32, fontWeight: 700, color: pnlColor,
+            letterSpacing: '-0.02em', lineHeight: 1.15, marginTop: 6,
           }}>
             {formatPnl(pnl)}
           </div>
@@ -63,35 +64,18 @@ export function PnlChartCard({ pointsHistory, pnl, subStats }: Props) {
         </div>
 
         {hasChart && (
-          <div className="pill-group" style={{ display: 'flex', gap: 2 }}>
-            {periods.map(p => (
-              <button
-                key={p.key}
-                onClick={() => setPeriod(p.key)}
-                className={`period-pill${period === p.key ? ' active' : ''}`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+          <Tabs<Period> size="sm" items={periods.map(p => ({ key: p.key, label: p.label }))} active={period} onChange={setPeriod} />
         )}
       </div>
 
       {hasChart ? (
         <FullChart data={slice} height={180} color={chartColor} valueSuffix=" PT" label="PT" />
       ) : subStats && subStats.length > 0 ? (
-        <div style={{ display: 'flex', marginTop: 'auto' }}>
-          {subStats.map((s, i) => (
-            <div key={s.label} style={{
-              flex: 1, minWidth: 0, paddingLeft: i === 0 ? 0 : 18,
-              borderLeft: i === 0 ? 'none' : '1px solid var(--border-subtle)',
-            }}>
-              <div className="font-mono" style={{ fontSize: '1.2rem', fontWeight: 700, color: s.color ?? 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                {s.value}
-              </div>
-              <div className="meta-label" style={{ marginTop: 4 }}>
-                {s.label}
-              </div>
+        <div className="stat-row" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginTop: 'auto', borderBottom: 'none' }}>
+          {subStats.map(s => (
+            <div key={s.label} style={{ minWidth: 0 }}>
+              <div className="stat-label">{s.label}</div>
+              <div className="stat-value" style={{ color: s.color ?? 'var(--text-primary)', whiteSpace: 'nowrap' }}>{s.value}</div>
             </div>
           ))}
         </div>

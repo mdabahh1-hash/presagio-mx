@@ -12,16 +12,13 @@
   --lg-surface: var(--bg-card);
   --lg-text: var(--text-primary);
   --lg-muted: var(--text-secondary);
-  --lg-primary: var(--oro);
-  --lg-primary-text: #07071a; /* texto sobre oro brillante (dark) */
-  --lg-border: var(--border-default);
+  --lg-primary: var(--accent-fill);
+  --lg-primary-text: var(--text-on-accent);
+  --lg-border: var(--border-subtle);
   --lg-success: var(--green);
   --lg-danger: var(--red);
   --lg-warning: var(--warning);
-  --lg-radius: 14px;
-}
-html[data-theme='light'] {
-  --lg-primary-text: #ffffff; /* el oro claro es #8A6A00: texto blanco */
+  --lg-radius: 12px;
 }
 
 .lg-page { padding: 16px; max-width: 560px; margin: 0 auto; color: var(--lg-text); }
@@ -38,21 +35,21 @@ html[data-theme='light'] {
 .lg-btn--xl { width: 100%; min-height: 52px; font-size: 17px; margin-top: 16px; }
 .lg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.lg-link { background: none; border: none; color: var(--lg-primary); font-weight: 600; cursor: pointer; padding: 8px 0; }
+.lg-link { background: none; border: none; color: var(--lg-text); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 8px 0; font-family: inherit; }
 
 /* ---------------------------------------------------------------- chips */
 .lg-chip {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; border-radius: 999px; font-size: 13px;
-  background: var(--lg-surface); border: 1px solid var(--lg-border);
+  padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  background: var(--bg-elevated); border: 1px solid transparent; color: var(--lg-muted);
 }
-.lg-chip--alert { background: var(--warning-bg); color: var(--lg-warning); border: 1px solid var(--warning-border); font-weight: 700; }
-.lg-chip--pick { font-weight: 600; }
-.lg-chip--open { border-color: var(--lg-border); }
-.lg-chip--won { border-color: var(--lg-success); color: var(--lg-success); }
-.lg-chip--lost { border-color: var(--lg-danger); color: var(--lg-danger); opacity: 0.8; }
+.lg-chip--alert { background: var(--warning-bg); color: var(--lg-warning); font-weight: 600; }
+.lg-chip--pick { font-weight: 600; color: var(--lg-text); }
+.lg-chip--open { }
+.lg-chip--won { background: var(--green-soft); color: var(--lg-success); }
+.lg-chip--lost { background: var(--red-soft); color: var(--lg-danger); }
 .lg-chip--void { opacity: 0.7; }
-.lg-chip--rank { border-color: var(--lg-primary); color: var(--lg-primary); font-weight: 700; }
+.lg-chip--rank { color: var(--lg-text); font-weight: 600; }
 .lg-chip--stake { min-height: 44px; min-width: 64px; justify-content: center; font-size: 15px; cursor: pointer; }
 .lg-chip--stake.is-active { background: var(--lg-primary); color: var(--lg-primary-text); border-color: transparent; }
 .lg-chip--stake:disabled { opacity: 0.35; }
@@ -91,7 +88,7 @@ html[data-theme='light'] {
   color: var(--lg-muted); font-weight: 700; font-size: 15px; cursor: pointer;
   border-bottom: 2px solid transparent;
 }
-.lg-tabs button.is-active { color: var(--lg-text); border-bottom-color: var(--lg-primary); }
+.lg-tabs button.is-active { color: var(--lg-text); border-bottom-color: var(--lg-text); }
 
 /* ---------------------------------------------------------------- progreso */
 .lg-progress {
@@ -110,7 +107,7 @@ html[data-theme='light'] {
   border-radius: var(--lg-radius); padding: 12px;
   display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
 }
-.lg-market--highlight { border-color: var(--lg-primary); box-shadow: 0 0 0 1px var(--lg-primary); }
+.lg-market--highlight { border-color: var(--border-hover); }
 .lg-market--closed { opacity: 0.75; }
 .lg-market__main { min-width: 0; }
 .lg-market__action { display: flex; align-items: center; }
@@ -152,7 +149,7 @@ html[data-theme='light'] {
   color: var(--lg-text); cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
-.lg-outcome.is-active { border-color: var(--lg-primary); box-shadow: 0 0 0 1px var(--lg-primary); }
+.lg-outcome.is-active { border-color: var(--border-hover); background: var(--bg-elevated); }
 .lg-outcome__label { font-weight: 700; }
 .lg-outcome__price { font-size: 13px; color: var(--lg-muted); }
 
@@ -187,16 +184,16 @@ html[data-theme='light'] {
 .lg-result__title { font-size: 20px; margin: 8px 0 16px; }
 .lg-podium { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; gap: 8px; margin-bottom: 8px; }
 .lg-podium__slot { background: var(--lg-surface); border: 1px solid var(--lg-border); border-radius: var(--lg-radius); padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.lg-podium__slot--1 { padding-top: 24px; border-color: #eab308; }
-.lg-podium__slot--2 { border-color: #94a3b8; }
-.lg-podium__slot--3 { border-color: #b45309; }
+.lg-podium__slot--1 { padding-top: 24px; border-color: var(--border-hover); }
+.lg-podium__slot--2 { }
+.lg-podium__slot--3 { }
 .lg-podium__name { font-weight: 700; font-size: 14px; }
 .lg-podium__pts { font-size: 15px; font-weight: 700; }
 .lg-podium__hits { font-size: 12px; color: var(--lg-muted); }
 
 /* ---------------------------------------------------------------- pending */
 .lg-pending { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding-top: 32px; }
-.lg-pending__counter { font-size: 17px; font-weight: 700; color: var(--lg-primary); }
+.lg-pending__counter { font-size: 17px; font-weight: 600; color: var(--lg-text); font-variant-numeric: tabular-nums; }
 .lg-pending__hint { font-size: 13px; color: var(--lg-muted); }
 
 /* ---------------------------------------------------------------- misc */
@@ -207,8 +204,8 @@ html[data-theme='light'] {
 .lg-card__meta { display: flex; gap: 12px; margin-top: 6px; font-size: 13px; color: var(--lg-muted); }
 
 .lg-banner {
-  background: color-mix(in srgb, var(--lg-primary) 15%, transparent);
-  border: 1px solid var(--lg-primary); border-radius: var(--lg-radius);
+  background: var(--accent-soft); color: var(--accent);
+  border: none; border-radius: var(--lg-radius);
   padding: 10px 14px; font-size: 14px; margin-bottom: 12px;
   /* la bienvenida se auto-descarta vía onAnimationEnd al terminar el fade */
   animation: lg-banner-out 6s ease forwards;
@@ -229,6 +226,6 @@ html[data-theme='light'] {
 .lg-wizard { display: flex; flex-direction: column; }
 .lg-wizard__steps { display: flex; gap: 8px; margin-bottom: 16px; }
 .lg-wizard__steps span { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--lg-border); font-size: 13px; color: var(--lg-muted); }
-.lg-wizard__steps span.is-active { border-color: var(--lg-primary); color: var(--lg-text); font-weight: 700; }
-.lg-wizard__steps span.is-done { background: var(--lg-primary); color: var(--lg-primary-text); border-color: transparent; }
+.lg-wizard__steps span.is-active { border-color: var(--lg-text); color: var(--lg-text); font-weight: 600; }
+.lg-wizard__steps span.is-done { background: var(--lg-text); color: var(--bg-base); border-color: transparent; }
 .lg-skeleton { min-height: 40vh; opacity: 0.4; }

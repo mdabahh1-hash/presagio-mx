@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { usersApi } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
+import { Icon } from './Icon'
 
 // "Day" is anchored to Mexico time so the boundary is midnight Mexico, matching the backend.
 const mxDay = (d: Date | string) =>
   new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' }) // YYYY-MM-DD
 
+// Único pill de la app (radio 999): bonus diario reclamable. Acento suave.
 export function DailyBonusPill() {
   const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
@@ -40,26 +42,22 @@ export function DailyBonusPill() {
   }
 
   return (
-    <div className="bonus-pill" style={{
-      display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
-      background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
-      borderRadius: 99, padding: '4px 5px 4px 11px',
-    }}>
-      <span style={{ fontSize: '0.95rem', lineHeight: 1 }} aria-hidden>🎁</span>
-      <span className="bonus-amount" style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--gold)', whiteSpace: 'nowrap' }}>
-        +{amount} PT
-      </span>
-      <button
-        onClick={claim}
-        disabled={claiming}
-        style={{
-          background: 'var(--oro-fill)', border: 'none', borderRadius: 99,
-          padding: '5px 13px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.01em',
-          color: '#07071A', cursor: claiming ? 'wait' : 'pointer', opacity: claiming ? 0.7 : 1, whiteSpace: 'nowrap',
-        }}
-      >
-        {claiming ? '...' : t('bonus.claim')}
-      </button>
-    </div>
+    <button
+      className="bonus-pill"
+      onClick={claim}
+      disabled={claiming}
+      title={t('bonus.claim')}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
+        background: 'var(--accent-soft)', color: 'var(--accent)', border: 'none',
+        borderRadius: 999, padding: '0 12px 0 10px', height: 34,
+        fontFamily: 'inherit', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+        cursor: claiming ? 'wait' : 'pointer', opacity: claiming ? 0.7 : 1,
+      }}
+    >
+      <Icon name="gift" size={15} />
+      <span className="bonus-amount num">+{amount} PT</span>
+      <span style={{ fontWeight: 500, opacity: 0.85 }}>· {claiming ? '…' : t('bonus.claim')}</span>
+    </button>
   )
 }

@@ -10,11 +10,11 @@ const ADMIN_EMAIL = 'mdabahh@atid.edu.mx'
 
 const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   open: { label: 'Abierto', color: 'var(--green)' },
-  pending_resolution: { label: '⏳ Pendiente', color: 'var(--gold)' },
-  closed: { label: 'Cerrado', color: 'var(--gold)' },
-  resolved_yes: { label: 'Resuelto SÍ', color: 'var(--accent-alt)' },
+  pending_resolution: { label: 'Pendiente', color: 'var(--accent)' },
+  closed: { label: 'Cerrado', color: 'var(--accent)' },
+  resolved_yes: { label: 'Resuelto SÍ', color: 'var(--text-secondary)' },
   resolved_no: { label: 'Resuelto NO', color: 'var(--red)' },
-  resolved: { label: 'Resuelto', color: 'var(--accent-alt)' },
+  resolved: { label: 'Resuelto', color: 'var(--text-secondary)' },
   cancelled: { label: 'Cancelado', color: 'var(--text-tertiary)' },
 }
 
@@ -58,7 +58,7 @@ export function Admin() {
     setMessage(null)
     try {
       const result = await adminApi.resolveMarket(marketId, { resolution })
-      setMessage(`✓ Resuelto como ${result.resolution}. ${result.positions_settled} posiciones liquidadas.`)
+      setMessage(`Resuelto como ${result.resolution}. ${result.positions_settled} posiciones liquidadas.`)
       setMarkets(await adminApi.listAllMarkets())
     } catch (e: unknown) {
       setMessage(`Error: ${e instanceof Error ? e.message : 'desconocido'}`)
@@ -77,7 +77,7 @@ export function Admin() {
     setMessage(null)
     try {
       const result = await adminApi.resolveMarket(marketId, { outcome_key: outcomeKey })
-      setMessage(`✓ Resuelto: "${outcomeLabel}". ${result.positions_settled} posiciones liquidadas.`)
+      setMessage(`Resuelto: "${outcomeLabel}". ${result.positions_settled} posiciones liquidadas.`)
       setMarkets(await adminApi.listAllMarkets())
     } catch (e: unknown) {
       setMessage(`Error: ${e instanceof Error ? e.message : 'desconocido'}`)
@@ -106,10 +106,10 @@ export function Admin() {
 
       {message && (
         <div style={{
-          background: message.startsWith('✓') ? 'var(--green-soft)' : 'var(--red-soft)',
-          border: `1px solid ${message.startsWith('✓') ? 'var(--green)' : 'var(--red)'}`,
+          background: !message.startsWith('Error') ? 'var(--green-soft)' : 'var(--red-soft)',
+          border: `1px solid ${!message.startsWith('Error') ? 'var(--green)' : 'var(--red)'}`,
           borderRadius: 8, padding: '12px 16px', marginBottom: 24,
-          color: message.startsWith('✓') ? 'var(--green)' : 'var(--red)',
+          color: !message.startsWith('Error') ? 'var(--green)' : 'var(--red)',
           fontSize: '0.875rem',
         }}>
           {message}
@@ -144,9 +144,9 @@ export function Admin() {
                     </span>
                     {isMulti && (
                       <span style={{
-                        fontSize: '0.6rem', fontWeight: 700, color: 'var(--accent-alt)',
-                        background: 'var(--accent-alt-bg)', border: '1px solid var(--accent-alt-border)',
-                        padding: '2px 6px', borderRadius: 99,
+                        fontSize: '0.6rem', fontWeight: 700, color: 'var(--text-secondary)',
+                        background: 'var(--bg-elevated)', border: 'none',
+                        padding: '2px 6px', borderRadius: 6,
                       }}>MULTI</span>
                     )}
                   </div>
@@ -180,13 +180,13 @@ export function Admin() {
                       disabled={resolving === m.id || !selectedOutcomes[m.id]}
                       onClick={() => resolveMulti(m.id)}
                       style={{
-                        background: 'var(--gold)', color: '#07071A', border: 'none',
+                        background: 'var(--accent-fill)', color: 'var(--text-on-accent)', border: 'none',
                         borderRadius: 8, padding: '8px 16px', fontWeight: 700,
                         fontSize: '0.8rem', cursor: 'pointer',
                         opacity: (resolving === m.id || !selectedOutcomes[m.id]) ? 0.5 : 1,
                       }}
                     >
-                      Resolver ✓
+                      Resolver
                     </button>
                   </div>
                 ) : (
@@ -201,7 +201,7 @@ export function Admin() {
                         fontSize: '0.8rem', cursor: 'pointer', opacity: resolving === m.id ? 0.5 : 1,
                       }}
                     >
-                      SÍ ✓
+                      Sí
                     </button>
                     <button
                       className="admin-resolve-btn"
@@ -213,7 +213,7 @@ export function Admin() {
                         fontSize: '0.8rem', cursor: 'pointer', opacity: resolving === m.id ? 0.5 : 1,
                       }}
                     >
-                      NO ✗
+                      No
                     </button>
                   </div>
                 )}

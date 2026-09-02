@@ -8,6 +8,8 @@ import { PnlChartCard } from '../components/profile/PnlChartCard'
 import { PositionsTable } from '../components/profile/PositionsTable'
 import { SettingsSection } from '../components/profile/SettingsSection'
 import { CategoryBar } from '../components/CategoryBar'
+import { Tabs } from '../components/Tabs'
+import { Icon } from '../components/Icon'
 import type { PricePoint } from '../types'
 
 const STARTING_POINTS = 10_000
@@ -40,34 +42,27 @@ export function Profile() {
 
   if (!user) {
     return (
-      <div className="page-container" style={{ paddingTop: 20, paddingBottom: 100 }}>
+      <>
         <CategoryBar />
-        <div style={{ paddingTop: 60, textAlign: 'center' }}>
-        <div style={{
-          width: 64, height: 64, borderRadius: '50%',
-          background: 'var(--bg-elevated)',
-          border: '1px solid var(--border-subtle)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 20px', fontSize: '1.5rem',
-        }}>🔐</div>
-        <h2 className="font-display" style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: 12, letterSpacing: '-0.02em' }}>
-          {t('profile.loginTitle')}
-        </h2>
-        <p style={{ color: 'var(--text-tertiary)', marginBottom: 28, fontSize: '0.9rem' }}>
-          {t('profile.loginSubtitle')}
-        </p>
-        <a href={authApi.googleUrl()} style={{ textDecoration: 'none' }}>
-          <button style={{
-            background: 'linear-gradient(135deg, var(--brand), #b03018)',
-            border: 'none', padding: '14px 32px', color: '#fff', fontWeight: 700, fontSize: '0.9rem',
-            borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 6px 24px var(--oro-glow)',
+        <div className="page-container" style={{ paddingTop: 80, paddingBottom: 100, textAlign: 'center' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%', background: 'var(--bg-elevated)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 16px', color: 'var(--text-tertiary)',
           }}>
+            <Icon name="lock" size={22} />
+          </div>
+          <h2 style={{ fontSize: 22, fontWeight: 600, marginBottom: 8, letterSpacing: '-0.01em' }}>
+            {t('profile.loginTitle')}
+          </h2>
+          <p style={{ color: 'var(--text-tertiary)', marginBottom: 24, fontSize: 14 }}>
+            {t('profile.loginSubtitle')}
+          </p>
+          <a href={authApi.googleUrl()} className="btn btn-primary btn-lg">
             {t('profile.loginGoogle')}
-          </button>
-        </a>
+          </a>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -80,8 +75,9 @@ export function Profile() {
   const biggestWin = wins.length ? Math.max(...wins.map(e => e.amount)) : null
 
   return (
-    <div className="page-container" style={{ paddingTop: 20, paddingBottom: 24 }}>
-      <CategoryBar />
+    <>
+    <CategoryBar />
+    <div className="page-container" style={{ paddingTop: 24, paddingBottom: 24 }}>
 
       {/* Fila superior: perfil + P&L */}
       <div className="anim-1 profile-top-grid">
@@ -101,25 +97,15 @@ export function Profile() {
       </div>
 
       {/* Tabs */}
-      <div className="anim-2" style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid var(--border-subtle)' }}>
-        {(['posiciones', 'actividad'] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              background: 'transparent', border: 'none',
-              borderBottom: `2px solid ${activeTab === tab ? 'var(--blue)' : 'transparent'}`,
-              padding: '10px 18px',
-              fontSize: '0.85rem', fontWeight: 700,
-              color: activeTab === tab ? 'var(--text-primary)' : 'var(--text-secondary)',
-              cursor: 'pointer',
-              letterSpacing: '0.05em', textTransform: 'capitalize',
-              transition: 'color 0.15s', marginBottom: -1,
-            }}
-          >
-            {tab === 'posiciones' ? t('profile.tabPositions') : t('profile.tabActivity')}
-          </button>
-        ))}
+      <div className="anim-2 tabs-line" style={{ marginBottom: 16 }}>
+        <Tabs<'posiciones' | 'actividad'>
+          items={[
+            { key: 'posiciones', label: t('profile.tabPositions') },
+            { key: 'actividad', label: t('profile.tabActivity') },
+          ]}
+          active={activeTab}
+          onChange={setActiveTab}
+        />
       </div>
 
       {activeTab === 'posiciones' && (
@@ -136,5 +122,6 @@ export function Profile() {
 
       <SettingsSection open={settingsOpen} />
     </div>
+    </>
   )
 }

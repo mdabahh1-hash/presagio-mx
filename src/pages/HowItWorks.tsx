@@ -1,14 +1,17 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Icon } from '../components/Icon'
 
+// Página editorial: columna de lectura, pasos numerados en gris, FAQ en
+// <details> y un solo CTA. Sin tarjetas por paso ni cuadros dorados.
 export function HowItWorks() {
   const { t } = useTranslation()
   const steps = [
-    { n: '1', title: t('how.step1Title'), body: t('how.step1Body') },
-    { n: '2', title: t('how.step2Title'), body: t('how.step2Body') },
-    { n: '3', title: t('how.step3Title'), body: t('how.step3Body') },
-    { n: '4', title: t('how.step4Title'), body: t('how.step4Body') },
+    { n: '01', title: t('how.step1Title'), body: t('how.step1Body') },
+    { n: '02', title: t('how.step2Title'), body: t('how.step2Body') },
+    { n: '03', title: t('how.step3Title'), body: t('how.step3Body') },
+    { n: '04', title: t('how.step4Title'), body: t('how.step4Body') },
   ]
   const faq = [
     { q: t('how.faq1Q'), a: t('how.faq1A') },
@@ -16,65 +19,52 @@ export function HowItWorks() {
     { q: t('how.faq3Q'), a: t('how.faq3A') },
   ]
   return (
-    <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '48px 24px 24px' }}>
-      <div className="anim-1" style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h1 className="font-display" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
-          {t('how.title')}
-        </h1>
-        <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
-          {t('how.intro')}
-        </p>
-      </div>
+    <div className="page-container anim-1" style={{ maxWidth: 720, margin: '0 auto', padding: '48px 24px 32px' }}>
+      <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.015em', margin: '0 0 10px' }}>
+        {t('how.title')}
+      </h1>
+      <p style={{ fontSize: 15, color: 'var(--text-secondary)', margin: '0 0 36px', lineHeight: 1.6, maxWidth: 560 }}>
+        {t('how.intro')}
+      </p>
 
       {/* Steps */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 48 }}>
-        {steps.map((s, i) => (
-          <div key={s.n} className={`card anim-${Math.min(i + 1, 6)}`} style={{ display: 'flex', gap: 18, padding: '22px 24px', alignItems: 'flex-start' }}>
-            <div style={{
-              flexShrink: 0, width: 42, height: 42, borderRadius: 12,
-              background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.1rem', color: 'var(--gold)',
-            }}>
+      <ol style={{ listStyle: 'none', margin: '0 0 40px', padding: 0, display: 'flex', flexDirection: 'column' }}>
+        {steps.map(s => (
+          <li key={s.n} style={{ display: 'flex', gap: 20, padding: '18px 0', borderTop: '1px solid var(--border-subtle)' }}>
+            <span className="num" style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-tertiary)', width: 28, flexShrink: 0, paddingTop: 3 }}>
               {s.n}
-            </div>
+            </span>
             <div>
-              <h3 className="font-display" style={{ margin: '0 0 6px', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                {s.title}
-              </h3>
-              <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {s.body}
-              </p>
+              <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{s.title}</h3>
+              <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{s.body}</p>
             </div>
-          </div>
+          </li>
+        ))}
+      </ol>
+
+      {/* FAQ */}
+      <h2 className="section-title" style={{ marginBottom: 8 }}>{t('how.faqTitle')}</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 40 }}>
+        {faq.map(f => (
+          <details key={f.q} className="faq-item" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+            <summary style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+              padding: '14px 0', cursor: 'pointer', listStyle: 'none',
+              fontSize: 15, fontWeight: 500, color: 'var(--text-primary)',
+            }}>
+              {f.q}
+              <Icon name="chevron-down" size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} className="faq-chevron" />
+            </summary>
+            <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.a}</p>
+          </details>
         ))}
       </div>
 
-      {/* FAQ */}
-      <div style={{ marginBottom: 48 }}>
-        <div className="exchange-header" style={{ marginBottom: 18 }}>{t('how.faqTitle')}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {faq.map(f => (
-            <div key={f.q} className="card" style={{ padding: '20px 24px' }}>
-              <h4 style={{ margin: '0 0 8px', fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>{f.q}</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* CTA */}
-      <div style={{ textAlign: 'center' }}>
-        <Link to="/mercados" style={{ textDecoration: 'none' }}>
-          <button style={{
-            background: 'var(--oro-fill)', border: 'none', padding: '15px 36px',
-            color: '#07071A', fontWeight: 700,
-            fontSize: '0.9rem', letterSpacing: '0.02em', borderRadius: 12, cursor: 'pointer',
-            boxShadow: '0 8px 32px var(--oro-glow)',
-          }}>
-            {t('how.cta')}
-          </button>
-        </Link>
-      </div>
+      <Link to="/mercados" className="btn btn-primary btn-lg">
+        {t('how.cta')}
+        <Icon name="arrow-right" size={16} />
+      </Link>
     </div>
   )
 }

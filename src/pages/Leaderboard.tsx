@@ -3,28 +3,13 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usersApi, type ApiLeaderboardEntry, type LeaderboardPeriod } from '../lib/api'
 import { formatPnl, formatNum } from '../lib/format'
+import { Avatar } from '../components/Avatar'
+import { Tabs } from '../components/Tabs'
+import { Icon } from '../components/Icon'
 
-const MEDAL = ['🥇', '🥈', '🥉']
 const PERIODS = ['Hoy', 'Semanal', 'Mensual', 'Todos'] as const
 const PERIOD_PARAM: Record<typeof PERIODS[number], LeaderboardPeriod> = {
   Hoy: 'today', Semanal: 'week', Mensual: 'month', Todos: 'all',
-}
-
-function initials(name: string) {
-  return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
-}
-
-function Avatar({ name, size = 40 }: { name: string; size?: number }) {
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: '50%', flexShrink: 0,
-      background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.34, fontWeight: 700, color: '#07071A',
-    }}>
-      {initials(name)}
-    </div>
-  )
 }
 
 export function Leaderboard() {
@@ -67,54 +52,26 @@ export function Leaderboard() {
 
   return (
     <div className="page-container" style={{ paddingTop: 44, paddingBottom: 24 }}>
-      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
+      <h1 className="anim-1" style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 16px' }}>
         {t('leaderboard.title')}
       </h1>
 
-      {/* Period tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
-        {PERIODS.map(p => {
-          const active = p === period
-          return (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              style={{
-                background: active ? 'var(--oro-dim)' : 'var(--bg-card)',
-                border: `1px solid ${active ? 'var(--gold)' : 'var(--border-subtle)'}`,
-                borderRadius: 99, padding: '8px 18px',
-                fontSize: '0.82rem', fontWeight: 700,
-                color: active ? 'var(--gold)' : 'var(--text-tertiary)',
-                cursor: 'pointer', transition: 'all 0.15s',
-              }}
-            >
-              {periodLabels[p]}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Search */}
-      <div style={{
-        display: 'flex', alignItems: 'center', maxWidth: 360,
-        background: 'var(--bg-card)', border: '1px solid var(--border-default)',
-        borderRadius: 10, overflow: 'hidden', marginBottom: 20,
-      }}>
-        <span style={{ paddingLeft: 14, color: 'var(--text-tertiary)', display: 'flex' }}>
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-            <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5"/>
-            <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </span>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={t('leaderboard.searchPlaceholder')}
-          style={{
-            flex: 1, background: 'transparent', border: 'none', outline: 'none',
-            padding: '11px 12px', fontSize: '0.875rem', color: 'var(--text-primary)',
-          }}
+      {/* Period tabs + search */}
+      <div className="tabs-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <Tabs<typeof PERIODS[number]>
+          items={PERIODS.map(p => ({ key: p, label: periodLabels[p] }))}
+          active={period}
+          onChange={setPeriod}
         />
+        <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, width: 280, maxWidth: '100%', height: 36, padding: '0 10px', marginBottom: 8 }}>
+          <Icon name="search" size={15} style={{ color: 'var(--text-tertiary)' }} />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={t('leaderboard.searchPlaceholder')}
+            style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontSize: 14, color: 'var(--text-primary)', fontFamily: 'inherit' }}
+          />
+        </div>
       </div>
 
       <div className="leaderboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24, alignItems: 'start' }}>
@@ -123,7 +80,7 @@ export function Leaderboard() {
           {/* Column headers (sortable) */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 16,
-            padding: '0 16px 12px', borderBottom: '1px solid var(--border-subtle)',
+            padding: '0 8px 8px', borderBottom: '1px solid var(--border-subtle)',
           }}>
             <span style={{ width: 28, flexShrink: 0 }} />
             <span style={{ flex: 1 }} />
@@ -131,15 +88,16 @@ export function Leaderboard() {
               <button
                 key={key}
                 onClick={() => setSort(key)}
+                className={key === 'volume' ? 'lb-vol' : 'lb-pnl'}
                 style={{
                   width: key === 'pnl' ? 140 : 120, textAlign: 'right',
-                  background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                  background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, fontFamily: 'inherit',
                   color: sort === key ? 'var(--text-primary)' : 'var(--text-tertiary)',
-                  paddingBottom: 4,
-                  borderBottom: `2px solid ${sort === key ? 'var(--gold)' : 'transparent'}`,
+                  display: 'inline-flex', justifyContent: 'flex-end', alignItems: 'center', gap: 4, padding: 0,
                 }}
               >
                 {label}
+                {sort === key && <Icon name="chevron-down" size={12} />}
               </button>
             ))}
           </div>
@@ -165,30 +123,25 @@ export function Leaderboard() {
                 <Link
                   key={u.id}
                   to={`/u/${u.username}`}
-                  className="lb-row"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 16, textDecoration: 'none',
-                    padding: '12px 16px', borderBottom: '1px solid var(--border-subtle)',
-                  }}
+                  className="list-row is-link lb-row"
+                  style={{ gap: 16, padding: '12px 8px' }}
                 >
-                  <span style={{ width: 28, flexShrink: 0, textAlign: 'center', fontSize: i < 3 && sort === 'pnl' ? '1.2rem' : '0.9rem' }}>
-                    {i < 3 && sort === 'pnl'
-                      ? MEDAL[i]
-                      : <span className="font-mono" style={{ fontWeight: 600, color: 'var(--text-tertiary)' }}>{i + 1}</span>}
+                  <span className="num" style={{ width: 28, flexShrink: 0, textAlign: 'center', fontSize: 13, fontWeight: i < 3 ? 600 : 500, color: i < 3 ? 'var(--text-primary)' : 'var(--text-tertiary)', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+                    {i === 0 && sort === 'pnl' ? <Icon name="medal" size={16} style={{ color: 'var(--accent)' }} /> : i + 1}
                   </span>
-                  <Avatar name={u.display_name} />
+                  <Avatar name={u.display_name} size={36} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.display_name}
                     </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+                    <div className="meta-label num">
                       {t('leaderboard.statLine', { accuracy: u.accuracy, markets: u.markets_traded })}
                     </div>
                   </div>
-                  <span className="font-mono lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: '0.95rem', fontWeight: 700, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                  <span className="num lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: 14, fontWeight: 600, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
                     {formatPnl(u.pnl)}
                   </span>
-                  <span className="font-mono lb-vol" style={{ width: 120, textAlign: 'right', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  <span className="num lb-vol" style={{ width: 120, textAlign: 'right', fontSize: 14, fontWeight: 500, color: 'var(--text-secondary)' }}>
                     {`${formatNum(u.volume)} PT`}
                   </span>
                 </Link>
@@ -199,8 +152,8 @@ export function Leaderboard() {
 
         {/* ── Sidebar: top gainers ── */}
         <div className="leaderboard-side">
-          <div className="card" style={{ padding: '20px 18px' }}>
-            <div className="exchange-header" style={{ marginBottom: 16 }}>{t('leaderboard.topGainers')}</div>
+          <div className="card" style={{ padding: '16px 16px 8px' }}>
+            <h3 className="section-title" style={{ fontSize: 16, marginBottom: 6 }}>{t('leaderboard.topGainers')}</h3>
             {loading ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[...Array(6)].map((_, i) => (
@@ -212,19 +165,16 @@ export function Leaderboard() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {topGainers.map((u, i) => (
-                  <div key={u.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 11,
-                    padding: '10px 0', borderTop: i === 0 ? 'none' : '1px solid var(--border-subtle)',
-                  }}>
-                    <span className="font-mono" style={{ width: 14, fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-tertiary)', flexShrink: 0 }}>{i + 1}</span>
-                    <Avatar name={u.display_name} size={30} />
-                    <span style={{ flex: 1, minWidth: 0, fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Link key={u.id} to={`/u/${u.username}`} className="list-row is-link" style={{ gap: 10, padding: '10px 4px' }}>
+                    <span className="num" style={{ width: 14, fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)', flexShrink: 0 }}>{i + 1}</span>
+                    <Avatar name={u.display_name} size={28} />
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.display_name}
                     </span>
-                    <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
+                    <span className="num" style={{ fontSize: 13, fontWeight: 600, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
                       {formatPnl(u.pnl)}
                     </span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

@@ -3,19 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { proposalsApi } from '../lib/api'
 import { track } from '../lib/analytics'
 import { translateApiError } from '../lib/errors'
+import { Icon } from '../components/Icon'
 
 const CATEGORIES = ['Deportes', 'Política', 'Economía', 'Crypto', 'Tech', 'Clima', 'Otro']
 
-const inputStyle: React.CSSProperties = {
-  width: '100%', background: 'var(--bg-surface)',
-  border: '1px solid var(--border-default)', borderRadius: 10,
-  padding: '11px 14px', fontSize: '0.9rem', color: 'var(--text-primary)', outline: 'none', boxSizing: 'border-box',
-}
+const inputStyle: React.CSSProperties = { width: '100%', display: 'block' }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: '0.74rem', color: 'var(--text-tertiary)',
-  display: 'block', marginBottom: 5, fontWeight: 600,
-  letterSpacing: 0,
+  fontSize: 13, color: 'var(--text-secondary)',
+  display: 'block', marginBottom: 6, fontWeight: 500,
 }
 
 export function Propose() {
@@ -54,44 +50,36 @@ export function Propose() {
   }
 
   return (
-    <div className="page-container" style={{ maxWidth: 560, margin: '0 auto', padding: '44px 24px 24px' }}>
-      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 10px' }}>
+    <div className="page-container anim-1" style={{ maxWidth: 600, margin: '0 auto', padding: '40px 24px 24px' }}>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 6px' }}>
         {t('propose.title')}
       </h1>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 28px', lineHeight: 1.6 }}>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 24px', lineHeight: 1.6 }}>
         {t('propose.intro')}
       </p>
 
       {success && (
-        <div style={{
-          margin: '0 0 20px', fontSize: '0.85rem', color: 'var(--green)',
-          background: 'var(--green-soft)',
-          border: '1px solid var(--green-border)',
-          borderRadius: 10, padding: '14px 16px',
-        }}>
-          ✓ {success}
+        <div style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--green)', background: 'var(--green-soft)', borderRadius: 8, padding: '12px 14px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <Icon name="check" size={16} strokeWidth={2.2} style={{ marginTop: 2 }} />
+          <span>{success}</span>
         </div>
       )}
       {error && (
-        <div style={{
-          margin: '0 0 20px', fontSize: '0.85rem', color: 'var(--red)',
-          background: 'var(--red-soft)',
-          border: '1px solid var(--red-border)',
-          borderRadius: 10, padding: '14px 16px',
-        }}>
+        <div style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--red)', background: 'var(--red-soft)', borderRadius: 8, padding: '12px 14px' }}>
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="anim-2 card" style={{ padding: '26px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
           <label style={labelStyle}>
             {t('propose.questionLabel')}
-            <span style={{ float: 'right', textTransform: 'none', letterSpacing: 0 }}>
+            <span className="num" style={{ float: 'right', color: 'var(--text-tertiary)' }}>
               {question.length}/200
             </span>
           </label>
           <input
+            className="input"
             style={inputStyle}
             value={question}
             onChange={e => setQuestion(e.target.value)}
@@ -104,6 +92,7 @@ export function Propose() {
         <div>
           <label style={labelStyle}>{t('propose.categoryLabel')}</label>
           <select
+            className="input"
             value={category}
             onChange={e => setCategory(e.target.value)}
             style={{ ...inputStyle, cursor: 'pointer' }}
@@ -115,7 +104,8 @@ export function Propose() {
         <div>
           <label style={labelStyle}>{t('propose.descriptionLabel')}</label>
           <textarea
-            style={{ ...inputStyle, resize: 'vertical', minHeight: 90 }}
+            className="input"
+            style={{ ...inputStyle, minHeight: 96 }}
             value={description}
             onChange={e => setDescription(e.target.value)}
             maxLength={2000}
@@ -127,6 +117,7 @@ export function Propose() {
         <div>
           <label style={labelStyle}>{t('propose.contactLabel')}</label>
           <input
+            className="input"
             style={inputStyle}
             value={contact}
             onChange={e => setContact(e.target.value)}
@@ -135,24 +126,12 @@ export function Propose() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting || !question.trim()}
-          style={{
-            width: '100%', padding: '15px',
-            background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
-            border: 'none', borderRadius: 12, color: '#07071A', fontWeight: 700, fontSize: '0.92rem',
-            letterSpacing: '0.02em',
-            cursor: (submitting || !question.trim()) ? 'not-allowed' : 'pointer',
-            opacity: (submitting || !question.trim()) ? 0.6 : 1,
-            transition: 'opacity 0.15s',
-          }}
-        >
+        <button type="submit" className="btn btn-primary btn-lg" disabled={submitting || !question.trim()} style={{ width: '100%', marginTop: 4 }}>
           {submitting ? t('propose.submitting') : t('propose.submit')}
         </button>
       </form>
 
-      <p style={{ margin: '18px 0 0', fontSize: '0.7rem', color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
+      <p className="meta-label" style={{ margin: '16px 0 0', textAlign: 'center', lineHeight: 1.5 }}>
         {t('propose.reviewNote')}
       </p>
     </div>

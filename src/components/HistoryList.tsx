@@ -2,16 +2,26 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ApiHistoryEvent } from '../lib/api'
 import { formatPnl, timeAgo } from '../lib/format'
+import { Icon, type IconName } from './Icon'
+import { Badge } from './Badge'
 
-// Badge palette per event type — same pill style as the positions tab.
+// Color del icono por tipo de evento.
 function badgeStyle(type: ApiHistoryEvent['type']) {
   switch (type) {
-    case 'win':
-      return { color: 'var(--green)', bg: 'var(--green-soft)', border: 'var(--green-border)' }
-    case 'loss':
-      return { color: 'var(--red)', bg: 'var(--red-soft)', border: 'var(--red-border)' }
-    default:
-      return { color: 'var(--gold)', bg: 'var(--oro-dim)', border: 'var(--oro-glow)' }
+    case 'win': return { color: 'var(--green)' }
+    case 'loss': return { color: 'var(--red)' }
+    default: return { color: 'var(--text-secondary)' }
+  }
+}
+
+function iconFor(type: ApiHistoryEvent['type']): IconName {
+  switch (type) {
+    case 'trade': return 'trending'
+    case 'win': return 'trophy'
+    case 'loss': return 'x'
+    case 'daily_bonus': return 'gift'
+    case 'referral': return 'users'
+    default: return 'coin'
   }
 }
 
@@ -19,7 +29,7 @@ function amountColor(type: ApiHistoryEvent['type']) {
   if (type === 'win') return 'var(--green)'
   if (type === 'loss') return 'var(--red)'
   if (type === 'trade') return 'var(--text-secondary)' // spend, not P&L
-  return 'var(--gold)'
+  return 'var(--text-secondary)'
 }
 
 interface HistoryListProps {
@@ -70,13 +80,14 @@ export function HistoryList({ events, variant }: HistoryListProps) {
     return (
       <div style={{ color: 'var(--text-secondary)', padding: '60px 0', textAlign: 'center' }}>
         <div style={{
-          width: 60, height: 60, borderRadius: '50%',
-          background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
+          width: 56, height: 56, borderRadius: '50%', background: 'var(--bg-elevated)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 18px', fontSize: '1.4rem',
-        }}>📋</div>
-        <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>{t('profile.historyEmpty')}</p>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
+          margin: '0 auto 16px', color: 'var(--text-tertiary)',
+        }}>
+          <Icon name="list" size={22} />
+        </div>
+        <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>{t('profile.historyEmpty')}</p>
+        <p style={{ fontSize: 14, color: 'var(--text-tertiary)' }}>
           {variant === 'own' ? t('profile.historyEmptySub') : t('profile.historyEmptySubPublic')}
         </p>
       </div>
@@ -84,33 +95,30 @@ export function HistoryList({ events, variant }: HistoryListProps) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       {events.map((e, i) => {
         const b = badgeStyle(e.type)
         const card = (
-          <div
-            className="card"
-            style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}
-          >
-            <div>
-              <span style={{
-                fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.03em',
-                textTransform: 'uppercase', color: b.color, background: b.bg,
-                border: `1px solid ${b.border}`, padding: '3px 10px', borderRadius: 99,
-              }}>
-                {badgeText(e)}
-              </span>
-              <p style={{ margin: '10px 0 0', fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+          <div className={`list-row${e.market_id ? ' is-link' : ''}`} style={{ padding: '14px 0', gap: 14 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%', background: 'var(--bg-elevated)', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: b.color,
+            }}>
+              <Icon name={iconFor(e.type)} size={16} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <Badge tone={e.type === 'win' ? 'green' : e.type === 'loss' ? 'red' : 'neutral'}>{badgeText(e)}</Badge>
+                <span className="meta-label">{timeAgo(e.created_at)}</span>
+              </div>
+              <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                 {lineText(e)}
                 {e.market_question && (
-                  <> <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{e.market_question}</span></>
+                  <> <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{e.market_question}</span></>
                 )}
               </p>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 6 }}>
-                {timeAgo(e.created_at)}
-              </div>
             </div>
-            <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 700, color: amountColor(e.type), textAlign: 'right' }}>
+            <div className="num" style={{ fontSize: 15, fontWeight: 600, color: amountColor(e.type), textAlign: 'right', flexShrink: 0 }}>
               {formatPnl(e.amount)}
             </div>
           </div>
