@@ -377,14 +377,14 @@ body::before {
 .btn-yes {
   background: linear-gradient(135deg, var(--green-fill), var(--green-fill-2));
   color: #001a0d;
-  font-weight: 800;
+  font-weight: 700;
   border: none;
   border-radius: 10px;
   padding: 14px 20px;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
   font-family: 'DM Sans', sans-serif;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 .btn-yes:hover {
   opacity: 0.92;
@@ -395,14 +395,14 @@ body::before {
 .btn-no {
   background: linear-gradient(135deg, var(--red-fill), var(--red-fill-2));
   color: #fff;
-  font-weight: 800;
+  font-weight: 700;
   border: none;
   border-radius: 10px;
   padding: 14px 20px;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
   font-family: 'DM Sans', sans-serif;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 .btn-no:hover {
   opacity: 0.92;
@@ -606,8 +606,8 @@ body::before {
 .exchange-header {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-tertiary);
   display: flex;
@@ -722,11 +722,16 @@ input[type='range']::-webkit-slider-thumb {
   transition: filter 0.15s;
 }
 .market-row:hover .row-outcome-btn { filter: brightness(1.12); }
+/* Jerarquía: etiqueta en 600 sin mayúsculas forzadas; el número es el que
+   pesa (700). 800 queda reservado para el porcentaje protagonista. */
 .row-outcome-label {
-  font-family: 'DM Sans'; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: 'DM Sans'; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.01em;
+  max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.row-outcome-price { font-family: 'DM Mono'; font-size: 1rem; font-weight: 800; line-height: 1.1; }
+.row-outcome-price { font-family: 'DM Mono'; font-size: 1rem; font-weight: 700; line-height: 1.1; }
+
+/* Etiqueta de metadato (Volumen, Cierre, Cantidad…): gris, 500, sin mayúsculas */
+.meta-label { font-size: 0.7rem; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; }
 
 /* Leaderboard row hover */
 .lb-row { transition: background 0.15s; }
@@ -765,9 +770,9 @@ input[type='range']::-webkit-slider-thumb {
   border: none;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0;
   background: transparent;
   color: var(--text-tertiary);
   transition: all 0.15s;
@@ -863,7 +868,7 @@ input[type='range']::-webkit-slider-thumb {
   }
   .mobile-trade-bar button {
     flex: 1; min-height: 48px; border: none; border-radius: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em;
+    font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.02em;
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .mobile-trade-bar .mtb-yes { background: linear-gradient(135deg, var(--green-fill), var(--green-fill-2)); color: #001a0d; }

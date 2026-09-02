@@ -103,14 +103,14 @@ export function ProfileHeaderCard({
             : initials(displayName)}
         </div>
         <div style={{ minWidth: 0 }}>
-          <h1 className="font-display" style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+          <h1 className="font-display" style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.03em' }}>
             {displayName}
           </h1>
           <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
             @{username} · {joined}
           </div>
           {variant === 'own' && balance != null && (
-            <div style={{ fontSize: '0.82rem', color: 'var(--gold)', marginTop: 4, fontWeight: 700 }}>
+            <div style={{ fontSize: '0.82rem', color: 'var(--gold)', marginTop: 4, fontWeight: 600 }}>
               {t('profile.balanceLabel')}: <span className="font-mono">{formatNum(Math.floor(balance))} PT</span>
             </div>
           )}
@@ -129,13 +129,10 @@ export function ProfileHeaderCard({
             flex: 1, minWidth: 0, paddingLeft: i === 0 ? 0 : 18,
             borderLeft: i === 0 ? 'none' : '1px solid var(--border-subtle)',
           }}>
-            <div className="font-mono" style={{ fontSize: '1.2rem', fontWeight: 800, color: s.color, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
+            <div className="font-mono" style={{ fontSize: '1.2rem', fontWeight: 700, color: s.color, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>
               {s.value}
             </div>
-            <div style={{
-              fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 4,
-              textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600,
-            }}>
+            <div className="meta-label" style={{ marginTop: 4 }}>
               {s.label}
             </div>
           </div>
@@ -150,7 +147,7 @@ export function ProfileHeaderCard({
               <button style={{
                 width: '100%', padding: '12px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
                 background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                fontFamily: 'DM Sans', fontWeight: 800, fontSize: '0.88rem',
+                fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
               }}>
                 {t('profile.exploreMarkets')}
               </button>
@@ -178,7 +175,7 @@ export function ProfileHeaderCard({
                 } : {
                   width: '100%', padding: '12px 0', borderRadius: 10, cursor: 'pointer', border: 'none',
                   background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                  fontFamily: 'DM Sans', fontWeight: 800, fontSize: '0.88rem',
+                  fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
                   opacity: followBusy ? 0.6 : 1,
                 }}
               >
@@ -189,7 +186,7 @@ export function ProfileHeaderCard({
                 <button style={{
                   width: '100%', padding: '12px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
                   background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                  fontFamily: 'DM Sans', fontWeight: 800, fontSize: '0.88rem',
+                  fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.88rem',
                 }}>
                   {t('profile.exploreMarkets')}
                 </button>

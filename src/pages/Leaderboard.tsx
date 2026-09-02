@@ -67,7 +67,7 @@ export function Leaderboard() {
 
   return (
     <div className="page-container" style={{ paddingTop: 44, paddingBottom: 24 }}>
-      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
+      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
         {t('leaderboard.title')}
       </h1>
 
@@ -135,7 +135,7 @@ export function Leaderboard() {
                 style={{
                   width: key === 'pnl' ? 140 : 120, textAlign: 'right',
                   background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 700,
+                  fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 600,
                   color: sort === key ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   paddingBottom: 4,
                   borderBottom: `2px solid ${sort === key ? 'var(--gold)' : 'transparent'}`,
@@ -150,7 +150,7 @@ export function Leaderboard() {
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 8 }}>
               {[...Array(8)].map((_, i) => (
-                <div key={i} style={{ height: 60, background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: 10, animation: 'livePulse 1.8s ease infinite' }} />
+                <div key={i} className="skeleton" style={{ height: 60, borderRadius: 10 }} />
               ))}
             </div>
           ) : error ? (
@@ -176,18 +176,18 @@ export function Leaderboard() {
                   <span style={{ width: 28, flexShrink: 0, textAlign: 'center', fontSize: i < 3 && sort === 'pnl' ? '1.2rem' : '0.9rem' }}>
                     {i < 3 && sort === 'pnl'
                       ? MEDAL[i]
-                      : <span className="font-mono" style={{ fontWeight: 800, color: 'var(--text-tertiary)' }}>{i + 1}</span>}
+                      : <span className="font-mono" style={{ fontWeight: 600, color: 'var(--text-tertiary)' }}>{i + 1}</span>}
                   </span>
                   <Avatar name={u.display_name} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.display_name}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
                       {t('leaderboard.statLine', { accuracy: u.accuracy, markets: u.markets_traded })}
                     </div>
                   </div>
-                  <span className="font-mono lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: '0.95rem', fontWeight: 800, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                  <span className="font-mono lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: '0.95rem', fontWeight: 700, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
                     {formatPnl(u.pnl)}
                   </span>
                   <span className="font-mono lb-vol" style={{ width: 120, textAlign: 'right', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
@@ -206,7 +206,7 @@ export function Leaderboard() {
             {loading ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} style={{ height: 40, background: 'var(--bg-surface)', borderRadius: 8, animation: 'livePulse 1.8s ease infinite' }} />
+                  <div key={i} className="skeleton" style={{ height: 40, borderRadius: 8, background: 'var(--bg-surface)', border: 'none' }} />
                 ))}
               </div>
             ) : topGainers.length === 0 ? (
@@ -218,12 +218,12 @@ export function Leaderboard() {
                     display: 'flex', alignItems: 'center', gap: 11,
                     padding: '10px 0', borderTop: i === 0 ? 'none' : '1px solid var(--border-subtle)',
                   }}>
-                    <span className="font-mono" style={{ width: 14, fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-tertiary)', flexShrink: 0 }}>{i + 1}</span>
+                    <span className="font-mono" style={{ width: 14, fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-tertiary)', flexShrink: 0 }}>{i + 1}</span>
                     <Avatar name={u.display_name} size={30} />
                     <span style={{ flex: 1, minWidth: 0, fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.display_name}
                     </span>
-                    <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
+                    <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 700, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
                       {formatPnl(u.pnl)}
                     </span>
                   </div>

@@ -131,7 +131,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
           <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: 14, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{
-                fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em',
+                fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
                 textTransform: 'uppercase', color: catColor,
                 background: getCategoryBg(m.category), border: `1px solid ${getCategoryBorder(m.category)}`,
                 padding: '3px 10px', borderRadius: 99,
@@ -142,7 +142,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                   envolvería a 2 líneas y el contenido ya no cabe en los 420px */}
               {m.trending && !isMulti && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--gold)',
                   background: 'var(--oro-dim)',
                   border: '1px solid var(--oro-glow)',
@@ -153,7 +153,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
               )}
               {isMulti && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--accent-alt)',
                   background: 'var(--accent-alt-bg)',
                   border: '1px solid var(--accent-alt-border)',
@@ -165,7 +165,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginLeft: 'auto' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div className="live-dot" />
-                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>{t('common.live')}</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 600, letterSpacing: '0.04em' }}>{t('common.live')}</span>
                 </div>
                 {featured.length > 1 && (
                   <div style={{
@@ -195,7 +195,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
             <Link to={`/mercado/${m.id}`} style={{ textDecoration: 'none' }}>
               <h2 className={`font-display featured-title${isMulti ? ' featured-title-multi' : ''}`} style={{
                 fontSize: 'clamp(1.25rem, 1.6vw, 1.6rem)',
-                fontWeight: 700, letterSpacing: '-0.025em',
+                fontWeight: 600, letterSpacing: '-0.02em',
                 margin: '0 0 14px', lineHeight: 1.25,
                 color: 'var(--text-primary)',
               }}>
@@ -214,12 +214,12 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                   }}>
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: `var(--chart-${i + 1})`, flexShrink: 0 }} />
                     <span style={{
-                      fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-primary)',
+                      fontSize: '0.92rem', fontWeight: 500, color: 'var(--text-primary)',
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1,
                     }}>
                       {o.label}
                     </span>
-                    <span className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <span className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {Math.round(o.price)}%
                     </span>
                   </div>
@@ -242,13 +242,13 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                     }}>
                       {pair.yes}%
                     </span>
-                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>{t('common.yes')}</span>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 500 }}>{t('common.yes')}</span>
                   </div>
                   <div style={{ paddingBottom: 5, opacity: 0.5 }}>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 600, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
                       {pair.no}%
                     </span>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>{t('common.no')}</span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 500 }}>{t('common.no')}</span>
                   </div>
                 </div>
 
@@ -272,16 +272,16 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
             {/* Meta + link (pegado abajo) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', marginTop: 'auto', paddingTop: 12 }}>
               <div>
-                <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>
+                <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>
                   {formatVolume(m.volume)}<span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginLeft: 3 }}>PT</span>
                 </div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 5, fontWeight: 600, letterSpacing: '0.04em' }}>{t('carousel.volumeLabel')}</div>
+                <div className="meta-label" style={{ marginTop: 5 }}>{t('carousel.volumeLabel')}</div>
               </div>
               <div>
-                <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--gold)', lineHeight: 1 }}>
+                <div className="font-mono" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold)', lineHeight: 1 }}>
                   {daysLeft(m.ends_at, m.status)}
                 </div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 5, fontWeight: 600, letterSpacing: '0.04em' }}>{t('carousel.closeLabel')}</div>
+                <div className="meta-label" style={{ marginTop: 5 }}>{t('carousel.closeLabel')}</div>
               </div>
               <Link to={`/mercado/${m.id}`} style={{
                 marginLeft: 'auto', textDecoration: 'none', fontSize: '0.8rem',

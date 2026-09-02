@@ -112,9 +112,9 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
   }
 
   const labelStyle: React.CSSProperties = {
-    fontSize: '0.68rem', color: 'var(--text-tertiary)',
-    display: 'block', marginBottom: 5, fontWeight: 700,
-    letterSpacing: '0.07em', textTransform: 'uppercase',
+    fontSize: '0.74rem', color: 'var(--text-tertiary)',
+    display: 'block', marginBottom: 5, fontWeight: 600,
+    letterSpacing: 0,
   }
 
   return (
@@ -174,7 +174,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
         {step === 'verify' ? (
           <>
             <div style={{ marginBottom: 24, paddingRight: 36 }}>
-              <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.03em' }}>
                 {t('auth.verifyTitle')}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 6, lineHeight: 1.5 }}>
@@ -247,7 +247,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false 
           <>
             {/* ── Form step ── */}
             <div style={{ marginBottom: 22, paddingRight: 36 }}>
-              <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
+              <div className="font-display" style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.03em' }}>
                 {mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
               </div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)', marginTop: 4 }}>

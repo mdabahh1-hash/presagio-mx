@@ -14,9 +14,9 @@ const inputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontSize: '0.68rem', color: 'var(--text-tertiary)',
-  display: 'block', marginBottom: 5, fontWeight: 700,
-  letterSpacing: '0.07em', textTransform: 'uppercase',
+  fontSize: '0.74rem', color: 'var(--text-tertiary)',
+  display: 'block', marginBottom: 5, fontWeight: 600,
+  letterSpacing: 0,
 }
 
 export function Propose() {
@@ -56,7 +56,7 @@ export function Propose() {
 
   return (
     <div className="page-container" style={{ maxWidth: 560, margin: '0 auto', padding: '44px 24px 24px' }}>
-      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 10px' }}>
+      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 10px' }}>
         {t('propose.title')}
       </h1>
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 28px', lineHeight: 1.6 }}>
@@ -143,8 +143,8 @@ export function Propose() {
             width: '100%', padding: '15px',
             background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))',
             border: 'none', borderRadius: 12, color: '#07071A',
-            fontFamily: 'DM Sans', fontWeight: 800, fontSize: '0.92rem',
-            letterSpacing: '0.05em',
+            fontFamily: 'DM Sans', fontWeight: 700, fontSize: '0.92rem',
+            letterSpacing: '0.02em',
             cursor: (submitting || !question.trim()) ? 'not-allowed' : 'pointer',
             opacity: (submitting || !question.trim()) ? 0.6 : 1,
             transition: 'opacity 0.15s',

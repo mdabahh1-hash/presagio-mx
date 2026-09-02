@@ -24,7 +24,7 @@ export function ReferralCard({ code }: { code: string | null }) {
     <div className="card" style={{ padding: '18px 20px', marginBottom: 20, border: '1px solid var(--oro-glow)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <span aria-hidden style={{ fontSize: '1rem' }}>🎁</span>
-        <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>{t('referral.title')}</div>
+        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('referral.title')}</div>
       </div>
       <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: 14 }}>
         {t('referral.sub')}

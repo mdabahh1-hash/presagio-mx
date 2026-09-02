@@ -18,7 +18,7 @@ export function HowItWorks() {
   return (
     <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '48px 24px 24px' }}>
       <div className="anim-1" style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h1 className="font-display" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
+        <h1 className="font-display" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 14px' }}>
           {t('how.title')}
         </h1>
         <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto', lineHeight: 1.6 }}>
@@ -34,7 +34,7 @@ export function HowItWorks() {
               flexShrink: 0, width: 42, height: 42, borderRadius: 12,
               background: 'var(--oro-dim)', border: '1px solid var(--oro-glow)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'DM Mono', fontWeight: 800, fontSize: '1.1rem', color: 'var(--gold)',
+              fontFamily: 'DM Mono', fontWeight: 700, fontSize: '1.1rem', color: 'var(--gold)',
             }}>
               {s.n}
             </div>
@@ -68,8 +68,8 @@ export function HowItWorks() {
         <Link to="/mercados" style={{ textDecoration: 'none' }}>
           <button style={{
             background: 'var(--oro-fill)', border: 'none', padding: '15px 36px',
-            color: '#07071A', fontFamily: 'DM Sans', fontWeight: 800,
-            fontSize: '0.9rem', letterSpacing: '0.06em', borderRadius: 12, cursor: 'pointer',
+            color: '#07071A', fontFamily: 'DM Sans', fontWeight: 700,
+            fontSize: '0.9rem', letterSpacing: '0.02em', borderRadius: 12, cursor: 'pointer',
             boxShadow: '0 8px 32px var(--oro-glow)',
           }}>
             {t('how.cta')}

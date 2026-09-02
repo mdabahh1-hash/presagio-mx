@@ -320,7 +320,7 @@ export function MarketDetail() {
             {/* Badges row */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'center' }}>
               <span style={{
-                fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.08em',
+                fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
                 textTransform: 'uppercase', color: catColor,
                 background: getCategoryBg(market.category), border: `1px solid ${getCategoryBorder(market.category)}`,
                 padding: '3px 10px', borderRadius: 99,
@@ -329,7 +329,7 @@ export function MarketDetail() {
               </span>
               {market.trending && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--gold)',
                   background: 'var(--oro-dim)',
                   border: '1px solid var(--oro-glow)',
@@ -341,7 +341,7 @@ export function MarketDetail() {
               {market.status === 'open' && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
                   <div className="live-dot" />
-                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.08em' }}>{t('common.live')}</span>
+                  <span style={{ fontSize: '0.62rem', color: 'var(--green)', fontWeight: 600, letterSpacing: '0.04em' }}>{t('common.live')}</span>
                 </div>
               )}
             </div>
@@ -401,12 +401,12 @@ export function MarketDetail() {
                       }}
                     >
                       <span style={{
-                        fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 800, width: 28, flexShrink: 0,
+                        fontSize: '0.72rem', fontFamily: 'DM Mono', fontWeight: 600, width: 28, flexShrink: 0,
                         color: i === 0 ? 'var(--gold)' : 'var(--text-tertiary)',
                       }}>
                         #{i + 1}
                       </span>
-                      <span style={{ flex: 1, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <span style={{ flex: 1, fontSize: '0.88rem', fontWeight: 500, color: 'var(--text-primary)' }}>
                         {o.label}
                         {isWinner && <span style={{ marginLeft: 8, color: 'var(--green)' }}>✓</span>}
                       </span>
@@ -415,7 +415,7 @@ export function MarketDetail() {
                       </div>
                       <span style={{
                         width: 48, textAlign: 'right', flexShrink: 0,
-                        fontSize: '0.88rem', fontFamily: 'DM Mono', fontWeight: 800,
+                        fontSize: '0.88rem', fontFamily: 'DM Mono', fontWeight: 700,
                         color: isWinner ? 'var(--green)' : 'var(--gold)',
                       }}>
                         {o.price.toFixed(1)}%
@@ -436,17 +436,17 @@ export function MarketDetail() {
                     }}>
                       {pair.yes}%
                     </span>
-                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 600 }}>{t('common.yes')}</span>
+                    <span style={{ fontSize: '1rem', color: 'var(--text-tertiary)', marginLeft: 10, fontWeight: 500 }}>{t('common.yes')}</span>
                   </div>
                   <div style={{ paddingBottom: 8, opacity: 0.5 }}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 700, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 600, fontFamily: 'DM Mono', color: 'var(--text-secondary)' }}>
                       {pair.no}%
                     </span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 600 }}>{t('common.no')}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginLeft: 6, fontWeight: 500 }}>{t('common.no')}</span>
                   </div>
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 500 }}>
                     <span style={{ color: 'var(--green)' }}>{t('common.yes')} · {pair.yes}%</span>
                     <span style={{ color: 'var(--red)' }}>{t('common.no')} · {pair.no}%</span>
                   </div>
@@ -477,7 +477,7 @@ export function MarketDetail() {
               }
               return (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 22, paddingTop: 18, borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+                  <span className="meta-label" style={{ fontSize: '0.78rem' }}>
                     {t('common.share')}
                   </span>
                   <a className="share-btn" onClick={() => track('Share', { channel: 'whatsapp', market: id ?? '' })} href={`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`} target="_blank" rel="noopener noreferrer" aria-label={t('referral.shareWhatsApp')} style={iconBtn}>
@@ -581,7 +581,7 @@ export function MarketDetail() {
                       background: chartRange === p ? 'var(--bg-elevated)' : 'transparent',
                       border: `1px solid ${chartRange === p ? 'var(--border-default)' : 'transparent'}`,
                       borderRadius: 6, padding: '4px 10px',
-                      fontSize: '0.72rem', fontWeight: 700,
+                      fontSize: '0.72rem', fontWeight: 600,
                       color: chartRange === p ? 'var(--text-primary)' : 'var(--text-tertiary)',
                       cursor: 'pointer', fontFamily: 'DM Mono',
                       transition: 'all 0.15s',
@@ -681,11 +681,11 @@ export function MarketDetail() {
               { label: t('market.statsComments'), value: comments.length.toString(), unit: '', color: 'var(--text-primary)' },
             ].map(stat => (
               <div key={stat.label} className="stat-card" style={{ textAlign: 'center' }}>
-                <div className="font-mono" style={{ fontSize: '1.3rem', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+                <div className="font-mono" style={{ fontSize: '1.3rem', fontWeight: 700, color: stat.color, lineHeight: 1 }}>
                   {stat.value}
-                  {stat.unit && <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginLeft: 3, fontWeight: 600 }}>{stat.unit}</span>}
+                  {stat.unit && <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', marginLeft: 3, fontWeight: 500 }}>{stat.unit}</span>}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 6, fontWeight: 500 }}>{stat.label}</div>
+                <div className="meta-label" style={{ marginTop: 6 }}>{stat.label}</div>
               </div>
             ))}
           </div>
@@ -735,7 +735,7 @@ export function MarketDetail() {
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 99, padding: '1px 8px',
                 fontSize: '0.68rem', color: 'var(--text-tertiary)',
-                fontFamily: 'DM Mono', fontWeight: 700,
+                fontFamily: 'DM Mono', fontWeight: 600,
               }}>
                 {comments.length}
               </span>
@@ -770,8 +770,8 @@ export function MarketDetail() {
                       border: '1px solid var(--border-default)',
                       borderRadius: 8, padding: '9px 18px',
                       fontSize: '0.78rem', color: 'var(--text-primary)',
-                      fontWeight: 700, cursor: 'pointer', fontFamily: 'DM Sans',
-                      letterSpacing: '0.04em', transition: 'all 0.15s',
+                      fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans',
+                      transition: 'all 0.15s',
                     }}
                   >
                     {t('market.publish')}

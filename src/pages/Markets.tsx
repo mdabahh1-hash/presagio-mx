@@ -116,7 +116,7 @@ export function Markets() {
       }}>
         <div>
           <h1 className="font-display" style={{
-            fontSize: '2.2rem', fontWeight: 800,
+            fontSize: '2.2rem', fontWeight: 700,
             letterSpacing: '-0.04em', margin: '0 0 8px',
           }}>
             {t('markets.title')}

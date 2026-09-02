@@ -88,7 +88,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             {/* Badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span style={{
-                fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.07em',
+                fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
                 textTransform: 'uppercase', color: catColor,
                 background: getCategoryBg(market.category), border: `1px solid ${getCategoryBorder(market.category)}`,
                 padding: '3px 9px', borderRadius: 99,
@@ -97,7 +97,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               </span>
               {isMulti && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--accent-alt)',
                   background: 'var(--accent-alt-bg)',
                   border: '1px solid var(--accent-alt-border)',
@@ -108,7 +108,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               )}
               {market.trending && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--gold)',
                   background: 'var(--oro-dim)',
                   border: '1px solid var(--oro-glow)',
@@ -119,7 +119,7 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
               )}
               {isPending && (
                 <span style={{
-                  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+                  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
                   textTransform: 'uppercase', color: 'var(--gold)',
                   background: 'var(--oro-dim)',
                   border: '1px solid var(--gold)',
@@ -156,22 +156,22 @@ export function MarketCard({ market, animClass = '' }: MarketCardProps) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
                 <span style={{
-                  fontSize: '1.6rem', fontWeight: 800,
+                  fontSize: '1.6rem', fontWeight: 700,
                   fontFamily: 'DM Mono', color: yesColor,
                   lineHeight: 1, letterSpacing: '-0.02em',
                 }}>
                   {market.yesPrice}%
                 </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                <span className="meta-label">
                   {t('common.yes')}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.05em' }}>
+                <span className="meta-label">
                   {t('common.no')}
                 </span>
                 <span style={{
-                  fontSize: '0.95rem', fontWeight: 700,
+                  fontSize: '0.95rem', fontWeight: 600,
                   fontFamily: 'DM Mono', color: 'var(--text-secondary)',
                 }}>
                   {100 - market.yesPrice}%

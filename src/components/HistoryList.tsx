@@ -89,12 +89,12 @@ export function HistoryList({ events, variant }: HistoryListProps) {
         const b = badgeStyle(e.type)
         const card = (
           <div
-            className={`card anim-${Math.min(i + 1, 6)}`}
+            className="card"
             style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}
           >
             <div>
               <span style={{
-                fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em',
+                fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.03em',
                 textTransform: 'uppercase', color: b.color, background: b.bg,
                 border: `1px solid ${b.border}`, padding: '3px 10px', borderRadius: 99,
               }}>

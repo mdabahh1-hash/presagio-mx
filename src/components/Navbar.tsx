@@ -103,7 +103,7 @@ function ThemeControls({ variant }: { variant: 'dropdown' | 'drawer' }) {
                   background: active ? 'var(--oro-dim)' : 'transparent',
                   color: active ? 'var(--gold)' : 'var(--text-tertiary)',
                   borderRadius: 8, padding: '4px 10px', cursor: 'pointer',
-                  fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em',
+                  fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.02em',
                   fontFamily: "'DM Sans', sans-serif", transition: 'all 0.15s',
                 }}
               >
@@ -435,7 +435,7 @@ export function Navbar() {
               <>
                 <div className="navbar-live" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div className="live-dot" />
-                  <span style={{ fontSize: '0.65rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.1em' }}>{t('common.live')}</span>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--green)', fontWeight: 600, letterSpacing: '0.04em' }}>{t('common.live')}</span>
                 </div>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8,
@@ -443,8 +443,8 @@ export function Navbar() {
                   border: '1px solid var(--border-default)',
                   borderRadius: 10, padding: '7px 14px',
                 }}>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, letterSpacing: '0.1em' }}>PT</span>
-                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 600, letterSpacing: '0.04em' }}>PT</span>
+                  <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                     {formatNum(Math.floor(user.points))}
                   </span>
                 </div>
@@ -617,7 +617,7 @@ export function Navbar() {
           <div style={{ padding: '12px 16px 0' }}>
             <div style={{
               fontSize: '0.62rem', color: 'var(--text-tertiary)',
-              fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
               padding: '12px 4px 8px',
             }}>
               {t('nav.navigation')}
@@ -663,7 +663,7 @@ export function Navbar() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{
                   fontSize: '0.62rem', color: 'var(--text-tertiary)',
-                  fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                  fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
                   padding: '4px 4px 8px',
                 }}>
                   {t('nav.account')}
@@ -745,7 +745,7 @@ export function Navbar() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{
                   fontSize: '0.62rem', color: 'var(--text-tertiary)',
-                  fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                  fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
                   padding: '4px 4px 8px',
                 }}>
                   {t('nav.access')}
@@ -757,7 +757,7 @@ export function Navbar() {
                   style={{
                     background: 'var(--oro-fill)', border: 'none',
                     borderRadius: 14, padding: '16px',
-                    fontSize: '0.95rem', fontWeight: 800, color: '#07071A',
+                    fontSize: '0.95rem', fontWeight: 700, color: '#07071A',
                     cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                     boxShadow: '0 4px 20px var(--oro-glow)',
@@ -829,7 +829,7 @@ export function Navbar() {
             <div style={{ height: 1, background: 'var(--border-subtle)', margin: '20px 0 12px' }} />
             <div style={{
               fontSize: '0.62rem', color: 'var(--text-tertiary)',
-              fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+              fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase',
               padding: '4px 4px 8px',
             }}>
               {t('nav.preferences')}

@@ -11,7 +11,7 @@ const colLink: React.CSSProperties = {
 }
 
 const colHeader: React.CSSProperties = {
-  fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.08em',
+  fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.06em',
   textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 14,
 }
 

@@ -42,7 +42,7 @@ export function PnlChartCard({ pointsHistory, pnl, subStats }: Props) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: pnlColor, flexShrink: 0 }} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
               {t('profile.pnlLabel')}
             </span>
           </div>
@@ -86,13 +86,10 @@ export function PnlChartCard({ pointsHistory, pnl, subStats }: Props) {
               flex: 1, minWidth: 0, paddingLeft: i === 0 ? 0 : 18,
               borderLeft: i === 0 ? 'none' : '1px solid var(--border-subtle)',
             }}>
-              <div className="font-mono" style={{ fontSize: '1.2rem', fontWeight: 800, color: s.color ?? 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+              <div className="font-mono" style={{ fontSize: '1.2rem', fontWeight: 700, color: s.color ?? 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                 {s.value}
               </div>
-              <div style={{
-                fontSize: '0.65rem', color: 'var(--text-tertiary)', marginTop: 4,
-                textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600,
-              }}>
+              <div className="meta-label" style={{ marginTop: 4 }}>
                 {s.label}
               </div>
             </div>

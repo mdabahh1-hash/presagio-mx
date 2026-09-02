@@ -23,7 +23,7 @@ function OutcomeBadge({ side, outcomeKey, outcomeLabel }: { side: string | null;
   const border = isYes ? 'var(--green-border)' : isNo ? 'var(--red-border)' : 'var(--oro-glow)'
   return (
     <span style={{
-      fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.06em',
+      fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.03em',
       textTransform: 'uppercase', color, background: bg,
       border: `1px solid ${border}`, padding: '2px 8px', borderRadius: 99,
       maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -53,8 +53,7 @@ function EmptyState({ text }: { text: string }) {
 }
 
 const headStyle: React.CSSProperties = {
-  fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600,
-  textTransform: 'uppercase', letterSpacing: '0.08em',
+  fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 500,
 }
 
 export function PositionsTable({ positions, history }: Props) {
@@ -84,7 +83,7 @@ export function PositionsTable({ positions, history }: Props) {
 
   const pillStyle = (active: boolean): React.CSSProperties => ({
     padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-    fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 700,
+    fontFamily: 'DM Sans', fontSize: '0.78rem', fontWeight: 600,
     background: active ? 'var(--bg-elevated)' : 'transparent',
     color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
     transition: 'all 0.15s',
@@ -165,7 +164,7 @@ export function PositionsTable({ positions, history }: Props) {
                     <div className="font-mono positions-table-sub" style={{ textAlign: 'right', fontSize: '0.85rem', fontWeight: 700, color: curColor }}>
                       {p.current_price != null ? p.current_price.toFixed(2) : '—'}
                     </div>
-                    <div className="font-mono" style={{ textAlign: 'right', fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    <div className="font-mono" style={{ textAlign: 'right', fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {formatNum(value)} PT
                     </div>
                   </div>
@@ -202,7 +201,7 @@ export function PositionsTable({ positions, history }: Props) {
                     </div>
                   </div>
                   <span style={{
-                    fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase',
+                    fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.03em', textTransform: 'uppercase',
                     color: won ? 'var(--green)' : 'var(--red)',
                     background: won ? 'var(--green-soft)' : 'var(--red-soft)',
                     border: `1px solid ${won ? 'var(--green-border)' : 'var(--red-border)'}`,
@@ -211,7 +210,7 @@ export function PositionsTable({ positions, history }: Props) {
                     {won ? t('profile.historyBadgeWin') : t('profile.historyBadgeLoss')}
                   </span>
                   <span className="font-mono" style={{
-                    fontSize: '0.95rem', fontWeight: 800, flexShrink: 0, textAlign: 'right', minWidth: 90,
+                    fontSize: '0.95rem', fontWeight: 700, flexShrink: 0, textAlign: 'right', minWidth: 90,
                     color: e.amount >= 0 ? 'var(--green)' : 'var(--red)',
                   }}>
                     {formatPnl(e.amount)}

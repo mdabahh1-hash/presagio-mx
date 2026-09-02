@@ -81,7 +81,7 @@ function RailButton({ active, label, count, onClick, nested = false }: {
 function RailHeader({ children }: { children: React.ReactNode }) {
   return (
     <div className="cat-rail-header" style={{
-      fontSize: '0.66rem', fontWeight: 700, letterSpacing: '0.12em',
+      fontSize: '0.66rem', fontWeight: 600, letterSpacing: '0.08em',
       textTransform: 'uppercase', color: 'var(--text-tertiary)',
       padding: '6px 14px 4px', fontFamily: 'DM Sans',
     }}>

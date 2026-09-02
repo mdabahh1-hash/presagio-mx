@@ -85,7 +85,7 @@ export function Following() {
     return (
       <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '48px 24px' }}>
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="card" style={{ height: 100, animation: 'livePulse 1.8s ease infinite', marginBottom: 12 }} />
+          <div key={i} className="skeleton" style={{ height: 100, marginBottom: 12 }} />
         ))}
       </div>
     )
@@ -113,7 +113,7 @@ export function Following() {
 
   return (
     <div className="page-container" style={{ maxWidth: 820, margin: '0 auto', padding: '44px 24px 24px' }}>
-      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
+      <h1 className="font-display anim-1" style={{ fontSize: 'clamp(1.9rem, 5vw, 2.6rem)', fontWeight: 700, letterSpacing: '-0.03em', margin: '0 0 24px' }}>
         {t('following.title')}
       </h1>
 
@@ -166,7 +166,7 @@ export function Following() {
                       {tr.display_name}
                     </Link>
                     {' '}{t('following.bought')}{' '}
-                    <span style={{ color: tradeColor(tr), fontWeight: 800 }}>{tradeTag(tr, t('common.yes'), t('common.no'))}</span>
+                    <span style={{ color: tradeColor(tr), fontWeight: 700 }}>{tradeTag(tr, t('common.yes'), t('common.no'))}</span>
                     {' '}{t('following.atPrice')} <span className="font-mono" style={{ fontWeight: 700 }}>{Math.round(tradePrice(tr))}%</span> {t('following.inMarket')}{' '}
                     <Link to={`/mercado/${tr.market_id}`} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>
                       {tr.market_question}
@@ -188,7 +188,7 @@ export function Following() {
                     style={{
                       flexShrink: 0, textDecoration: 'none',
                       background: 'linear-gradient(135deg, var(--oro-fill), var(--oro-fill-2))', color: '#07071A',
-                      borderRadius: 10, padding: '9px 16px', fontSize: '0.78rem', fontWeight: 800,
+                      borderRadius: 10, padding: '9px 16px', fontSize: '0.78rem', fontWeight: 700,
                     }}
                   >
                     {t('following.copyTrade')}
@@ -215,20 +215,20 @@ export function Following() {
                 </Link>
                 <div style={{ display: 'flex', gap: 18, alignItems: 'center', flexWrap: 'wrap' }}>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 800, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>{formatPnl(u.pnl)}</div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{t('following.pnlLabel')}</div>
+                    <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 700, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>{formatPnl(u.pnl)}</div>
+                    <div className="meta-label">{t('following.pnlLabel')}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--gold)' }}>{formatNum(u.points)} PT</div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{t('following.balanceLabel')}</div>
+                    <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--gold)' }}>{formatNum(u.points)} PT</div>
+                    <div className="meta-label">{t('following.balanceLabel')}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{formatNum(u.volume)} PT</div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{t('following.investedLabel')}</div>
+                    <div className="meta-label">{t('following.investedLabel')}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div className="font-mono" style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{u.accuracy}%</div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{t('following.precisionLabel')}</div>
+                    <div className="meta-label">{t('following.precisionLabel')}</div>
                   </div>
                   <button
                     onClick={() => unfollow(u)}

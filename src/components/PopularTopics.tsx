@@ -39,14 +39,14 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
             }}
           >
             <span className="font-mono" style={{
-              fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-tertiary)',
+              fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-tertiary)',
               width: 16, flexShrink: 0, textAlign: 'center',
             }}>
               {i + 1}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)',
+                fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)',
                 lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {m.question}

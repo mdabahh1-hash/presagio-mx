@@ -151,7 +151,7 @@ export function BetBox({
                 <span style={{ flex: 1, fontSize: '0.82rem', fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                   {o.label}
                 </span>
-                <span style={{ fontSize: '0.78rem', fontFamily: 'DM Mono', fontWeight: 800, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
+                <span style={{ fontSize: '0.78rem', fontFamily: 'DM Mono', fontWeight: 700, color: isSelected ? 'var(--gold)' : 'var(--text-tertiary)' }}>
                   {o.price.toFixed(1)}%
                 </span>
               </button>
@@ -179,14 +179,14 @@ export function BetBox({
                 }}
               >
                 <div style={{
-                  fontSize: '0.65rem', fontWeight: 800,
+                  fontSize: '0.7rem', fontWeight: 600,
                   color: isSelected ? color : 'var(--text-tertiary)',
-                  letterSpacing: '0.12em', marginBottom: 6,
+                  letterSpacing: '0.04em', marginBottom: 6,
                 }}>
                   {s === 'YES' ? t('common.yes') : t('common.no')}
                 </div>
                 <div className="font-mono" style={{
-                  fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 800,
+                  fontSize: compact ? '1.25rem' : '1.4rem', fontWeight: 700,
                   color: isSelected ? color : 'var(--text-secondary)',
                   lineHeight: 1, letterSpacing: '-0.02em',
                 }}>
@@ -201,9 +201,9 @@ export function BetBox({
       {/* Amount input */}
       <div style={{ marginBottom: 16 }}>
         <label style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: '0.78rem' }}>
-          <span style={{ color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.03em' }}>{t('bet.amount')}</span>
+          <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{t('bet.amount')}</span>
           {user && (
-            <span style={{ color: 'var(--gold)', fontFamily: 'DM Mono', fontWeight: 700, fontSize: '0.75rem' }}>
+            <span style={{ color: 'var(--gold)', fontFamily: 'DM Mono', fontWeight: 600, fontSize: '0.75rem' }}>
               {formatNum(Math.floor(user.points))} PT
             </span>
           )}
@@ -230,7 +230,7 @@ export function BetBox({
             style={{
               flex: 1, background: 'transparent', border: 'none',
               outline: 'none', textAlign: 'center',
-              fontSize: '1.05rem', fontWeight: 800,
+              fontSize: '1.05rem', fontWeight: 700,
               fontFamily: 'DM Mono', color: 'var(--text-primary)',
               minWidth: 0,
             }}
@@ -238,7 +238,7 @@ export function BetBox({
           <span style={{
             display: 'flex', alignItems: 'center',
             paddingRight: 12, fontSize: '0.72rem',
-            fontWeight: 800, color: 'var(--gold)',
+            fontWeight: 600, color: 'var(--gold)',
           }}>PT</span>
           <button
             className="amount-adjust-btn"
@@ -271,7 +271,7 @@ export function BetBox({
               borderRadius: 8, padding: '7px 4px',
               fontSize: '0.72rem',
               color: amount === v ? 'var(--text-primary)' : 'var(--text-tertiary)',
-              cursor: 'pointer', fontFamily: 'DM Mono', fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'DM Mono', fontWeight: 600,
               transition: 'all 0.15s',
             }}
           >
@@ -300,7 +300,7 @@ export function BetBox({
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.potentialGain')}</span>
-          <span className="font-mono" style={{ color: 'var(--green)', fontWeight: 800 }}>
+          <span className="font-mono" style={{ color: 'var(--green)', fontWeight: 700 }}>
             {quote ? `+${Math.round(quote.potential_gain)} PT` : '—'}
           </span>
         </div>
@@ -392,8 +392,8 @@ export function BetBox({
             : 'linear-gradient(135deg, #ff2d55, #cc1a40)',
           border: 'none', borderRadius: 12,
           color: isMulti ? '#07071A' : side === 'YES' ? '#001a0d' : '#fff',
-          fontFamily: 'DM Sans', fontWeight: 800,
-          fontSize: '0.92rem', letterSpacing: '0.06em',
+          fontFamily: 'DM Sans', fontWeight: 700,
+          fontSize: '0.92rem', letterSpacing: '0.02em',
           cursor: (trading || (isMulti && !selectedOutcome)) ? 'not-allowed' : 'pointer',
           opacity: (trading || (isMulti && !selectedOutcome)) ? 0.6 : 1,
           boxShadow: isMulti

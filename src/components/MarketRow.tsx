@@ -18,7 +18,7 @@ interface MarketRowProps {
 }
 
 const badgeBase: React.CSSProperties = {
-  fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.06em',
+  fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.03em',
   textTransform: 'uppercase', padding: '3px 8px', borderRadius: 99,
 }
 
@@ -113,7 +113,7 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
           {badgeLabel && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span style={{
-                ...badgeBase, fontSize: '0.62rem', letterSpacing: '0.07em', padding: '3px 9px',
+                ...badgeBase, fontSize: '0.62rem', padding: '3px 9px',
                 color: getCategoryColor(market.category),
                 background: getCategoryBg(market.category),
                 border: `1px solid ${getCategoryBorder(market.category)}`,
@@ -124,25 +124,25 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
           )}
 
           <p className="font-display market-row-title" style={{
-            margin: 0, fontSize: '1rem', fontWeight: 600,
+            margin: 0, fontSize: '1.02rem', fontWeight: 500,
             color: 'var(--text-primary)', lineHeight: 1.35, letterSpacing: '-0.01em',
           }}>
             {market.question}
           </p>
 
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+          <div className="meta-label" style={{ display: 'flex', gap: 14, alignItems: 'center', fontSize: '0.72rem' }}>
             <span>
               {t('card.vol')}{' '}
-              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 600 }}>
+              <span style={{ color: 'var(--text-secondary)', fontFamily: 'DM Mono', fontWeight: 500 }}>
                 {formatVolume(market.volume)}
               </span>
             </span>
             {isPending ? (
-              <span style={{ color: 'var(--gold)', fontWeight: 700 }}>{t('card.waitingResolution')}</span>
+              <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{t('card.waitingResolution')}</span>
             ) : (
               <span style={{
                 color: urgent ? 'var(--red)' : 'var(--text-tertiary)',
-                fontWeight: urgent ? 700 : 400,
+                fontWeight: urgent ? 600 : 500,
                 fontFamily: urgent ? 'DM Mono' : undefined,
               }}>
                 {countdownText}
