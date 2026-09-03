@@ -112,8 +112,8 @@ export function Home() {
                 ))
               ) : filtered.length > 0 ? (
                 <>
-                  {filtered.slice(0, visibleTrending).map(market => (
-                    <MarketCard key={market.id} market={market} />
+                  {filtered.slice(0, visibleTrending).map((market, i) => (
+                    <MarketCard key={market.id} market={market} animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''} />
                   ))}
                   {filtered.length > visibleTrending && (
                     <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
@@ -183,8 +183,8 @@ export function Home() {
             ) : filtered.length > 0 ? (
               <>
                 <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-                  {filtered.slice(0, visibleTrending).map(market => (
-                    <MarketCard key={market.id} market={market} />
+                  {filtered.slice(0, visibleTrending).map((market, i) => (
+                    <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
                   ))}
                 </div>
                 {filtered.length > visibleTrending && (

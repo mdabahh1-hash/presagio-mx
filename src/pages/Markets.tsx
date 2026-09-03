@@ -225,8 +225,8 @@ export function Markets() {
             </div>
           ) : markets.length > 0 ? (
             <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-              {markets.map(market => (
-                <MarketCard key={market.id} market={market} />
+              {markets.map((market, i) => (
+                <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
               ))}
             </div>
           ) : (

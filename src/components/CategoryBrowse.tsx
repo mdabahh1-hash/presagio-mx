@@ -302,12 +302,12 @@ export function CategoryBrowse({
 
         {shown.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {sections.map(sec => (
+            {sections.map((sec, si) => (
               <section key={sec.title ?? '__all'}>
                 {sec.title && <SectionHeader title={sec.title} count={sec.items.length} />}
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {sec.items.map(m => (
-                    <MarketRow key={m.id} market={m} hideSubcategory={!!sec.title && sec.title === m.subcategory} />
+                  {sec.items.map((m, i) => (
+                    <MarketRow key={m.id} market={m} hideSubcategory={!!sec.title && sec.title === m.subcategory} animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''} />
                   ))}
                 </div>
               </section>

@@ -115,7 +115,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
   return (
     <div style={{ position: 'relative' }}>
       <div
-        className="card featured-slide"
+        className="anim-1 card featured-slide"
         style={{ padding: 0, overflow: 'hidden', cursor: 'pointer' }}
         onClick={e => {
           if ((e.target as HTMLElement).closest('a,button')) return

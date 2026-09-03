@@ -396,13 +396,13 @@ input[type='range']::-webkit-slider-thumb {
 /* ============================================================
    MOTION (corto, solo contenedores de página)
    ============================================================ */
-.anim-1 { animation: fadeUp 0.22s ease-out 0s both; }
-.anim-2 { animation: fadeUp 0.22s ease-out 0.03s both; }
-.anim-3 { animation: fadeUp 0.22s ease-out 0.06s both; }
-.anim-4 { animation: fadeUp 0.22s ease-out 0.09s both; }
-.anim-5 { animation: fadeUp 0.22s ease-out 0.12s both; }
-.anim-6 { animation: fadeUp 0.22s ease-out 0.15s both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.anim-1 { animation: fadeUp 0.5s ease 0.05s both; }
+.anim-2 { animation: fadeUp 0.5s ease 0.1s both; }
+.anim-3 { animation: fadeUp 0.5s ease 0.15s both; }
+.anim-4 { animation: fadeUp 0.5s ease 0.2s both; }
+.anim-5 { animation: fadeUp 0.5s ease 0.25s both; }
+.anim-6 { animation: fadeUp 0.5s ease 0.3s both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
 .fade-in { animation: fadeIn 0.18s ease-out both; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

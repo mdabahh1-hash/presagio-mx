@@ -41,7 +41,7 @@ export function CategoryBar({ active, onChange, sticky = true, children, style }
 
   return (
     <div className={sticky ? 'cat-tabs-sticky' : 'tabs-line'} style={style}>
-      <div className="page-container">
+      <div className="page-container anim-1">
         {children}
         <Tabs items={items} active={onChange ? active : urlActive} onChange={onChange} ariaLabel={t('nav.markets')} />
       </div>

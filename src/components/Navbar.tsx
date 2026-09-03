@@ -450,8 +450,14 @@ export function Navbar() {
               </div>
             )}
 
-            {/* Desktop dropdown menu (click) */}
-            <div className="nav-menu-wrap" ref={menuRef} style={{ position: 'relative' }}>
+            {/* Desktop dropdown menu (hover + click) */}
+            <div
+              className="nav-menu-wrap"
+              ref={menuRef}
+              style={{ position: 'relative' }}
+              onMouseEnter={() => setDeskMenu(true)}
+              onMouseLeave={() => setDeskMenu(false)}
+            >
               <button
                 onClick={() => setDeskMenu(o => !o)}
                 aria-label={t('nav.menu')}

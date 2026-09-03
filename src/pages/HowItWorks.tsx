@@ -29,8 +29,8 @@ export function HowItWorks() {
 
       {/* Steps */}
       <ol style={{ listStyle: 'none', margin: '0 0 40px', padding: 0, display: 'flex', flexDirection: 'column' }}>
-        {steps.map(s => (
-          <li key={s.n} style={{ display: 'flex', gap: 20, padding: '18px 0', borderTop: '1px solid var(--border-subtle)' }}>
+        {steps.map((s, i) => (
+          <li key={s.n} className={`anim-${Math.min(i + 1, 6)}`} style={{ display: 'flex', gap: 20, padding: '18px 0', borderTop: '1px solid var(--border-subtle)' }}>
             <span className="num" style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-tertiary)', width: 28, flexShrink: 0, paddingTop: 3 }}>
               {s.n}
             </span>
