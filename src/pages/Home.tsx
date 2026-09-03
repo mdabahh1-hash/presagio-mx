@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
@@ -38,9 +38,15 @@ export function Home() {
   const [mobileTab, setMobileTab] = useState<MobileTab>('Tendencia')
   const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()
+  const location = useLocation()
   const isMobile = useMobile()
 
   useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
+
+  // Clic en el logo (Link a "/") estando ya en Home: la ruta no cambia pero
+  // location.key sí → volver a la pestaña Tendencia en vez de quedarse en la
+  // categoría seleccionada.
+  useEffect(() => { setMobileTab('Tendencia') }, [location.key])
 
   useEffect(() => {
     // Paginado completo: el top-100 por volumen dejaba fuera ligas enteras
