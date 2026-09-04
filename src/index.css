@@ -351,8 +351,13 @@ select.input { padding-right: 32px; appearance: none; }
 .thumb-vs img:first-child { left: 0; top: 0; }
 .thumb-vs img:last-child  { right: 0; bottom: 0; }
 .thumb-vs--solo img { position: static; width: 78%; height: 78%; }
+/* Composite de dos caras (Canelo vs Mbilli): recorte circular, sin padding */
+.thumb-vs--faces img { border-radius: 50%; object-fit: cover; padding: 0; width: 62%; height: 62%; }
+.thumb-vs--faces.thumb-vs--solo img { width: 78%; height: 78%; }
 /* Escudo pequeño junto a un resultado */
 .team-mark { flex-shrink: 0; object-fit: contain; display: block; }
+/* Cara de persona: recorte circular */
+.team-mark--person { border-radius: 50%; object-fit: cover; }
 
 /* Avatar */
 .avatar {

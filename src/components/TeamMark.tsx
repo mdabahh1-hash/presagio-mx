@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import { outcomeLogo } from '../lib/teamLogos'
+import { isPersonSrc } from '../lib/peoplePhotos'
 
-// Escudo pequeño junto a un resultado (fila, tarjeta, detalle, BetBox…).
-// Si no hay logo mapeado o el archivo falla, no pinta nada (sin placeholder).
+// Escudo (o cara, recortada en círculo) pequeño junto a un resultado (fila,
+// tarjeta, detalle, BetBox…). Si no hay imagen mapeada o el archivo falla, no
+// pinta nada (sin placeholder).
 interface Props {
   label?: string
   outcomeKey?: string
@@ -18,7 +20,7 @@ export function TeamMark({ label = '', outcomeKey = '', sub, marketId, size = 20
   if (!src || failed) return null
   return (
     <img
-      className="team-mark"
+      className={`team-mark${isPersonSrc(src) ? ' team-mark--person' : ''}`}
       src={src}
       width={size}
       height={size}

@@ -1,0 +1,116 @@
+# Créditos de fotos de personas
+
+Generado por `scripts/fetch-people-photos.mjs`. Las fotos de Wikimedia Commons se usan bajo su licencia
+Creative Commons (se indica autor y licencia); las de ESPN / Formula 1 se usan con fines editoriales dentro de la app.
+
+- `boxeo/canelo.png` — [Saúl_Álvarez.png](https://commons.wikimedia.org/wiki/File:Sa%C3%BAl_%C3%81lvarez.png) · Box Azteca · CC BY 3.0
+- `boxeo/mbilli.png` — [Christian_Mbilli_Assomo_Rio2016.jpg](https://commons.wikimedia.org/wiki/File:Christian_Mbilli_Assomo_Rio2016.jpg) · Boxing AIBA · CC BY-SA 2.0
+- `f1/albon.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png · uso editorial
+- `f1/alonso.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png · uso editorial
+- `f1/antonelli.png` — https://media.formula1.com/content/dam/fom-website/drivers/2025Drivers/antonelli.jpg · uso editorial
+- `f1/bearman.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OLIBEA01_Oliver_Bearman/olibea01.png · uso editorial
+- `f1/bortoleto.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GABBOR01_Gabriel_Bortoleto/gabbor01.png · uso editorial
+- `f1/bottas.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/V/VALBOT01_Valtteri_Bottas/valbot01.png · uso editorial
+- `f1/colapinto.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FRACOL01_Franco_Colapinto/fracol01.png · uso editorial
+- `f1/gasly.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/P/PIEGAS01_Pierre_Gasly/piegas01.png · uso editorial
+- `f1/hadjar.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/I/ISAHAD01_Isack_Hadjar/isahad01.png · uso editorial
+- `f1/hamilton.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png · uso editorial
+- `f1/hulkenberg.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/N/NICHUL01_Nico_Hulkenberg/nichul01.png · uso editorial
+- `f1/lawson.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LIALAW01_Liam_Lawson/lialaw01.png · uso editorial
+- `f1/leclerc.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png · uso editorial
+- `f1/lindblad.png` — [Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_–_Crown_Riverwalk,_Melbourne_(028A7869)_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Arvid_Lindblad_at_the_Red_Bull_Fan_Zone_%E2%80%93_Crown_Riverwalk%2C_Melbourne_(028A7869)_(cropped).jpg) · Yu Chu Chin · CC BY-SA 4.0
+- `f1/norris.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png · uso editorial
+- `f1/ocon.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/E/ESTOCO01_Esteban_Ocon/estoco01.png · uso editorial
+- `f1/perez.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/S/SERPER01_Sergio_Perez/serper01.png · uso editorial
+- `f1/piastri.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png · uso editorial
+- `f1/russell.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png · uso editorial
+- `f1/sainz.png` — https://media.formula1.com/content/dam/fom-website/drivers/2025Drivers/sainz.jpg · uso editorial
+- `f1/stroll.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/L/LANSTR01_Lance_Stroll/lanstr01.png · uso editorial
+- `f1/verstappen.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png · uso editorial
+- `futbol/ardaguler.png` — [Arda_Güler_2025.jpg](https://commons.wikimedia.org/wiki/File:Arda_G%C3%BCler_2025.jpg) · LawEnthusiast · CC BY-SA 4.0
+- `futbol/bellingham.png` — [Jude_Bellingham_England_v_Ghana_23_June_2026-061_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Jude_Bellingham_England_v_Ghana_23_June_2026-061_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/bernardosilva.png` — [Bernardo_Silva_Croatia_v_Portugal_2_July_2026-238.jpg](https://commons.wikimedia.org/wiki/File:Bernardo_Silva_Croatia_v_Portugal_2_July_2026-238.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/cherki.png` — [Rayan_Cherki_France_v_Norway_26_June_26-114.jpg](https://commons.wikimedia.org/wiki/File:Rayan_Cherki_France_v_Norway_26_June_26-114.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/dembele.png` — [Ousmane_Dembele_France_v_Senegal_16_June_2026-341_(cropped)_2.jpg](https://commons.wikimedia.org/wiki/File:Ousmane_Dembele_France_v_Senegal_16_June_2026-341_(cropped)_2.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/dimarco.png` — [Norway_Italy_-_June_2025_A_26_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Norway_Italy_-_June_2025_A_26_(cropped).jpg) · MichaelEmilio · CC BY 4.0
+- `futbol/diomande.png` — [Yan_Diomande_Cote_D'Ivoire_v_Ecuador_14_June_2026-17_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Yan_Diomande_Cote_D'Ivoire_v_Ecuador_14_June_2026-17_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/fabianruiz.png` — [Fabian_Ruiz_Argentina_v_Spain_19_July_2026-315.jpg](https://commons.wikimedia.org/wiki/File:Fabian_Ruiz_Argentina_v_Spain_19_July_2026-315.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/ferminlopez.png` — [Fermín_López_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Ferm%C3%ADn_L%C3%B3pez_(cropped).jpg) · Biso · CC BY 4.0
+- `futbol/fidalgo.png` — [Álvaro_Fidalgo.png](https://commons.wikimedia.org/wiki/File:%C3%81lvaro_Fidalgo.png) · Selección Nacional de México · CC BY 3.0
+- `futbol/gakpo.png` — [Netherlands_v_Tunisia_2026_World_Cup_-_55373562032_(Cody_Gakpo).jpg](https://commons.wikimedia.org/wiki/File:Netherlands_v_Tunisia_2026_World_Cup_-_55373562032_(Cody_Gakpo).jpg) · elisfkc3 · CC BY-SA 4.0
+- `futbol/gnabry.png` — [Serge_Gnabry_WC2022.jpg](https://commons.wikimedia.org/wiki/File:Serge_Gnabry_WC2022.jpg) · حسین ظهروند · CC BY-SA 4.0
+- `futbol/haaland.png` — [Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg](https://commons.wikimedia.org/wiki/File:Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/julianalvarez.png` — [Julian_Alvarez_Argentina_v_Spain_19_July_2026-052_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Julian_Alvarez_Argentina_v_Spain_19_July_2026-052_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/kane.png` — [Harry_Kane_England_v_Ghana_23_June_2026-219_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Harry_Kane_England_v_Ghana_23_June_2026-219_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/kovacic.png` — [Mateo_Kovacic_Croatia_v_Portugal_2_July_2026-132.jpg](https://commons.wikimedia.org/wiki/File:Mateo_Kovacic_Croatia_v_Portugal_2_July_2026-132.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/kvaratskhelia.png` — [Kvaratskhelia_asse_psg_2425_3.png](https://commons.wikimedia.org/wiki/File:Kvaratskhelia_asse_psg_2425_3.png) · Paté kroute · CC0
+- `futbol/lenormand.png` — [Robin_Le_Normand_2122.jpg](https://commons.wikimedia.org/wiki/File:Robin_Le_Normand_2122.jpg) · Basara001 · CC BY-SA 4.0
+- `futbol/luisdiaz.png` — [FC_RB_Salzburg_gegen_FC_Bayern_München_(2026-01-06_Testspiel)_40_(Luiz_Díaz).jpg](https://commons.wikimedia.org/wiki/File:FC_RB_Salzburg_gegen_FC_Bayern_M%C3%BCnchen_(2026-01-06_Testspiel)_40_(Luiz_D%C3%ADaz).jpg) · Werner100359 · CC BY-SA 4.0
+- `futbol/mbappe.png` — [Kylian_Mbappe_France_v_Senegal_16_June_2026-391_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Kylian_Mbappe_France_v_Senegal_16_June_2026-391_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/messi.png` — [Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg](https://commons.wikimedia.org/wiki/File:Leo_Messi_Argentina_v_Egypt_7_July_2026-1.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/olise.png` — [Michael_Olise_France_v_Senegal_16_June_2026-307_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Michael_Olise_France_v_Senegal_16_June_2026-307_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/osimhen.png` — [Victor-osimhen-nigeria-2024-3-4.jpg](https://commons.wikimedia.org/wiki/File:Victor-osimhen-nigeria-2024-3-4.jpg) · Fédération Guinéenne Football · Public domain
+- `futbol/oyarzabal.png` — [Mikel_Oyarzabal_France_v_Spain_7.24.26-161_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Mikel_Oyarzabal_France_v_Spain_7.24.26-161_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/pedri.png` — [Pedri_France_v_Spain_7.24.26-245.jpg](https://commons.wikimedia.org/wiki/File:Pedri_France_v_Spain_7.24.26-245.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/rodri.png` — [Rodri_Argentina_v_Spain_19_July_2026-187_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Rodri_Argentina_v_Spain_19_July_2026-187_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/vinicius.png` — [Vinícius_Júnior_Brazil_V_Morocco_13_June_2026-207_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Vin%C3%ADcius_J%C3%BAnior_Brazil_V_Morocco_13_June_2026-207_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/wirtz.png` — [Florian_Wirtz_Ecuador_v_Germany_25_June_2026-181_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Florian_Wirtz_Ecuador_v_Germany_25_June_2026-181_(cropped).jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/yamal.png` — [Lamine_Yamal_France_v_Spain_7.24.26-142.jpg](https://commons.wikimedia.org/wiki/File:Lamine_Yamal_France_v_Spain_7.24.26-142.jpg) · Bryan Berlin · CC BY-SA 4.0
+- `futbol/yoro.png` — [RC_Lens_-_Lille_OSC_(08-10-2023)_12_(cropped1).jpg](https://commons.wikimedia.org/wiki/File:RC_Lens_-_Lille_OSC_(08-10-2023)_12_(cropped1).jpg) · Supporterhéninois · CC0
+- `nfl/achane.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4429160.png · uso editorial
+- `nfl/allen.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3918298.png · uso editorial
+- `nfl/anderson.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4685724.png · uso editorial
+- `nfl/bailey.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4685248.png · uso editorial
+- `nfl/bain.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4870617.png · uso editorial
+- `nfl/barkley.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3929630.png · uso editorial
+- `nfl/beck.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4430841.png · uso editorial
+- `nfl/bijan.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4430807.png · uso editorial
+- `nfl/bonitto.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4360259.png · uso editorial
+- `nfl/bosa.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4040605.png · uso editorial
+- `nfl/breecehall.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4427366.png · uso editorial
+- `nfl/bthomas.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4432773.png · uso editorial
+- `nfl/burns.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4035631.png · uso editorial
+- `nfl/burrow.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png · uso editorial
+- `nfl/chase.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4362628.png · uso editorial
+- `nfl/collins.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4258173.png · uso editorial
+- `nfl/concepcion.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4870653.png · uso editorial
+- `nfl/crosby.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3916655.png · uso editorial
+- `nfl/daniels.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4426348.png · uso editorial
+- `nfl/delane.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4880124.png · uso editorial
+- `nfl/downs.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4870706.png · uso editorial
+- `nfl/garrett.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3122132.png · uso editorial
+- `nfl/gibbs.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4429795.png · uso editorial
+- `nfl/goff.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3046779.png · uso editorial
+- `nfl/henry.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3043078.png · uso editorial
+- `nfl/herbert.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4038941.png · uso editorial
+- `nfl/hurts.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4040715.png · uso editorial
+- `nfl/hutchinson.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4372099.png · uso editorial
+- `nfl/jacobs.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4047365.png · uso editorial
+- `nfl/jcook.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4379399.png · uso editorial
+- `nfl/jefferson.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4262921.png · uso editorial
+- `nfl/jprice.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4685512.png · uso editorial
+- `nfl/jrodriguez.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4566094.png · uso editorial
+- `nfl/jsn.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4430878.png · uso editorial
+- `nfl/jtaylor.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4242335.png · uso editorial
+- `nfl/lamar.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3916387.png · uso editorial
+- `nfl/lamb.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4241389.png · uso editorial
+- `nfl/laporta.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4430027.png · uso editorial
+- `nfl/lemon.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4870795.png · uso editorial
+- `nfl/london.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4426502.png · uso editorial
+- `nfl/love.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4870808.png · uso editorial
+- `nfl/mahomes.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3139477.png · uso editorial
+- `nfl/maye.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4431452.png · uso editorial
+- `nfl/mccaffrey.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3117251.png · uso editorial
+- `nfl/mclaurin.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3121422.png · uso editorial
+- `nfl/mendoza.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4837248.png · uso editorial
+- `nfl/mesidor.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4429190.png · uso editorial
+- `nfl/nabers.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4595348.png · uso editorial
+- `nfl/nacua.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4426515.png · uso editorial
+- `nfl/reese.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4950400.png · uso editorial
+- `nfl/stafford.png` — https://a.espncdn.com/i/headshots/nfl/players/full/12483.png · uso editorial
+- `nfl/stbrown.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4374302.png · uso editorial
+- `nfl/stribling.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4710714.png · uso editorial
+- `nfl/styles.png` — https://a.espncdn.com/i/headshots/nfl/players/full/5081807.png · uso editorial
+- `nfl/tate.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4871023.png · uso editorial
+- `nfl/waddle.png` — https://a.espncdn.com/i/headshots/nfl/players/full/4372016.png · uso editorial
+- `nfl/watt.png` — https://a.espncdn.com/i/headshots/nfl/players/full/3045282.png · uso editorial

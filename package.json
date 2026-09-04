@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "logos": "node scripts/fetch-team-logos.mjs"
+    "logos": "node scripts/fetch-team-logos.mjs",
+    "photos": "node scripts/fetch-people-photos.mjs"
   },
   "dependencies": {
     "i18next": "^26.3.6",
@@ -23,6 +24,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
+    "sharp": "^0.35.4",
     "tailwindcss": "^3.4.14",
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
