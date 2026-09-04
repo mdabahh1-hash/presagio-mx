@@ -16,7 +16,9 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'Champions League',
     'Saudi Pro League', 'NFL', 'F1', 'Boxeo',
   ],
-  'Política': ['Elecciones'],
+  'Política': ['Elecciones', 'Sheinbaum'],
+  'Entretenimiento': ['Influencers'],
+  'Global': ['Migración'],
 }
 
 // Deporte → ligas (rail "Todos los deportes" en CategoryBrowse). Solo Deportes
