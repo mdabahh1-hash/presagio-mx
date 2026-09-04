@@ -28,7 +28,9 @@
       "pending": "Pending result"
     },
     "continue": "Continue",
-    "error": "Something went wrong, try again"
+    "error": "Something went wrong, try again",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "nav": {
     "home": "Home",
@@ -191,7 +193,10 @@
     "statsClose": "Closes",
     "statsComments": "Comments",
     "resolutionTitle": "Resolution criteria",
+    "rulesTab": "Rules",
+    "contextTab": "Market context",
     "resolutionSource": "Official source:",
+    "openedDate": "Market opened:",
     "closeDate": "Close date:",
     "discussion": "Discussion",
     "commentPlaceholder": "Share your analysis...",

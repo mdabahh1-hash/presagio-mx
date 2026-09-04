@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { displayPair } from '../lib/prices'
@@ -24,6 +24,9 @@ import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
 import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
+
+type InfoTab = 'criteria' | 'rules' | 'context'
+const INFO_CLAMP_LINES = 6
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
 const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
@@ -71,6 +74,25 @@ export function MarketDetail() {
 
   const [comment, setComment] = useState('')
   const [chartRange, setChartRange] = useState<ChartRange>('all')
+  // Sección "Criterios | Normas | Contexto" (estilo Polymarket): pestaña activa,
+  // texto colapsado a 6 líneas con "Mostrar más" cuando desborda.
+  const [infoTab, setInfoTab] = useState<InfoTab>('criteria')
+  const [infoExpanded, setInfoExpanded] = useState(false)
+  const [infoOverflows, setInfoOverflows] = useState(false)
+  const infoRef = useRef<HTMLParagraphElement>(null)
+  // Normas/Contexto solo aparecen cuando el mercado trae texto (los resueltos viejos no lo tienen).
+  const infoTabs = useMemo(() => {
+    const items: { key: InfoTab; label: string }[] = [{ key: 'criteria', label: t('market.resolutionTitle') }]
+    if (market?.rules) items.push({ key: 'rules', label: t('market.rulesTab') })
+    if (market?.context) items.push({ key: 'context', label: t('market.contextTab') })
+    return items
+  }, [market, t])
+  const infoText = infoTab === 'rules' ? market?.rules : infoTab === 'context' ? market?.context : market?.resolution_criteria
+  useLayoutEffect(() => {
+    if (infoExpanded) return
+    const el = infoRef.current
+    setInfoOverflows(!!el && el.scrollHeight > el.clientHeight + 1)
+  }, [infoTab, infoText, infoExpanded])
   // Multi: outcomes dibujados en la gráfica (default top 4 por precio).
   const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set())
   const [showChartMenu, setShowChartMenu] = useState(false)
@@ -624,13 +646,36 @@ export function MarketDetail() {
             ))}
           </div>
 
-          {/* Resolution criteria */}
-          <div className="anim-4" style={{ paddingTop: 20, borderTop: '1px solid var(--border-subtle)' }}>
-            <h3 className="section-title" style={{ fontSize: 16, marginBottom: 10 }}>{t('market.resolutionTitle')}</h3>
-            <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-              {market.resolution_criteria}
+          {/* Criterios de resolución | Normas | Contexto del mercado (estilo Polymarket) */}
+          <div className="anim-4" style={{ paddingTop: 8, borderTop: '1px solid var(--border-subtle)' }}>
+            <Tabs<InfoTab>
+              size="sm"
+              className="tabs-line"
+              ariaLabel={t('market.resolutionTitle')}
+              items={infoTabs}
+              active={infoTab}
+              onChange={key => { setInfoTab(key); setInfoExpanded(false) }}
+            />
+            <p
+              ref={infoRef}
+              className={infoExpanded ? undefined : 'info-clamp'}
+              style={{ margin: '14px 0 0', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.65, whiteSpace: 'pre-line' }}
+            >
+              {infoText}
             </p>
-            <div className="meta-label" style={{ marginTop: 12, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            {(infoOverflows || infoExpanded) && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                style={{ marginTop: 6, marginLeft: -8 }}
+                aria-expanded={infoExpanded}
+                onClick={() => setInfoExpanded(v => !v)}
+              >
+                {infoExpanded ? t('common.showLess') : t('common.showMore')}
+                <Icon name={infoExpanded ? 'chevron-up' : 'chevron-down'} size={14} />
+              </button>
+            )}
+            <div className="meta-label" style={{ marginTop: 14, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
               {market.resolution_source_url && (
                 <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
                   {t('market.resolutionSource')}
@@ -645,6 +690,12 @@ export function MarketDetail() {
                   </a>
                 </span>
               )}
+              <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                {t('market.openedDate')}
+                <span className="num" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {formatDate(market.created_at, { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+              </span>
               <span style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
                 {t('market.closeDate')}
                 <span className="num" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>

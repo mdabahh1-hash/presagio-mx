@@ -64,6 +64,9 @@ export interface ApiMarket {
   kind?: 'partido' | 'accesorio' | null
   resolution_criteria: string
   resolution_source_url?: string | null
+  /** Normas y Contexto del mercado (estilo Polymarket); solo llegan en el detalle. */
+  rules?: string | null
+  context?: string | null
   image_url?: string | null
   yes_price: number
   volume: number

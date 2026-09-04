@@ -330,6 +330,12 @@ select.input { padding-right: 32px; appearance: none; }
 /* Contenedor con línea inferior fija: el subrayado del tab activo pisa esta línea */
 .tabs-line { border-bottom: 1px solid var(--border-subtle); }
 
+/* Texto largo colapsado (Criterios / Normas / Contexto del mercado): 6 líneas + "Mostrar más" */
+.info-clamp {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
+  overflow: hidden;
+}
+
 /* Barra de categorías sticky (bajo el navbar, línea que no se mueve) */
 .cat-tabs-sticky {
   position: sticky; top: var(--nav-h); z-index: 40;
