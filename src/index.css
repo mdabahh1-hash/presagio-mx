@@ -77,9 +77,10 @@
   --cat-coral:   #E48F6E;  --cat-coral-bg:   rgba(228, 143, 110, 0.12);
   --cat-default: #9A9AB8;  --cat-default-bg: rgba(154, 154, 184, 0.12);
 
-  /* Layout */
-  --page-max: 1760px;
-  --page-pad: 32px;
+  /* Layout: columna central estilo Polymarket. --page-max es el ancho del
+     CONTENIDO (sin gutters); .page-container/.navbar-inner suman el padding. */
+  --page-max: 1300px;
+  --page-pad: 24px;
   --nav-h: 62px;
   --catbar-h: 48px;
   --r-sm: 6px;
@@ -203,11 +204,16 @@ body {
 
 /* Layout containers */
 .page-container {
-  max-width: var(--page-max);
+  box-sizing: border-box;
+  max-width: calc(var(--page-max) + 2 * var(--page-pad));
   margin-left: auto; margin-right: auto;
   padding-left: var(--page-pad); padding-right: var(--page-pad);
 }
-.navbar-inner { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--page-pad); }
+.navbar-inner {
+  box-sizing: border-box;
+  max-width: calc(var(--page-max) + 2 * var(--page-pad));
+  margin: 0 auto; padding: 0 var(--page-pad);
+}
 
 /* ============================================================
    PRIMITIVAS
