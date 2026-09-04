@@ -1,5 +1,6 @@
 import type { Category, Market } from '../types'
 import type { IconName } from '../components/Icon'
+import { SPORT_GROUPS } from './categories'
 
 // Imagen cuadrada por mercado. Prioridad:
 //   1. market.imageUrl (backend: https:// absoluta o ruta /img/... del frontend)
@@ -18,6 +19,8 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'Ligue 1': '/img/markets/sub/ligue-1.svg',
   'Liga Portugal': '/img/markets/sub/liga-portugal.svg',
   'MLS': '/img/markets/sub/mls.svg',
+  'Champions League': '/img/markets/sub/champions-league.svg',
+  'Saudi Pro League': '/img/markets/sub/saudi-pro-league.svg',
   'NFL': '/img/markets/sub/nfl.svg',
   'F1': '/img/markets/sub/f1.svg',
   'Boxeo': '/img/markets/sub/boxeo.svg',
@@ -38,7 +41,8 @@ export const CATEGORY_IMAGE: Partial<Record<string, string>> = {
   'Mundial 2026': '/img/markets/cat/deportes.svg',
 }
 
-const FOOTBALL_LEAGUES = new Set(['Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS'])
+// Fuente única: SPORT_GROUPS (antes había una copia literal que se desfasaba).
+const FOOTBALL_LEAGUES = new Set(SPORT_GROUPS['Fútbol'] ?? [])
 
 export function subcategoryIcon(sub?: string | null, cat?: Category | string): IconName {
   if (sub) {

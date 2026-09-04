@@ -8,7 +8,7 @@ import { CategoryBrowse } from '../components/CategoryBrowse'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
-import { CATEGORIES, SUBCATEGORIES, sportOfSub } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
@@ -29,17 +29,21 @@ export function Markets() {
   const catParam = (searchParams.get('cat') || 'Todos') as Category | 'Todos'
   const subParam = searchParams.get('sub')
   const sportParam = searchParams.get('sport')
+  const rawKind = searchParams.get('kind')
+  const kindParam: Kind | null = isKind(rawKind) ? rawKind : null
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
   const [activeSport, setActiveSport] = useState<string | null>(sportParam)
+  const [activeKind, setActiveKind] = useState<Kind | null>(kindParam)
 
   useEffect(() => {
     setSearchInput(queryParam)
     setActiveCategory(catParam)
     setActiveSub(subParam)
     setActiveSport(sportParam)
-  }, [queryParam, catParam, subParam, sportParam])
+    setActiveKind(kindParam)
+  }, [queryParam, catParam, subParam, sportParam, kindParam])
 
   useEffect(() => {
     let active = true
@@ -73,11 +77,13 @@ export function Markets() {
     setActiveCategory(cat)
     setActiveSub(null)
     setActiveSport(null)
+    setActiveKind(null)
     setSearchParams(p => {
       if (cat === 'Todos') p.delete('cat')
       else p.set('cat', cat)
       p.delete('sub')
       p.delete('sport')
+      p.delete('kind')
       return p
     })
   }
@@ -87,11 +93,13 @@ export function Markets() {
     const sport = sub && activeCategory === 'Deportes' ? (sportOfSub(sub) ?? sub) : activeSport
     setActiveSub(sub)
     setActiveSport(sport)
+    setActiveKind(null)
     setSearchParams(p => {
       if (sub) p.set('sub', sub)
       else p.delete('sub')
       if (sport) p.set('sport', sport)
       else p.delete('sport')
+      p.delete('kind')
       return p
     })
   }
@@ -99,10 +107,22 @@ export function Markets() {
   const handleSportChange = (sport: string | null) => {
     setActiveSport(sport)
     setActiveSub(null)
+    setActiveKind(null)
     setSearchParams(p => {
       if (sport) p.set('sport', sport)
       else p.delete('sport')
       p.delete('sub')
+      p.delete('kind')
+      return p
+    })
+  }
+
+  // Partidos / Accesorios: hoja bajo la liga (o bajo NFL); cambiar de liga o deporte lo limpia.
+  const handleKindChange = (kind: Kind | null) => {
+    setActiveKind(kind)
+    setSearchParams(p => {
+      if (kind) p.set('kind', kind)
+      else p.delete('kind')
       return p
     })
   }
@@ -192,6 +212,8 @@ export function Markets() {
           onSubChange={handleSubChange}
           activeSport={activeSport}
           onSportChange={handleSportChange}
+          activeKind={activeKind}
+          onKindChange={handleKindChange}
         />
       ) : (
         <>

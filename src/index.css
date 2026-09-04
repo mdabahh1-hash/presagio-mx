@@ -478,6 +478,7 @@ input[type='range']::-webkit-slider-thumb {
 .cat-rail { display: flex; flex-direction: column; gap: 2px; position: sticky; top: calc(var(--nav-h) + var(--catbar-h) + 16px); }
 .cat-rail-item:hover { background: var(--bg-hover) !important; }
 .cat-rail-sub { padding-left: 24px !important; font-weight: 500 !important; }
+.cat-rail-sub2 { padding-left: 38px !important; font-weight: 500 !important; }
 
 /* Market rows: thumb + info + outcomes */
 .market-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 16px; align-items: center; }
@@ -610,7 +611,11 @@ input[type='range']::-webkit-slider-thumb {
   .cat-rail-item { width: auto !important; flex-shrink: 0; }
   .cat-rail-header { display: none; }
   .cat-rail-divider { width: 1px; height: auto !important; align-self: stretch; margin: 4px 6px !important; flex-shrink: 0; }
-  .cat-rail-sub { padding-left: 14px !important; }
+  .cat-rail-sub, .cat-rail-sub2 { padding-left: 14px !important; }
+  /* El rail horizontal no muestra indentación: marcar los niveles anidados */
+  .cat-rail-sub > span:first-child::before, .cat-rail-sub2 > span:first-child::before {
+    content: '› '; color: var(--text-tertiary);
+  }
 
   .market-row { grid-template-columns: 44px minmax(0, 1fr) !important; gap: 10px 12px !important; }
   .market-row .market-row-thumb { width: 44px !important; height: 44px !important; }

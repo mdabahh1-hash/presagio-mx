@@ -21,6 +21,7 @@ export function apiToMarket(m: ApiMarket): Market {
     description: m.description,
     category: m.category as Category,
     subcategory: m.subcategory ?? null,
+    kind: m.kind ?? null,
     imageUrl: m.image_url ?? null,
     yesPrice: Math.round(m.yes_price),
     volume: m.volume,

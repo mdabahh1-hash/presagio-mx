@@ -61,6 +61,7 @@ export interface ApiMarket {
   description: string
   category: string
   subcategory?: string | null
+  kind?: 'partido' | 'accesorio' | null
   resolution_criteria: string
   resolution_source_url?: string | null
   image_url?: string | null
@@ -121,10 +122,11 @@ export const marketsApi = {
     if (opts.outcome_key) qs.set('outcome_key', opts.outcome_key)
     return request<ApiQuote>(`/markets/${id}/quote?${qs}`)
   },
-  list: (params?: { category?: string; subcategory?: string; q?: string; sort?: string; limit?: number; status?: string }) => {
+  list: (params?: { category?: string; subcategory?: string; kind?: string; q?: string; sort?: string; limit?: number; status?: string }) => {
     const qs = new URLSearchParams()
     if (params?.category) qs.set('category', params.category)
     if (params?.subcategory) qs.set('subcategory', params.subcategory)
+    if (params?.kind) qs.set('kind', params.kind)
     if (params?.q) qs.set('q', params.q)
     if (params?.sort) qs.set('sort', params.sort)
     if (params?.limit) qs.set('limit', String(params.limit))
@@ -133,13 +135,14 @@ export const marketsApi = {
   },
   // El backend capea limit a 100; una categoría (Deportes) puede rebasarlo.
   // Pagina con offset hasta recibir una página incompleta.
-  listAll: async (params?: { category?: string; subcategory?: string; q?: string; sort?: string; status?: string }): Promise<ApiMarket[]> => {
+  listAll: async (params?: { category?: string; subcategory?: string; kind?: string; q?: string; sort?: string; status?: string }): Promise<ApiMarket[]> => {
     const PAGE = 100
     const all: ApiMarket[] = []
     for (let offset = 0; ; offset += PAGE) {
       const qs = new URLSearchParams()
       if (params?.category) qs.set('category', params.category)
       if (params?.subcategory) qs.set('subcategory', params.subcategory)
+      if (params?.kind) qs.set('kind', params.kind)
       if (params?.q) qs.set('q', params.q)
       if (params?.sort) qs.set('sort', params.sort)
       if (params?.status) qs.set('status', params.status)

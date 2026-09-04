@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MarketRow } from './MarketRow'
-import { SPORT_GROUPS, sportOfSub } from '../lib/categories'
+import { SPORT_GROUPS, sportOfSub, KINDS, kindLabelKey, type Kind } from '../lib/categories'
 import type { Category, Market } from '../types'
 
 type BucketKey = 'all' | 'now' | 'today' | 'week' | 'month' | 'later' | 'pending'
@@ -40,19 +40,23 @@ interface CategoryBrowseProps {
   onSubChange?: (sub: string | null) => void
   activeSport?: string | null
   onSportChange?: (sport: string | null) => void
+  // Tercer nivel (Partidos / Accesorios) bajo la liga activa o bajo un deporte de liga única.
+  activeKind?: Kind | null
+  onKindChange?: (kind: Kind | null) => void
 }
 
-function RailButton({ active, label, count, onClick, nested = false }: {
+function RailButton({ active, label, count, onClick, nested = false, nested2 = false }: {
   active: boolean
   label: string
   count: number
   onClick: () => void
   nested?: boolean
+  nested2?: boolean
 }) {
   return (
     <button
       onClick={onClick}
-      className={`cat-rail-item${nested ? ' cat-rail-sub' : ''}`}
+      className={`cat-rail-item${nested ? ' cat-rail-sub' : ''}${nested2 ? ' cat-rail-sub2' : ''}`}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
         width: '100%', textAlign: 'left', cursor: 'pointer',
@@ -94,6 +98,7 @@ function SectionHeader({ title, count }: { title: string; count: number }) {
 export function CategoryBrowse({
   category, markets, loading, subcats,
   activeSub, onSubChange, activeSport, onSportChange,
+  activeKind, onKindChange,
 }: CategoryBrowseProps) {
   const { t } = useTranslation()
   const isSports = category === 'Deportes'
@@ -105,12 +110,16 @@ export function CategoryBrowse({
   const setSub = onSubChange ?? setInnerSub
   const sportState = onSportChange ? (activeSport ?? null) : innerSport
   const setSport = onSportChange ?? setInnerSport
+  const [innerKind, setInnerKind] = useState<Kind | null>(null)
+  const kind = onKindChange ? (activeKind ?? null) : innerKind
+  const setKind = onKindChange ?? setInnerKind
   // Una liga activa implica su deporte (deep links viejos ?sub=Liga MX siguen funcionando)
   const sport = isSports ? ((sub && sportOfSub(sub)) || sportState) : null
 
   useEffect(() => {
     setInnerSub(null)
     setInnerSport(null)
+    setInnerKind(null)
     setBucket('all')
   }, [category])
 
@@ -166,22 +175,57 @@ export function CategoryBrowse({
     return inCat
   }, [inCat, sub, sportLeagues])
 
-  const counts = useMemo(() => {
-    const c: Record<BucketKey, number> = { all: inSub.length, now: 0, today: 0, week: 0, month: 0, later: 0, pending: 0 }
-    for (const m of inSub) c[bucketOf(m)]++
+  // Tercer nivel (Partidos / Accesorios): solo bajo una liga activa o bajo un
+  // deporte de liga única (NFL). Se muestra únicamente si hay de los dos tipos;
+  // un ?kind= obsoleto en un alcance sin división se ignora en vez de vaciar la lista.
+  const kindScope = isSports && (!!sub || sportLeagues?.length === 1)
+  const kindCounts = useMemo(() => {
+    const c: Record<Kind, number> = { partido: 0, accesorio: 0 }
+    if (kindScope) for (const m of inSub) if (m.kind) c[m.kind]++
     return c
-  }, [inSub])
+  }, [inSub, kindScope])
+  const kindVisible = kindScope && kindCounts.partido > 0 && kindCounts.accesorio > 0
+  const effKind = kindVisible ? kind : null
+
+  const inScope = useMemo(
+    () => (effKind ? inSub.filter(m => m.kind === effKind) : inSub),
+    [inSub, effKind],
+  )
+
+  const counts = useMemo(() => {
+    const c: Record<BucketKey, number> = { all: inScope.length, now: 0, today: 0, week: 0, month: 0, later: 0, pending: 0 }
+    for (const m of inScope) c[bucketOf(m)]++
+    return c
+  }, [inScope])
 
   const shown = useMemo(
-    () => (bucket === 'all' ? inSub : inSub.filter(m => bucketOf(m) === bucket)),
-    [inSub, bucket],
+    () => (bucket === 'all' ? inScope : inScope.filter(m => bucketOf(m) === bucket)),
+    [inScope, bucket],
   )
 
   // Secciones por subcategoría en orden de display; sin subcategoría al final ("Otros").
+  // Bajo una liga (o NFL) las secciones son por tipo: Partidos / Accesorios.
   // Categorías sin subcategorías: una sola lista sin encabezado.
   const sections = useMemo(() => {
+    const single = () => [{ title: null as string | null, items: [...shown].sort(byClosing) }]
+    if (kindScope) {
+      if (effKind || !kindVisible) return single()
+      const byKind = new Map<Kind | null, Market[]>()
+      for (const m of shown) {
+        const k = m.kind ?? null
+        byKind.set(k, [...(byKind.get(k) ?? []), m])
+      }
+      const out: { title: string | null; items: Market[] }[] = []
+      for (const k of KINDS) {
+        const items = byKind.get(k)
+        if (items?.length) out.push({ title: t(kindLabelKey(k)), items: items.sort(byClosing) })
+      }
+      const rest = byKind.get(null)
+      if (rest?.length) out.push({ title: t('categoryBrowse.otherSection'), items: rest.sort(byClosing) })
+      return out
+    }
     const order = sportLeagues ?? subcats ?? []
-    if (order.length === 0) return [{ title: null as string | null, items: [...shown].sort(byClosing) }]
+    if (order.length === 0) return single()
     const byKey = new Map<string | null, Market[]>()
     for (const m of shown) {
       const key = m.subcategory && order.includes(m.subcategory) ? m.subcategory : null
@@ -195,16 +239,19 @@ export function CategoryBrowse({
     const rest = byKey.get(null)
     if (rest?.length) out.push({ title: t('categoryBrowse.otherSection'), items: rest.sort(byClosing) })
     return out
-  }, [shown, sportLeagues, subcats, t])
+  }, [shown, sportLeagues, subcats, t, kindScope, kindVisible, effKind])
 
   const selectSport = (s: string | null) => {
+    setKind(null)
     setSub(null)
     setSport(s)
   }
   const selectSub = (s: string | null) => {
+    setKind(null)
     if (s && isSports) setSport(sportOfSub(s) ?? s)
     setSub(s)
   }
+  const selectKind = (k: Kind | null) => setKind(k)
 
   if (loading) {
     return (
@@ -220,7 +267,23 @@ export function CategoryBrowse({
   }
 
   // "Deportes · Fútbol · Liga MX"; no repetir cuando deporte y liga coinciden (F1, Boxeo)
-  const headParts = [category, sport, sub && sub !== sport ? sub : null].filter((p): p is string => !!p)
+  const headParts = [
+    category, sport, sub && sub !== sport ? sub : null, effKind ? t(kindLabelKey(effKind)) : null,
+  ].filter((p): p is string => !!p)
+
+  // Botones Partidos / Accesorios: nivel 2 bajo un deporte de liga única (NFL),
+  // nivel 3 bajo la liga activa (Fútbol › Champions League › Partidos).
+  const kindRows = (level: 'sport' | 'league') => kindVisible && KINDS.map(k => (
+    <RailButton
+      key={k}
+      nested={level === 'sport'}
+      nested2={level === 'league'}
+      active={kind === k}
+      label={t(kindLabelKey(k))}
+      count={kindCounts[k]}
+      onClick={() => selectKind(kind === k ? null : k)}
+    />
+  ))
 
   return (
     <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 20, alignItems: 'start', marginBottom: 48 }}>
@@ -238,20 +301,23 @@ export function CategoryBrowse({
             {sportTree.map(node => (
               <React.Fragment key={node.sport}>
                 <RailButton
-                  active={sport === node.sport && !sub}
+                  active={sport === node.sport && !sub && !effKind}
                   label={node.sport}
                   count={node.count}
                   onClick={() => selectSport(sport === node.sport ? null : node.sport)}
                 />
+                {sport === node.sport && node.leagues.length === 1 && kindRows('sport')}
                 {sport === node.sport && node.leagues.length > 1 && node.leagues.map(l => (
-                  <RailButton
-                    key={l}
-                    nested
-                    active={sub === l}
-                    label={l}
-                    count={subCounts[l] ?? 0}
-                    onClick={() => selectSub(sub === l ? null : l)}
-                  />
+                  <React.Fragment key={l}>
+                    <RailButton
+                      nested
+                      active={sub === l && !effKind}
+                      label={l}
+                      count={subCounts[l] ?? 0}
+                      onClick={() => selectSub(sub === l ? null : l)}
+                    />
+                    {sub === l && kindRows('league')}
+                  </React.Fragment>
                 ))}
               </React.Fragment>
             ))}
@@ -307,7 +373,7 @@ export function CategoryBrowse({
                 {sec.title && <SectionHeader title={sec.title} count={sec.items.length} />}
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {sec.items.map((m, i) => (
-                    <MarketRow key={m.id} market={m} hideSubcategory={!!sec.title && sec.title === m.subcategory} animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''} />
+                    <MarketRow key={m.id} market={m} hideSubcategory={kindScope || (!!sec.title && sec.title === m.subcategory)} animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''} />
                   ))}
                 </div>
               </section>

@@ -138,6 +138,8 @@
     "marketCount_one": "{{count}} market",
     "marketCount_other": "{{count}} markets",
     "allSports": "All sports",
+    "kindPartido": "Matches",
+    "kindAccesorio": "Props",
     "otherSection": "Other",
     "emptyFilter": "No markets match this filter"
   },

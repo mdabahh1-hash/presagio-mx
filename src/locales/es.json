@@ -138,6 +138,8 @@
     "marketCount_one": "{{count}} mercado",
     "marketCount_other": "{{count}} mercados",
     "allSports": "Todos los deportes",
+    "kindPartido": "Partidos",
+    "kindAccesorio": "Accesorios",
     "otherSection": "Otros",
     "emptyFilter": "Sin mercados en este filtro"
   },

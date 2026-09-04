@@ -5,6 +5,10 @@ export type Category =
 export type MarketStatus =
   | 'open' | 'pending_resolution' | 'closed' | 'resolved_yes' | 'resolved_no' | 'resolved' | 'cancelled'
 
+// Tercer nivel dentro de Deportes (deporte → liga → tipo): ganador del
+// partido vs. todo lo demás (props, premios, futuros). null = sin división.
+export type MarketKind = 'partido' | 'accesorio'
+
 export interface Outcome {
   outcome_key: string
   label: string
@@ -17,6 +21,7 @@ export interface Market {
   description: string
   category: Category
   subcategory?: string | null
+  kind?: MarketKind | null
   // Imagen cuadrada (https:// o /img/...); null → fallback por liga/categoría
   imageUrl?: string | null
   yesPrice: number

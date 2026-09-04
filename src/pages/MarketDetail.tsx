@@ -22,6 +22,7 @@ import { Tabs } from '../components/Tabs'
 import { TeamMark } from '../components/TeamMark'
 import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
+import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
 
 type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
@@ -318,6 +319,17 @@ export function MarketDetail() {
             >
               {market.subcategory}
             </Link>
+            {market.kind && (
+              <>
+                <Icon name="chevron-right" size={12} style={{ color: 'var(--text-tertiary)' }} />
+                <Link
+                  to={`/mercados?cat=${encodeURIComponent(market.category)}&sub=${encodeURIComponent(market.subcategory)}&kind=${market.kind}`}
+                  style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}
+                >
+                  {t(kindLabelKey(market.kind))}
+                </Link>
+              </>
+            )}
           </>
         )}
       </div>
