@@ -99,7 +99,8 @@
     "passkeyConnecting": "Conectando..."
   },
   "app": {
-    "signingIn": "Iniciando sesión..."
+    "signingIn": "Iniciando sesión...",
+    "signInFailed": "No pudimos completar el inicio de sesión. Inténtalo de nuevo."
   },
   "home": {
     "searchPlaceholder": "Buscar mercados...",

@@ -99,7 +99,8 @@
     "passkeyConnecting": "Connecting..."
   },
   "app": {
-    "signingIn": "Signing in..."
+    "signingIn": "Signing in...",
+    "signInFailed": "We couldn't complete the sign-in. Please try again."
   },
   "home": {
     "searchPlaceholder": "Search markets...",
