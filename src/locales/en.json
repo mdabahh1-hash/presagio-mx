@@ -424,6 +424,14 @@
       "share": "Invite via WhatsApp",
       "hint": "The league starts once the spots are filled"
     },
+    "noCycle": {
+      "titleCreator": "Your league is ready",
+      "hintCreator": "Open the first round so everyone can start making picks.",
+      "cta": "Open first round",
+      "titleMember": "Waiting for the first round",
+      "hintMember": "{{creator}} will open the first round soon. Meanwhile, invite more friends.",
+      "invite": "Invite via WhatsApp"
+    },
     "scoring": "Resolving markets… {{n}} left. Results tonight.",
     "tabs": {
       "picks": "Picks",

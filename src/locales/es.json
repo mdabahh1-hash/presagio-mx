@@ -424,6 +424,14 @@
       "share": "Invitar por WhatsApp",
       "hint": "La liga arranca cuando se completen los lugares"
     },
+    "noCycle": {
+      "titleCreator": "Tu liga está lista",
+      "hintCreator": "Abre el primer ciclo para que todos empiecen a hacer sus picks.",
+      "cta": "Abrir primer ciclo",
+      "titleMember": "Esperando el primer ciclo",
+      "hintMember": "{{creator}} abrirá el primer ciclo pronto. Mientras, invita a más amigos.",
+      "invite": "Invitar por WhatsApp"
+    },
     "scoring": "Resolviendo mercados… faltan {{n}}. Resultados hoy en la noche.",
     "tabs": {
       "picks": "Picks",

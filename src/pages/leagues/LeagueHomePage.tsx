@@ -89,6 +89,44 @@ export default function LeagueHomePage() {
     )
   }
 
+  // ------------------------------------------------ estado ACTIVA SIN CICLO
+  // La liga ya arrancó pero nadie ha abierto el primer ciclo: sin esto las
+  // pestañas Picks/Tabla quedaban vacías y el creador no tenía cómo abrirlo.
+  if (!cycle) {
+    const creatorName =
+      league.members.find(m => m.role === 'creator')?.display_name ??
+      league.members.find(m => m.user_id === league.creator_id)?.display_name ??
+      '—'
+    return (
+      <div className="lg-page lg-pending">
+        <h1>{league.name}</h1>
+        <div className="lg-pending__counter">
+          {isCreator ? t('leagues.noCycle.titleCreator') : t('leagues.noCycle.titleMember')}
+        </div>
+        <p className="lg-pending__hint">
+          {isCreator
+            ? t('leagues.noCycle.hintCreator')
+            : t('leagues.noCycle.hintMember', { creator: creatorName })}
+        </p>
+        {isCreator && (
+          <button
+            className="lg-btn lg-btn--primary lg-btn--xl"
+            onClick={() => navigate(`/ligas/${league.id}/nuevo-ciclo`)}
+          >
+            {t('leagues.noCycle.cta')}
+          </button>
+        )}
+        <button
+          className="lg-btn lg-btn--secondary"
+          style={{ marginTop: 8 }}
+          onClick={() => shareOnWhatsApp(league.name, null, league.invite_code)}
+        >
+          {t('leagues.noCycle.invite')}
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="lg-page">
       {/* ------------------------------------------------ header */}
