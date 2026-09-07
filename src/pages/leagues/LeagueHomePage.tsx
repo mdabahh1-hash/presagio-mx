@@ -31,6 +31,8 @@ export default function LeagueHomePage() {
   const [tab, setTab] = useState<'picks' | 'tabla'>('picks')
   const [pickMarket, setPickMarket] = useState<CycleMarket | null>(null)
   const [welcome, setWelcome] = useState(params.get('bienvenida') === '1')
+  // ?creada=1 llega desde CreateLeaguePage justo después de crear la liga.
+  const [created, setCreated] = useState(params.get('creada') === '1')
 
   const load = useCallback(() => {
     if (!id) return
@@ -63,6 +65,11 @@ export default function LeagueHomePage() {
     const missing = league.min_members - league.members.length
     return (
       <div className="lg-page lg-pending">
+        {created && (
+          <div className="lg-banner" onAnimationEnd={() => setCreated(false)}>
+            {t('leagues.create.created')}
+          </div>
+        )}
         <h1>{league.name}</h1>
         <div className="lg-pending__counter">
           {t('leagues.pending.counter', {

@@ -24,7 +24,7 @@ const Leaderboard = lazy(() => import('./pages/Leaderboard').then(m => ({ defaul
 const PublicProfile = lazy(() => import('./pages/PublicProfile').then(m => ({ default: m.PublicProfile })))
 const Following = lazy(() => import('./pages/Following').then(m => ({ default: m.Following })))
 const LeaguesPage = lazy(() => import('./pages/leagues/LeaguesPage').then(m => ({ default: m.LeaguesPage })))
-const CreateLeaguePage = lazy(() => import('./pages/leagues/LeaguesPage').then(m => ({ default: m.CreateLeaguePage })))
+const CreateLeaguePage = lazy(() => import('./pages/leagues/CreateLeaguePage').then(m => ({ default: m.CreateLeaguePage })))
 const InviteLandingPage = lazy(() => import('./pages/leagues/InviteLandingPage'))
 const LeagueHomePage = lazy(() => import('./pages/leagues/LeagueHomePage'))
 

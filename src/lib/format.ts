@@ -31,6 +31,21 @@ export function formatDate(d: string | Date, opts?: Intl.DateTimeFormatOptions):
   return new Date(d).toLocaleDateString(locale(), opts)
 }
 
+/* "7–13 sep" / "Sep 7 – 13" para el nombre automático de una jornada de liga.
+   formatRange colapsa el mes cuando es el mismo; si el navegador no lo tiene,
+   cae a dos fechas sueltas. */
+export function formatDateRange(a: Date, b: Date): string {
+  const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+  const fmt = new Intl.DateTimeFormat(locale(), opts) as Intl.DateTimeFormat & {
+    formatRange?: (x: Date, y: Date) => string
+  }
+  const out = typeof fmt.formatRange === 'function'
+    ? fmt.formatRange(a, b)
+    : `${formatDate(a, opts)} – ${formatDate(b, opts)}`
+  // es-MX abrevia con punto ("sep."); en un título corto estorba.
+  return out.replace(/\./g, '')
+}
+
 /* Countdown corto de MarketCard: "3d 4h", "2 meses", "12m 30s". Los sufijos
    d/h/m/s son iguales en ambos idiomas; solo mes(es) y "Cerrado" se traducen. */
 export function formatCountdown(diff: number): { text: string; urgent: boolean } {
