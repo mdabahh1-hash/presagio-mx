@@ -3,18 +3,22 @@
  *
  * Orden del contenido (no cambiar, está diseñado como funnel):
  * 1. Pregunta + cierre absoluto
- * 2. Outcomes como botones grandes con probabilidad ("América 42%")
+ * 2. Opciones como tiles con probabilidad ("América · 42%")
  * 3. Stake: chips 500/1000/2500/5000 + campo editable, default 1000,
  *    balance restante visible
  * 4. La línea que vende: "Si aciertas ganas 2,380 pts" en vivo (cap 20x)
  * 5. Confirmar + leyenda "Los picks no se pueden cambiar"
  *
- * Al confirmar: feedback inmediato, cerrar, y el caller auto-avanza al
- * siguiente mercado sin pick.
+ * Usa el bottom sheet del sitio (.sheet-overlay/.sheet-panel de index.css):
+ * Escape cierra y el body no scrollea mientras está abierto.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Cycle, CycleMarket, leaguesApi, potentialPayout, STAKE_CHIPS } from '../../lib/leaguesApi'
+import { formatNum } from '../../lib/format'
+import { cleanLabel } from '../../lib/mapMarket'
+import { Icon } from '../Icon'
+import { outcomeLabel } from './adapters'
 
 type Selection =
   | { kind: 'binary'; side: 'yes' | 'no'; price: number; label: string }
@@ -41,8 +45,20 @@ export default function PickSheet({
 
   const payout = useMemo(() => (sel ? potentialPayout(stake, sel.price) : 0), [sel, stake])
   const capped = sel ? stake / sel.price > stake * 20 : false
-
   const stakeInvalid = stake < 100 || stake > balance
+
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [onClose])
 
   async function confirm() {
     if (!sel || stakeInvalid) return
@@ -70,67 +86,80 @@ export default function PickSheet({
     minute: '2-digit',
   })
 
+  const options: Array<{ key: string; label: string; price: number; select: () => void; active: boolean }> =
+    market.market_type === 'binary'
+      ? (['yes', 'no'] as const).map(side => {
+          const o = market.outcomes.find(x => x.side === side)
+          const price = o ? Number(o.price) : 0.5
+          const label = side === 'yes' ? t('common.yes') : t('common.no')
+          return {
+            key: side,
+            label,
+            price,
+            active: sel?.kind === 'binary' && sel.side === side,
+            select: () => setSel({ kind: 'binary', side, price, label }),
+          }
+        })
+      : market.outcomes.map(o => {
+          const price = Number(o.price)
+          const label = outcomeLabel(o)
+          return {
+            key: String(o.id),
+            label,
+            price,
+            active: sel?.kind === 'multi' && sel.outcomeId === o.id,
+            select: () => setSel({ kind: 'multi', outcomeId: o.id!, price, label }),
+          }
+        })
+
   return (
-    <div className="lg-sheet__backdrop" onClick={onClose}>
-      <div className="lg-sheet" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
-        <div className="lg-sheet__handle" />
+    <div className="sheet-overlay" onClick={onClose}>
+      <div
+        className="sheet-panel lg-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label={cleanLabel(market.question)}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="sheet-handle" />
 
         {/* 1. pregunta + cierre */}
-        <p className="lg-sheet__q">{market.question}</p>
-        <p className="lg-sheet__closes">{t('leagues.sheet.closes', { when: closesAbs })}</p>
+        <p className="lg-sheet__q">{cleanLabel(market.question)}</p>
+        <p className="meta-label lg-sheet__closes">{t('leagues.sheet.closes', { when: closesAbs })}</p>
 
-        {/* 2. outcomes grandes con probabilidad */}
-        <div className={`lg-outcomes ${market.market_type === 'binary' ? 'lg-outcomes--binary' : ''}`}>
-          {market.market_type === 'binary'
-            ? (['yes', 'no'] as const).map(side => {
-                const o = market.outcomes.find(x => x.side === side)
-                const price = o ? Number(o.price) : 0.5
-                const label = side === 'yes' ? t('common.yes') : t('common.no')
-                const active = sel?.kind === 'binary' && sel.side === side
-                return (
-                  <OutcomeButton
-                    key={side}
-                    label={label}
-                    price={price}
-                    active={active}
-                    onClick={() => setSel({ kind: 'binary', side, price, label })}
-                  />
-                )
-              })
-            : market.outcomes.map(o => {
-                const price = Number(o.price)
-                const active = sel?.kind === 'multi' && sel.outcomeId === o.id
-                return (
-                  <OutcomeButton
-                    key={o.id}
-                    label={o.label ?? '—'}
-                    price={price}
-                    active={active}
-                    onClick={() =>
-                      setSel({ kind: 'multi', outcomeId: o.id!, price, label: o.label ?? '—' })
-                    }
-                  />
-                )
-              })}
+        {/* 2. opciones */}
+        <div className={`lg-tiles lg-options${options.length === 2 ? ' lg-options--two' : ''}`}>
+          {options.map(o => (
+            <button key={o.key} type="button" className={`lg-tile${o.active ? ' is-active' : ''}`} aria-pressed={o.active} onClick={o.select}>
+              <span className="lg-tile__text">
+                <span className="lg-tile__name">{o.label}</span>
+                <span className="lg-tile__count num">{Math.round(o.price * 100)}%</span>
+              </span>
+              {o.active && <Icon name="check" size={14} className="lg-tile__check" />}
+            </button>
+          ))}
         </div>
 
         {/* 3. stake */}
         <div className="lg-stake">
-          <div className="lg-stake__chips">
+          <div className="lg-presets">
             {STAKE_CHIPS.map(c => (
               <button
                 key={c}
-                className={`lg-chip lg-chip--stake ${stake === c ? 'is-active' : ''}`}
+                type="button"
+                className={`lg-preset${stake === c ? ' is-active' : ''}`}
+                aria-pressed={stake === c}
                 disabled={c > balance}
                 onClick={() => setStake(c)}
               >
-                {c.toLocaleString('es-MX')}
+                <span className="num">{formatNum(c)}</span>
               </button>
             ))}
           </div>
           <div className="lg-stake__custom">
             <input
               type="number"
+              className="input num"
               inputMode="numeric"
               min={100}
               max={balance}
@@ -139,63 +168,39 @@ export default function PickSheet({
               onChange={e => setStake(Number(e.target.value))}
               aria-label={t('leagues.sheet.stakeAria')}
             />
-            <span className="lg-stake__balance">
-              {t('leagues.sheet.balance', { n: balance.toLocaleString('es-MX') })}
-            </span>
+            <span className="meta-label num">{t('leagues.sheet.balance', { n: formatNum(balance) })}</span>
           </div>
           {stakeInvalid && (
-            <p className="lg-error">
-              {stake < 100 ? t('leagues.sheet.minStake') : t('leagues.sheet.maxStake')}
-            </p>
+            <p className="lg-form__error">{stake < 100 ? t('leagues.sheet.minStake') : t('leagues.sheet.maxStake')}</p>
           )}
         </div>
 
         {/* 4. la línea que vende */}
-        <div className="lg-payout" aria-live="polite">
+        <div className="card lg-payout" aria-live="polite">
           {sel ? (
             <>
-              <span className="lg-payout__label">{t('leagues.sheet.ifYouWin')}</span>
-              <span className="lg-payout__value">
-                {Math.floor(payout).toLocaleString('es-MX')} pts
-              </span>
-              {capped && <span className="lg-payout__cap">{t('leagues.sheet.cap')}</span>}
+              <span className="meta-label">{t('leagues.sheet.ifYouWin')}</span>
+              <span className="lg-payout__value num">+{formatNum(Math.floor(payout))} pts</span>
+              {capped && <span className="meta-label">{t('leagues.sheet.cap')}</span>}
             </>
           ) : (
-            <span className="lg-payout__label lg-muted">{t('leagues.sheet.pickFirst')}</span>
+            <span className="meta-label">{t('leagues.sheet.pickFirst')}</span>
           )}
         </div>
 
-        {error && <p className="lg-error">{error}</p>}
+        {error && <p className="lg-form__error">{error}</p>}
 
         {/* 5. confirmar */}
         <button
-          className="lg-btn lg-btn--primary lg-btn--xl"
+          type="button"
+          className="btn btn-primary btn-lg lg-form__cta"
           disabled={!sel || stakeInvalid || submitting}
           onClick={confirm}
         >
           {submitting ? t('common.loading') : t('leagues.sheet.confirm')}
         </button>
-        <p className="lg-sheet__final">{t('leagues.sheet.noChanges')}</p>
+        <p className="meta-label lg-sheet__final">{t('leagues.sheet.noChanges')}</p>
       </div>
     </div>
-  )
-}
-
-function OutcomeButton({
-  label,
-  price,
-  active,
-  onClick,
-}: {
-  label: string
-  price: number
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button className={`lg-outcome ${active ? 'is-active' : ''}`} onClick={onClick}>
-      <span className="lg-outcome__label">{label}</span>
-      <span className="lg-outcome__price">{Math.round(price * 100)}%</span>
-    </button>
   )
 }

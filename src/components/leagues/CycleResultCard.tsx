@@ -1,19 +1,20 @@
 /**
- * CycleResultCard — pantalla de podio al resolverse el ciclo.
+ * CycleResultCard — podio al resolverse la jornada.
  *
- * Reglas UX:
- * - Podio oro/plata/bronce con balance final y aciertos.
- * - Botón primario "Compartir resultado": genera la card (src/lib/shareCard,
- *   1080x1350 feed / 1200x630 OG, dark) y usa navigator.share con el archivo;
- *   si no se puede compartir archivos, descarga el PNG y abre WhatsApp con el
- *   texto+link como respaldo.
- * - Para el creador, "Arrancar siguiente ciclo" a UN TAP del podio.
- *   Ahí vive la retención, no en notificaciones.
+ * - Podio 2-1-3 con iniciales, puntos finales y aciertos.
+ * - "Compartir resultado": genera la card (src/lib/shareCard, 1080x1350
+ *   feed / 1200x630 OG) y usa navigator.share con el archivo; si no se
+ *   puede, descarga el PNG y abre WhatsApp con el texto+link.
+ * - Para el creador, "Arrancar siguiente jornada" a UN TAP del podio.
  */
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Cycle, LeagueDetail, inviteUrl } from '../../lib/leaguesApi'
+import { formatDateRange, formatNum } from '../../lib/format'
 import { generateResultCard } from '../../lib/shareCard'
+import { Avatar } from '../Avatar'
+import { Badge } from '../Badge'
+import { Icon } from '../Icon'
 import StandingsTable from './StandingsTable'
 
 export default function CycleResultCard({
@@ -30,7 +31,6 @@ export default function CycleResultCard({
   const { t } = useTranslation()
   const [sharing, setSharing] = useState(false)
   const podium = league.standings.slice(0, 3)
-  const rest = league.standings
 
   async function share() {
     const url = inviteUrl(league.invite_code)
@@ -47,7 +47,7 @@ export default function CycleResultCard({
           cycleName: cycle.name,
           podium: podium.map(s => ({
             name: s.display_name,
-            points: fmt(s.balance),
+            points: formatNum(Number(s.balance)),
             hits: `${s.hits}/${s.total_resolved}`,
           })),
           footer: 'veredikt.mx',
@@ -80,41 +80,47 @@ export default function CycleResultCard({
 
   return (
     <div className="lg-result">
-      <h2 className="lg-result__title">{t('leagues.result.title', { cycle: cycle.name })}</h2>
+      <div className="lg-section-head">
+        <h2 className="lg-form__label">{t('leagues.result.title', { cycle: cycle.name })}</h2>
+        <span className="meta-label">{formatDateRange(new Date(cycle.starts_at), new Date(cycle.ends_at))}</span>
+      </div>
 
       <div className="lg-podium">
         {/* orden visual 2-1-3 */}
         {[1, 0, 2].map(idx => {
           const s = podium[idx]
-          if (!s) return <div key={idx} className="lg-podium__slot" />
+          if (!s) return <div key={`empty-${idx}`} className="card lg-podium__slot is-empty" aria-hidden="true" />
           return (
-            <div key={s.user_id} className={`lg-podium__slot lg-podium__slot--${idx + 1}`}>
-              <span className="lg-avatar lg-avatar--big" />
+            <div key={s.user_id} className={`card lg-podium__slot${idx === 0 ? ' is-winner' : ''}`}>
+              <Avatar name={s.display_name} size={48} />
+              {idx === 0 ? (
+                <Badge icon="medal">{t('leagues.result.winner')}</Badge>
+              ) : (
+                <Badge>{`${idx + 1}°`}</Badge>
+              )}
               <span className="lg-podium__name">{s.display_name}</span>
-              <span className="lg-podium__pts">{fmt(s.balance)} pts</span>
-              <span className="lg-podium__hits">
-                {s.hits}/{s.total_resolved}
+              <span className="lg-podium__pts num">{formatNum(Number(s.balance))}</span>
+              <span className="meta-label num">
+                {t('leagues.table.hitsOf', { hits: s.hits, total: s.total_resolved })}
               </span>
             </div>
           )
         })}
       </div>
 
-      <button className="lg-btn lg-btn--primary lg-btn--xl" onClick={share} disabled={sharing}>
-        {sharing ? t('common.loading') : t('leagues.result.share')}
-      </button>
-
-      {isCreator && (
-        <button className="lg-btn lg-btn--secondary" onClick={onNextCycle}>
-          {t('leagues.result.nextCycle')}
+      <div className="lg-actions">
+        <button type="button" className="btn btn-primary btn-lg" onClick={share} disabled={sharing}>
+          <Icon name="share" size={16} />
+          {sharing ? t('common.loading') : t('leagues.result.share')}
         </button>
-      )}
+        {isCreator && (
+          <button type="button" className="btn btn-secondary btn-lg" onClick={onNextCycle}>
+            {t('leagues.result.nextCycle')}
+          </button>
+        )}
+      </div>
 
-      <StandingsTable standings={rest} provisional={false} unresolved={0} />
+      <StandingsTable standings={league.standings} provisional={false} unresolved={0} />
     </div>
   )
-}
-
-function fmt(n: string | number): string {
-  return Number(n).toLocaleString('es-MX', { maximumFractionDigits: 0 })
 }

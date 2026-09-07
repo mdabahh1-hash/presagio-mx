@@ -414,23 +414,49 @@
       "badge": "Private league",
       "createdBy": "Created by {{name}}",
       "members": "{{n}} in",
+      "slotsLeft_one": "{{count}} spot left",
+      "slotsLeft_other": "{{count}} spots left",
+      "markets": "{{n}} markets",
       "cta": "Join the league",
       "free": "Free, points only. Takes 20 seconds.",
+      "how1": "Make your picks before each market closes",
+      "how2": "No money: everyone starts with the same points",
+      "how3": "Whoever gets the most right wins the round",
       "notFound": "This league doesn't exist or the link is wrong"
     },
     "welcome": "You're in. You have {{stack}} points for this round",
-    "pending": {
-      "counter": "{{have}} of {{need}} to kick off",
-      "share": "Invite via WhatsApp",
-      "hint": "The league starts once the spots are filled"
+    "lobby": {
+      "createdBy": "Created by {{name}}",
+      "startsWhen": "kicks off once {{n}} are in",
+      "membersCount_one": "{{count}} member",
+      "membersCount_other": "{{count}} members",
+      "membersTitle": "Members",
+      "membersOf": "{{have}} of {{need}}",
+      "slotFree": "Open spot",
+      "roleCreator": "Creator",
+      "whatsapp": "Invite via WhatsApp",
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "firstClose": "First close",
+      "noCycleTitleCreator": "Your league is ready",
+      "noCycleHintCreator": "Open the first round so everyone can make their picks.",
+      "noCycleCta": "Open first round",
+      "noCycleTitleMember": "Waiting for the first round",
+      "noCycleHintMember": "{{creator}} will open it soon. Meanwhile, invite more friends."
     },
-    "noCycle": {
-      "titleCreator": "Your league is ready",
-      "hintCreator": "Open the first round so everyone can start making picks.",
-      "cta": "Open first round",
-      "titleMember": "Waiting for the first round",
-      "hintMember": "{{creator}} will open the first round soon. Meanwhile, invite more friends.",
-      "invite": "Invite via WhatsApp"
+    "share": {
+      "withCycle": "I set up our league \"{{league}}\" on Veredikt for {{cycle}}. Join: {{url}}",
+      "noCycle": "I set up our league \"{{league}}\" on Veredikt. Join: {{url}}"
+    },
+    "home": {
+      "myRank": "My rank",
+      "myPoints": "My points",
+      "picks": "Picks",
+      "picksValue": "{{done}} of {{total}}",
+      "closes": "Next close",
+      "rankValue": "{{pos}} of {{total}}",
+      "resolving": "Resolving",
+      "noOpen": "No closes"
     },
     "scoring": "Resolving markets… {{n}} left. Results tonight.",
     "tabs": {
@@ -469,10 +495,14 @@
       "member": "Member",
       "points": "Points",
       "hits": "Hits",
+      "hitsOf": "{{hits}} of {{total}} right",
+      "noHits": "No markets resolved yet",
+      "you": "you",
       "provisional": "Provisional standings, {{n}} markets left to resolve"
     },
     "result": {
       "title": "Results · {{cycle}}",
+      "winner": "Winner",
       "share": "Share result",
       "nextCycle": "Start next round",
       "shareText": "{{winner}} took {{cycle}} in our Veredikt league \"{{league}}\" Join the next round:"
@@ -485,7 +515,9 @@
       "emptyBody": "Like a pick'em pool, but with live probabilities. Free, points only.",
       "pendingPicks": "{{n}} picks left",
       "members": "{{n}} members",
-      "rank": "You're {{pos}}"
+      "rank": "You're {{pos}}",
+      "waiting": "Waiting for {{n}}",
+      "noCycle": "No round yet"
     },
     "create": {
       "title": "Build your league",

@@ -9,6 +9,7 @@
  */
 import { request } from './api'
 import { SITE } from './embed'
+import i18n from '../i18n'
 
 export interface LeagueSummary {
   id: number
@@ -30,6 +31,9 @@ export interface InvitePreview {
   status: string
   cycle_name: string | null
   cycle_ends_at: string | null
+  // Opcionales: llegan desde el backend 2026-09-07; un backend viejo los omite.
+  member_names?: string[]
+  market_count?: number
 }
 
 export interface MyPrediction {
@@ -46,6 +50,10 @@ export interface CycleMarket {
   market_id: string
   question: string
   market_type: 'binary' | 'multi'
+  // Para MarketThumb (opcionales: backend viejo no los manda)
+  category?: string
+  subcategory?: string | null
+  image_url?: string | null
   closes_at: string
   is_open: boolean
   outcomes: Array<{ id?: number; outcome_key?: string; side?: 'yes' | 'no'; label?: string; price: string }>
@@ -154,10 +162,26 @@ export function inviteUrl(code: string): string {
   return `${SITE}/#/l/${code}`
 }
 
-/** Abre WhatsApp con el mensaje prellenado. Nunca compartir el link pelón. */
+/** Texto de invitación (idioma activo). Nunca compartir el link pelón. */
+export function inviteMessage(leagueName: string, cycleName: string | null, code: string): string {
+  const url = inviteUrl(code)
+  return cycleName
+    ? i18n.t('leagues.share.withCycle', { league: leagueName, cycle: cycleName, url })
+    : i18n.t('leagues.share.noCycle', { league: leagueName, url })
+}
+
+/** Abre WhatsApp con el mensaje prellenado. */
 export function shareOnWhatsApp(leagueName: string, cycleName: string | null, code: string) {
-  const msg = cycleName
-    ? `Ya armé nuestra liga "${leagueName}" en Veredikt para ${cycleName}. Éntrale: ${inviteUrl(code)}`
-    : `Ya armé nuestra liga "${leagueName}" en Veredikt. Éntrale: ${inviteUrl(code)}`
+  const msg = inviteMessage(leagueName, cycleName, code)
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
+}
+
+/** Copia el link de invitación; false si el navegador no deja. */
+export async function copyInviteLink(code: string): Promise<boolean> {
+  try {
+    await navigator.clipboard?.writeText(inviteUrl(code))
+    return true
+  } catch {
+    return false
+  }
 }

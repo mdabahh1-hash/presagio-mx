@@ -174,7 +174,7 @@ export function CreateLeaguePage() {
         <CyclePicker markets={markets} value={sel} onChange={setSel} />
 
         <CyclePreview
-          matched={resolved.matched}
+          markets={resolved.matched}
           name={cycleName}
           nameEdited={sel.nameEdited}
           onNameChange={(n, edited) => setSel({ ...sel, name: n, nameEdited: edited })}

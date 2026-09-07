@@ -414,23 +414,49 @@
       "badge": "Liga privada",
       "createdBy": "Creada por {{name}}",
       "members": "{{n}} dentro",
+      "slotsLeft_one": "falta {{count}}",
+      "slotsLeft_other": "faltan {{count}}",
+      "markets": "{{n}} mercados",
       "cta": "Unirme a la liga",
       "free": "Gratis, con puntos. Entras en 20 segundos.",
+      "how1": "Haces tus picks antes de que cierre cada mercado",
+      "how2": "Sin dinero: todos arrancan con los mismos puntos",
+      "how3": "Gana quien más acierte en la jornada",
       "notFound": "Esta liga no existe o el link está mal"
     },
     "welcome": "Ya estás dentro. Tienes {{stack}} puntos para esta jornada",
-    "pending": {
-      "counter": "{{have}} de {{need}} para arrancar",
-      "share": "Invitar por WhatsApp",
-      "hint": "La liga arranca cuando se completen los lugares"
+    "lobby": {
+      "createdBy": "Creada por {{name}}",
+      "startsWhen": "arranca cuando entren {{n}}",
+      "membersCount_one": "{{count}} miembro",
+      "membersCount_other": "{{count}} miembros",
+      "membersTitle": "Miembros",
+      "membersOf": "{{have}} de {{need}}",
+      "slotFree": "Lugar libre",
+      "roleCreator": "Creador",
+      "whatsapp": "Invitar por WhatsApp",
+      "copyLink": "Copiar link",
+      "copied": "Copiado",
+      "firstClose": "Primer cierre",
+      "noCycleTitleCreator": "Tu liga está lista",
+      "noCycleHintCreator": "Abre la primera jornada para que todos hagan sus picks.",
+      "noCycleCta": "Abrir primera jornada",
+      "noCycleTitleMember": "Esperando la primera jornada",
+      "noCycleHintMember": "{{creator}} la abrirá pronto. Mientras, invita a más amigos."
     },
-    "noCycle": {
-      "titleCreator": "Tu liga está lista",
-      "hintCreator": "Abre el primer ciclo para que todos empiecen a hacer sus picks.",
-      "cta": "Abrir primer ciclo",
-      "titleMember": "Esperando el primer ciclo",
-      "hintMember": "{{creator}} abrirá el primer ciclo pronto. Mientras, invita a más amigos.",
-      "invite": "Invitar por WhatsApp"
+    "share": {
+      "withCycle": "Ya armé nuestra liga \"{{league}}\" en Veredikt para {{cycle}}. Éntrale: {{url}}",
+      "noCycle": "Ya armé nuestra liga \"{{league}}\" en Veredikt. Éntrale: {{url}}"
+    },
+    "home": {
+      "myRank": "Mi posición",
+      "myPoints": "Mis puntos",
+      "picks": "Picks",
+      "picksValue": "{{done}} de {{total}}",
+      "closes": "Próximo cierre",
+      "rankValue": "{{pos}}° de {{total}}",
+      "resolving": "Resolviendo",
+      "noOpen": "Sin cierres"
     },
     "scoring": "Resolviendo mercados… faltan {{n}}. Resultados hoy en la noche.",
     "tabs": {
@@ -469,12 +495,16 @@
       "member": "Miembro",
       "points": "Puntos",
       "hits": "Aciertos",
+      "hitsOf": "{{hits}} de {{total}} aciertos",
+      "noHits": "Sin mercados resueltos",
+      "you": "tú",
       "provisional": "Tabla provisional, faltan {{n}} mercados por resolverse"
     },
     "result": {
       "title": "Resultados · {{cycle}}",
+      "winner": "Ganador",
       "share": "Compartir resultado",
-      "nextCycle": "Arrancar siguiente ciclo",
+      "nextCycle": "Arrancar siguiente jornada",
       "shareText": "{{winner}} se llevó {{cycle}} en nuestra liga \"{{league}}\" de Veredikt Éntrale al siguiente ciclo:"
     },
     "list": {
@@ -485,7 +515,9 @@
       "emptyBody": "Como una quiniela, pero con probabilidades en vivo. Gratis, con puntos.",
       "pendingPicks": "Te faltan {{n}} picks",
       "members": "{{n}} miembros",
-      "rank": "Vas {{pos}}°"
+      "rank": "Vas {{pos}}°",
+      "waiting": "Esperando {{n}}",
+      "noCycle": "Sin jornada"
     },
     "create": {
       "title": "Arma tu liga",

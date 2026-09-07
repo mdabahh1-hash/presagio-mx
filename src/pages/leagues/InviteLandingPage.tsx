@@ -15,6 +15,10 @@ import { useTranslation } from 'react-i18next'
 import { leaguesApi, InvitePreview } from '../../lib/leaguesApi'
 import { useAuth } from '../../lib/AuthContext'
 import { AuthModal } from '../../components/AuthModal'
+import { Avatar } from '../../components/Avatar'
+import { Badge } from '../../components/Badge'
+import { Icon } from '../../components/Icon'
+import { Logo } from '../../components/Logo'
 import { setReturnTo } from '../../lib/returnTo'
 
 export default function InviteLandingPage() {
@@ -75,61 +79,108 @@ export default function InviteLandingPage() {
 
   if (error) {
     return (
-      <div className="lg-invite lg-invite--error">
-        <p>{error}</p>
+      <div className="lg-invite">
+        <div className="lg-invite__card lg-empty">
+          <Brand />
+          <span className="lg-empty__puck">
+            <Icon name="ban" size={22} />
+          </span>
+          <p className="lg-empty__title">{error}</p>
+        </div>
       </div>
     )
   }
-  if (!preview) return <div className="lg-invite lg-skeleton" />
+
+  if (!preview) {
+    return (
+      <div className="lg-invite" aria-busy="true">
+        <div className="lg-invite__card">
+          <Brand />
+          <div className="skeleton lg-sk lg-sk--title" />
+          <div className="skeleton lg-sk lg-sk--row" />
+          <div className="skeleton lg-sk lg-sk--input" />
+        </div>
+      </div>
+    )
+  }
 
   const slots = Math.max(preview.min_members - preview.member_count, 0)
+  // Backend nuevo manda nombres; uno viejo no → iniciales del creador y "?".
+  const names =
+    preview.member_names && preview.member_names.length > 0
+      ? preview.member_names
+      : [preview.creator_name, ...Array.from({ length: Math.max(preview.member_count - 1, 0) }, () => '')]
 
   return (
     <div className="lg-invite">
-      <div className="lg-invite__badge">{t('leagues.invite.badge')}</div>
+      <div className="lg-invite__card anim-1">
+        <Brand />
 
-      <h1 className="lg-invite__name">{preview.name}</h1>
-      <p className="lg-invite__creator">
-        {t('leagues.invite.createdBy', { name: preview.creator_name })}
-      </p>
+        <Badge icon="users">{t('leagues.invite.badge')}</Badge>
+        <h1 className="lg-invite__name">{preview.name}</h1>
+        <p className="lg-invite__creator">{t('leagues.invite.createdBy', { name: preview.creator_name })}</p>
 
-      {/* avatares reales + slots vacíos punteados que invitan a llenar */}
-      <div className="lg-invite__members">
-        {Array.from({ length: preview.member_count }).map((_, i) => (
-          <span key={`m${i}`} className="lg-avatar" />
-        ))}
-        {Array.from({ length: slots }).map((_, i) => (
-          <span key={`s${i}`} className="lg-avatar lg-avatar--empty" />
-        ))}
-        <span className="lg-invite__count">
-          {t('leagues.invite.members', { n: preview.member_count })}
-        </span>
-      </div>
-
-      {preview.cycle_name && (
-        <div className="lg-invite__cycle">
-          <span>{preview.cycle_name}</span>
-          {preview.cycle_ends_at && <Countdown to={preview.cycle_ends_at} />}
+        <div className="lg-invite__members" aria-hidden="true">
+          {names.map((n, i) => (
+            <Avatar key={`m${i}`} name={n} size={36} className="lg-invite__avatar" />
+          ))}
+          {Array.from({ length: slots }).map((_, i) => (
+            <span key={`s${i}`} className="lg-slot lg-invite__avatar" />
+          ))}
         </div>
-      )}
+        <p className="meta-label num">
+          {t('leagues.invite.members', { n: preview.member_count })}
+          {slots > 0 && ` · ${t('leagues.invite.slotsLeft', { count: slots })}`}
+        </p>
 
-      <button
-        className="lg-btn lg-btn--primary lg-btn--xl"
-        onClick={handleJoin}
-        disabled={joining || authLoading}
-      >
-        {joining ? t('common.loading') : t('leagues.invite.cta')}
-      </button>
+        {preview.cycle_name && (
+          <div className="lg-invite__cycle">
+            <Badge icon="clock">{preview.cycle_name}</Badge>
+            {(preview.market_count ?? 0) > 0 && (
+              <span className="meta-label num">{t('leagues.invite.markets', { n: preview.market_count })}</span>
+            )}
+            {preview.cycle_ends_at && <Countdown to={preview.cycle_ends_at} />}
+          </div>
+        )}
 
-      <p className="lg-invite__foot">{t('leagues.invite.free')}</p>
+        <button
+          type="button"
+          className="btn btn-primary btn-lg lg-invite__cta"
+          onClick={handleJoin}
+          disabled={joining || authLoading}
+        >
+          {joining ? t('common.loading') : t('leagues.invite.cta')}
+        </button>
+        <p className="meta-label">{t('leagues.invite.free')}</p>
 
-      {authModal && (
-        <AuthModal
-          initialMode="register"
-          hidePasskey
-          onClose={() => setAuthModal(false)}
-        />
-      )}
+        <ul className="lg-invite__how">
+          {(
+            [
+              ['check', t('leagues.invite.how1')],
+              ['coin', t('leagues.invite.how2')],
+              ['trophy', t('leagues.invite.how3')],
+            ] as const
+          ).map(([icon, text]) => (
+            <li key={icon} className="list-row">
+              <span className="lg-invite__how-icon">
+                <Icon name={icon} size={15} />
+              </span>
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+
+        {authModal && <AuthModal initialMode="register" hidePasskey onClose={() => setAuthModal(false)} />}
+      </div>
+    </div>
+  )
+}
+
+function Brand() {
+  return (
+    <div className="lg-invite__brand">
+      <Logo size={22} />
+      <span>VEREDIKT</span>
     </div>
   )
 }
@@ -168,7 +219,7 @@ export function Countdown({ to }: { to: string }) {
   })
 
   return (
-    <span className={`lg-countdown ${urgent ? 'lg-countdown--urgent' : ''}`} title={abs}>
+    <span className={`lg-countdown${urgent ? ' lg-countdown--urgent' : ''}`} title={abs}>
       {rel}
       <small className="lg-countdown__abs">{abs}</small>
     </span>
