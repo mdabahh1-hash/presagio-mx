@@ -4,7 +4,7 @@
  * Mi fila resaltada. Durante la jornada lleva nota "provisional".
  */
 import { useTranslation } from 'react-i18next'
-import { Standing } from '../../lib/leaguesApi'
+import { Standing, provisionalRanks } from '../../lib/leaguesApi'
 import { formatNum } from '../../lib/format'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
@@ -19,6 +19,8 @@ export default function StandingsTable({
   unresolved: number
 }) {
   const { t } = useTranslation()
+  // Empates comparten rank también en vivo (igual que el final_rank del backend).
+  const ranks = provisionalRanks(standings)
   return (
     <div className="lg-standings">
       {provisional && unresolved > 0 && (
@@ -26,7 +28,7 @@ export default function StandingsTable({
       )}
       <div className="card">
         {standings.map((s, i) => {
-          const rank = s.final_rank ?? i + 1
+          const rank = ranks[i]
           return (
             <div key={s.user_id} className={`list-row lg-standing${s.is_me ? ' is-me' : ''}`}>
               <span className={`lg-standing__rank num${rank <= 3 ? ' is-top' : ''}`}>

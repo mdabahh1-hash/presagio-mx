@@ -14,6 +14,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Market } from '../../types'
 import { marketsApi } from '../../lib/api'
+import { translateApiError } from '../../lib/errors'
 import { apiToMarket } from '../../lib/mapMarket'
 import { LeagueDetail, leaguesApi } from '../../lib/leaguesApi'
 import {
@@ -99,7 +100,7 @@ export function CreateLeaguePage() {
       })
       navigate(isNewCycle ? `/ligas/${id}` : `/ligas/${id}?creada=1`)
     } catch (e) {
-      setError((e as Error)?.message ?? t('common.error'))
+      setError(translateApiError(e))
     } finally {
       setBusy(false)
     }

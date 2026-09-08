@@ -14,6 +14,8 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { leaguesApi, InvitePreview } from '../../lib/leaguesApi'
 import { useAuth } from '../../lib/AuthContext'
+import { translateApiError } from '../../lib/errors'
+import { formatDate } from '../../lib/format'
 import { AuthModal } from '../../components/AuthModal'
 import { Avatar } from '../../components/Avatar'
 import { Badge } from '../../components/Badge'
@@ -50,7 +52,7 @@ export default function InviteLandingPage() {
       const league = await leaguesApi.join(code)
       navigate(`/ligas/${league.id}?bienvenida=1`)
     } catch (e) {
-      setError((e as Error)?.message ?? t('common.error'))
+      setError(translateApiError(e))
       setJoining(false)
     }
   }
@@ -210,7 +212,8 @@ export function Countdown({ to }: { to: string }) {
           : t('leagues.countdown.minutes', { n: Math.max(1, Math.floor(ms / 60_000)) })
   }
 
-  const abs = target.toLocaleString(undefined, {
+  // Idioma de la app (no del navegador), igual que el resto de fechas del sitio.
+  const abs = formatDate(target, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',

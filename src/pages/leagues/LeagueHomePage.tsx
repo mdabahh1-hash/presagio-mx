@@ -8,12 +8,15 @@
  * - resolved → podio (CycleResultCard) + siguiente jornada a un tap.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CycleMarket, LeagueDetail, leaguesApi } from '../../lib/leaguesApi'
+import { CycleMarket, LeagueDetail, leaguesApi, provisionalRanks } from '../../lib/leaguesApi'
 import { useAuth } from '../../lib/AuthContext'
+import { translateApiError } from '../../lib/errors'
 import { formatDate, formatNum } from '../../lib/format'
+import { setReturnTo } from '../../lib/returnTo'
 import { Countdown } from './InviteLandingPage'
+import { AuthModal } from '../../components/AuthModal'
 import { Badge } from '../../components/Badge'
 import { Icon } from '../../components/Icon'
 import { Tabs } from '../../components/Tabs'
@@ -33,6 +36,9 @@ export default function LeagueHomePage() {
   const { user } = useAuth()
 
   const [league, setLeague] = useState<LeagueDetail | null>(null)
+  // 403/404/red: mensaje en vez de skeleton eterno. 401: pedir sesión y volver aquí.
+  const [error, setError] = useState<string | null>(null)
+  const [needsAuth, setNeedsAuth] = useState(false)
   const [tab, setTab] = useState<Tab>('picks')
   const [pickMarket, setPickMarket] = useState<CycleMarket | null>(null)
   const [welcome, setWelcome] = useState(params.get('bienvenida') === '1')
@@ -41,28 +47,67 @@ export default function LeagueHomePage() {
 
   const load = useCallback(() => {
     if (!id) return
-    leaguesApi.detail(Number(id)).then(setLeague)
+    setError(null)
+    leaguesApi
+      .detail(Number(id))
+      .then(setLeague)
+      .catch((e: Error & { status?: number }) => {
+        if (e.status === 401) {
+          setReturnTo(`/ligas/${id}`)
+          setNeedsAuth(true)
+          return
+        }
+        setError(translateApiError(e))
+      })
   }, [id])
 
   useEffect(load, [load])
   // Al saltar de una liga a otra (mismo componente montado), volver a Picks.
   useEffect(() => setTab('picks'), [id])
+  // Al iniciar sesión desde aquí, reintentar.
+  useEffect(() => {
+    if (user && needsAuth) {
+      setNeedsAuth(false)
+      load()
+    }
+  }, [user, needsAuth, load])
 
   const cycle = league?.current_cycle ?? null
   const isCreator = !!league && !!user && league.creator_id === user.id
 
-  const pending = useMemo(() => {
-    if (!cycle) return 0
-    return cycle.markets.filter(m => m.is_open && !m.my_prediction).length
+  // pendientes = todavía puedo jugar; hechos = tengo pick (un mercado cerrado
+  // sin pick no es ni lo uno ni lo otro: no infla el progreso).
+  const { pending, done } = useMemo(() => {
+    if (!cycle) return { pending: 0, done: 0 }
+    return {
+      pending: cycle.markets.filter(m => m.is_open && !m.my_prediction).length,
+      done: cycle.markets.filter(m => !!m.my_prediction).length,
+    }
   }, [cycle])
 
   const total = cycle?.markets.length ?? 0
-  const done = total - pending
 
   /** Al confirmar un pick, recarga; el checklist resalta el siguiente sin pick. */
   function handlePicked() {
     setPickMarket(null)
     load()
+  }
+
+  if (error || needsAuth) {
+    return (
+      <div className="lg-page lg-page--form">
+        <section className="card lg-empty">
+          <span className="lg-empty__puck">
+            <Icon name={needsAuth ? 'lock' : 'ban'} size={22} />
+          </span>
+          <p className="lg-empty__title">{needsAuth ? t('errors.NOT_AUTHENTICATED') : error}</p>
+          <Link to="/ligas" className="btn btn-secondary lg-empty__cta">
+            {t('leagues.home.backToList')}
+          </Link>
+        </section>
+        {needsAuth && <AuthModal initialMode="login" onClose={() => setNeedsAuth(false)} />}
+      </div>
+    )
   }
 
   if (!league) {
@@ -88,6 +133,7 @@ export default function LeagueHomePage() {
 
   const next = nextClose(cycle.markets)
   const myIdx = league.standings.findIndex(s => s.is_me)
+  const myRank = myIdx >= 0 ? provisionalRanks(league.standings)[myIdx] : null
   const unresolved = unresolvedCount(cycle.markets)
 
   return (
@@ -133,7 +179,7 @@ export default function LeagueHomePage() {
               <div>
                 <div className="stat-label">{t('leagues.home.myRank')}</div>
                 <div className="stat-value">
-                  {myIdx >= 0 ? t('leagues.home.rankValue', { pos: myIdx + 1, total: league.standings.length }) : '—'}
+                  {myRank !== null ? t('leagues.home.rankValue', { pos: myRank, total: league.standings.length }) : '—'}
                 </div>
               </div>
               <div>
@@ -198,6 +244,12 @@ function nextClose(markets: CycleMarket[]): string | null {
   return open.map(m => m.closes_at).sort((a, b) => Date.parse(a) - Date.parse(b))[0]
 }
 
+/**
+ * Mercados del ciclo que aún no tienen resultado global. Usa `is_resolved`
+ * del backend; si no llega (backend viejo), aproxima con el estado de mi pick.
+ */
 function unresolvedCount(markets: CycleMarket[]): number {
-  return markets.filter(m => !m.my_prediction || m.my_prediction.status === 'open').length
+  return markets.filter(m =>
+    m.is_resolved !== undefined ? !m.is_resolved : !m.my_prediction || m.my_prediction.status === 'open',
+  ).length
 }

@@ -56,6 +56,8 @@ export interface CycleMarket {
   image_url?: string | null
   closes_at: string
   is_open: boolean
+  // El mercado global ya se resolvió/canceló (opcional: backend viejo no lo manda).
+  is_resolved?: boolean
   outcomes: Array<{ id?: number; outcome_key?: string; side?: 'yes' | 'no'; label?: string; price: string }>
   predicted_count: number
   my_prediction: MyPrediction | null
@@ -151,15 +153,38 @@ export const leaguesApi = {
 export const PAYOUT_CAP = 20
 export const STAKE_CHIPS = [500, 1000, 2500, 5000]
 
+/**
+ * Rank provisional con empates compartidos (mismo algoritmo que
+ * `maybe_resolve_cycle` en el backend: el rank solo avanza cuando baja el
+ * balance). `standings` ya viene ordenado por balance desc.
+ */
+export function provisionalRanks(standings: Standing[]): number[] {
+  const ranks: number[] = []
+  let rank = 0
+  let prev: string | null = null
+  standings.forEach((s, i) => {
+    if (prev === null || Number(s.balance) < Number(prev)) {
+      rank = i + 1
+      prev = s.balance
+    }
+    ranks.push(s.final_rank ?? rank)
+  })
+  return ranks
+}
+
 /** Payout proyectado con el mismo cap del backend, para pintar en vivo. */
 export function potentialPayout(stake: number, price: number): number {
   if (price <= 0 || price >= 1) return 0
   return Math.min(stake / price, stake * PAYOUT_CAP)
 }
 
-/** Link de invitación corto que viaja por WhatsApp. */
+/**
+ * Link de invitación corto que viaja por WhatsApp. SIN `#`: los crawlers no
+ * mandan el fragmento al servidor, así que solo `/l/:code` llega a la función
+ * OG (`api/l/[code].js`), que sirve los meta tags y redirige a `/#/l/:code`.
+ */
 export function inviteUrl(code: string): string {
-  return `${SITE}/#/l/${code}`
+  return `${SITE}/l/${encodeURIComponent(code)}`
 }
 
 /** Texto de invitación (idioma activo). Nunca compartir el link pelón. */

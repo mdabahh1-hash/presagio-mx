@@ -15,7 +15,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Cycle, CycleMarket, leaguesApi, potentialPayout, STAKE_CHIPS } from '../../lib/leaguesApi'
-import { formatNum } from '../../lib/format'
+import { translateApiError } from '../../lib/errors'
+import { formatDate, formatNum } from '../../lib/format'
 import { cleanLabel } from '../../lib/mapMarket'
 import { Icon } from '../Icon'
 import { outcomeLabel } from './adapters'
@@ -72,13 +73,14 @@ export default function PickSheet({
       })
       onPicked()
     } catch (e) {
-      // el cliente ya traduce {code, message}; PRICE_MOVED style retry
-      setError((e as Error)?.message ?? t('common.error'))
+      // Códigos de liga traducidos por errors.<CODE>; si no hay, message del backend.
+      setError(translateApiError(e))
       setSubmitting(false)
     }
   }
 
-  const closesAbs = new Date(market.closes_at).toLocaleString(undefined, {
+  // Idioma de la app (no del navegador), igual que el resto de fechas del sitio.
+  const closesAbs = formatDate(market.closes_at, {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
