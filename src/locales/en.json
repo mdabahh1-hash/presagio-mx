@@ -100,7 +100,8 @@
   },
   "app": {
     "signingIn": "Signing in...",
-    "signInFailed": "We couldn't complete the sign-in. Please try again."
+    "signInFailed": "We couldn't complete the sign-in. Please try again.",
+    "signInExpired": "The sign-in link expired or is invalid. Please try again."
   },
   "home": {
     "searchPlaceholder": "Search markets...",

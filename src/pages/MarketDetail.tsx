@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { displayPair } from '../lib/prices'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
+import { oauthNext } from '../lib/returnTo'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart, MultiLineChart, outcomeColor } from '../components/SparkChart'
@@ -730,7 +731,7 @@ export function MarketDetail() {
               </div>
             ) : (
               <p style={{ fontSize: 14, color: 'var(--text-tertiary)', marginBottom: 20 }}>
-                <a href={authApi.googleUrl()} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
+                <a href={authApi.googleUrl(oauthNext())} style={{ color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
                   {t('market.loginLink')}
                 </a>{' '}{t('market.toComment')}
               </p>

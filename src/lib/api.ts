@@ -343,8 +343,12 @@ export const proposalsApi = {
 
 export const authApi = {
   logout: () => request('/auth/logout', { method: 'POST' }),
-  googleUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/google`,
-  githubUrl: () => `${import.meta.env.VITE_API_URL ?? ''}/api/auth/github`,
+  // `next`: ruta hash a la que volver tras el login (viaja en el `state` firmado
+  // del backend y regresa como ?next= en /auth/callback). Ver lib/returnTo.ts.
+  googleUrl: (next?: string) =>
+    `${import.meta.env.VITE_API_URL ?? ''}/api/auth/google${next ? `?next=${encodeURIComponent(next)}` : ''}`,
+  githubUrl: (next?: string) =>
+    `${import.meta.env.VITE_API_URL ?? ''}/api/auth/github${next ? `?next=${encodeURIComponent(next)}` : ''}`,
   emailLogin: (email: string, password: string) =>
     request<{ token: string; user: ApiUser }>('/auth/login', {
       method: 'POST',

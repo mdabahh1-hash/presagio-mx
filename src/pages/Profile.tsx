@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { usersApi, authApi, type ApiPosition, type ApiHistoryEvent } from '../lib/api'
+import { oauthNext } from '../lib/returnTo'
 import { useAuth } from '../lib/AuthContext'
 import { HistoryList } from '../components/HistoryList'
 import { ProfileHeaderCard } from '../components/profile/ProfileHeaderCard'
@@ -58,7 +59,7 @@ export function Profile() {
           <p style={{ color: 'var(--text-tertiary)', marginBottom: 24, fontSize: 14 }}>
             {t('profile.loginSubtitle')}
           </p>
-          <a href={authApi.googleUrl()} className="btn btn-primary btn-lg">
+          <a href={authApi.googleUrl(oauthNext())} className="btn btn-primary btn-lg">
             {t('profile.loginGoogle')}
           </a>
         </div>

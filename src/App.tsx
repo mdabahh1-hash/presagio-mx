@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from './lib/AuthContext'
 import { ThemeProvider } from './lib/ThemeContext'
 import { ScrollToTop } from './lib/ScrollToTop'
 import { setToken } from './lib/api'
-import { consumeReturnTo } from './lib/returnTo'
+import { consumeReturnTo, isSafeRoute } from './lib/returnTo'
 import { useTranslation } from 'react-i18next'
 import './components/leagues/leagues.css'
 
@@ -95,18 +95,24 @@ function AuthCallbackRedirect() {
     const hash = window.location.hash
     const params = new URLSearchParams(hash.split('?')[1] ?? '')
     const token = params.get('token')
-    // El backend redirige aquí con ?error=oauth_failed si el login con
-    // Google/GitHub falló. Volver a donde estaba el usuario (p. ej. la landing
-    // de invitación) para que pueda reintentar, en vez de dejarlo en blanco.
-    if (!token && params.get('error')) {
-      window.alert(t('app.signInFailed'))
-      navigate(consumeReturnTo() ?? '/', { replace: true })
+    // A dónde volver: `next` viene del `state` firmado del OAuth (sobrevive el
+    // salto de navegador in-app → Safari); sessionStorage es el fallback y se
+    // consume siempre para no arrastrar un valor viejo a un login posterior.
+    const nextParam = params.get('next')
+    const stored = consumeReturnTo()
+    const dest = (isSafeRoute(nextParam) ? nextParam : null) ?? stored ?? '/'
+    // El backend redirige aquí con ?error=… si el login con Google/GitHub
+    // falló o el state no era válido. Volver a donde estaba el usuario (p. ej.
+    // la landing de invitación) para que pueda reintentar.
+    const error = params.get('error')
+    if (!token && error) {
+      window.alert(t(error === 'oauth_state_invalid' ? 'app.signInExpired' : 'app.signInFailed'))
+      navigate(dest, { replace: true })
       return
     }
     if (token) setToken(token)
     // Load the user (and attach any pending referral) before leaving the page.
-    // Si había un returnTo pendiente (p. ej. /l/:code?join=1), volver ahí.
-    refreshUser().finally(() => navigate(consumeReturnTo() ?? '/', { replace: true }))
+    refreshUser().finally(() => navigate(dest, { replace: true }))
   }, [navigate, refreshUser, t])
   return <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-secondary)' }}>{t('app.signingIn')}</div>
 }

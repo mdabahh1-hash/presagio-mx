@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { tradesApi, marketsApi, authApi, type ApiOutcome, type ApiQuote } from '../lib/api'
+import { oauthNext } from '../lib/returnTo'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { displayPair } from '../lib/prices'
@@ -357,7 +358,7 @@ export function BetBox({
 
       {!user && !onRequireAuth && (
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <a href={authApi.googleUrl()} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
+          <a href={authApi.googleUrl(oauthNext())} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
             {t('bet.loginToTradeLink')}
           </a>
         </div>
