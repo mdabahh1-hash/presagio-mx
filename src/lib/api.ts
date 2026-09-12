@@ -400,4 +400,10 @@ export const adminApi = {
       `/admin/markets/${marketId}/resolve`,
       { method: 'POST', body: JSON.stringify(opts) }
     ),
+  // Cancela y reembolsa lo pagado (shares × costo promedio); anula picks de ligas.
+  cancelMarket: (marketId: string) =>
+    request<{ ok: boolean; resolution: 'CANCELLED'; positions_refunded: number; refunded: number }>(
+      `/admin/markets/${marketId}/cancel`,
+      { method: 'POST', body: '{}' }
+    ),
 }

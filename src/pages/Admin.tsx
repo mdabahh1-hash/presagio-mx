@@ -86,6 +86,39 @@ export function Admin() {
     }
   }
 
+  const cancelMarket = async (marketId: string) => {
+    const market = markets.find(m => m.id === marketId)
+    if (!market) return
+    if (!confirm(`¿Cancelar "${market.question.slice(0, 60)}..."? Se reembolsa lo pagado a cada posición. Irreversible.`)) return
+    setResolving(marketId)
+    setMessage(null)
+    try {
+      const result = await adminApi.cancelMarket(marketId)
+      setMessage(`Cancelado. ${result.positions_refunded} posiciones reembolsadas (${result.refunded.toFixed(0)} PT).`)
+      setMarkets(await adminApi.listAllMarkets())
+    } catch (e: unknown) {
+      setMessage(`Error: ${e instanceof Error ? e.message : 'desconocido'}`)
+    } finally {
+      setResolving(null)
+    }
+  }
+
+  const cancelButton = (marketId: string) => (
+    <button
+      className="admin-resolve-btn"
+      disabled={resolving === marketId}
+      onClick={() => cancelMarket(marketId)}
+      title="Cancelar y reembolsar (aplazado fuera de ventana, jugador inactivo, empate)"
+      style={{
+        background: 'transparent', color: 'var(--text-secondary)',
+        border: '1px solid var(--border-default)', borderRadius: 8, padding: '8px 12px',
+        fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', opacity: resolving === marketId ? 0.5 : 1,
+      }}
+    >
+      Cancelar
+    </button>
+  )
+
   if (loading || !user) return null
 
   const resolvable = markets.filter(m =>
@@ -188,6 +221,7 @@ export function Admin() {
                     >
                       Resolver
                     </button>
+                    {cancelButton(m.id)}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -215,6 +249,7 @@ export function Admin() {
                     >
                       No
                     </button>
+                    {cancelButton(m.id)}
                   </div>
                 )}
               </div>
