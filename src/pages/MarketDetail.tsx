@@ -9,6 +9,7 @@ import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
 import { FullChart, MultiLineChart, outcomeColor } from '../components/SparkChart'
 import { BetBox } from '../components/BetBox'
+import { TradeSheet } from '../components/TradeSheet'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 import { formatVolume, formatDate, daysLeft } from '../lib/format'
@@ -106,15 +107,7 @@ export function MarketDetail() {
   // sustituye por una barra fija abajo que abre un bottom sheet con el BetBox.
   const isMobile = useMobile()
   const [sheetSide, setSheetSide] = useState<'YES' | 'NO' | null>(null)
-  const sheetOpen = sheetSide !== null
-  useEffect(() => {
-    if (!sheetOpen) return
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSheetSide(null) }
-    document.addEventListener('keydown', onKey)
-    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey) }
-  }, [sheetOpen])
+  const closeSheet = useCallback(() => setSheetSide(null), [])
   useEffect(() => { setSheetSide(null) }, [id])
 
   // Ancho real de la columna del chart: el SVG usa viewBox fijo, y sin
@@ -816,15 +809,10 @@ export function MarketDetail() {
               </>
             )}
           </div>
-          {sheetOpen && (
-            <div className="sheet-overlay" onClick={() => setSheetSide(null)}>
-              <div className="sheet-panel" role="dialog" aria-modal="true" aria-label={t('bet.title')} onClick={e => e.stopPropagation()}>
-                <div className="sheet-handle" />
-                {/* key: el BetBox toma initialSide solo al montar */}
-                <div key={sheetSide}>{betBox}</div>
-              </div>
-            </div>
-          )}
+          <TradeSheet open={sheetSide !== null} onClose={closeSheet}>
+            {/* key: el BetBox toma initialSide solo al montar */}
+            <div key={sheetSide}>{betBox}</div>
+          </TradeSheet>
         </>
       )}
     </div>

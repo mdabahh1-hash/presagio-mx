@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMarket } from '../lib/api'
@@ -9,6 +9,9 @@ import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { CategoryBar } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
+import { BetBox } from '../components/BetBox'
+import { TradeSheet } from '../components/TradeSheet'
+import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
@@ -40,6 +43,11 @@ export function Home() {
   const navigate = useNavigate()
   const location = useLocation()
   const isMobile = useMobile()
+  // Compra rápida desde la lista (móvil): el sheet lee el mercado vivo por id
+  const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
+  const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const closeTrade = useCallback(() => setTrade(null), [])
 
   useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
 
@@ -61,6 +69,23 @@ export function Home() {
     () => (usingMock ? MOCK_MARKETS : apiMarkets.map(apiToMarket)),
     [apiMarkets, usingMock],
   )
+
+  const tradeMarket = trade ? markets.find(m => m.id === trade.marketId) ?? null : null
+
+  const openTrade = (marketId: string, side: 'YES' | 'NO', outcomeKey?: string) => {
+    setTradeOutcome(outcomeKey ?? null)
+    setTrade({ marketId, side, outcomeKey })
+  }
+
+  // Tras operar, la tarjeta refleja el precio nuevo
+  const handleTraded = (marketId: string, newYesPrice: number, isMulti: boolean) => {
+    setApiMarkets(prev => prev.map(m => (m.id === marketId ? { ...m, yes_price: newYesPrice } : m)))
+    if (isMulti) {
+      marketsApi.outcomes(marketId)
+        .then(outcomes => setApiMarkets(prev => prev.map(m => (m.id === marketId ? { ...m, outcomes } : m))))
+        .catch(() => {})
+    }
+  }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,17 +126,9 @@ export function Home() {
 
         {mobileTab === 'Tendencia' ? (
           <>
-            {/* Featured carousel */}
-            {!loading && (
-              <div style={{ padding: '16px 16px 4px' }}>
-                <h2 className="section-title" style={{ fontSize: 16, marginBottom: 12 }}>{t('home.featuredMarket')}</h2>
-                <FeaturedCarousel markets={markets} />
-              </div>
-            )}
-
-            {/* Trending list — paginado como en desktop (antes pintaba las 40+
-                tarjetas de golpe: una página de 11,000px) */}
-            <div style={{ padding: '10px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Trending list estilo Polymarket: sin carrusel destacado, tarjetas
+                compactas con Sí/No que abren la compra. Paginado como en desktop. */}
+            <div style={{ padding: '12px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <div key={i} className="skeleton" style={{ height: 130 }} />
@@ -119,7 +136,12 @@ export function Home() {
               ) : filtered.length > 0 ? (
                 <>
                   {filtered.slice(0, visibleTrending).map((market, i) => (
-                    <MarketCard key={market.id} market={market} animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''} />
+                    <MarketCard
+                      key={market.id}
+                      market={market}
+                      animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''}
+                      onQuickTrade={(side, outcomeKey) => openTrade(market.id, side, outcomeKey)}
+                    />
                   ))}
                   {filtered.length > visibleTrending && (
                     <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
@@ -137,6 +159,26 @@ export function Home() {
             <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
           </div>
         )}
+
+        <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
+          {tradeMarket && trade && (
+            <BetBox
+              key={`${tradeMarket.id}-${trade.side}-${trade.outcomeKey ?? ''}`}
+              marketId={tradeMarket.id}
+              yesPrice={tradeMarket.yesPrice}
+              marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
+              outcomes={tradeMarket.outcomes ?? []}
+              selectedOutcomeKey={tradeOutcome}
+              onOutcomeSelect={setTradeOutcome}
+              subcategory={tradeMarket.subcategory}
+              initialSide={trade.side}
+              compact
+              onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
+              onTraded={p => handleTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
+            />
+          )}
+        </TradeSheet>
+        {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
 
       </div>
     )
