@@ -239,7 +239,8 @@
     "disclaimer": "VEREDIKT runs on virtual points. No real money is involved.",
     "successBinary": "You bought {{shares}} {{side}} shares for {{cost}} PT",
     "successMulti": "You bought {{shares}} shares of \"{{label}}\" for {{cost}} PT",
-    "selectOutcome": "Select an outcome"
+    "selectOutcome": "Select an outcome",
+    "minAmount": "The minimum is {{min}} PT"
   },
   "profile": {
     "loginTitle": "Log in to see your profile",
@@ -620,6 +621,7 @@
     "INVALID_RESOLUTION": "The resolution must be YES or NO",
     "SIDE_REQUIRED": "Select YES or NO",
     "INVALID_AMOUNT": "The amount must be greater than 0",
+    "MIN_AMOUNT": "The minimum bet is 10 PT",
     "AMOUNT_TOO_LARGE": "Maximum 100,000 PT per trade",
     "INSUFFICIENT_BALANCE": "Insufficient balance. You have {{available}} PT, you need {{required}} PT"
   }

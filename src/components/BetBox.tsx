@@ -11,6 +11,9 @@ import { translateApiError } from '../lib/errors'
 import { Icon } from './Icon'
 import { TeamMark } from './TeamMark'
 
+// Espejo de MIN_TRADE_POINTS en el backend (app/schemas/trade.py)
+const MIN_AMOUNT = 10
+
 interface BetBoxProps {
   marketId: string
   yesPrice: number
@@ -44,7 +47,14 @@ export function BetBox({
   const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
   const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
-  const [amount, setAmount] = useState(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 1000)
+  // El input guarda texto para poder borrarlo y escribir libremente; el mínimo
+  // se valida al operar, nunca en onChange.
+  const [amountInput, setAmountInput] = useState(String(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 1000))
+  const amount = parseInt(amountInput) || 0
+  const setAmount = (v: number | ((a: number) => number)) =>
+    setAmountInput(String(typeof v === 'function' ? v(amount) : v))
+  const belowMin = amount < MIN_AMOUNT
+  const amountStep = (a: number) => (a <= 1000 ? 100 : 500)
   const [trading, setTrading] = useState(false)
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
@@ -68,6 +78,7 @@ export function BetBox({
 
   useEffect(() => {
     let cancelled = false
+    if (debouncedAmount < MIN_AMOUNT) { setQuote(null); return }
     const opts = isMulti
       ? selectedOutcome ? { outcome_key: selectedOutcome.outcome_key, amount: debouncedAmount } : null
       : { side, amount: debouncedAmount }
@@ -85,6 +96,7 @@ export function BetBox({
       setTradeError(t('bet.loginToTrade'))
       return
     }
+    if (belowMin) { setTradeError(t('bet.minAmount', { min: MIN_AMOUNT })); return }
     setTrading(true)
     setTradeError(null)
     setTradeSuccess(null)
@@ -209,13 +221,15 @@ export function BetBox({
           )}
         </label>
         <div className="input" style={{ display: 'flex', alignItems: 'center', height: 48, padding: '0 4px' }}>
-          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => Math.max(100, a - 500))} aria-label="−" style={{ width: 40, height: 40 }}>
+          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => Math.max(MIN_AMOUNT, a - amountStep(a - 1)))} aria-label="−" style={{ width: 40, height: 40 }}>
             <Icon name="minus" size={16} />
           </button>
           <input
             type="number"
-            value={amount}
-            onChange={e => setAmount(Math.max(100, parseInt(e.target.value) || 100))}
+            value={amountInput}
+            min={MIN_AMOUNT}
+            inputMode="numeric"
+            onChange={e => setAmountInput(e.target.value.replace(/\D/g, ''))}
             className="num"
             style={{
               flex: 1, background: 'transparent', border: 'none',
@@ -225,12 +239,17 @@ export function BetBox({
             }}
           />
           <span className="meta-label" style={{ paddingRight: 6 }}>PT</span>
-          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => a + 500)} aria-label="+" style={{ width: 40, height: 40 }}>
+          <button className="icon-btn amount-adjust-btn" onClick={() => setAmount(a => a + amountStep(a + 1))} aria-label="+" style={{ width: 40, height: 40 }}>
             <Icon name="plus" size={16} />
           </button>
         </div>
+        {belowMin && (
+          <p className="meta-label" style={{ margin: '6px 0 0', color: 'var(--red)' }}>
+            {t('bet.minAmount', { min: MIN_AMOUNT })}
+          </p>
+        )}
         <input
-          type="range" min={100} max={10000} step={100}
+          type="range" min={MIN_AMOUNT} max={10000} step={10}
           value={amount}
           onChange={e => setAmount(parseInt(e.target.value))}
           style={{ width: '100%', marginTop: 12 }}
@@ -239,7 +258,7 @@ export function BetBox({
 
       {/* Preset amounts */}
       <div className="amount-presets" style={{ display: 'flex', gap: 6, marginBottom: compact ? 14 : 18 }}>
-        {[500, 1000, 2500, 5000].map(v => (
+        {[100, 500, 1000, 2500].map(v => (
           <button
             key={v}
             onClick={() => setAmount(v)}
@@ -337,7 +356,7 @@ export function BetBox({
 
       <button
         onClick={handleTrade}
-        disabled={trading || (isMulti && !selectedOutcome)}
+        disabled={trading || belowMin || (isMulti && !selectedOutcome)}
         className="btn btn-lg"
         style={{
           width: '100%',

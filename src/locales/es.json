@@ -239,7 +239,8 @@
     "disclaimer": "VEREDIKT opera con puntos virtuales. No se involucra dinero real.",
     "successBinary": "Compraste {{shares}} acciones {{side}} por {{cost}} PT",
     "successMulti": "Compraste {{shares}} acciones de \"{{label}}\" por {{cost}} PT",
-    "selectOutcome": "Selecciona un resultado"
+    "selectOutcome": "Selecciona un resultado",
+    "minAmount": "El mínimo es {{min}} PT"
   },
   "profile": {
     "loginTitle": "Inicia sesión para ver tu perfil",
@@ -620,6 +621,7 @@
     "INVALID_RESOLUTION": "La resolución debe ser SÍ o NO",
     "SIDE_REQUIRED": "Selecciona SÍ o NO",
     "INVALID_AMOUNT": "La cantidad debe ser mayor a 0",
+    "MIN_AMOUNT": "La apuesta mínima es 10 PT",
     "AMOUNT_TOO_LARGE": "Máximo 100,000 PT por operación",
     "INSUFFICIENT_BALANCE": "Saldo insuficiente. Tienes {{available}} PT, necesitas {{required}} PT"
   }
