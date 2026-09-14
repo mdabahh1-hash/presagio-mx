@@ -14,7 +14,8 @@ function readStoredPreference(): ThemePreference {
   } catch {
     /* localStorage no disponible */
   }
-  return 'system'
+  // Sin preferencia guardada: oscuro por default (no sigue al SO)
+  return 'dark'
 }
 
 function systemTheme(): ResolvedTheme {

@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" id="meta-theme-color" content="#0B0B0C" />
     <script>
-      // Anti-FOUC: resuelve el tema ANTES del primer paint. 'system' (o
-      // ausencia de preferencia) sigue prefers-color-scheme; sin señal de
-      // light cae en dark (comportamiento histórico de la app).
+      // Anti-FOUC: resuelve el tema ANTES del primer paint. Sin preferencia
+      // guardada el default es dark; solo 'system' sigue prefers-color-scheme.
+      // Espejo de readStoredPreference en src/lib/ThemeContext.tsx.
       ;(function () {
         var pref = null
         try { pref = localStorage.getItem('veredikt-theme') } catch (e) {}
         var resolved =
           pref === 'light' || pref === 'dark'
             ? pref
-            : window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+            : pref === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
               ? 'light'
               : 'dark'
         document.documentElement.dataset.theme = resolved
