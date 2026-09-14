@@ -49,7 +49,7 @@ export function BetBox({
   const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
   // El input guarda texto para poder borrarlo y escribir libremente; el mínimo
   // se valida al operar, nunca en onChange.
-  const [amountInput, setAmountInput] = useState(String(initialAmount && initialAmount > 0 ? Math.round(initialAmount) : 1000))
+  const [amountInput, setAmountInput] = useState(String(initialAmount && initialAmount > 0 ? Math.max(MIN_AMOUNT, Math.round(initialAmount)) : 1000))
   const amount = parseInt(amountInput) || 0
   const setAmount = (v: number | ((a: number) => number)) =>
     setAmountInput(String(typeof v === 'function' ? v(amount) : v))
@@ -225,11 +225,13 @@ export function BetBox({
             <Icon name="minus" size={16} />
           </button>
           <input
-            type="number"
+            type="text"
             value={amountInput}
-            min={MIN_AMOUNT}
             inputMode="numeric"
-            onChange={e => setAmountInput(e.target.value.replace(/\D/g, ''))}
+            pattern="[0-9]*"
+            // Solo enteros: se descarta lo que venga tras el punto decimal ("12.5" → 12, no 125);
+            // la coma de miles se ignora ("1,000" → 1000)
+            onChange={e => setAmountInput(e.target.value.split('.')[0].replace(/\D/g, '').slice(0, 7))}
             className="num"
             style={{
               flex: 1, background: 'transparent', border: 'none',
