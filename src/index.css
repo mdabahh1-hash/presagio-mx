@@ -522,6 +522,7 @@ input[type='range']::-webkit-slider-thumb {
 
 /* Navbar */
 .navbar-bonus-mobile { display: none; }
+.navbar-register-mobile { display: none; }
 .navbar-howitworks:hover { color: var(--text-primary) !important; }
 
 /* /mercados: en desktop el navbar ya trae buscador y CTA; los de la página
@@ -588,6 +589,7 @@ input[type='range']::-webkit-slider-thumb {
   .navbar-inner     { gap: 0 !important; padding: 0 16px !important; }
   .navbar-search, .navbar-howitworks, .navbar-propose { display: none !important; }
   .navbar-bonus-mobile { display: flex !important; }
+  .navbar-register-mobile { display: inline-flex !important; }
   .navbar-user      { display: none !important; }
   .navbar-hamburger {
     display: flex !important; align-items: center; justify-content: center;

@@ -416,6 +416,13 @@ export function Navbar() {
           {/* Spacer pushes the user section to the right */}
           <div style={{ flex: 1 }} />
 
+          {/* Registrarse visible arriba a la derecha en móvil (estilo Polymarket) */}
+          {!user && (
+            <button className="btn btn-primary navbar-register-mobile" onClick={() => setAuthModal('register')} style={{ height: 36, flexShrink: 0 }}>
+              {t('nav.register')}
+            </button>
+          )}
+
           {/* Desktop user section */}
           <div className="navbar-user" style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {user ? (
