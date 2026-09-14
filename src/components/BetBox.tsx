@@ -10,6 +10,7 @@ import { formatNum } from '../lib/format'
 import { translateApiError } from '../lib/errors'
 import { Icon } from './Icon'
 import { TeamMark } from './TeamMark'
+import { ConfettiBurst } from './ConfettiBurst'
 
 // Espejo de MIN_TRADE_POINTS en el backend (app/schemas/trade.py)
 const MIN_AMOUNT = 10
@@ -60,6 +61,7 @@ export function BetBox({
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
   const [quote, setQuote] = useState<ApiQuote | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [confettiKey, setConfettiKey] = useState(0)
 
   const isMulti = marketType === 'multi'
   // NO label derived from rounded YES so the pair always sums to 100.
@@ -123,6 +125,7 @@ export function BetBox({
         setTradeSuccess(t('bet.successBinary', { shares: result.shares.toFixed(1), side: side === 'YES' ? t('common.yes') : t('common.no'), cost: Math.round(result.cost) }))
       }
       track('Trade', { market: marketId, type: marketType, cost: Math.round(result.cost) })
+      setConfettiKey(k => k + 1)
       onTraded?.(result.new_yes_price)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)
@@ -356,6 +359,16 @@ export function BetBox({
         </div>
       )}
 
+      <div style={{ position: 'relative' }}>
+      {/* Confetti del color del botón que se apretó */}
+      <ConfettiBurst
+        trigger={confettiKey}
+        colors={isMulti
+          ? ['--accent-fill', '--accent', '--text-primary']
+          : side === 'YES'
+          ? ['--green-fill', '--green', '--text-primary']
+          : ['--red-fill', '--red', '--text-primary']}
+      />
       <button
         onClick={handleTrade}
         disabled={trading || belowMin || (isMulti && !selectedOutcome)}
@@ -376,6 +389,7 @@ export function BetBox({
           : t('bet.buyBtn', { side: side === 'YES' ? t('common.yes') : t('common.no'), amount })
         }
       </button>
+      </div>
 
       {!user && !onRequireAuth && (
         <div style={{ marginTop: 12, textAlign: 'center' }}>
