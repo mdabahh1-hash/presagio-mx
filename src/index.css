@@ -552,6 +552,9 @@ input[type='range']::-webkit-slider-thumb {
 .row-outcome-btn--mark { flex-direction: row; gap: 7px; min-width: 96px; padding: 0 10px; }
 .row-outcome-btn--mark .row-outcome-label { max-width: 90px; font-size: 12px; }
 .row-outcome-price { font-size: 14px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+/* Tercera columna de .market-row cuando la fila lleva sparkline (landing de Política) */
+.market-row-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.market-row-spark { width: 90px; height: 32px; flex-shrink: 0; line-height: 0; }
 
 .lb-row { transition: background 0.15s; }
 .lb-row:hover { background: var(--bg-hover); }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { Market } from '../types'
+import type { Market, PricePoint } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
@@ -9,6 +9,7 @@ import { outcomeLogo } from '../lib/teamLogos'
 import { MarketThumb } from './MarketThumb'
 import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
+import { SparkChart } from './SparkChart'
 
 interface MarketRowProps {
   market: Market
@@ -19,12 +20,19 @@ interface MarketRowProps {
   // La fila vive dentro de una sección titulada con su subcategoría: el badge
   // repetiría el encabezado.
   hideSubcategory?: boolean
+  // Padding vertical de la fila (landing de Política usa 14px)
+  padding?: string
+  // Sparkline antes de los chips Sí/No. undefined = sin hueco (uso actual);
+  // null o < 2 puntos = hueco reservado vacío (evita saltos al cargar).
+  spark?: PricePoint[] | null
+  // Tercer dato de la meta (fuente o umbral en corto), con elipsis
+  extraMeta?: string | null
 }
 
 // Fila estilo Polymarket: thumbnail + pregunta + meta a la izquierda,
 // probabilidades a la derecha. Es una fila de lista (divisor), no una tarjeta.
 // Toda la fila es un Link al mercado.
-export function MarketRow({ market, animClass = '', compact = false, hideSubcategory = false }: MarketRowProps) {
+export function MarketRow({ market, animClass = '', compact = false, hideSubcategory = false, padding = '12px 0', spark, extraMeta = null }: MarketRowProps) {
   const { t } = useTranslation()
   const isMulti = market.marketType === 'multi'
   const isPending = market.status === 'pending_resolution'
@@ -72,6 +80,18 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
     </div>
   )
 
+  // Sube/baja/plano en la ventana del sparkline (1 pp = mismo corte que movers)
+  const sparkDelta = spark && spark.length >= 2 ? spark[spark.length - 1].price - spark[0].price : 0
+  const sparkColor = sparkDelta > 1 ? 'var(--green)' : sparkDelta < -1 ? 'var(--red)' : 'var(--text-tertiary)'
+  const rightBlock = spark === undefined ? outcomesBlock : (
+    <div className="market-row-right">
+      <div className="market-row-spark">
+        {spark && spark.length >= 2 && <SparkChart data={spark} width={90} height={32} showArea={false} color={sparkColor} />}
+      </div>
+      {outcomesBlock}
+    </div>
+  )
+
   if (compact) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0 }}>
@@ -89,7 +109,7 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
     <Link
       to={`/mercado/${market.id}`}
       className={`list-row is-link market-row ${animClass}`}
-      style={{ padding: '12px 0', opacity: isPending ? 0.8 : 1 }}
+      style={{ padding, opacity: isPending ? 0.8 : 1 }}
     >
       <MarketThumb market={market} size={56} className="market-row-thumb" />
 
@@ -110,10 +130,16 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
           ) : (
             <span style={{ color: urgent ? 'var(--red)' : undefined, fontWeight: urgent ? 600 : 500 }}>{countdownText}</span>
           )}
+          {extraMeta && (
+            <>
+              <span aria-hidden>·</span>
+              <span style={{ minWidth: 0, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={extraMeta}>{extraMeta}</span>
+            </>
+          )}
         </div>
       </div>
 
-      {outcomesBlock}
+      {rightBlock}
     </Link>
   )
 }

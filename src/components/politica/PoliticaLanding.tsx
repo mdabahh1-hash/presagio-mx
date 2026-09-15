@@ -11,6 +11,8 @@ import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
 import { ElectionTimeline } from './ElectionTimeline'
 import { SeatProjection } from './SeatProjection'
 import { PartyTable } from './PartyTable'
+import { PoliticaSections, type MarketSection } from './PoliticaSections'
+import { byClosing } from '../../lib/closing'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -138,6 +140,11 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     return out
   }, [inCat, subcats])
 
+  const labelForHost = useCallback(
+    (host: string) => content?.fuentes.find(f => f.host === host)?.etiqueta ?? host,
+    [content],
+  )
+
   // Fuentes oficiales: hosts únicos de resolution_source_url, etiqueta curada o el host
   const sources = useMemo<SourceRow[]>(() => {
     const byHost = new Map<string, SourceRow>()
@@ -147,13 +154,36 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
       if (!host) continue
       const cur = byHost.get(host)
       if (cur) cur.count += 1
-      else {
-        const label = content?.fuentes.find(f => f.host === host)?.etiqueta ?? host
-        byHost.set(host, { host, label, url: m.resolutionSourceUrl, count: 1 })
-      }
+      else byHost.set(host, { host, label: labelForHost(host), url: m.resolutionSourceUrl, count: 1 })
     }
     return [...byHost.values()].sort((a, b) => b.count - a.count)
-  }, [inCat, content])
+  }, [inCat, labelForHost])
+
+  // Tercer dato de la fila: nota curada, si no la fuente en corto
+  const extraMetaOf = useCallback((m: Market): string | null => {
+    const nota = content?.notas[m.id]
+    if (nota) return nota
+    const host = m.resolutionSourceUrl ? hostOf(m.resolutionSourceUrl) : null
+    return host ? labelForHost(host) : null
+  }, [content, labelForHost])
+
+  // Secciones por subcategoría declarada (orden de categories.ts) + "Otros";
+  // con ?sub= activo, solo esa sección. Una sección vacía no se renderiza.
+  const sections = useMemo<MarketSection[]>(() => {
+    const byKey = new Map<string | null, Market[]>()
+    for (const m of inCat) {
+      const key = m.subcategory && subcats.includes(m.subcategory) ? m.subcategory : null
+      byKey.set(key, [...(byKey.get(key) ?? []), m])
+    }
+    const out: MarketSection[] = []
+    for (const sub of subcats) {
+      const items = byKey.get(sub)
+      if (items?.length) out.push({ title: sub, sub, items: items.sort(byClosing) })
+    }
+    const rest = byKey.get(null)
+    if (rest?.length) out.push({ title: t('categoryBrowse.otherSection'), sub: null, items: rest.sort(byClosing) })
+    return activeSub ? out.filter(sec => sec.sub === activeSub) : out
+  }, [inCat, subcats, activeSub, t])
 
   // "Prob. de 334+": la única cifra viva de la proyección
   const thresholdId = content?.proyeccion?.mercado_umbral_id ?? null
@@ -222,6 +252,15 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           <PartyTable bloques={content.proyeccion.bloques} total={content.proyeccion.total} partidos={content.partidos} />
         </div>
       )}
+
+      <PoliticaSections
+        className="anim-4"
+        sections={sections}
+        activeSub={activeSub}
+        onViewAll={sub => onSubChange(sub)}
+        onClearSub={() => onSubChange(null)}
+        extraMetaOf={extraMetaOf}
+      />
 
       <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
         {tradeMarket && trade && (
