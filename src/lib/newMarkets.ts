@@ -6,9 +6,16 @@ export const NEW_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000
 // Si no hay nada en ventana, la pestaña muestra los N más recientes con aviso
 export const NEW_FALLBACK_COUNT = 12
 
-export function isNewMarket(m: Market, now = Date.now()): boolean {
-  if (m.status === 'pending_resolution' || !m.createdAt) return false
+// Sembrado dentro de la ventana, sin mirar el estado (la pestaña Nuevo filtra
+// el estado aparte: Activa / Por resolverse / Todos).
+export function isRecent(m: Market, now = Date.now()): boolean {
+  if (!m.createdAt) return false
   return now - Date.parse(m.createdAt) < NEW_MAX_AGE_MS
+}
+
+// Sello dorado de la tarjeta: reciente y todavía abierto
+export function isNewMarket(m: Market, now = Date.now()): boolean {
+  return m.status !== 'pending_resolution' && isRecent(m, now)
 }
 
 // Lo último sembrado primero; los vencidos (por resolverse) al final
@@ -21,7 +28,7 @@ export function byNewest(a: Market, b: Market): number {
 
 export function selectNewMarkets(markets: Market[]): { items: Market[]; fallback: boolean } {
   const sorted = [...markets].sort(byNewest)
-  const fresh = sorted.filter(m => isNewMarket(m))
+  const fresh = sorted.filter(m => isRecent(m))
   if (fresh.length > 0) return { items: fresh, fallback: false }
   return { items: sorted.slice(0, NEW_FALLBACK_COUNT), fallback: true }
 }

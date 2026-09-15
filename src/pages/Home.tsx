@@ -16,16 +16,16 @@ import type { Category, Market } from '../types'
 import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
-import { selectNewMarkets } from '../lib/newMarkets'
 import { SeeMoreButton } from '../components/SeeMoreButton'
+import { NewFeed } from '../components/NewFeed'
 
 type MobileTab = CategoryTab
 
 const PAGE_SIZE = 12
 
-// Sección de grid del desktop (Tendencia y Nuevo comparten título + "Ver todos" + paginado)
-function MarketGridSection({ title, viewAllTo, emptyText, notice, markets, loading, visible, onMore }: {
-  title: string; viewAllTo: string; emptyText: string; notice?: string
+// Sección de grid de Tendencia en desktop (título + "Ver todos" + paginado)
+function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore }: {
+  title: string; viewAllTo: string; emptyText: string
   markets: Market[]; loading: boolean; visible: number; onMore: () => void
 }) {
   const { t } = useTranslation()
@@ -42,9 +42,6 @@ function MarketGridSection({ title, viewAllTo, emptyText, notice, markets, loadi
           <Icon name="arrow-right" size={14} />
         </Link>
       </div>
-      {notice && !loading && (
-        <p className="meta-label" style={{ margin: '0 0 16px' }}>{notice}</p>
-      )}
       {loading ? (
         <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
           {[...Array(9)].map((_, i) => (
@@ -133,15 +130,9 @@ export function Home() {
     if (search.trim()) navigate(`/mercados?q=${encodeURIComponent(search)}`)
   }
 
-  // Nuevo: solo los de ≤3 días; si no hay, los 12 más recientes con aviso
-  const nuevos = useMemo(() => selectNewMarkets(markets), [markets])
-  const filtered = (() => {
-    if (mobileTab === 'Tendencia') return markets.filter(m => m.trending)
-    if (mobileTab === 'Nuevo') return nuevos.items
-    return markets.filter(m => m.category === mobileTab)
-  })()
-  const emptyText = mobileTab === 'Nuevo' ? t('home.noNew') : t('home.noTrending')
-  const notice = mobileTab === 'Nuevo' && nuevos.fallback ? t('home.newFallback') : undefined
+  // Tendencia; la pestaña Nuevo se filtra dentro de NewFeed
+  const filtered = mobileTab === 'Tendencia' ? markets.filter(m => m.trending) : markets.filter(m => m.category === mobileTab)
+  const emptyText = t('home.noTrending')
 
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
@@ -170,14 +161,15 @@ export function Home() {
           </form>
         </CategoryBar>
 
-        {isFeed(mobileTab) ? (
+        {mobileTab === 'Nuevo' ? (
+          <div style={{ padding: '16px 14px 80px' }}>
+            <NewFeed markets={markets} loading={loading} compact onQuickTrade={market => (side, outcomeKey) => openTrade(market.id, side, outcomeKey)} />
+          </div>
+        ) : isFeed(mobileTab) ? (
           <>
-            {/* Feed (Tendencia / Nuevo) estilo Polymarket: sin carrusel destacado,
+            {/* Feed Tendencia estilo Polymarket: sin carrusel destacado,
                 tarjetas compactas con Sí/No que abren la compra. Paginado como en desktop. */}
             <div style={{ padding: '12px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {notice && !loading && (
-                <p className="meta-label" style={{ margin: '0 0 4px' }}>{notice}</p>
-              )}
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <div key={i} className="skeleton" style={{ height: 130 }} />
@@ -270,17 +262,8 @@ export function Home() {
           />
         </>
       ) : mobileTab === 'Nuevo' ? (
-        /* Nuevo: solo el grid, sin carrusel ni temas populares */
-        <MarketGridSection
-          title={t('home.newMarkets')}
-          viewAllTo="/mercados?sort=new"
-          emptyText={emptyText}
-          notice={notice}
-          markets={filtered}
-          loading={loading}
-          visible={visibleTrending}
-          onMore={() => setVisibleTrending(v => v + PAGE_SIZE)}
-        />
+        /* Nuevo: página propia estilo Polymarket (píldoras + filtros + grid) */
+        <NewFeed markets={markets} loading={loading} />
       ) : (
         <section style={{ marginBottom: 56 }}>
           <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
