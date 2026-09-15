@@ -10,6 +10,11 @@ export const CATEGORIES: Category[] = [
 // Subcategorías por categoría, en orden de display (México primero en Deportes).
 // El string es exactamente el valor guardado en markets.subcategory; solo se
 // listan las que tienen mercados hoy — agregar aquí al sembrar mercados nuevos.
+// Categorías con pantalla propia (hoy solo Política, `src/components/politica/`):
+// en la Home su píldora NAVEGA a /mercados?cat= en vez de filtrar in-place, para
+// que la landing conserve su URL (y el ?sub= de los temas) y se pueda compartir.
+export const CATEGORIES_CON_LANDING: Category[] = ['Política']
+
 export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
   'Deportes': [
     'Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A',

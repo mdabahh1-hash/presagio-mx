@@ -13,7 +13,7 @@ import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES } from '../lib/categories'
+import { SUBCATEGORIES, CATEGORIES_CON_LANDING } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -87,6 +87,16 @@ export function Home() {
   const [authOpen, setAuthOpen] = useState(false)
   const closeTrade = useCallback(() => setTrade(null), [])
 
+  // Píldora de categoría: las que tienen pantalla propia navegan a su URL; el
+  // resto sigue filtrando dentro de la Home, como hasta ahora.
+  const handleTab = useCallback((tab: MobileTab) => {
+    if (!isFeed(tab) && CATEGORIES_CON_LANDING.includes(tab as Category)) {
+      navigate(`/mercados?cat=${encodeURIComponent(tab)}`)
+      return
+    }
+    setMobileTab(tab)
+  }, [navigate])
+
   useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
@@ -141,7 +151,7 @@ export function Home() {
 
         {/* Buscador + tabs de categoría, pegados bajo el navbar (mismo
             componente que en desktop; la línea inferior no se mueve) */}
-        <CategoryBar active={mobileTab} onChange={setMobileTab}>
+        <CategoryBar active={mobileTab} onChange={handleTab}>
           <form onSubmit={handleSearch} style={{ padding: '10px 0 4px' }}>
             <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px' }}>
               <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -229,7 +239,7 @@ export function Home() {
   return (
     <>
     {/* Barra de categorías full-bleed y sticky (fuera del container) */}
-    <CategoryBar active={mobileTab} onChange={setMobileTab} />
+    <CategoryBar active={mobileTab} onChange={handleTab} />
     <div className="page-container" style={{ paddingTop: 24 }}>
 
       {mobileTab === 'Tendencia' ? (
