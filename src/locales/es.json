@@ -467,7 +467,13 @@
     "topics": "Temas populares",
     "topicsAll": "Todos los temas",
     "topicsViewAll": "Ver todos los temas",
-    "sources": "Fuente oficial"
+    "sources": "Fuente oficial",
+    "parties": "Los partidos, según el mercado",
+    "coalition": "Coalición proyectada",
+    "partyAlone": "{{party}} solo",
+    "thresholdProb": "Prob. de {{count}}+",
+    "seats_one": "{{count}} escaño",
+    "seats_other": "{{count}} escaños"
   },
   "leagues": {
     "invite": {

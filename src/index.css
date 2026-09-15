@@ -524,6 +524,9 @@ input[type='range']::-webkit-slider-thumb {
 .pol-timeline-grid { position: relative; display: grid; gap: 12px; padding-bottom: 4px; }
 .pol-timeline-rail { position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: var(--border-subtle); }
 .pol-timeline-progress { height: 2px; background: var(--text-primary); }
+.pol-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+.pol-seatbar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; background: var(--bg-elevated); margin-bottom: 10px; }
+.pol-party-track { width: 140px; height: 6px; border-radius: 3px; background: var(--border-subtle); overflow: hidden; flex-shrink: 0; }
 /* El sheet de compra solo se usaba en móvil; en desktop (hero de Política) se centra y acota */
 @media (min-width: 769px) {
   .sheet-panel { max-width: 520px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) 0 0; }

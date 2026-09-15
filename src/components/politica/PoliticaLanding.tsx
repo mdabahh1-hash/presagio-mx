@@ -9,6 +9,8 @@ import { AuthModal } from '../AuthModal'
 import { PoliticaHero } from './PoliticaHero'
 import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
 import { ElectionTimeline } from './ElectionTimeline'
+import { SeatProjection } from './SeatProjection'
+import { PartyTable } from './PartyTable'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -153,6 +155,11 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     return [...byHost.values()].sort((a, b) => b.count - a.count)
   }, [inCat, content])
 
+  // "Prob. de 334+": la única cifra viva de la proyección
+  const thresholdId = content?.proyeccion?.mercado_umbral_id ?? null
+  const thresholdMarket = thresholdId ? inCat.find(m => m.id === thresholdId) : undefined
+  const thresholdProb = thresholdMarket ? thresholdMarket.yesPrice : null
+
   const featuredPoints = featured ? histories[featured.id] : undefined
   const historyLoading = !!featured && featuredPoints === undefined
 
@@ -207,6 +214,13 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           subtitulo={content.cronologia.subtitulo}
           hitos={content.cronologia.hitos}
         />
+      )}
+
+      {content?.proyeccion && (
+        <div className="pol-cards anim-3">
+          <SeatProjection proyeccion={content.proyeccion} partidos={content.partidos} thresholdProb={thresholdProb} />
+          <PartyTable bloques={content.proyeccion.bloques} total={content.proyeccion.total} partidos={content.partidos} />
+        </div>
       )}
 
       <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
