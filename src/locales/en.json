@@ -116,7 +116,8 @@
     "tabTrending": "Trending",
     "tabNew": "New",
     "newMarkets": "New markets",
-    "noNew": "No new markets"
+    "noNew": "No new markets",
+    "newFallback": "No new markets in the last 3 days; these are the 12 most recent"
   },
   "markets": {
     "title": "Markets",
@@ -127,7 +128,7 @@
     "sortVolume": "Highest volume",
     "sortTrending": "Trending",
     "sortEnding": "Closing soon",
-    "sortNew": "Newest",
+    "sortNew": "New (3 days)",
     "allCategory": "All",
     "emptyTitle": "No markets found",
     "emptySubtitle": "Try a different category or search"

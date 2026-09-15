@@ -16,18 +16,11 @@ import type { Category, Market } from '../types'
 import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
+import { selectNewMarkets } from '../lib/newMarkets'
 
 type MobileTab = CategoryTab
 
 const PAGE_SIZE = 12
-
-// Pestaña "Nuevo": lo último sembrado primero; los vencidos (por resolverse) al final
-function byNewest(a: Market, b: Market): number {
-  const pa = a.status === 'pending_resolution' ? 1 : 0
-  const pb = b.status === 'pending_resolution' ? 1 : 0
-  if (pa !== pb) return pa - pb
-  return (Date.parse(b.createdAt ?? '') || 0) - (Date.parse(a.createdAt ?? '') || 0)
-}
 
 function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () => void }) {
   const { t } = useTranslation()
@@ -41,8 +34,8 @@ function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () 
 }
 
 // Sección de grid del desktop (Tendencia y Nuevo comparten título + "Ver todos" + paginado)
-function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore }: {
-  title: string; viewAllTo: string; emptyText: string
+function MarketGridSection({ title, viewAllTo, emptyText, notice, markets, loading, visible, onMore }: {
+  title: string; viewAllTo: string; emptyText: string; notice?: string
   markets: Market[]; loading: boolean; visible: number; onMore: () => void
 }) {
   const { t } = useTranslation()
@@ -59,6 +52,9 @@ function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visi
           <Icon name="arrow-right" size={14} />
         </Link>
       </div>
+      {notice && !loading && (
+        <p className="meta-label" style={{ margin: '0 0 16px' }}>{notice}</p>
+      )}
       {loading ? (
         <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
           {[...Array(9)].map((_, i) => (
@@ -145,12 +141,15 @@ export function Home() {
     if (search.trim()) navigate(`/mercados?q=${encodeURIComponent(search)}`)
   }
 
+  // Nuevo: solo los de ≤3 días; si no hay, los 12 más recientes con aviso
+  const nuevos = useMemo(() => selectNewMarkets(markets), [markets])
   const filtered = (() => {
     if (mobileTab === 'Tendencia') return markets.filter(m => m.trending)
-    if (mobileTab === 'Nuevo') return [...markets].sort(byNewest)
+    if (mobileTab === 'Nuevo') return nuevos.items
     return markets.filter(m => m.category === mobileTab)
   })()
   const emptyText = mobileTab === 'Nuevo' ? t('home.noNew') : t('home.noTrending')
+  const notice = mobileTab === 'Nuevo' && nuevos.fallback ? t('home.newFallback') : undefined
 
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
@@ -184,6 +183,9 @@ export function Home() {
             {/* Feed (Tendencia / Nuevo) estilo Polymarket: sin carrusel destacado,
                 tarjetas compactas con Sí/No que abren la compra. Paginado como en desktop. */}
             <div style={{ padding: '12px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {notice && !loading && (
+                <p className="meta-label" style={{ margin: '0 0 4px' }}>{notice}</p>
+              )}
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <div key={i} className="skeleton" style={{ height: 130 }} />
@@ -281,6 +283,7 @@ export function Home() {
           title={t('home.newMarkets')}
           viewAllTo="/mercados?sort=new"
           emptyText={emptyText}
+          notice={notice}
           markets={filtered}
           loading={loading}
           visible={visibleTrending}

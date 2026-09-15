@@ -5,6 +5,7 @@ import type { Market, Outcome } from '../types'
 import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
 import { displayPair } from '../lib/prices'
+import { isNewMarket } from '../lib/newMarkets'
 import { MarketThumb } from './MarketThumb'
 import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
@@ -64,9 +65,6 @@ function MultiOutcomeList({ outcomes, sub, marketId, onQuickTrade }: { outcomes:
   )
 }
 
-// Sello "Nuevo": 3 días desde la siembra (decisión de Mark, 15-sep-2026)
-const NEW_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000
-
 // Tarjeta de mercado (grid de Home / Mercados): thumbnail + pregunta arriba,
 // probabilidad al centro, meta + Sí/No abajo. Sin sparkline; el único badge
 // extra es el sello "Nuevo" de los recién sembrados.
@@ -76,7 +74,7 @@ export function MarketCard({ market, animClass = '', onQuickTrade }: MarketCardP
   const diff = useCountdown(market.endsAt)
   const { text: countdownText, urgent } = formatCountdown(diff)
   const isPending = market.status === 'pending_resolution'
-  const isNew = !isPending && !!market.createdAt && Date.now() - Date.parse(market.createdAt) < NEW_MAX_AGE_MS
+  const isNew = isNewMarket(market)
   const canQuick = !!onQuickTrade && !isPending
   const pair = displayPair(market.yesPrice)
 

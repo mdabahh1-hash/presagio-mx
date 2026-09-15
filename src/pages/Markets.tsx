@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi } from '../lib/api'
@@ -10,6 +10,7 @@ import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
 import { CATEGORIES, SUBCATEGORIES, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
+import { selectNewMarkets } from '../lib/newMarkets'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
 
@@ -68,6 +69,12 @@ export function Markets() {
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }  // drop out-of-order responses from fast typing / tab switches
   }, [activeCategory, searchInput, sortBy])
+
+  // "Nuevos (3 días)": el API ordena por siembra; el recorte a 3 días (y el
+  // respaldo de los 12 más recientes) es de UI, compartido con la Home.
+  const nuevos = useMemo(() => (sortBy === 'new' ? selectNewMarkets(markets) : null), [markets, sortBy])
+  const shown = nuevos ? nuevos.items : markets
+  const notice = nuevos?.fallback ? t('home.newFallback') : null
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -234,8 +241,9 @@ export function Markets() {
         <>
           {/* Results count */}
           {!loading && (
-            <div className="meta-label" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="num">{t('markets.resultCount', { count: markets.length })}</span>
+            <div className="meta-label" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span className="num">{t('markets.resultCount', { count: shown.length })}</span>
+              {notice && <span>· {notice}</span>}
               {searchInput && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   {t('markets.searchLabel')} <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>"{searchInput}"</span>
@@ -260,9 +268,9 @@ export function Markets() {
                 <div key={i} className="skeleton" style={{ height: 210 }} />
               ))}
             </div>
-          ) : markets.length > 0 ? (
+          ) : shown.length > 0 ? (
             <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-              {markets.map((market, i) => (
+              {shown.map((market, i) => (
                 <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
               ))}
             </div>

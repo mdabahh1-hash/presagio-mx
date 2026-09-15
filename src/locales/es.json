@@ -116,7 +116,8 @@
     "tabTrending": "Tendencia",
     "tabNew": "Nuevo",
     "newMarkets": "Mercados nuevos",
-    "noNew": "Sin mercados nuevos"
+    "noNew": "Sin mercados nuevos",
+    "newFallback": "Sin mercados nuevos en los últimos 3 días; estos son los 12 más recientes"
   },
   "markets": {
     "title": "Mercados",
@@ -127,7 +128,7 @@
     "sortVolume": "Mayor volumen",
     "sortTrending": "Tendencias",
     "sortEnding": "Cierra pronto",
-    "sortNew": "Más reciente",
+    "sortNew": "Nuevos (3 días)",
     "allCategory": "Todos",
     "emptyTitle": "No encontramos mercados",
     "emptySubtitle": "Intenta con otra categoría o búsqueda"
