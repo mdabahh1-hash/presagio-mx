@@ -9,6 +9,7 @@ export type IconName =
   | 'heart' | 'gift' | 'globe' | 'sun' | 'moon' | 'menu' | 'user' | 'users' | 'plus' | 'minus'
   | 'medal' | 'ball' | 'football' | 'car' | 'gloves' | 'vote' | 'chart' | 'coin' | 'cpu'
   | 'film' | 'cloud' | 'flag' | 'bank' | 'code' | 'logout' | 'home' | 'list' | 'sliders' | 'key' | 'mail'
+  | 'sparkle'
 
 const PATHS: Record<IconName, React.ReactNode> = {
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
@@ -61,6 +62,8 @@ const PATHS: Record<IconName, React.ReactNode> = {
   sliders: <><path d="M4 21v-7" /><path d="M4 10V3" /><path d="M12 21v-9" /><path d="M12 8V3" /><path d="M20 21v-5" /><path d="M20 12V3" /><path d="M1 14h6" /><path d="M9 8h6" /><path d="M17 16h6" /></>,
   key: <><circle cx="7.5" cy="15.5" r="5.5" /><path d="m21 2-9.6 9.6" /><path d="m15.5 7.5 3 3L22 7l-3-3" /></>,
   mail: <><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>,
+  // Chispa de 4 puntas: pestaña "Nuevo" y sello de mercado recién sembrado
+  sparkle: <path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z" />,
 }
 
 interface IconProps extends Omit<React.SVGProps<SVGSVGElement>, 'name'> {

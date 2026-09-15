@@ -113,7 +113,10 @@
     "viewAll": "Ver todos",
     "seeMore": "Ver más mercados ({{count}} restantes)",
     "noTrending": "Sin mercados en tendencia",
-    "tabTrending": "Tendencia"
+    "tabTrending": "Tendencia",
+    "tabNew": "Nuevo",
+    "newMarkets": "Mercados nuevos",
+    "noNew": "Sin mercados nuevos"
   },
   "markets": {
     "title": "Mercados",
@@ -124,6 +127,7 @@
     "sortVolume": "Mayor volumen",
     "sortTrending": "Tendencias",
     "sortEnding": "Cierra pronto",
+    "sortNew": "Más reciente",
     "allCategory": "Todos",
     "emptyTitle": "No encontramos mercados",
     "emptySubtitle": "Intenta con otra categoría o búsqueda"
@@ -151,6 +155,7 @@
     "vol": "Vol",
     "liq": "Liq",
     "waitingResolution": "Por resolverse",
+    "new": "Nuevo",
     "more": "+ {{count}} más",
     "chance": "Sí"
   },

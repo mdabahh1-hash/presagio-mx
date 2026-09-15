@@ -325,6 +325,8 @@ select.input { padding-right: 32px; appearance: none; }
   background: var(--text-primary); border-radius: 1px;
 }
 .tab .tab-count { font-size: 12px; color: var(--text-tertiary); font-weight: 500; font-variant-numeric: tabular-nums; }
+/* Línea vertical que separa los feeds (Tendencia, Nuevo) de las categorías */
+.tab-divider { flex-shrink: 0; align-self: center; width: 1px; height: 16px; background: var(--border-default); }
 .tabs-sm { gap: 16px; }
 .tabs-sm .tab { padding: 8px 0; font-size: 13px; }
 /* Contenedor con línea inferior fija: el subrayado del tab activo pisa esta línea */

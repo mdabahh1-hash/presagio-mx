@@ -113,7 +113,10 @@
     "viewAll": "View all",
     "seeMore": "See more markets ({{count}} left)",
     "noTrending": "No trending markets",
-    "tabTrending": "Trending"
+    "tabTrending": "Trending",
+    "tabNew": "New",
+    "newMarkets": "New markets",
+    "noNew": "No new markets"
   },
   "markets": {
     "title": "Markets",
@@ -124,6 +127,7 @@
     "sortVolume": "Highest volume",
     "sortTrending": "Trending",
     "sortEnding": "Closing soon",
+    "sortNew": "Newest",
     "allCategory": "All",
     "emptyTitle": "No markets found",
     "emptySubtitle": "Try a different category or search"
@@ -151,6 +155,7 @@
     "vol": "Vol",
     "liq": "Liq",
     "waitingResolution": "Awaiting resolution",
+    "new": "New",
     "more": "+ {{count}} more",
     "chance": "Yes"
   },

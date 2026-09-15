@@ -20,8 +20,8 @@ export function Markets() {
     { value: 'volume', label: t('markets.sortVolume') },
     { value: 'trending', label: t('markets.sortTrending') },
     { value: 'ending', label: t('markets.sortEnding') },
+    { value: 'new', label: t('markets.sortNew') },
   ]
-  const [sortBy, setSortBy] = useState('volume')
   const [markets, setMarkets] = useState<Market[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -31,11 +31,15 @@ export function Markets() {
   const sportParam = searchParams.get('sport')
   const rawKind = searchParams.get('kind')
   const kindParam: Kind | null = isKind(rawKind) ? rawKind : null
+  // ?sort= vive en la URL para que la pestaña "Nuevo" de la barra (/mercados?sort=new) sea enlazable
+  const rawSort = searchParams.get('sort')
+  const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
   const [activeSport, setActiveSport] = useState<string | null>(sportParam)
   const [activeKind, setActiveKind] = useState<Kind | null>(kindParam)
+  const [sortBy, setSortBy] = useState(sortParam)
 
   useEffect(() => {
     setSearchInput(queryParam)
@@ -43,7 +47,8 @@ export function Markets() {
     setActiveSub(subParam)
     setActiveSport(sportParam)
     setActiveKind(kindParam)
-  }, [queryParam, catParam, subParam, sportParam, kindParam])
+    setSortBy(sortParam)
+  }, [queryParam, catParam, subParam, sportParam, kindParam, sortParam])
 
   useEffect(() => {
     let active = true
@@ -84,6 +89,16 @@ export function Markets() {
       p.delete('sub')
       p.delete('sport')
       p.delete('kind')
+      p.delete('sort')  // el orden solo existe en "Todos"
+      return p
+    })
+  }
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort)
+    setSearchParams(p => {
+      if (sort === 'volume') p.delete('sort')
+      else p.set('sort', sort)
       return p
     })
   }
@@ -190,7 +205,7 @@ export function Markets() {
             <select
               className="input"
               value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
+              onChange={e => handleSortChange(e.target.value)}
               style={{ height: 36, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer', marginBottom: 6, flexShrink: 0 }}
             >
               {sortOptions.map(opt => (

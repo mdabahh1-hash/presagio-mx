@@ -64,14 +64,19 @@ function MultiOutcomeList({ outcomes, sub, marketId, onQuickTrade }: { outcomes:
   )
 }
 
+// Sello "Nuevo": 3 días desde la siembra (decisión de Mark, 15-sep-2026)
+const NEW_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000
+
 // Tarjeta de mercado (grid de Home / Mercados): thumbnail + pregunta arriba,
-// probabilidad al centro, meta + Sí/No abajo. Sin sparkline, sin badges extra.
+// probabilidad al centro, meta + Sí/No abajo. Sin sparkline; el único badge
+// extra es el sello "Nuevo" de los recién sembrados.
 export function MarketCard({ market, animClass = '', onQuickTrade }: MarketCardProps) {
   const { t } = useTranslation()
   const isMulti = market.marketType === 'multi'
   const diff = useCountdown(market.endsAt)
   const { text: countdownText, urgent } = formatCountdown(diff)
   const isPending = market.status === 'pending_resolution'
+  const isNew = !isPending && !!market.createdAt && Date.now() - Date.parse(market.createdAt) < NEW_MAX_AGE_MS
   const canQuick = !!onQuickTrade && !isPending
   const pair = displayPair(market.yesPrice)
 
@@ -130,6 +135,13 @@ export function MarketCard({ market, animClass = '', onQuickTrade }: MarketCardP
         {/* Pie: meta + Sí/No */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', gap: 10 }}>
           <div className="meta-label num" style={{ display: 'flex', gap: 6, alignItems: 'center', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden' }}>
+            {/* El sello va primero: el overflow de la fila recorta por la derecha */}
+            {isNew && (
+              <>
+                <Badge tone="accent" icon="sparkle">{t('card.new')}</Badge>
+                <span aria-hidden>·</span>
+              </>
+            )}
             <span>{t('card.vol')} {formatVolume(market.volume)} PT</span>
             <span aria-hidden>·</span>
             {isPending ? (

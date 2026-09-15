@@ -1,15 +1,20 @@
 import React, { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { Icon, type IconName } from './Icon'
 
 // Tabs de texto con subrayado (estilo Polymarket): sin píldoras, sin bordes.
 // Con `onChange` son botones; con `to` en cada item son Links. El subrayado
 // del activo (2px) pisa la línea inferior del contenedor (.tabs-line o
-// .cat-tabs-sticky) para que la línea "no se mueva".
+// .cat-tabs-sticky) para que la línea "no se mueva". `icon` va a la izquierda
+// del texto; `divider` pinta una línea vertical ANTES del item (separa los
+// feeds Tendencia/Nuevo de las categorías).
 export interface TabItem<K extends string = string> {
   key: K
   label: React.ReactNode
   to?: string
   count?: number
+  icon?: IconName
+  divider?: boolean
 }
 
 interface TabsProps<K extends string> {
@@ -37,22 +42,30 @@ export function Tabs<K extends string>({ items, active, onChange, size = 'md', a
         const isActive = item.key === active
         const inner = (
           <>
+            {item.icon && <Icon name={item.icon} size={14} />}
             {item.label}
             {item.count != null && <span className="tab-count">{item.count}</span>}
           </>
         )
         const cls = `tab${isActive ? ' active' : ''}`
+        const divider = item.divider ? <span className="tab-divider" aria-hidden /> : null
         if (item.to && !onChange) {
           return (
-            <Link key={item.key} to={item.to} role="tab" aria-selected={isActive} className={cls}>
-              {inner}
-            </Link>
+            <React.Fragment key={item.key}>
+              {divider}
+              <Link to={item.to} role="tab" aria-selected={isActive} className={cls}>
+                {inner}
+              </Link>
+            </React.Fragment>
           )
         }
         return (
-          <button key={item.key} type="button" role="tab" aria-selected={isActive} className={cls} onClick={() => onChange?.(item.key)}>
-            {inner}
-          </button>
+          <React.Fragment key={item.key}>
+            {divider}
+            <button type="button" role="tab" aria-selected={isActive} className={cls} onClick={() => onChange?.(item.key)}>
+              {inner}
+            </button>
+          </React.Fragment>
         )
       })}
     </div>

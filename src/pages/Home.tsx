@@ -7,7 +7,7 @@ import { MarketCard } from '../components/MarketCard'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
-import { CategoryBar } from '../components/CategoryBar'
+import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
@@ -17,9 +17,17 @@ import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 
-type MobileTab = Category | 'Tendencia'
+type MobileTab = CategoryTab
 
 const PAGE_SIZE = 12
+
+// Pestaña "Nuevo": lo último sembrado primero; los vencidos (por resolverse) al final
+function byNewest(a: Market, b: Market): number {
+  const pa = a.status === 'pending_resolution' ? 1 : 0
+  const pb = b.status === 'pending_resolution' ? 1 : 0
+  if (pa !== pb) return pa - pb
+  return (Date.parse(b.createdAt ?? '') || 0) - (Date.parse(a.createdAt ?? '') || 0)
+}
 
 function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () => void }) {
   const { t } = useTranslation()
@@ -29,6 +37,51 @@ function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () 
         {t('home.seeMore', { count: remaining })}
       </button>
     </div>
+  )
+}
+
+// Sección de grid del desktop (Tendencia y Nuevo comparten título + "Ver todos" + paginado)
+function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore }: {
+  title: string; viewAllTo: string; emptyText: string
+  markets: Market[]; loading: boolean; visible: number; onMore: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <section style={{ marginBottom: 56 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 className="section-title">{title}</h2>
+        <Link to={viewAllTo} style={{
+          textDecoration: 'none', fontSize: 13,
+          color: 'var(--text-secondary)', fontWeight: 500,
+          display: 'flex', alignItems: 'center', gap: 4,
+        }}>
+          {t('home.viewAll')}
+          <Icon name="arrow-right" size={14} />
+        </Link>
+      </div>
+      {loading ? (
+        <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: 210 }} />
+          ))}
+        </div>
+      ) : markets.length > 0 ? (
+        <>
+          <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
+            {markets.slice(0, visible).map((market, i) => (
+              <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
+            ))}
+          </div>
+          {markets.length > visible && (
+            <SeeMoreButton remaining={markets.length - visible} onClick={onMore} />
+          )}
+        </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
+          <p style={{ fontWeight: 600 }}>{emptyText}</p>
+        </div>
+      )}
+    </section>
   )
 }
 
@@ -94,8 +147,10 @@ export function Home() {
 
   const filtered = (() => {
     if (mobileTab === 'Tendencia') return markets.filter(m => m.trending)
+    if (mobileTab === 'Nuevo') return [...markets].sort(byNewest)
     return markets.filter(m => m.category === mobileTab)
   })()
+  const emptyText = mobileTab === 'Nuevo' ? t('home.noNew') : t('home.noTrending')
 
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
@@ -124,10 +179,10 @@ export function Home() {
           </form>
         </CategoryBar>
 
-        {mobileTab === 'Tendencia' ? (
+        {isFeed(mobileTab) ? (
           <>
-            {/* Trending list estilo Polymarket: sin carrusel destacado, tarjetas
-                compactas con Sí/No que abren la compra. Paginado como en desktop. */}
+            {/* Feed (Tendencia / Nuevo) estilo Polymarket: sin carrusel destacado,
+                tarjetas compactas con Sí/No que abren la compra. Paginado como en desktop. */}
             <div style={{ padding: '12px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {loading ? (
                 [...Array(5)].map((_, i) => (
@@ -149,7 +204,7 @@ export function Home() {
                 </>
               ) : (
                 <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-                  <p style={{ fontWeight: 600 }}>{t('home.noTrending')}</p>
+                  <p style={{ fontWeight: 600 }}>{emptyText}</p>
                 </div>
               )}
             </div>
@@ -210,42 +265,27 @@ export function Home() {
           </section>
 
           {/* Trending markets grid */}
-          <section style={{ marginBottom: 56 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 className="section-title">{t('home.trendingMarkets')}</h2>
-              <Link to="/mercados" style={{
-                textDecoration: 'none', fontSize: 13,
-                color: 'var(--text-secondary)', fontWeight: 500,
-                display: 'flex', alignItems: 'center', gap: 4,
-              }}>
-                {t('home.viewAll')}
-                <Icon name="arrow-right" size={14} />
-              </Link>
-            </div>
-            {loading ? (
-              <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-                {[...Array(9)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: 210 }} />
-                ))}
-              </div>
-            ) : filtered.length > 0 ? (
-              <>
-                <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-                  {filtered.slice(0, visibleTrending).map((market, i) => (
-                    <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
-                  ))}
-                </div>
-                {filtered.length > visibleTrending && (
-                  <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
-                )}
-              </>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-                <p style={{ fontWeight: 600 }}>{t('home.noTrending')}</p>
-              </div>
-            )}
-          </section>
+          <MarketGridSection
+            title={t('home.trendingMarkets')}
+            viewAllTo="/mercados"
+            emptyText={emptyText}
+            markets={filtered}
+            loading={loading}
+            visible={visibleTrending}
+            onMore={() => setVisibleTrending(v => v + PAGE_SIZE)}
+          />
         </>
+      ) : mobileTab === 'Nuevo' ? (
+        /* Nuevo: solo el grid, sin carrusel ni temas populares */
+        <MarketGridSection
+          title={t('home.newMarkets')}
+          viewAllTo="/mercados?sort=new"
+          emptyText={emptyText}
+          markets={filtered}
+          loading={loading}
+          visible={visibleTrending}
+          onMore={() => setVisibleTrending(v => v + PAGE_SIZE)}
+        />
       ) : (
         <section style={{ marginBottom: 56 }}>
           <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />

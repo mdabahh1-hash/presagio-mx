@@ -28,6 +28,8 @@ export interface Market {
   volume: number
   liquidity: number
   endsAt: string
+  // ISO de la siembra (sello "Nuevo" ≤3 días y orden de la pestaña Nuevo); los mocks no lo traen
+  createdAt?: string
   resolutionCriteria: string
   trending: boolean
   status?: MarketStatus
