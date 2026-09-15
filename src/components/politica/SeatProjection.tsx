@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { ApiProyeccion, ApiPartido } from '../../lib/api'
 import { getPartyColor, getPartyTextColor } from '../../lib/partyColors'
 import { probColor } from '../../lib/prices'
+import { useElementWidth } from '../../lib/useElementWidth'
 
 interface SeatProjectionProps {
   proyeccion: ApiProyeccion
@@ -33,6 +34,10 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
   const coalitionSeats = coalicion.reduce((s, c) => s + seats(c), 0)
   const main = coalicion[0]
   const thresholdPct = (umbral / total) * 100
+  const [barRef, barW] = useElementWidth()
+  // La etiqueta del segmento solo si cabe: ~5.5 px por carácter a 11 px + aire.
+  // Sin medida aún (primer render), regla fija del 6 %.
+  const fits = (pct: number, label: string) => (barW ? (pct / 100) * barW >= label.length * 5.5 + 6 : pct >= 6)
 
   return (
     <div className={`card ${className}`} style={{ padding: '18px 20px', minWidth: 0 }}>
@@ -41,9 +46,10 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
         <span className="meta-label num">{t('politica.seats', { count: total })}</span>
       </div>
 
-      <div className="pol-seatbar">
+      <div className="pol-seatbar" ref={barRef}>
         {bloques.map(b => {
           const pct = (b.escanos / total) * 100
+          const label = `${ficha(b.partido)?.siglas ?? b.partido} ${b.escanos}`
           return (
             <div
               key={b.partido}
@@ -54,7 +60,7 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
                 fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden',
               }}
             >
-              {pct >= 6 && <span className="num">{ficha(b.partido)?.siglas ?? b.partido} {b.escanos}</span>}
+              {fits(pct, label) && <span className="num">{label}</span>}
             </div>
           )
         })}

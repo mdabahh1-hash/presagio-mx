@@ -513,6 +513,7 @@ input[type='range']::-webkit-slider-thumb {
 /* ── Landing de Política (src/components/politica) ── */
 .pol-hero { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: stretch; margin-bottom: 14px; }
 .pol-hero-cta { display: flex; gap: 8px; }
+.pol-hero-cta > .btn { flex: 1; height: 44px; padding: 0 20px; }
 .pol-topic {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
   padding: 10px 8px; border-radius: 8px; border: none; background: none; text-align: left;
@@ -701,6 +702,7 @@ input[type='range']::-webkit-slider-thumb {
 
   /* Landing de Política */
   .pol-hero-cta { flex-direction: column; }
+  .pol-hero-cta > .btn { flex: 0 0 auto; }
   .pol-topic { min-height: 44px; }
   .pol-party-track { width: 90px; }
   .pol-timeline-grid { display: flex; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; padding-bottom: 8px; }

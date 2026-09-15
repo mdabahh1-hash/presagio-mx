@@ -84,10 +84,10 @@ export function PoliticaHero({ market, series, historyLoading, delta7, onBuy }: 
 
       {/* CTAs: abren el sheet de operar, no navegan */}
       <div className="pol-hero-cta">
-        <button type="button" className="btn btn-yes" style={{ flex: 1, height: 44, padding: '0 20px' }} onClick={() => onBuy('YES')}>
+        <button type="button" className="btn btn-yes" onClick={() => onBuy('YES')}>
           {t('politica.buyYes', { pct: pair.yes })}
         </button>
-        <button type="button" className="btn btn-no" style={{ flex: 1, height: 44, padding: '0 20px' }} onClick={() => onBuy('NO')}>
+        <button type="button" className="btn btn-no" onClick={() => onBuy('NO')}>
           {t('politica.buyNo', { pct: pair.no })}
         </button>
       </div>
