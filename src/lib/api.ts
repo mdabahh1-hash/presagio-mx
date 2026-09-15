@@ -187,6 +187,42 @@ export const marketsApi = {
     request<ApiComment>(`/markets/${marketId}/comments/${commentId}/like`, { method: 'POST' }),
 }
 
+// ── Contenido curado por categoría (landing de Política) ───────────────────
+// Espejo de app/schemas/contenido.py; formato en contenido_categorias/__init__.py.
+
+export interface ApiHito { fecha: string; etiqueta: string; texto: string; clave: boolean }
+export interface ApiBloque { partido: string; escanos: number }
+export interface ApiProyeccion {
+  titulo: string
+  total: number
+  umbral: number
+  umbral_etiqueta: string
+  mercado_umbral_id?: string | null
+  bloques: ApiBloque[]
+  coalicion: string[]
+  nota?: string | null
+}
+export interface ApiCronologia { titulo: string; subtitulo?: string | null; hitos: ApiHito[] }
+export interface ApiPartido { clave: string; nombre: string; siglas: string }
+export interface ApiFuente { host: string; etiqueta: string }
+export interface ApiContenidoCategoria {
+  categoria: string
+  actualizado: string
+  resumen?: string | null
+  hero: { secundario_id?: string | null }
+  proyeccion?: ApiProyeccion | null
+  cronologia?: ApiCronologia | null
+  partidos: ApiPartido[]
+  fuentes: ApiFuente[]
+  notas: Record<string, string>
+}
+
+export const contenidoApi = {
+  // La categoría va por VALOR ("Política"), igual que ?category= del listado.
+  categoria: (categoria: string) =>
+    request<ApiContenidoCategoria>(`/contenido/categorias/${encodeURIComponent(categoria)}`),
+}
+
 // ── Trades ─────────────────────────────────────────────────────────────────
 
 export interface TradeResponse {

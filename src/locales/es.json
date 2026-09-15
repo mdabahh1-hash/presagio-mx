@@ -453,6 +453,18 @@
     "emptyHint": "Cuando alguien opere, aquí verás qué mercados se movieron",
     "emptyCategory": "Sin movimientos en esta categoría"
   },
+  "politica": {
+    "headerMeta_one": "{{count}} mercado · {{volume}} PT operados",
+    "headerMeta_other": "{{count}} mercados · {{volume}} PT operados",
+    "trades_one": "{{count}} operación",
+    "trades_other": "{{count}} operaciones",
+    "delta7Up": "Sí · +{{count}} pts en 7 días",
+    "delta7Down": "Sí · −{{count}} pts en 7 días",
+    "delta7Flat": "Sí · sin cambios en 7 días",
+    "buyYes": "Comprar Sí · {{pct}}%",
+    "buyNo": "Comprar No · {{pct}}%",
+    "historyTitle": "Probabilidad histórica · 90 días"
+  },
   "leagues": {
     "invite": {
       "badge": "Liga privada",

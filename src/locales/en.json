@@ -453,6 +453,18 @@
     "emptyHint": "Once someone trades, you'll see which markets moved here",
     "emptyCategory": "No moves in this category"
   },
+  "politica": {
+    "headerMeta_one": "{{count}} market · {{volume}} PT traded",
+    "headerMeta_other": "{{count}} markets · {{volume}} PT traded",
+    "trades_one": "{{count}} trade",
+    "trades_other": "{{count}} trades",
+    "delta7Up": "Yes · +{{count}} pts in 7 days",
+    "delta7Down": "Yes · −{{count}} pts in 7 days",
+    "delta7Flat": "Yes · unchanged in 7 days",
+    "buyYes": "Buy Yes · {{pct}}%",
+    "buyNo": "Buy No · {{pct}}%",
+    "historyTitle": "Historical probability · 90 days"
+  },
   "leagues": {
     "invite": {
       "badge": "Private league",

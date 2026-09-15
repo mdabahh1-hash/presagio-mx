@@ -31,6 +31,10 @@ export interface Market {
   // ISO de la siembra (sello "Nuevo" ≤3 días y orden de la pestaña Nuevo); los mocks no lo traen
   createdAt?: string
   resolutionCriteria: string
+  // Fuente oficial de resolución (https://…); null si el mercado no la declara
+  resolutionSourceUrl?: string | null
+  // Operaciones ejecutadas (num_trades del API)
+  numTrades?: number
   trending: boolean
   status?: MarketStatus
   marketType?: 'binary' | 'multi'

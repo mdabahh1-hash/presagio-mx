@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
+import { PoliticaLanding, featuredCandidates } from '../components/politica/PoliticaLanding'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
 import { CATEGORIES, SUBCATEGORIES, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
+import { formatVolume } from '../lib/format'
 
 const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
 
@@ -75,6 +77,16 @@ export function Markets() {
   const nuevos = useMemo(() => (sortBy === 'new' ? selectNewMarkets(markets) : null), [markets, sortBy])
   const shown = nuevos ? nuevos.items : markets
   const notice = nuevos?.fallback ? t('home.newFallback') : null
+
+  // Política tiene landing propia (components/politica) cuando hay un mercado
+  // trending abierto y no hay búsqueda; si no, cae al CategoryBrowse genérico.
+  const isPolitica = activeCategory === 'Política' && !searchInput
+  const hasOpenTrending = useMemo(() => featuredCandidates(markets).some(m => m.trending), [markets])
+  const showLanding = isPolitica && (loading || hasOpenTrending)
+  const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
+  const patchPrice = useCallback((id: string, yes: number) => {
+    setMarkets(prev => prev.map(m => (m.id === id ? { ...m, yesPrice: Math.round(yes) } : m)))
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -159,10 +171,12 @@ export function Markets() {
       }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {t('markets.title')}
+            {showLanding ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
-            {loading ? t('common.loading') : (
+            {loading ? t('common.loading') : showLanding ? (
+              <span className="num">{t('politica.headerMeta', { count: markets.length, volume: formatVolume(categoryVolume) })}</span>
+            ) : (
               <><span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{markets.length}</span>{' '}{t('markets.activeCount')}</>
             )}
           </p>
@@ -223,7 +237,16 @@ export function Markets() {
         </div>
       </div>
 
-      {activeCategory !== 'Todos' ? (
+      {showLanding ? (
+        <PoliticaLanding
+          markets={markets}
+          loading={loading}
+          subcats={SUBCATEGORIES['Política'] ?? []}
+          activeSub={activeSub}
+          onSubChange={handleSubChange}
+          onTraded={patchPrice}
+        />
+      ) : activeCategory !== 'Todos' ? (
         /* Category view — same sidebar layout as the home page */
         <CategoryBrowse
           category={activeCategory}

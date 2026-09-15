@@ -7,3 +7,9 @@ export function displayPair(yesPrice: number): { yes: number; no: number } {
   const yes = Math.round(yesPrice)
   return { yes, no: 100 - yes }
 }
+
+// Color de una probabilidad SÍ (0-100): verde si es alta, rojo si es baja, neutro
+// en medio. Regla del design system (veredikt.md §7); antes vivía copiada inline.
+export function probColor(yesPrice: number): string {
+  return yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--text-primary)'
+}

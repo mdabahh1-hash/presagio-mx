@@ -29,6 +29,8 @@ export function apiToMarket(m: ApiMarket): Market {
     endsAt: m.ends_at,
     createdAt: m.created_at,
     resolutionCriteria: '',
+    resolutionSourceUrl: m.resolution_source_url ?? null,
+    numTrades: m.num_trades,
     trending: m.trending,
     status: m.status as MarketStatus,
     marketType: m.market_type ?? 'binary',
