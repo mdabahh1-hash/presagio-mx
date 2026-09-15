@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { Market } from '../../types'
+import type { Market, PricePoint } from '../../types'
 import { MarketRow } from '../MarketRow'
 import { SeeMoreButton } from '../SeeMoreButton'
 import { useSparks } from '../../lib/useSparks'
@@ -23,6 +23,18 @@ interface PoliticaSectionsProps {
 }
 
 const PAGE = 5
+const SPARK_DAYS = 7
+
+// El historial de 7 días de un mercado sin operaciones trae 0 o 1 puntos: se
+// completa con el precio actual para pintar la línea plana (color neutro).
+function sparkOf(points: PricePoint[] | null | undefined, m: Market): PricePoint[] | null {
+  if (points === undefined || points === null) return points ?? null
+  if (points.length >= 2) return points
+  const now = new Date()
+  const start = new Date(now.getTime() - SPARK_DAYS * 86_400_000)
+  const first = points[0] ?? { date: start.toISOString(), price: m.yesPrice }
+  return [first, { date: now.toISOString(), price: m.yesPrice }]
+}
 
 // Secciones de filas por subcategoría con sparkline de 7 días. Con ?sub=
 // activo solo se muestra esa sección completa; si no, PAGE filas por sección
@@ -40,7 +52,7 @@ export function PoliticaSections({ sections, activeSub, onViewAll, onClearSub, e
     [sections, activeSub, visible],
   )
   const visibleIds = useMemo(() => shown.flatMap(s => s.shown.map(m => m.id)), [shown])
-  const sparks = useSparks(visibleIds)
+  const sparks = useSparks(visibleIds, SPARK_DAYS)
 
   if (sections.length === 0) {
     return (
@@ -75,9 +87,9 @@ export function PoliticaSections({ sections, activeSub, onViewAll, onClearSub, e
               <MarketRow
                 key={m.id}
                 market={m}
-                hideSubcategory
+                hideBadge
                 padding="14px 0"
-                spark={sparks[m.id] ?? null}
+                spark={sparkOf(sparks[m.id], m)}
                 extraMeta={extraMetaOf(m)}
                 animClass={si === 0 ? `anim-${Math.min(i + 1, 6)}` : ''}
               />

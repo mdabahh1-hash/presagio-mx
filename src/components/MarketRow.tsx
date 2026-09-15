@@ -20,6 +20,8 @@ interface MarketRowProps {
   // La fila vive dentro de una sección titulada con su subcategoría: el badge
   // repetiría el encabezado.
   hideSubcategory?: boolean
+  // Sin badge alguno (la landing de una categoría ya da el contexto)
+  hideBadge?: boolean
   // Padding vertical de la fila (landing de Política usa 14px)
   padding?: string
   // Sparkline antes de los chips Sí/No. undefined = sin hueco (uso actual);
@@ -32,7 +34,7 @@ interface MarketRowProps {
 // Fila estilo Polymarket: thumbnail + pregunta + meta a la izquierda,
 // probabilidades a la derecha. Es una fila de lista (divisor), no una tarjeta.
 // Toda la fila es un Link al mercado.
-export function MarketRow({ market, animClass = '', compact = false, hideSubcategory = false, padding = '12px 0', spark, extraMeta = null }: MarketRowProps) {
+export function MarketRow({ market, animClass = '', compact = false, hideSubcategory = false, hideBadge = false, padding = '12px 0', spark, extraMeta = null }: MarketRowProps) {
   const { t } = useTranslation()
   const isMulti = market.marketType === 'multi'
   const isPending = market.status === 'pending_resolution'
@@ -103,7 +105,7 @@ export function MarketRow({ market, animClass = '', compact = false, hideSubcate
     )
   }
 
-  const badgeLabel = hideSubcategory && market.subcategory ? null : (market.subcategory ?? market.category)
+  const badgeLabel = hideBadge || (hideSubcategory && market.subcategory) ? null : (market.subcategory ?? market.category)
 
   return (
     <Link

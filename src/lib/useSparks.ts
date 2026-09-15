@@ -12,7 +12,11 @@ export function useSparks(ids: string[], days = 7): Record<string, PricePoint[] 
   const [sparks, setSparks] = useState<Record<string, PricePoint[] | null>>({})
   const requested = useRef(new Set<string>())
   const mounted = useRef(true)
-  useEffect(() => () => { mounted.current = false }, [])
+  // StrictMode monta/desmonta/monta: reponer el flag en cada montaje real
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false }
+  }, [])
 
   const key = ids.join('|')
   useEffect(() => {
