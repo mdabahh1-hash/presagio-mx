@@ -198,6 +198,7 @@ export function Navbar() {
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/mercados', label: t('nav.markets') },
+    { to: '/noticias', label: t('nav.news') },
     { to: '/ligas', label: t('nav.leagues') },
     { to: '/clasificacion', label: t('nav.leaderboard') },
     { to: '/como-funciona', label: t('nav.howItWorks') },
@@ -595,7 +596,7 @@ export function Navbar() {
                   background: isActive(link.to) ? 'var(--bg-hover)' : 'transparent',
                 }}
               >
-                <Icon name={link.to === '/' ? 'home' : link.to === '/ligas' ? 'users' : link.to === '/clasificacion' ? 'trophy' : link.to === '/proponer' ? 'plus' : link.to === '/como-funciona' ? 'list' : 'chart'} size={18} style={{ color: 'var(--text-tertiary)' }} />
+                <Icon name={link.to === '/' ? 'home' : link.to === '/ligas' ? 'users' : link.to === '/clasificacion' ? 'trophy' : link.to === '/proponer' ? 'plus' : link.to === '/como-funciona' ? 'list' : link.to === '/noticias' ? 'news' : 'chart'} size={18} style={{ color: 'var(--text-tertiary)' }} />
                 {link.label}
               </Link>
             ))}

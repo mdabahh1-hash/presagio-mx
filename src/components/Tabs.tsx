@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { Icon, type IconName } from './Icon'
 
 // Tabs de texto con subrayado (estilo Polymarket): sin píldoras, sin bordes.
-// Con `onChange` son botones; con `to` en cada item son Links. El subrayado
+// Un item con `to` es un Link (aunque haya `onChange`: así "Noticias" navega
+// desde la Home, que filtra el resto in-place); sin `to` es un botón. El subrayado
 // del activo (2px) pisa la línea inferior del contenedor (.tabs-line o
 // .cat-tabs-sticky) para que la línea "no se mueva". `icon` va a la izquierda
 // del texto; `divider` pinta una línea vertical ANTES del item (separa los
@@ -49,7 +50,7 @@ export function Tabs<K extends string>({ items, active, onChange, size = 'md', a
         )
         const cls = `tab${isActive ? ' active' : ''}`
         const divider = item.divider ? <span className="tab-divider" aria-hidden /> : null
-        if (item.to && !onChange) {
+        if (item.to) {
           return (
             <React.Fragment key={item.key}>
               {divider}

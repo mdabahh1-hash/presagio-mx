@@ -17,21 +17,11 @@ import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { selectNewMarkets } from '../lib/newMarkets'
+import { SeeMoreButton } from '../components/SeeMoreButton'
 
 type MobileTab = CategoryTab
 
 const PAGE_SIZE = 12
-
-function SeeMoreButton({ remaining, onClick }: { remaining: number; onClick: () => void }) {
-  const { t } = useTranslation()
-  return (
-    <div style={{ textAlign: 'center', marginTop: 24 }}>
-      <button className="btn btn-secondary" onClick={onClick} style={{ minHeight: 44, padding: '0 24px' }}>
-        {t('home.seeMore', { count: remaining })}
-      </button>
-    </div>
-  )
-}
 
 // Sección de grid del desktop (Tendencia y Nuevo comparten título + "Ver todos" + paginado)
 function MarketGridSection({ title, viewAllTo, emptyText, notice, markets, loading, visible, onMore }: {

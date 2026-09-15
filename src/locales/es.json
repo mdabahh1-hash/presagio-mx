@@ -35,6 +35,7 @@
   "nav": {
     "home": "Inicio",
     "markets": "Mercados",
+    "news": "Noticias",
     "leagues": "Ligas",
     "leaderboard": "Clasificación",
     "howItWorks": "Cómo funciona",
@@ -115,6 +116,7 @@
     "noTrending": "Sin mercados en tendencia",
     "tabTrending": "Tendencia",
     "tabNew": "Nuevo",
+    "tabNews": "Noticias",
     "newMarkets": "Mercados nuevos",
     "noNew": "Sin mercados nuevos",
     "newFallback": "Sin mercados nuevos en los últimos 3 días; estos son los 12 más recientes"
@@ -416,6 +418,21 @@
   },
   "embed": {
     "cta": "Predice en VEREDIKT"
+  },
+  "news": {
+    "title": "Noticias",
+    "subtitle": "Los mercados que más se han movido en las últimas 24 horas",
+    "all": "Todos",
+    "summaryTitle": "Resumen de 24 h",
+    "summaryTitle7": "Resumen de 7 días",
+    "moved": "Mercados que se movieron",
+    "topRise": "Mayor subida",
+    "topFall": "Mayor bajada",
+    "volume": "Volumen operado",
+    "fallback": "Sin movimientos en las últimas 24 h; mostrando los últimos 7 días",
+    "empty": "Sin movimientos todavía",
+    "emptyHint": "Cuando alguien opere, aquí verás qué mercados se movieron",
+    "emptyCategory": "Sin movimientos en esta categoría"
   },
   "leagues": {
     "invite": {

@@ -325,7 +325,18 @@ select.input { padding-right: 32px; appearance: none; }
   background: var(--text-primary); border-radius: 1px;
 }
 .tab .tab-count { font-size: 12px; color: var(--text-tertiary); font-weight: 500; font-variant-numeric: tabular-nums; }
-/* Línea vertical que separa los feeds (Tendencia, Nuevo) de las categorías */
+/* Píldoras de filtro (Noticias): neutras, sin oro; radius 99 permitido en pills */
+.pills { display: flex; gap: 8px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+.pills::-webkit-scrollbar { display: none; }
+.pill {
+  flex-shrink: 0; min-height: 36px; padding: 0 14px; border-radius: 99px;
+  border: 1px solid transparent; background: var(--bg-elevated); color: var(--text-secondary);
+  font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.pill:hover { color: var(--text-primary); }
+.pill.active { color: var(--text-primary); background: var(--bg-hover); border-color: var(--border-hover); font-weight: 600; }
+/* Línea vertical que separa los feeds (Tendencia, Noticias, Nuevo) de las categorías */
 .tab-divider { flex-shrink: 0; align-self: center; width: 1px; height: 16px; background: var(--border-default); }
 .tabs-sm { gap: 16px; }
 .tabs-sm .tab { padding: 8px 0; font-size: 13px; }
@@ -576,6 +587,9 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }
+  /* minmax(0, …): el resumen lleva texto en nowrap y con `1fr` a secas ensancharía la columna */
+  .news-layout  { grid-template-columns: minmax(0, 1fr) !important; }
+  .news-hero-art { display: none !important; }
   .leaderboard-grid { grid-template-columns: 1fr !important; }
   .bonus-amount { display: none !important; }
   .bonus-pill   { padding: 4px 5px 4px 9px !important; }
@@ -583,6 +597,7 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 560px) {
   .lb-vol { display: none !important; }
+  .news-spark { display: none !important; }
 }
 
 @media (max-width: 768px) {

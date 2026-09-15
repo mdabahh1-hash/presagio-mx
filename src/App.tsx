@@ -21,6 +21,7 @@ const Admin = lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin }
 const HowItWorks = lazy(() => import('./pages/HowItWorks').then(m => ({ default: m.HowItWorks })))
 const Propose = lazy(() => import('./pages/Propose').then(m => ({ default: m.Propose })))
 const Leaderboard = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
+const News = lazy(() => import('./pages/News').then(m => ({ default: m.News })))
 const PublicProfile = lazy(() => import('./pages/PublicProfile').then(m => ({ default: m.PublicProfile })))
 const Following = lazy(() => import('./pages/Following').then(m => ({ default: m.Following })))
 const LeaguesPage = lazy(() => import('./pages/leagues/LeaguesPage').then(m => ({ default: m.LeaguesPage })))
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/mercados" element={<Markets />} />
               <Route path="/mercado/:id" element={<MarketDetail />} />
+              <Route path="/noticias" element={<News />} />
               <Route path="/perfil" element={<Profile />} />
               <Route path="/siguiendo" element={<Following />} />
               <Route path="/clasificacion" element={<Leaderboard />} />

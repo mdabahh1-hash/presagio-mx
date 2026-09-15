@@ -9,7 +9,7 @@ export type IconName =
   | 'heart' | 'gift' | 'globe' | 'sun' | 'moon' | 'menu' | 'user' | 'users' | 'plus' | 'minus'
   | 'medal' | 'ball' | 'football' | 'car' | 'gloves' | 'vote' | 'chart' | 'coin' | 'cpu'
   | 'film' | 'cloud' | 'flag' | 'bank' | 'code' | 'logout' | 'home' | 'list' | 'sliders' | 'key' | 'mail'
-  | 'sparkle'
+  | 'sparkle' | 'news' | 'arrow-up-right' | 'arrow-down-right'
 
 const PATHS: Record<IconName, React.ReactNode> = {
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
@@ -64,6 +64,11 @@ const PATHS: Record<IconName, React.ReactNode> = {
   mail: <><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>,
   // Chispa de 4 puntas: pestaña "Nuevo" y sello de mercado recién sembrado
   sparkle: <path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z" />,
+  // Periódico: pestaña Noticias
+  news: <><path d="M4 5h13a2 2 0 0 1 2 2v11a1 1 0 0 0 2 0V9" /><path d="M4 5v13a1 1 0 0 0 1 1h16" /><path d="M8 9h5" /><path d="M8 13h7" /><path d="M8 17h7" /></>,
+  // Sube / baja (cambio de precio en Noticias)
+  'arrow-up-right': <><path d="M7 17 17 7" /><path d="M7 7h10v10" /></>,
+  'arrow-down-right': <><path d="m7 7 10 10" /><path d="M17 7v10H7" /></>,
 }
 
 interface IconProps extends Omit<React.SVGProps<SVGSVGElement>, 'name'> {

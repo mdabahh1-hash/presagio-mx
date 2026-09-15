@@ -87,6 +87,25 @@ export interface ApiPricePoint {
   outcome_key?: string | null
 }
 
+// Página Noticias: un mercado y cuánto se movió en la ventana (puntos porcentuales)
+export interface ApiMover {
+  id: string
+  question: string
+  category: string
+  subcategory?: string | null
+  image_url?: string | null
+  market_type: 'binary' | 'multi'
+  status: string
+  ends_at: string
+  outcome_key?: string | null
+  outcome_label?: string | null
+  price: number
+  price_before: number
+  change: number
+  volume_delta: number
+  points: { recorded_at: string; price: number }[]
+}
+
 export interface ApiComment {
   id: number
   market_id: string
@@ -160,6 +179,7 @@ export const marketsApi = {
     request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
   outcomes: (id: string) => request<ApiOutcome[]>(`/markets/${id}/outcomes`),
   history: (id: string, days = 60) => request<ApiPricePoint[]>(`/markets/${id}/history?days=${days}`),
+  movers: (hours = 24, limit = 50) => request<ApiMover[]>(`/markets/movers?hours=${hours}&limit=${limit}`),
   comments: (id: string) => request<ApiComment[]>(`/markets/${id}/comments`),
   postComment: (id: string, text: string) =>
     request<ApiComment>(`/markets/${id}/comments`, { method: 'POST', body: JSON.stringify({ text }) }),

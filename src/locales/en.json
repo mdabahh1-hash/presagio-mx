@@ -35,6 +35,7 @@
   "nav": {
     "home": "Home",
     "markets": "Markets",
+    "news": "News",
     "leagues": "Leagues",
     "leaderboard": "Leaderboard",
     "howItWorks": "How it works",
@@ -115,6 +116,7 @@
     "noTrending": "No trending markets",
     "tabTrending": "Trending",
     "tabNew": "New",
+    "tabNews": "News",
     "newMarkets": "New markets",
     "noNew": "No new markets",
     "newFallback": "No new markets in the last 3 days; these are the 12 most recent"
@@ -416,6 +418,21 @@
   },
   "embed": {
     "cta": "Predict on VEREDIKT"
+  },
+  "news": {
+    "title": "News",
+    "subtitle": "The markets that moved the most in the last 24 hours",
+    "all": "All",
+    "summaryTitle": "24h summary",
+    "summaryTitle7": "7-day summary",
+    "moved": "Markets that moved",
+    "topRise": "Biggest rise",
+    "topFall": "Biggest drop",
+    "volume": "Volume traded",
+    "fallback": "No moves in the last 24h; showing the last 7 days",
+    "empty": "No moves yet",
+    "emptyHint": "Once someone trades, you'll see which markets moved here",
+    "emptyCategory": "No moves in this category"
   },
   "leagues": {
     "invite": {
