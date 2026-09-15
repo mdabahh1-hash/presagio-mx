@@ -8,6 +8,7 @@ import { TradeSheet } from '../TradeSheet'
 import { AuthModal } from '../AuthModal'
 import { PoliticaHero } from './PoliticaHero'
 import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
+import { ElectionTimeline } from './ElectionTimeline'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -198,6 +199,15 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           sources={sources}
         />
       </div>
+
+      {content?.cronologia && (
+        <ElectionTimeline
+          className="anim-2"
+          titulo={content.cronologia.titulo}
+          subtitulo={content.cronologia.subtitulo}
+          hitos={content.cronologia.hitos}
+        />
+      )}
 
       <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
         {tradeMarket && trade && (
