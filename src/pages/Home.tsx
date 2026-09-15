@@ -77,10 +77,12 @@ export function Home() {
   const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>([])
   const [usingMock, setUsingMock] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [mobileTab, setMobileTab] = useState<MobileTab>('Tendencia')
+  const location = useLocation()
+  // El feed vive en la URL (/ = Tendencia, /nuevo = Nuevo); las categorías filtran in-place
+  const feedFromPath: MobileTab = location.pathname === '/nuevo' ? 'Nuevo' : 'Tendencia'
+  const [mobileTab, setMobileTab] = useState<MobileTab>(feedFromPath)
   const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()
-  const location = useLocation()
   const isMobile = useMobile()
   // Compra rápida desde la lista (móvil): el sheet lee el mercado vivo por id
   const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
@@ -90,10 +92,10 @@ export function Home() {
 
   useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
 
-  // Clic en el logo (Link a "/") estando ya en Home: la ruta no cambia pero
-  // location.key sí → volver a la pestaña Tendencia en vez de quedarse en la
-  // categoría seleccionada.
-  useEffect(() => { setMobileTab('Tendencia') }, [location.key])
+  // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
+  // ruta puede no cambiar pero location.key sí → volver al feed de la URL en
+  // vez de quedarse en la categoría seleccionada.
+  useEffect(() => { setMobileTab(feedFromPath) }, [location.key, feedFromPath])
 
   useEffect(() => {
     // Paginado completo: el top-100 por volumen dejaba fuera ligas enteras

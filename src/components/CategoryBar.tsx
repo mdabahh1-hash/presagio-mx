@@ -6,7 +6,9 @@ import { Tabs, type TabItem } from './Tabs'
 
 // Feeds (no son categorías del API): Tendencia, Noticias y Nuevo, con icono,
 // separados de las categorías por una línea vertical (estilo Polymarket).
-// Noticias es una página propia (/noticias): siempre es un Link.
+// Cada feed tiene URL propia (/, /nuevo, /noticias) y SIEMPRE es un Link, se
+// esté donde se esté: antes, fuera de la Home, Nuevo enlazaba a /mercados y
+// parecía caer en "todos los mercados".
 export const FEEDS = ['Tendencia', 'Noticias', 'Nuevo'] as const
 export type Feed = (typeof FEEDS)[number]
 const TABS = [...FEEDS, ...CATEGORIES] as const
@@ -15,9 +17,9 @@ export const isFeed = (tab: string): tab is Feed => (FEEDS as readonly string[])
 
 // Barra de categorías estilo Polymarket: tabs de texto con subrayado, pegada
 // bajo el navbar, con una línea inferior que no se mueve ("panel congelado").
-// Dos modos: con onChange filtra in-place (Home); sin onChange cada tab es un
-// Link (Tendencia → /mercados, Nuevo → /mercados?sort=new, categoría →
-// /mercados?cat=) y el activo se lee de la URL (Perfil, Mercados, Noticias).
+// Dos modos para las CATEGORÍAS: con onChange filtran in-place (Home); sin
+// onChange cada una es un Link a /mercados?cat= y el activo se lee de la URL
+// (Perfil, Noticias). Los feeds son Links en ambos modos.
 // El wrapper es full-bleed (la línea cruza todo el ancho): renderizar FUERA
 // del .page-container de la página. `children` = slot arriba de los tabs
 // (buscador de la Home móvil).
@@ -35,20 +37,20 @@ export function CategoryBar({ active, onChange, sticky = true, children, style }
 
   const urlActive: CategoryTab | null = (() => {
     if (onChange) return null
-    if (location.pathname.startsWith('/noticias')) return 'Noticias'
-    if (!location.pathname.startsWith('/mercados')) return null
-    const params = new URLSearchParams(location.search)
-    const cat = params.get('cat')
-    if (cat && (TABS as readonly string[]).includes(cat)) return cat as CategoryTab
-    return params.get('sort') === 'new' ? 'Nuevo' : 'Tendencia'
+    const path = location.pathname
+    if (path.startsWith('/noticias')) return 'Noticias'
+    if (path === '/nuevo') return 'Nuevo'
+    if (path === '/') return 'Tendencia'
+    if (!path.startsWith('/mercados')) return null
+    const cat = new URLSearchParams(location.search).get('cat')
+    return cat && (CATEGORIES as readonly string[]).includes(cat) ? (cat as CategoryTab) : null
   })()
 
   const linkTo = (tab: CategoryTab) => {
+    if (tab === 'Tendencia') return '/'
+    if (tab === 'Nuevo') return '/nuevo'
     if (tab === 'Noticias') return '/noticias'
-    if (onChange) return undefined
-    if (tab === 'Tendencia') return '/mercados'
-    if (tab === 'Nuevo') return '/mercados?sort=new'
-    return `/mercados?cat=${encodeURIComponent(tab)}`
+    return onChange ? undefined : `/mercados?cat=${encodeURIComponent(tab)}`
   }
 
   const items: TabItem<CategoryTab>[] = TABS.map(tab => ({
