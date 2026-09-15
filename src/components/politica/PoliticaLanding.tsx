@@ -201,10 +201,20 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
 
   if (loading) {
     return (
-      <div aria-busy="true" aria-label={t('common.loading')}>
+      <div aria-busy="true" aria-label={t('common.loading')} style={{ marginBottom: 48 }}>
         <div className="pol-hero">
           <div className="skeleton" style={{ height: 360 }} />
           <div className="skeleton" style={{ height: 360 }} />
+        </div>
+        <div className="skeleton" style={{ height: 120, marginBottom: 14 }} />
+        <div className="pol-cards">
+          <div className="skeleton" style={{ height: 220 }} />
+          <div className="skeleton" style={{ height: 220 }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="skeleton" style={{ height: 72, background: 'var(--bg-surface)', border: 'none' }} />
+          ))}
         </div>
       </div>
     )

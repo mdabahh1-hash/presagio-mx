@@ -616,6 +616,10 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 1024px) {
   .featured-row { grid-template-columns: 1fr !important; }
+  /* Landing de Política: hero y tarjetas a una columna; cronología en dos renglones sin riel */
+  .pol-hero, .pol-cards { grid-template-columns: 1fr !important; }
+  .pol-timeline-grid { grid-template-columns: repeat(3, 1fr) !important; row-gap: 20px; }
+  .pol-timeline-rail { display: none; }
   /* minmax(0, …): el resumen lleva texto en nowrap y con `1fr` a secas ensancharía la columna */
   .news-layout  { grid-template-columns: minmax(0, 1fr) !important; }
   .news-hero-art { display: none !important; }
@@ -690,6 +694,18 @@ input[type='range']::-webkit-slider-thumb {
   .market-row .market-row-thumb { width: 44px !important; height: 44px !important; }
   .market-row-outcomes { grid-column: 2; flex-wrap: wrap; }
   .row-outcome-btn { flex: 1 1 100px; min-width: 0 !important; }
+  /* Con sparkline el wrapper ocupa la columna 2 y el sparkline se oculta (como .news-spark) */
+  .market-row-right { grid-column: 2; }
+  .market-row-right .market-row-outcomes { flex: 1; }
+  .market-row-spark { display: none; }
+
+  /* Landing de Política */
+  .pol-hero-cta { flex-direction: column; }
+  .pol-topic { min-height: 44px; }
+  .pol-party-track { width: 90px; }
+  .pol-timeline-grid { display: flex; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; padding-bottom: 8px; }
+  .pol-timeline-grid::-webkit-scrollbar { display: none; }
+  .pol-timeline-hito { flex: 0 0 150px; }
 
   .amount-presets button { min-height: 44px !important; }
   .amount-adjust-btn     { min-height: 44px !important; }
