@@ -7,6 +7,7 @@ import { BetBox } from '../BetBox'
 import { TradeSheet } from '../TradeSheet'
 import { AuthModal } from '../AuthModal'
 import { PoliticaHero } from './PoliticaHero'
+import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -56,6 +57,11 @@ export function featuredCandidates(markets: Market[]): Market[] {
     })
 }
 
+// Host sin "www." para agrupar fuentes (www.ine.mx y ine.mx son la misma)
+function hostOf(url: string): string | null {
+  try { return new URL(url).host.replace(/^www\./, '') } catch { return null }
+}
+
 function truncate(s: string, n: number): string {
   return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s
 }
@@ -63,7 +69,7 @@ function truncate(s: string, n: number): string {
 // Landing de /mercados?cat=Política: hero destacado con compra en sitio,
 // temas, cronología, proyección de escaños y secciones por subcategoría.
 // Markets.tsx solo la monta cuando hay un mercado trending abierto.
-export function PoliticaLanding({ markets, loading, onTraded }: PoliticaLandingProps) {
+export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubChange, onTraded }: PoliticaLandingProps) {
   const { t } = useTranslation()
   const inCat = useMemo(() => markets.filter(m => m.category === POLITICA), [markets])
   const candidates = useMemo(() => featuredCandidates(inCat), [inCat])
@@ -116,6 +122,36 @@ export function PoliticaLanding({ markets, loading, onTraded }: PoliticaLandingP
     return out
   }, [featured, secondary, histories, labelOf])
 
+  // Temas: subcategorías declaradas con mercados + "Otros" (sin subcategoría o no declarada)
+  const topics = useMemo<TopicRow[]>(() => {
+    const counts = new Map<string | null, number>()
+    for (const m of inCat) {
+      const key = m.subcategory && subcats.includes(m.subcategory) ? m.subcategory : null
+      counts.set(key, (counts.get(key) ?? 0) + 1)
+    }
+    const out: TopicRow[] = subcats.filter(sub => counts.has(sub)).map(sub => ({ sub, count: counts.get(sub) ?? 0 }))
+    const rest = counts.get(null)
+    if (rest) out.push({ sub: null, count: rest })
+    return out
+  }, [inCat, subcats])
+
+  // Fuentes oficiales: hosts únicos de resolution_source_url, etiqueta curada o el host
+  const sources = useMemo<SourceRow[]>(() => {
+    const byHost = new Map<string, SourceRow>()
+    for (const m of inCat) {
+      if (!m.resolutionSourceUrl) continue
+      const host = hostOf(m.resolutionSourceUrl)
+      if (!host) continue
+      const cur = byHost.get(host)
+      if (cur) cur.count += 1
+      else {
+        const label = content?.fuentes.find(f => f.host === host)?.etiqueta ?? host
+        byHost.set(host, { host, label, url: m.resolutionSourceUrl, count: 1 })
+      }
+    }
+    return [...byHost.values()].sort((a, b) => b.count - a.count)
+  }, [inCat, content])
+
   const featuredPoints = featured ? histories[featured.id] : undefined
   const historyLoading = !!featured && featuredPoints === undefined
 
@@ -153,6 +189,13 @@ export function PoliticaLanding({ markets, loading, onTraded }: PoliticaLandingP
           historyLoading={historyLoading}
           delta7={featuredPoints ? delta7(featuredPoints) : null}
           onBuy={side => setTrade({ marketId: featured.id, side })}
+        />
+        <PoliticaTopics
+          total={inCat.length}
+          topics={topics}
+          activeSub={activeSub}
+          onSelect={onSubChange}
+          sources={sources}
         />
       </div>
 

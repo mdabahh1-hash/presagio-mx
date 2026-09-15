@@ -463,7 +463,11 @@
     "delta7Flat": "Yes · unchanged in 7 days",
     "buyYes": "Buy Yes · {{pct}}%",
     "buyNo": "Buy No · {{pct}}%",
-    "historyTitle": "Historical probability · 90 days"
+    "historyTitle": "Historical probability · 90 days",
+    "topics": "Popular topics",
+    "topicsAll": "All topics",
+    "topicsViewAll": "See all topics",
+    "sources": "Official source"
   },
   "leagues": {
     "invite": {

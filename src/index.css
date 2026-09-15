@@ -511,8 +511,16 @@ input[type='range']::-webkit-slider-thumb {
 .footer-link:hover { color: var(--text-primary) !important; }
 
 /* ── Landing de Política (src/components/politica) ── */
-.pol-hero { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; margin-bottom: 14px; }
+.pol-hero { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: stretch; margin-bottom: 14px; }
 .pol-hero-cta { display: flex; gap: 8px; }
+.pol-topic {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+  padding: 10px 8px; border-radius: 8px; border: none; background: none; text-align: left;
+  font-family: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+.pol-topic:hover { background: var(--bg-hover); color: var(--text-primary); }
+.pol-topic.active { background: var(--bg-elevated); color: var(--text-primary); font-weight: 600; }
 /* El sheet de compra solo se usaba en móvil; en desktop (hero de Política) se centra y acota */
 @media (min-width: 769px) {
   .sheet-panel { max-width: 520px; margin: 0 auto; border-radius: var(--r-lg) var(--r-lg) 0 0; }
