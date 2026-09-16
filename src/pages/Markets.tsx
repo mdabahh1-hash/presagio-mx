@@ -5,7 +5,7 @@ import { marketsApi } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
-import { PoliticaLanding, featuredCandidates } from '../components/politica/PoliticaLanding'
+import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
@@ -80,9 +80,9 @@ export function Markets() {
 
   // Política tiene landing propia (components/politica) cuando hay un mercado
   // trending abierto y no hay búsqueda; si no, cae al CategoryBrowse genérico.
+  // Misma regla que la píldora de la Home (politicaLandingAvailable).
   const isPolitica = activeCategory === 'Política' && !searchInput
-  const hasOpenTrending = useMemo(() => featuredCandidates(markets).some(m => m.trending), [markets])
-  const showLanding = isPolitica && (loading || hasOpenTrending)
+  const showLanding = isPolitica && politicaLandingAvailable(markets, loading)
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
   const patchPrice = useCallback((id: string, yes: number) => {
     setMarkets(prev => prev.map(m => (m.id === id ? { ...m, yesPrice: Math.round(yes) } : m)))

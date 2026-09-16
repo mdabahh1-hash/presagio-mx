@@ -7,13 +7,14 @@ import { MarketCard } from '../components/MarketCard'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
+import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES, CATEGORIES_CON_LANDING } from '../lib/categories'
+import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -86,18 +87,11 @@ export function Home() {
   const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
   const [authOpen, setAuthOpen] = useState(false)
   const closeTrade = useCallback(() => setTrade(null), [])
+  // Tema (?sub) de la landing de Política dentro de la Home: estado local, como
+  // el sub interno de CategoryBrowse (la Home no sincroniza con la URL)
+  const [homeSub, setHomeSub] = useState<string | null>(null)
 
-  // Píldora de categoría: las que tienen pantalla propia navegan a su URL; el
-  // resto sigue filtrando dentro de la Home, como hasta ahora.
-  const handleTab = useCallback((tab: MobileTab) => {
-    if (!isFeed(tab) && CATEGORIES_CON_LANDING.includes(tab as Category)) {
-      navigate(`/mercados?cat=${encodeURIComponent(tab)}`)
-      return
-    }
-    setMobileTab(tab)
-  }, [navigate])
-
-  useEffect(() => { setVisibleTrending(PAGE_SIZE) }, [mobileTab])
+  useEffect(() => { setVisibleTrending(PAGE_SIZE); setHomeSub(null) }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
   // ruta puede no cambiar pero location.key sí → volver al feed de la URL en
@@ -144,6 +138,21 @@ export function Home() {
   const filtered = mobileTab === 'Tendencia' ? markets.filter(m => m.trending) : markets.filter(m => m.category === mobileTab)
   const emptyText = t('home.noTrending')
 
+  // Política filtra in-place como las demás, pero con su landing propia en vez
+  // de CategoryBrowse (misma regla que /mercados?cat=Política)
+  const showPolitica = mobileTab === 'Política' && politicaLandingAvailable(markets, loading)
+  const politicaLanding = (
+    <PoliticaLanding
+      markets={markets}
+      loading={loading}
+      subcats={SUBCATEGORIES['Política'] ?? []}
+      activeSub={homeSub}
+      onSubChange={setHomeSub}
+      onTraded={(id, p) => handleTraded(id, p, false)}
+      showHeader
+    />
+  )
+
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
     return (
@@ -151,7 +160,7 @@ export function Home() {
 
         {/* Buscador + tabs de categoría, pegados bajo el navbar (mismo
             componente que en desktop; la línea inferior no se mueve) */}
-        <CategoryBar active={mobileTab} onChange={handleTab}>
+        <CategoryBar active={mobileTab} onChange={setMobileTab}>
           <form onSubmit={handleSearch} style={{ padding: '10px 0 4px' }}>
             <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px' }}>
               <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -207,7 +216,9 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
+            {showPolitica ? politicaLanding : (
+              <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
+            )}
           </div>
         )}
 
@@ -239,7 +250,7 @@ export function Home() {
   return (
     <>
     {/* Barra de categorías full-bleed y sticky (fuera del container) */}
-    <CategoryBar active={mobileTab} onChange={handleTab} />
+    <CategoryBar active={mobileTab} onChange={setMobileTab} />
     <div className="page-container" style={{ paddingTop: 24 }}>
 
       {mobileTab === 'Tendencia' ? (
@@ -276,7 +287,9 @@ export function Home() {
         <NewFeed markets={markets} loading={loading} />
       ) : (
         <section style={{ marginBottom: 56 }}>
-          <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
+          {showPolitica ? politicaLanding : (
+            <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
+          )}
         </section>
       )}
     </div>
