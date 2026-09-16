@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ApiProyeccion, ApiPartido } from '../../lib/api'
+import type { SeatProjectionResult } from '../../lib/seatProjection'
 import { getPartyColor, getPartyTextColor } from '../../lib/partyColors'
 import { probColor } from '../../lib/prices'
 import { useElementWidth } from '../../lib/useElementWidth'
@@ -8,6 +9,8 @@ import { useElementWidth } from '../../lib/useElementWidth'
 interface SeatProjectionProps {
   proyeccion: ApiProyeccion
   partidos: ApiPartido[]
+  // Esperados calculados con los precios vivos (lib/seatProjection.ts)
+  projection: SeatProjectionResult
   // yes_price vivo del mercado del umbral (proyeccion.mercado_umbral_id); null si no está en la lista
   thresholdProb: number | null
   className?: string
@@ -22,18 +25,21 @@ function Stat({ label, value, color }: { label: string; value: React.ReactNode; 
   )
 }
 
-// Barra de escaños (contenido curado, no cálculo) con la marca del umbral y
-// tres cifras al pie; la única viva es la probabilidad del mercado del umbral.
-export function SeatProjection({ proyeccion, partidos, thresholdProb, className = '' }: SeatProjectionProps) {
+// Barra de escaños esperados (Σ precio × punto medio de cada rango, por partido)
+// con la marca del umbral y tres cifras al pie. Todo sale de mercados vivos:
+// los seis multi de rangos y el binario del umbral.
+export function SeatProjection({ proyeccion, partidos, projection, thresholdProb, className = '' }: SeatProjectionProps) {
   const { t } = useTranslation()
-  const { titulo, total, umbral, umbral_etiqueta, bloques, coalicion, nota } = proyeccion
+  const { titulo, total, umbral, umbral_etiqueta, coalicion, nota } = proyeccion
+  const { rows, rest, scale } = projection
   const ficha = (clave: string) => partidos.find(p => p.clave === clave)
-  const seats = (clave: string) => bloques.find(b => b.partido === clave)?.escanos ?? 0
-  const used = bloques.reduce((s, b) => s + b.escanos, 0)
-  const rest = Math.max(0, total - used)
-  const coalitionSeats = coalicion.reduce((s, c) => s + seats(c), 0)
+  const siglas = (clave: string) => ficha(clave)?.siglas ?? clave
+  const seats = (clave: string) => rows.find(r => r.partido === clave)?.seats ?? null
+  const withData = rows.filter((r): r is typeof r & { seats: number } => r.seats !== null)
+  const blocSeats = coalicion.map(seats)
+  const blocTotal = blocSeats.every((s): s is number => s !== null) ? blocSeats.reduce((a, b) => a + b, 0) : null
   const main = coalicion[0]
-  const thresholdPct = (umbral / total) * 100
+  const thresholdPct = (umbral / scale) * 100
   const [barRef, barW] = useElementWidth()
   // La etiqueta del segmento solo si cabe: ~5.5 px por carácter a 11 px + aire.
   // Sin medida aún (primer render), regla fija del 6 %.
@@ -47,15 +53,15 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
       </div>
 
       <div className="pol-seatbar" ref={barRef}>
-        {bloques.map(b => {
-          const pct = (b.escanos / total) * 100
-          const label = `${ficha(b.partido)?.siglas ?? b.partido} ${b.escanos}`
+        {withData.map(r => {
+          const pct = (r.seats / scale) * 100
+          const label = `${siglas(r.partido)} ${r.seats}`
           return (
             <div
-              key={b.partido}
-              title={`${ficha(b.partido)?.nombre ?? b.partido} · ${b.escanos}`}
+              key={r.partido}
+              title={`${ficha(r.partido)?.nombre ?? r.partido} · ${r.seats}`}
               style={{
-                width: `${pct}%`, background: getPartyColor(b.partido), color: getPartyTextColor(b.partido),
+                width: `${pct}%`, background: getPartyColor(r.partido), color: getPartyTextColor(r.partido),
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden',
               }}
@@ -64,7 +70,7 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
             </div>
           )
         })}
-        {rest > 0 && <div style={{ width: `${(rest / total) * 100}%` }} />}
+        {rest > 0 && <div style={{ width: `${(rest / scale) * 100}%` }} />}
       </div>
 
       {/* Marca del umbral */}
@@ -82,8 +88,9 @@ export function SeatProjection({ proyeccion, partidos, thresholdProb, className 
       </div>
 
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', borderTop: '1px solid var(--border-subtle)', paddingTop: 12 }}>
-        <Stat label={t('politica.coalition')} value={coalitionSeats} />
-        {main && <Stat label={t('politica.partyAlone', { party: ficha(main)?.nombre ?? main })} value={seats(main)} />}
+        {/* Siglas de la coalición: identificadores, no se traducen */}
+        <Stat label={coalicion.map(siglas).join(' + ')} value={blocTotal ?? '—'} />
+        {main && <Stat label={t('politica.partyAlone', { party: ficha(main)?.nombre ?? main })} value={seats(main) ?? '—'} />}
         <Stat
           label={t('politica.thresholdProb', { count: umbral })}
           value={thresholdProb !== null ? `${thresholdProb}%` : '—'}

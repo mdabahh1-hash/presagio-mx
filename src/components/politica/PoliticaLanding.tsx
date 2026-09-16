@@ -13,6 +13,8 @@ import { SeatProjection } from './SeatProjection'
 import { PartyTable } from './PartyTable'
 import { PoliticaSections, type MarketSection } from './PoliticaSections'
 import { byClosing } from '../../lib/closing'
+import { formatVolume } from '../../lib/format'
+import { projectSeats } from '../../lib/seatProjection'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -23,8 +25,10 @@ interface PoliticaLandingProps {
   // ?sub= controlado por Markets.tsx
   activeSub: string | null
   onSubChange: (sub: string | null) => void
-  // Tras operar en el sheet, Markets.tsx parchea el precio en su estado
+  // Tras operar en el sheet, la página parchea el precio en su estado
   onTraded: (marketId: string, newYesPrice: number) => void
+  // h1 + conteo arriba (Home); Markets.tsx ya tiene su propia cabecera
+  showHeader?: boolean
 }
 
 export const POLITICA = 'Política'
@@ -62,6 +66,12 @@ export function featuredCandidates(markets: Market[]): Market[] {
     })
 }
 
+// La landing se monta (Home y /mercados?cat=Política) solo con un mercado
+// trending abierto; mientras carga se muestra su skeleton. Si no, CategoryBrowse.
+export function politicaLandingAvailable(markets: Market[], loading: boolean): boolean {
+  return loading || featuredCandidates(markets).some(m => m.trending)
+}
+
 // Host sin "www." para agrupar fuentes (www.ine.mx y ine.mx son la misma)
 function hostOf(url: string): string | null {
   try { return new URL(url).host.replace(/^www\./, '') } catch { return null }
@@ -71,10 +81,10 @@ function truncate(s: string, n: number): string {
   return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s
 }
 
-// Landing de /mercados?cat=Política: hero destacado con compra en sitio,
-// temas, cronología, proyección de escaños y secciones por subcategoría.
-// Markets.tsx solo la monta cuando hay un mercado trending abierto.
-export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubChange, onTraded }: PoliticaLandingProps) {
+// Landing de Política (píldora de la Home y /mercados?cat=Política): hero
+// destacado con compra en sitio, temas, cronología, proyección de escaños y
+// secciones por subcategoría. Se monta solo con un mercado trending abierto.
+export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubChange, onTraded, showHeader = false }: PoliticaLandingProps) {
   const { t } = useTranslation()
   const inCat = useMemo(() => markets.filter(m => m.category === POLITICA), [markets])
   const candidates = useMemo(() => featuredCandidates(inCat), [inCat])
@@ -185,7 +195,14 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     return activeSub ? out.filter(sec => sec.sub === activeSub) : out
   }, [inCat, subcats, activeSub, t])
 
-  // "Prob. de 334+": la única cifra viva de la proyección
+  // Proyección de escaños: esperados con los precios vivos de los mercados de rangos
+  const projection = useMemo(
+    () => (content?.proyeccion ? projectSeats(content.proyeccion, inCat) : null),
+    [content, inCat],
+  )
+  const hasProjection = !!projection && projection.rows.some(r => r.seats !== null)
+
+  // "Prob. de 334+": yes_price del binario del umbral
   const thresholdId = content?.proyeccion?.mercado_umbral_id ?? null
   const thresholdMarket = thresholdId ? inCat.find(m => m.id === thresholdId) : undefined
   const thresholdProb = thresholdMarket ? thresholdMarket.yesPrice : null
@@ -199,9 +216,21 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
   const closeTrade = useCallback(() => setTrade(null), [])
   const tradeMarket = trade ? inCat.find(m => m.id === trade.marketId) ?? null : null
 
+  const header = showHeader && (
+    <div className="anim-1" style={{ marginBottom: 24 }}>
+      <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>{POLITICA}</h1>
+      <p className="meta-label" style={{ margin: 0 }}>
+        {loading ? t('common.loading') : (
+          <span className="num">{t('politica.headerMeta', { count: inCat.length, volume: formatVolume(inCat.reduce((s, m) => s + m.volume, 0)) })}</span>
+        )}
+      </p>
+    </div>
+  )
+
   if (loading) {
     return (
       <div aria-busy="true" aria-label={t('common.loading')} style={{ marginBottom: 48 }}>
+        {header}
         <div className="pol-hero">
           <div className="skeleton" style={{ height: 360 }} />
           <div className="skeleton" style={{ height: 360 }} />
@@ -224,6 +253,7 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
 
   return (
     <div style={{ marginBottom: 48 }}>
+      {header}
       {content?.resumen && (
         <p style={{ margin: '0 0 24px', fontSize: 14, color: 'var(--text-secondary)', maxWidth: 760, lineHeight: 1.5 }}>
           {content.resumen}
@@ -252,14 +282,15 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           className="anim-2"
           titulo={content.cronologia.titulo}
           subtitulo={content.cronologia.subtitulo}
+          fuenteUrl={content.cronologia.fuente_url}
           hitos={content.cronologia.hitos}
         />
       )}
 
-      {content?.proyeccion && (
+      {content?.proyeccion && projection && hasProjection && (
         <div className="pol-cards anim-3">
-          <SeatProjection proyeccion={content.proyeccion} partidos={content.partidos} thresholdProb={thresholdProb} />
-          <PartyTable bloques={content.proyeccion.bloques} total={content.proyeccion.total} partidos={content.partidos} />
+          <SeatProjection proyeccion={content.proyeccion} partidos={content.partidos} projection={projection} thresholdProb={thresholdProb} />
+          <PartyTable rows={projection.rows} total={projection.total} partidos={content.partidos} />
         </div>
       )}
 

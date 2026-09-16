@@ -469,7 +469,7 @@
     "topicsViewAll": "Ver todos los temas",
     "sources": "Fuente oficial",
     "parties": "Los partidos, según el mercado",
-    "coalition": "Coalición proyectada",
+    "expectedSeats": "Escaños esperados",
     "partyAlone": "{{party}} solo",
     "thresholdProb": "Prob. de {{count}}+",
     "seats_one": "{{count}} escaño",

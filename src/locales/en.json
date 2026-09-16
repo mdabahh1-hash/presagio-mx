@@ -469,7 +469,7 @@
     "topicsViewAll": "See all topics",
     "sources": "Official source",
     "parties": "The parties, per the market",
-    "coalition": "Projected coalition",
+    "expectedSeats": "Expected seats",
     "partyAlone": "{{party}} alone",
     "thresholdProb": "Prob. of {{count}}+",
     "seats_one": "{{count}} seat",

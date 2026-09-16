@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import type { Market, PricePoint } from '../../types'
 import { MarketRow } from '../MarketRow'
 import { SeeMoreButton } from '../SeeMoreButton'
-import { useSparks } from '../../lib/useSparks'
+import { useSparks, type SparkItem } from '../../lib/useSparks'
+import { topOutcome } from '../../lib/seatProjection'
 
 export interface MarketSection {
   title: string
@@ -25,6 +26,14 @@ interface PoliticaSectionsProps {
 const PAGE = 5
 const SPARK_DAYS = 7
 
+// Serie del sparkline: el Sí en binarios; en multi la opción líder (yes_price
+// de un multi es 0 y el historial trae todas las opciones intercaladas).
+const sparkItemOf = (m: Market): SparkItem => ({
+  id: m.id,
+  outcomeKey: m.marketType === 'multi' ? topOutcome(m)?.outcome_key ?? null : null,
+})
+const sparkPriceOf = (m: Market) => (m.marketType === 'multi' ? topOutcome(m)?.price ?? 0 : m.yesPrice)
+
 // El historial de 7 días de un mercado sin operaciones trae 0 o 1 puntos: se
 // completa con el precio actual para pintar la línea plana (color neutro).
 function sparkOf(points: PricePoint[] | null | undefined, m: Market): PricePoint[] | null {
@@ -32,8 +41,9 @@ function sparkOf(points: PricePoint[] | null | undefined, m: Market): PricePoint
   if (points.length >= 2) return points
   const now = new Date()
   const start = new Date(now.getTime() - SPARK_DAYS * 86_400_000)
-  const first = points[0] ?? { date: start.toISOString(), price: m.yesPrice }
-  return [first, { date: now.toISOString(), price: m.yesPrice }]
+  const price = sparkPriceOf(m)
+  const first = points[0] ?? { date: start.toISOString(), price }
+  return [first, { date: now.toISOString(), price }]
 }
 
 // Secciones de filas por subcategoría con sparkline de 7 días. Con ?sub=
@@ -51,8 +61,8 @@ export function PoliticaSections({ sections, activeSub, onViewAll, onClearSub, e
     })),
     [sections, activeSub, visible],
   )
-  const visibleIds = useMemo(() => shown.flatMap(s => s.shown.map(m => m.id)), [shown])
-  const sparks = useSparks(visibleIds, SPARK_DAYS)
+  const visibleItems = useMemo(() => shown.flatMap(s => s.shown.map(sparkItemOf)), [shown])
+  const sparks = useSparks(visibleItems, SPARK_DAYS)
 
   if (sections.length === 0) {
     return (

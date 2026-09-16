@@ -191,7 +191,9 @@ export const marketsApi = {
 // Espejo de app/schemas/contenido.py; formato en contenido_categorias/__init__.py.
 
 export interface ApiHito { fecha: string; etiqueta: string; texto: string; clave: boolean }
-export interface ApiBloque { partido: string; escanos: number }
+// Un partido de la barra: su mercado multi de rangos y los escaños representativos por opción.
+// escanos_por_opcion puede faltar durante la ventana entre deploys del backend viejo → fila sin datos.
+export interface ApiBloque { partido: string; mercado_id: string; escanos_por_opcion?: Record<string, number> }
 export interface ApiProyeccion {
   titulo: string
   total: number
@@ -202,7 +204,7 @@ export interface ApiProyeccion {
   coalicion: string[]
   nota?: string | null
 }
-export interface ApiCronologia { titulo: string; subtitulo?: string | null; hitos: ApiHito[] }
+export interface ApiCronologia { titulo: string; subtitulo?: string | null; fuente_url?: string | null; hitos: ApiHito[] }
 export interface ApiPartido { clave: string; nombre: string; siglas: string }
 export interface ApiFuente { host: string; etiqueta: string }
 export interface ApiContenidoCategoria {
