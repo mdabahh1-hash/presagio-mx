@@ -8,13 +8,14 @@ import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
+import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES } from '../lib/categories'
+import { SUBCATEGORIES, sportOfSub, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -90,8 +91,11 @@ export function Home() {
   // Tema (?sub) de la landing de Política dentro de la Home: estado local, como
   // el sub interno de CategoryBrowse (la Home no sincroniza con la URL)
   const [homeSub, setHomeSub] = useState<string | null>(null)
+  // Filtros de la landing de Deportes dentro de la Home (liga, deporte, tipo, día):
+  // estado local como homeSub; /mercados los sincroniza con la URL
+  const [homeDep, setHomeDep] = useState<{ sub: string | null; sport: string | null; kind: Kind | null; dia: string | null }>({ sub: null, sport: null, kind: null, dia: null })
 
-  useEffect(() => { setVisibleTrending(PAGE_SIZE); setHomeSub(null) }, [mobileTab])
+  useEffect(() => { setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null }) }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
   // ruta puede no cambiar pero location.key sí → volver al feed de la URL en
@@ -149,6 +153,26 @@ export function Home() {
       activeSub={homeSub}
       onSubChange={setHomeSub}
       onTraded={(id, p) => handleTraded(id, p, false)}
+      showHeader
+    />
+  )
+
+  // Deportes: misma regla que Política (in-place, con cabecera); una liga implica su deporte
+  const showDeportes = mobileTab === 'Deportes' && deportesLandingAvailable(markets, loading)
+  const deportesLanding = (
+    <DeportesLanding
+      markets={markets}
+      loading={loading}
+      subcats={SUBCATEGORIES['Deportes'] ?? []}
+      activeSub={homeDep.sub}
+      onSubChange={sub => setHomeDep(d => ({ ...d, sub, sport: sub ? (sportOfSub(sub) ?? sub) : d.sport, kind: null }))}
+      activeSport={homeDep.sport}
+      onSportChange={sport => setHomeDep(d => ({ ...d, sport, sub: null, kind: null }))}
+      activeKind={homeDep.kind}
+      onKindChange={kind => setHomeDep(d => ({ ...d, kind }))}
+      activeDia={homeDep.dia}
+      onDiaChange={dia => setHomeDep(d => ({ ...d, dia }))}
+      onTraded={handleTraded}
       showHeader
     />
   )
@@ -216,7 +240,7 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            {showPolitica ? politicaLanding : (
+            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : (
               <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
             )}
           </div>
@@ -287,7 +311,7 @@ export function Home() {
         <NewFeed markets={markets} loading={loading} />
       ) : (
         <section style={{ marginBottom: 56 }}>
-          {showPolitica ? politicaLanding : (
+          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : (
             <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
           )}
         </section>

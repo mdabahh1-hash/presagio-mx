@@ -573,6 +573,39 @@ input[type='range']::-webkit-slider-thumb {
 .row-outcome-btn--track .row-outcome-label { flex: 1; min-width: 0; max-width: none; text-align: left; font-size: 12px; }
 .row-outcome-btn--rest { background: transparent; color: var(--text-tertiary); font-size: 12px; font-weight: 500; justify-content: flex-start; }
 
+/* Landing de Deportes (components/deportes): riel de ligas, hero, celdas y tarjetas */
+.ligas-rail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.ligas-rail-arrows { display: flex; gap: 4px; }
+.ligas-rail-arrows .carousel-nav-btn:disabled { opacity: 0.35; cursor: default; }
+.ligas-rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+.liga-card {
+  flex: 0 0 auto; width: 178px; display: flex; flex-direction: column; align-items: flex-start;
+  padding: 12px 13px 13px; border-radius: var(--r-lg); background: var(--bg-card);
+  border: 1px solid var(--border-subtle); cursor: pointer; text-align: left; font-family: inherit;
+  color: var(--text-primary); transition: border-color 0.15s;
+}
+.liga-card:hover, .liga-card.active { border-color: var(--border-hover); }
+.liga-card > img, .liga-card > div:first-child { margin-bottom: 9px; }
+.liga-card-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.liga-card-meta { margin-top: 2px; white-space: nowrap; }
+.dep-hero { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; margin-bottom: 30px; align-items: stretch; }
+.dep-cells { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dep-cell {
+  display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 14px; border-radius: var(--r-md);
+  background: var(--bg-elevated); border: 1px solid var(--border-subtle); min-width: 0;
+}
+.dep-cell-label { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dep-cell-price { font-size: 18px; font-weight: 600; }
+.dep-hero-cta { display: flex; gap: 8px; align-items: center; }
+.dep-hero-cta > .btn-primary { flex: 1; height: 44px; font-size: 15px; }
+.dep-hero-cta > .btn-secondary { height: 44px; }
+.dep-hero-cta > .icon-btn { width: 44px; height: 44px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--r-md); }
+.dep-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; align-items: start; }
+.dep-bar { height: 6px; border-radius: 3px; background: var(--border-subtle); overflow: hidden; flex-shrink: 0; display: inline-block; }
+.dep-bar > span { display: block; height: 100%; border-radius: 3px; background: var(--text-secondary); }
+.dep-bar > span.lead { background: var(--text-primary); }
+.dep-jornada-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+
 .lb-row { transition: background 0.15s; }
 .lb-row:hover { background: var(--bg-hover); }
 
@@ -635,6 +668,7 @@ input[type='range']::-webkit-slider-thumb {
   .featured-row { grid-template-columns: 1fr !important; }
   /* Landing de Política: hero y tarjetas a una columna; cronología en dos renglones sin riel */
   .pol-hero, .pol-cards { grid-template-columns: 1fr !important; }
+  .dep-hero, .dep-cards { grid-template-columns: minmax(0, 1fr) !important; }
   .pol-timeline-grid { grid-template-columns: repeat(3, 1fr) !important; row-gap: 20px; }
   .pol-timeline-rail { display: none; }
   /* minmax(0, …): el resumen lleva texto en nowrap y con `1fr` a secas ensancharía la columna */
@@ -723,6 +757,20 @@ input[type='range']::-webkit-slider-thumb {
     grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); justify-content: stretch; width: auto;
   }
   .row-outcome-btn--track { padding: 0 9px; }
+  /* Landing de Deportes en móvil: ligas como píldoras, celdas apiladas, CTA a ancho completo */
+  .ligas-rail-arrows { display: none; }
+  .liga-card { flex-direction: row; align-items: center; gap: 7px; width: auto; height: 44px; padding: 0 12px; border-radius: 999px; background: var(--bg-elevated); border-color: transparent; }
+  .liga-card.active { border-color: var(--border-hover); }
+  .liga-card > img, .liga-card > div:first-child { margin-bottom: 0; width: 20px !important; height: 20px !important; }
+  .liga-card-meta { margin-top: 0; }
+  .dep-cells { gap: 6px; }
+  .dep-cell { flex-direction: column; justify-content: center; gap: 2px; height: 56px; padding: 0 6px; }
+  .dep-cell.has-mark .dep-cell-label { display: none; }
+  .dep-cell-label { flex: 0 0 auto; font-size: 11px; color: var(--text-tertiary); }
+  .dep-cell-price { font-size: 15px; }
+  .dep-hero-cta > .btn-secondary, .dep-hero-cta > .icon-btn { display: none; }
+  .dep-hero-cta > .btn-primary { height: 48px; }
+  .dep-jornada-head { flex-direction: column; align-items: stretch; }
 
   /* Landing de Política */
   .pol-hero-cta { flex-direction: column; }

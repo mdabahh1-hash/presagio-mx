@@ -31,10 +31,17 @@ interface TabsProps<K extends string> {
 export function Tabs<K extends string>({ items, active, onChange, size = 'md', ariaLabel, className = '', style }: TabsProps<K>) {
   const ref = useRef<HTMLDivElement>(null)
 
-  // El tab activo entra en vista en barras con scroll horizontal (móvil)
+  // El tab activo entra en vista en barras con scroll horizontal (móvil). Solo se
+  // desplaza el contenedor: scrollIntoView también movía la página verticalmente
+  // cuando la barra estaba fuera del viewport (jornada de la landing de Deportes).
   useEffect(() => {
-    const el = ref.current?.querySelector<HTMLElement>('.tab.active')
-    el?.scrollIntoView({ inline: 'nearest', block: 'nearest' })
+    const c = ref.current
+    const el = c?.querySelector<HTMLElement>('.tab.active')
+    if (!c || !el) return
+    const cr = c.getBoundingClientRect()
+    const er = el.getBoundingClientRect()
+    if (er.left < cr.left) c.scrollBy({ left: er.left - cr.left })
+    else if (er.right > cr.right) c.scrollBy({ left: er.right - cr.right })
   }, [active])
 
   return (

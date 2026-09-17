@@ -6,11 +6,13 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
+import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
+import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
 import { CATEGORIES, SUBCATEGORIES, sportOfSub, isKind, type Kind } from '../lib/categories'
-import { apiToMarket } from '../lib/mapMarket'
+import { apiToMarket, cleanLabel } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
 import { formatVolume } from '../lib/format'
 
@@ -34,6 +36,8 @@ export function Markets() {
   const sportParam = searchParams.get('sport')
   const rawKind = searchParams.get('kind')
   const kindParam: Kind | null = isKind(rawKind) ? rawKind : null
+  // Día de la jornada de Deportes (hoy | manana | AAAA-MM-DD | later | pending), enlazable
+  const diaParam = searchParams.get('dia')
   // ?sort= vive en la URL para que la pestaña "Nuevo" de la barra (/mercados?sort=new) sea enlazable
   const rawSort = searchParams.get('sort')
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
@@ -42,6 +46,7 @@ export function Markets() {
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
   const [activeSport, setActiveSport] = useState<string | null>(sportParam)
   const [activeKind, setActiveKind] = useState<Kind | null>(kindParam)
+  const [activeDia, setActiveDia] = useState<string | null>(diaParam)
   const [sortBy, setSortBy] = useState(sortParam)
 
   useEffect(() => {
@@ -50,8 +55,9 @@ export function Markets() {
     setActiveSub(subParam)
     setActiveSport(sportParam)
     setActiveKind(kindParam)
+    setActiveDia(diaParam)
     setSortBy(sortParam)
-  }, [queryParam, catParam, subParam, sportParam, kindParam, sortParam])
+  }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
 
   useEffect(() => {
     let active = true
@@ -83,9 +89,20 @@ export function Markets() {
   // Misma regla que la píldora de la Home (politicaLandingAvailable).
   const isPolitica = activeCategory === 'Política' && !searchInput
   const showLanding = isPolitica && politicaLandingAvailable(markets, loading)
+  // Deportes: landing propia (components/deportes) con la misma regla (deportesLandingAvailable)
+  const isDeportes = activeCategory === 'Deportes' && !searchInput
+  const showDeportes = isDeportes && deportesLandingAvailable(markets, loading)
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
-  const patchPrice = useCallback((id: string, yes: number) => {
+  const abiertos = useMemo(() => markets.filter(m => m.status === 'open').length, [markets])
+  const hoy = useMemo(() => markets.filter(m => diaKeyOf(m) === 'hoy').length, [markets])
+  // Tras operar desde una landing: precio nuevo y, en un multi, opciones frescas
+  const patchPrice = useCallback((id: string, yes: number, isMulti = false) => {
     setMarkets(prev => prev.map(m => (m.id === id ? { ...m, yesPrice: Math.round(yes) } : m)))
+    if (isMulti) {
+      marketsApi.outcomes(id)
+        .then(outcomes => setMarkets(prev => prev.map(m => (m.id === id ? { ...m, outcomes: outcomes.map(o => ({ ...o, label: cleanLabel(o.label) })) } : m))))
+        .catch(() => {})
+    }
   }, [])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -102,12 +119,14 @@ export function Markets() {
     setActiveSub(null)
     setActiveSport(null)
     setActiveKind(null)
+    setActiveDia(null)
     setSearchParams(p => {
       if (cat === 'Todos') p.delete('cat')
       else p.set('cat', cat)
       p.delete('sub')
       p.delete('sport')
       p.delete('kind')
+      p.delete('dia')
       p.delete('sort')  // el orden solo existe en "Todos"
       return p
     })
@@ -161,6 +180,16 @@ export function Markets() {
     })
   }
 
+  // Día de la jornada (landing de Deportes)
+  const handleDiaChange = (dia: string | null) => {
+    setActiveDia(dia)
+    setSearchParams(p => {
+      if (dia) p.set('dia', dia)
+      else p.delete('dia')
+      return p
+    })
+  }
+
   return (
     <div className="page-container" style={{ paddingTop: 36, paddingBottom: 36 }}>
 
@@ -171,11 +200,13 @@ export function Markets() {
       }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {showLanding ? activeCategory : t('markets.title')}
+            {showLanding || showDeportes ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
             {loading ? t('common.loading') : showLanding ? (
               <span className="num">{t('politica.headerMeta', { count: markets.length, volume: formatVolume(categoryVolume) })}</span>
+            ) : showDeportes ? (
+              <span className="num">{t('deportes.headerMeta', { count: abiertos, today: hoy, volume: formatVolume(categoryVolume) })}</span>
             ) : (
               <><span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{markets.length}</span>{' '}{t('markets.activeCount')}</>
             )}
@@ -244,6 +275,21 @@ export function Markets() {
           subcats={SUBCATEGORIES['Política'] ?? []}
           activeSub={activeSub}
           onSubChange={handleSubChange}
+          onTraded={patchPrice}
+        />
+      ) : showDeportes ? (
+        <DeportesLanding
+          markets={markets}
+          loading={loading}
+          subcats={SUBCATEGORIES['Deportes'] ?? []}
+          activeSub={activeSub}
+          onSubChange={handleSubChange}
+          activeSport={activeSport}
+          onSportChange={handleSportChange}
+          activeKind={activeKind}
+          onKindChange={handleKindChange}
+          activeDia={activeDia}
+          onDiaChange={handleDiaChange}
           onTraded={patchPrice}
         />
       ) : activeCategory !== 'Todos' ? (
