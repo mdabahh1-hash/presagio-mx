@@ -21,6 +21,7 @@ import { filterRange, splitHistory, type ChartRange } from '../../lib/chartRange
 import { deltaSince, DAY_MS } from '../../lib/priceDelta'
 import { diaKeyOf } from '../../lib/jornada'
 import { topOutcome } from '../../lib/seatProjection'
+import { useEnVivo } from '../../lib/useEnVivo'
 
 interface DeportesLandingProps {
   // Todos los mercados cargados por la página; la landing filtra por categoría
@@ -97,6 +98,9 @@ export function DeportesLanding({
     () => featuredCandidates(inScope)[0] ?? featuredCandidates(inCat)[0] ?? null,
     [inScope, inCat],
   )
+
+  // Marcador en vivo de los partidos en ventana (poll de 1 min; {} si no hay o el poller está apagado)
+  const live = useEnVivo(inCat)
 
   // Agregados (riel de ligas y volumen por liga); sin respuesta, esos bloques no se montan
   const [resumen, setResumen] = useState<ApiResumenCategoria | null>(null)
@@ -257,6 +261,7 @@ export function DeportesLanding({
           onDiaChange={onDiaChange}
           extraMetaOf={extraMetaOf}
           onClear={clearFilters}
+          live={live}
         />
       ) : (
         <>
@@ -279,6 +284,7 @@ export function DeportesLanding({
             activeDia={activeDia}
             onDiaChange={onDiaChange}
             extraMetaOf={extraMetaOf}
+            live={live}
             hasFilters={hasFilters}
             onClearFilters={clearFilters}
           />

@@ -37,7 +37,9 @@ export function Jornada({ markets, activeDia, onDiaChange, extraMetaOf, live, ha
   const leadOf = (m: Market): RowLead => {
     const lv = live?.[m.id]
     if (lv?.estado === 'LIVE') {
-      return { primary: lv.reloj ?? t('common.live'), secondary: lv.periodo ? t('deportes.period', { count: lv.periodo }) : null, tone: 'live' }
+      // Periodo corto: "2T" en fútbol, "Q3" en la NFL
+      const periodo = lv.periodo ? (m.subcategory === 'NFL' ? `Q${lv.periodo}` : `${lv.periodo}T`) : null
+      return { primary: lv.reloj ?? t('common.live'), secondary: periodo, tone: 'live' }
     }
     const ev = eventAt(m)
     // Sin hora de evento (futuros, F1, boxeo) la columna muestra la fecha de cierre

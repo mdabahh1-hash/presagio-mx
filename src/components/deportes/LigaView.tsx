@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { Market } from '../../types'
+import type { LiveState, Market } from '../../types'
 import { marketsApi, type ApiMover, type ApiResumenSubcategoria } from '../../lib/api'
 import { LeagueMark } from './LeagueMark'
 import { Jornada } from './Jornada'
@@ -26,6 +26,7 @@ interface LigaViewProps {
   onDiaChange: (dia: string | null) => void
   extraMetaOf: (m: Market) => string | null
   onClear: () => void
+  live?: Record<string, LiveState>
   className?: string
 }
 
@@ -58,7 +59,7 @@ function MoversCard({ movers }: { movers: ApiMover[] }) {
 // accesorios, jornada a la izquierda y título, movimiento y ligas privadas a la
 // derecha. Cada tarjeta se monta solo si su dato existe.
 export function LigaView({
-  liga, sport, markets, resumen, tituloMarket, activeKind, onKindChange, activeDia, onDiaChange, extraMetaOf, onClear, className = '',
+  liga, sport, markets, resumen, tituloMarket, activeKind, onKindChange, activeDia, onDiaChange, extraMetaOf, onClear, live, className = '',
 }: LigaViewProps) {
   const { t } = useTranslation()
   const [movers, setMovers] = useState<ApiMover[] | null>(null)
@@ -132,6 +133,7 @@ export function LigaView({
           activeDia={activeDia}
           onDiaChange={onDiaChange}
           extraMetaOf={extraMetaOf}
+          live={live}
           hasFilters
           onClearFilters={onClear}
         />
