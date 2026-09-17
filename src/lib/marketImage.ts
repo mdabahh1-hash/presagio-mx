@@ -27,6 +27,27 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'Elecciones': '/img/markets/sub/elecciones.svg',
 }
 
+// Logos OFICIALES de liga (scripts/fetch-league-logos.mjs, CDN de ESPN), dos variantes
+// por tema: <liga>.png para fondo oscuro y <liga>-claro.png a color. Boxeo no es liga
+// (sin logo) y Elecciones no es deporte: caen al tile .svg de SUBCATEGORY_IMAGE.
+const LEAGUE_LOGO: Record<string, string> = {
+  'Liga MX': 'liga-mx', 'Premier League': 'premier-league', 'LaLiga': 'laliga',
+  'Serie A': 'serie-a', 'Bundesliga': 'bundesliga', 'Ligue 1': 'ligue-1',
+  'Liga Portugal': 'liga-portugal', 'MLS': 'mls', 'Champions League': 'champions-league',
+  'Leagues Cup': 'leagues-cup', 'Saudi Pro League': 'saudi-pro-league',
+  'NFL': 'nfl', 'F1': 'f1',
+}
+
+export function hasLeagueLogo(sub?: string | null): boolean {
+  return !!sub && sub in LEAGUE_LOGO
+}
+
+export function leagueLogo(sub?: string | null, theme: 'dark' | 'light' = 'dark'): string | null {
+  const slug = sub ? LEAGUE_LOGO[sub] : null
+  if (!slug) return sub ? SUBCATEGORY_IMAGE[sub] ?? null : null
+  return `/img/markets/sub/${slug}${theme === 'light' ? '-claro' : ''}.png`
+}
+
 export const CATEGORY_IMAGE: Partial<Record<string, string>> = {
   'Deportes': '/img/markets/cat/deportes.svg',
   'Política': '/img/markets/cat/politica.svg',

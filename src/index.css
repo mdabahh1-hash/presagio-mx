@@ -559,6 +559,19 @@ input[type='range']::-webkit-slider-thumb {
 /* Tercera columna de .market-row cuando la fila lleva sparkline (landing de Política) */
 .market-row-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 .market-row-spark { width: 90px; height: 32px; flex-shrink: 0; line-height: 0; }
+/* Pista de resultados de ancho fijo (landing de Deportes): N pistas de 158 px pegadas a la
+   derecha, así un binario (2) y un 1X2 (3) alinean su último chip en la misma columna.
+   --track-w (3×158+2×6 = 486) y --thumb-w los pone MarketRow (fixedTrack). */
+.market-row--track { grid-template-columns: 52px var(--thumb-w, 56px) minmax(0, 1fr) var(--track-w, 486px); }
+.market-row--track.market-row--nolead { grid-template-columns: var(--thumb-w, 56px) minmax(0, 1fr) var(--track-w, 486px); }
+.market-row-lead { min-width: 0; }
+.market-row-lead-primary { font-size: 13px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.market-row-lead-secondary { font-size: 11px; font-weight: 500; color: var(--text-tertiary); margin-top: 1px; white-space: nowrap; }
+.market-row-lead-meta { display: none; }
+.market-row-track { display: grid; grid-auto-flow: column; grid-auto-columns: 158px; gap: 6px; justify-content: end; width: 100%; }
+.row-outcome-btn--track { flex-direction: row; justify-content: space-between; gap: 7px; height: 44px; width: 100%; min-width: 0; padding: 0 10px; }
+.row-outcome-btn--track .row-outcome-label { flex: 1; min-width: 0; max-width: none; text-align: left; font-size: 12px; }
+.row-outcome-btn--rest { background: transparent; color: var(--text-tertiary); font-size: 12px; font-weight: 500; justify-content: flex-start; }
 
 .lb-row { transition: background 0.15s; }
 .lb-row:hover { background: var(--bg-hover); }
@@ -702,6 +715,14 @@ input[type='range']::-webkit-slider-thumb {
   .market-row-right { grid-column: 2; }
   .market-row-right .market-row-outcomes { flex: 1; }
   .market-row-spark { display: none; }
+  /* Pista fija: la hora pasa a la meta y los chips bajan al segundo renglón de la columna 2 */
+  .market-row-lead { display: none; }
+  .market-row-lead-meta { display: inline; }
+  .market-row-track {
+    grid-column: 2; grid-auto-flow: row; grid-auto-columns: auto;
+    grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); justify-content: stretch; width: auto;
+  }
+  .row-outcome-btn--track { padding: 0 9px; }
 
   /* Landing de Política */
   .pol-hero-cta { flex-direction: column; }

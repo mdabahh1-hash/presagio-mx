@@ -28,6 +28,9 @@ export interface Market {
   volume: number
   liquidity: number
   endsAt: string
+  // Hora del evento (partido / accesorio de partido); null en futuros, F1, boxeo. En un
+  // partido coincide con endsAt (cierra al silbatazo); la jornada agrupa por este campo.
+  kickoffAt?: string | null
   // ISO de la siembra (sello "Nuevo" ≤3 días y orden de la pestaña Nuevo); los mocks no lo traen
   createdAt?: string
   resolutionCriteria: string
@@ -42,6 +45,17 @@ export interface Market {
   resolvedOutcomeKey?: string | null
   history: PricePoint[]
   comments: Comment[]
+}
+
+// Estado en vivo de un partido (GET /markets/en-vivo), tal como lo pinta MarketRow
+export interface LiveState {
+  estado: 'SCHEDULED' | 'LIVE' | 'FT' | 'AET' | 'POSTPONED' | 'CANCELLED' | 'UNKNOWN'
+  local: string
+  visitante: string
+  marcadorLocal: number | null
+  marcadorVisitante: number | null
+  reloj: string | null
+  periodo: number | null
 }
 
 export interface Choice {

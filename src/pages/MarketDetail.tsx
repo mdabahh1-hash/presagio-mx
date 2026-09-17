@@ -26,32 +26,10 @@ import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
 import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
+import { CHART_RANGES, RANGE_LABELS, filterRange, type ChartRange } from '../lib/chartRange'
 
 type InfoTab = 'criteria' | 'rules' | 'context'
 const INFO_CLAMP_LINES = 6
-
-type ChartRange = '1h' | '6h' | '1d' | '1w' | '1m' | 'all'
-const CHART_RANGES: ChartRange[] = ['1h', '6h', '1d', '1w', '1m', 'all']
-const RANGE_LABELS: Record<ChartRange, string> = { '1h': '1H', '6h': '6H', '1d': '1D', '1w': '1S', '1m': '1M', all: '' }
-const RANGE_MS: Record<ChartRange, number> = {
-  '1h': 3_600_000, '6h': 6 * 3_600_000, '1d': 86_400_000, '1w': 7 * 86_400_000, '1m': 30 * 86_400_000, all: Infinity,
-}
-
-/** Recorta la serie al rango; antepone el último punto previo al corte
- *  (carry-forward) para que la línea no arranque "en el aire". */
-function filterRange(data: PricePoint[], range: ChartRange): PricePoint[] {
-  if (range === 'all' || data.length === 0) return data
-  const now = Date.now()
-  const cutoff = now - RANGE_MS[range]
-  const last = data[data.length - 1]
-  const firstIdx = data.findIndex(p => Date.parse(p.date) >= cutoff)
-  const out = firstIdx === -1 ? [] : data.slice(firstIdx)
-  const prev = firstIdx === -1 ? last : firstIdx > 0 ? data[firstIdx - 1] : null
-  if (prev) out.unshift({ date: new Date(cutoff).toISOString(), price: prev.price })
-  // El precio vigente se extiende hasta ahora para que la gráfica cubra todo el rango.
-  out.push({ date: new Date(now).toISOString(), price: last.price })
-  return out
-}
 
 export function MarketDetail() {
   const { t } = useTranslation()

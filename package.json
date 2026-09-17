@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "logos": "node scripts/fetch-team-logos.mjs",
-    "photos": "node scripts/fetch-people-photos.mjs"
+    "photos": "node scripts/fetch-people-photos.mjs",
+    "logos:ligas": "node scripts/fetch-league-logos.mjs"
   },
   "dependencies": {
     "i18next": "^26.3.6",

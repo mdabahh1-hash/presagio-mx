@@ -27,6 +27,7 @@ export function apiToMarket(m: ApiMarket): Market {
     volume: m.volume,
     liquidity: m.volume * 0.1,
     endsAt: m.ends_at,
+    kickoffAt: m.kickoff_at ?? null,
     createdAt: m.created_at,
     resolutionCriteria: '',
     resolutionSourceUrl: m.resolution_source_url ?? null,

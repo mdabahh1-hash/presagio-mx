@@ -15,6 +15,7 @@ import { PoliticaSections, type MarketSection } from './PoliticaSections'
 import { byClosing } from '../../lib/closing'
 import { formatVolume } from '../../lib/format'
 import { projectSeats } from '../../lib/seatProjection'
+import { deltaSince, DAY_MS } from '../../lib/priceDelta'
 
 interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
@@ -33,7 +34,6 @@ interface PoliticaLandingProps {
 
 export const POLITICA = 'Política'
 const HISTORY_DAYS = 90
-const DAY_MS = 86_400_000
 
 // Historial binario → puntos de gráfica con timestamp completo (el Δ de 7 días
 // necesita la hora; FeaturedCarousel trunca a día porque no la usa).
@@ -43,18 +43,8 @@ function toPoints(hist: ApiPricePoint[]): PricePoint[] {
     .map(p => ({ date: p.recorded_at, price: p.yes_price }))
 }
 
-// Cambio del Sí en 7 días: último precio menos el vigente hace 7 días
-// (último punto anterior al corte; si no hay, el primero, como movers.py).
-function delta7(points: PricePoint[]): number | null {
-  if (points.length < 2) return null
-  const cutoff = Date.now() - 7 * DAY_MS
-  let base = points[0]
-  for (const p of points) {
-    if (Date.parse(p.date) <= cutoff) base = p
-    else break
-  }
-  return Math.round(points[points.length - 1].price - base.price)
-}
+// Cambio del Sí en 7 días (lib/priceDelta, compartido con la landing de Deportes)
+const delta7 = (points: PricePoint[]) => deltaSince(points, 7 * DAY_MS)
 
 // Mercados abiertos, trending primero y luego por volumen (misma regla que FeaturedCarousel).
 export function featuredCandidates(markets: Market[]): Market[] {

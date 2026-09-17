@@ -74,6 +74,8 @@ export interface ApiMarket {
   status: string
   trending: boolean
   ends_at: string
+  // Hora del evento (partido / accesorio de partido); null en futuros, F1, boxeo
+  kickoff_at?: string | null
   created_at: string
   market_type: 'binary' | 'multi'
   outcomes: ApiOutcome[]
@@ -104,6 +106,32 @@ export interface ApiMover {
   change: number
   volume_delta: number
   points: { recorded_at: string; price: number }[]
+}
+
+// Landing de Deportes: agregados por subcategoría (app/services/resumen.py).
+// volumen_total suma todos los estatus (incluye resueltos); volumen_7d sale de trades.
+export interface ApiResumenSubcategoria { subcategory: string; abiertos: number; volumen_total: number; volumen_7d: number }
+export interface ApiResumenCategoria {
+  categoria: string
+  abiertos: number
+  volumen_total: number
+  volumen_7d: number
+  subcategorias: ApiResumenSubcategoria[]
+}
+
+// Marcador en vivo (app/services/en_vivo.py): estado normalizado de ESPN
+// (SCHEDULED | LIVE | FT | AET | POSTPONED | CANCELLED), marcador y reloj.
+export interface ApiEnVivo {
+  market_id: string
+  estado: string
+  local: string
+  visitante: string
+  marcador_local: number | null
+  marcador_visitante: number | null
+  reloj: string | null
+  periodo: number | null
+  fuente_url: string | null
+  actualizado: string
 }
 
 export interface ApiComment {
@@ -179,7 +207,17 @@ export const marketsApi = {
     request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
   outcomes: (id: string) => request<ApiOutcome[]>(`/markets/${id}/outcomes`),
   history: (id: string, days = 60) => request<ApiPricePoint[]>(`/markets/${id}/history?days=${days}`),
-  movers: (hours = 24, limit = 50) => request<ApiMover[]>(`/markets/movers?hours=${hours}&limit=${limit}`),
+  movers: (hours = 24, limit = 50, filtro?: { category?: string; subcategory?: string }) => {
+    const qs = new URLSearchParams({ hours: String(hours), limit: String(limit) })
+    if (filtro?.category) qs.set('category', filtro.category)
+    if (filtro?.subcategory) qs.set('subcategory', filtro.subcategory)
+    return request<ApiMover[]>(`/markets/movers?${qs}`)
+  },
+  // Landing de Deportes: abiertos y volumen (total y 7 d) por subcategoría
+  resumen: (category: string) =>
+    request<ApiResumenCategoria>(`/markets/resumen?category=${encodeURIComponent(category)}`),
+  // Marcador en vivo de los partidos en ventana; [] si el job está apagado
+  enVivo: () => request<ApiEnVivo[]>('/markets/en-vivo'),
   comments: (id: string) => request<ApiComment[]>(`/markets/${id}/comments`),
   postComment: (id: string, text: string) =>
     request<ApiComment>(`/markets/${id}/comments`, { method: 'POST', body: JSON.stringify({ text }) }),
@@ -217,6 +255,8 @@ export interface ApiContenidoCategoria {
   partidos: ApiPartido[]
   fuentes: ApiFuente[]
   notas: Record<string, string>
+  // Deportes: liga → id del multi de campeón (tabla "Probabilidad de título"); puede faltar
+  titulos?: Record<string, string>
 }
 
 export const contenidoApi = {
