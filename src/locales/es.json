@@ -665,6 +665,7 @@
     "prop": "Accesorio",
     "clearFilters": "Quitar filtros",
     "titleProb": "Probabilidad de título · {{league}}",
+    "titleShort": "Título",
     "titleSubtitle": "Precio del mercado «{{question}}»",
     "closes": "Cierra {{date}}",
     "viewOutcomes_one": "Ver la opción",
@@ -676,6 +677,14 @@
     "viewProps_other": "Ver los {{count}} accesorios",
     "filters": "Filtros",
     "filtersTitle": "Filtrar por deporte, liga y tipo",
+    "allKinds": "Todos",
+    "favorite": "Favorito al título",
+    "topMover": "Mayor movimiento",
+    "movers": "Movimiento del día",
+    "moversSubtitle": "Cambio en las últimas 24 h",
+    "privateLeagues": "Ligas privadas",
+    "privateLeaguesText": "Arma una liga con tus amigos y compite por puntos en esta jornada.",
+    "createLeague": "Crear liga",
     "kind": "Tipo"
   },
   "errors": {

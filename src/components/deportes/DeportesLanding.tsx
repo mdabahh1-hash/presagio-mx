@@ -13,6 +13,7 @@ import { Jornada } from './Jornada'
 import { TituloTable } from './TituloTable'
 import { AccesoriosCard } from './AccesoriosCard'
 import { FiltrosPopover } from './FiltrosPopover'
+import { LigaView } from './LigaView'
 import { SPORT_GROUPS, sportOfSub, type Kind } from '../../lib/categories'
 import { byClosing } from '../../lib/closing'
 import { formatVolume } from '../../lib/format'
@@ -241,34 +242,54 @@ export function DeportesLanding({
         )}
       </div>
 
-      <div className="dep-hero anim-2">
-        <DeportesHero
-          market={featured}
-          series={series}
-          historyLoading={historyLoading}
-          delta={delta}
-          range={range}
-          onRange={setRange}
-          onTrade={() => openTrade(featured)}
+      {activeSub ? (
+        /* Nivel 2: vista de liga (cabecera, tabs de tipo, jornada y columna derecha) */
+        <LigaView
+          className="anim-2"
+          liga={activeSub}
+          sport={sport}
+          markets={inCat.filter(m => m.subcategory === activeSub)}
+          resumen={resumen?.subcategorias.find(s => s.subcategory === activeSub) ?? null}
+          tituloMarket={tituloMarket}
+          activeKind={activeKind}
+          onKindChange={onKindChange}
+          activeDia={activeDia}
+          onDiaChange={onDiaChange}
+          extraMetaOf={extraMetaOf}
+          onClear={clearFilters}
         />
-        {resumen && <VolumenLigas resumen={resumen} />}
-      </div>
+      ) : (
+        <>
+          <div className="dep-hero anim-2">
+            <DeportesHero
+              market={featured}
+              series={series}
+              historyLoading={historyLoading}
+              delta={delta}
+              range={range}
+              onRange={setRange}
+              onTrade={() => openTrade(featured)}
+            />
+            {resumen && <VolumenLigas resumen={resumen} />}
+          </div>
 
-      <Jornada
-        className="anim-3"
-        markets={inScope}
-        activeDia={activeDia}
-        onDiaChange={onDiaChange}
-        extraMetaOf={extraMetaOf}
-        hasFilters={hasFilters}
-        onClearFilters={clearFilters}
-      />
+          <Jornada
+            className="anim-3"
+            markets={inScope}
+            activeDia={activeDia}
+            onDiaChange={onDiaChange}
+            extraMetaOf={extraMetaOf}
+            hasFilters={hasFilters}
+            onClearFilters={clearFilters}
+          />
 
-      {(tituloMarket || accesorios.length > 0) && (
-        <div className="dep-cards anim-4" style={singleCard ? { gridTemplateColumns: 'minmax(0, 1fr)' } : undefined}>
-          {tituloMarket && tituloLiga && <TituloTable market={tituloMarket} liga={tituloLiga} />}
-          {accesorios.length > 0 && <AccesoriosCard markets={accesorios} onViewAll={() => onKindChange('accesorio')} />}
-        </div>
+          {(tituloMarket || accesorios.length > 0) && (
+            <div className="dep-cards anim-4" style={singleCard ? { gridTemplateColumns: 'minmax(0, 1fr)' } : undefined}>
+              {tituloMarket && tituloLiga && <TituloTable market={tituloMarket} liga={tituloLiga} />}
+              {accesorios.length > 0 && <AccesoriosCard markets={accesorios} onViewAll={() => onKindChange('accesorio')} />}
+            </div>
+          )}
+        </>
       )}
 
       <TradeSheet open={!!tradeMarket} onClose={closeTrade}>

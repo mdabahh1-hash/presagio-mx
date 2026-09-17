@@ -665,6 +665,7 @@
     "prop": "Prop",
     "clearFilters": "Clear filters",
     "titleProb": "Title odds · {{league}}",
+    "titleShort": "Title",
     "titleSubtitle": "Price of the market “{{question}}”",
     "closes": "Closes {{date}}",
     "viewOutcomes_one": "View the option",
@@ -676,6 +677,14 @@
     "viewProps_other": "View all {{count}} props",
     "filters": "Filters",
     "filtersTitle": "Filter by sport, league and type",
+    "allKinds": "All",
+    "favorite": "Title favorite",
+    "topMover": "Biggest move",
+    "movers": "Today's movers",
+    "moversSubtitle": "Change over the last 24 h",
+    "privateLeagues": "Private leagues",
+    "privateLeaguesText": "Set up a league with your friends and compete for points this matchday.",
+    "createLeague": "Create league",
     "kind": "Type"
   },
   "errors": {

@@ -605,6 +605,9 @@ input[type='range']::-webkit-slider-thumb {
 .dep-bar > span { display: block; height: 100%; border-radius: 3px; background: var(--text-secondary); }
 .dep-bar > span.lead { background: var(--text-primary); }
 .dep-jornada-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.liga-head { display: flex; align-items: flex-end; gap: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 18px; }
+.liga-stats { display: flex; gap: 26px; padding-bottom: 2px; flex-shrink: 0; }
+.liga-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
 
 .lb-row { transition: background 0.15s; }
 .lb-row:hover { background: var(--bg-hover); }
@@ -668,7 +671,7 @@ input[type='range']::-webkit-slider-thumb {
   .featured-row { grid-template-columns: 1fr !important; }
   /* Landing de Política: hero y tarjetas a una columna; cronología en dos renglones sin riel */
   .pol-hero, .pol-cards { grid-template-columns: 1fr !important; }
-  .dep-hero, .dep-cards { grid-template-columns: minmax(0, 1fr) !important; }
+  .dep-hero, .dep-cards, .liga-body { grid-template-columns: minmax(0, 1fr) !important; }
   .pol-timeline-grid { grid-template-columns: repeat(3, 1fr) !important; row-gap: 20px; }
   .pol-timeline-rail { display: none; }
   /* minmax(0, …): el resumen lleva texto en nowrap y con `1fr` a secas ensancharía la columna */
@@ -771,6 +774,8 @@ input[type='range']::-webkit-slider-thumb {
   .dep-hero-cta > .btn-secondary, .dep-hero-cta > .icon-btn { display: none; }
   .dep-hero-cta > .btn-primary { height: 48px; }
   .dep-jornada-head { flex-direction: column; align-items: stretch; }
+  .liga-head { flex-wrap: wrap; align-items: center; }
+  .liga-stats { width: 100%; gap: 18px; }
 
   /* Landing de Política */
   .pol-hero-cta { flex-direction: column; }
