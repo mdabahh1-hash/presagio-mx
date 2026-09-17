@@ -438,12 +438,14 @@ input[type='range']::-webkit-slider-thumb {
 /* ============================================================
    MOTION (corto, solo contenedores de página)
    ============================================================ */
-.anim-1 { animation: fadeUp 0.5s ease 0.05s both; }
-.anim-2 { animation: fadeUp 0.5s ease 0.1s both; }
-.anim-3 { animation: fadeUp 0.5s ease 0.15s both; }
-.anim-4 { animation: fadeUp 0.5s ease 0.2s both; }
-.anim-5 { animation: fadeUp 0.5s ease 0.25s both; }
-.anim-6 { animation: fadeUp 0.5s ease 0.3s both; }
+/* `backwards`, no `both`: con `both` el transform final persiste, crea un stacking context y los popovers
+   (z 200) de dentro quedan debajo de las secciones siguientes (p. ej. "Filtros" en la landing de Deportes). */
+.anim-1 { animation: fadeUp 0.5s ease 0.05s backwards; }
+.anim-2 { animation: fadeUp 0.5s ease 0.1s backwards; }
+.anim-3 { animation: fadeUp 0.5s ease 0.15s backwards; }
+.anim-4 { animation: fadeUp 0.5s ease 0.2s backwards; }
+.anim-5 { animation: fadeUp 0.5s ease 0.25s backwards; }
+.anim-6 { animation: fadeUp 0.5s ease 0.3s backwards; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 
 .fade-in { animation: fadeIn 0.18s ease-out both; }

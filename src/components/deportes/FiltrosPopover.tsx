@@ -88,7 +88,7 @@ export function FiltrosPopover({ markets, sport, sub, kind, onSport, onSub, onKi
       <Item active={!sport && !sub} label={t('categoryBrowse.subcatAll')} count={markets.length} onClick={() => { onSport(null); setOpen(false) }} />
       {tree.map(node => (
         <React.Fragment key={node.sport}>
-          <Item active={sport === node.sport && !sub} label={node.sport} count={node.count} onClick={() => { onSport(sport === node.sport ? null : node.sport); if (!isMobile) setOpen(false) }} />
+          <Item active={sport === node.sport && !sub} label={node.sport} count={node.count} onClick={() => { onSport(sport === node.sport && !sub ? null : node.sport); if (!isMobile) setOpen(false) }} />
           {sport === node.sport && node.leagues.length > 1 && node.leagues.map(l => (
             <Item key={l} nested={1} active={sub === l} label={l} count={subCounts[l] ?? 0} onClick={() => { onSub(sub === l ? null : l); if (!isMobile) setOpen(false) }} />
           ))}
