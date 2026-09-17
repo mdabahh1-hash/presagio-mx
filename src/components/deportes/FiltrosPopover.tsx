@@ -16,19 +16,23 @@ interface FiltrosPopoverProps {
   onKind: (kind: Kind | null) => void
 }
 
-function Item({ active, label, count, onClick, nested = 0 }: { active: boolean; label: string; count: number; onClick: () => void; nested?: 0 | 1 | 2 }) {
+// Fila del menú. Clase propia (no `.cat-rail-item`): las reglas móviles del rail horizontal
+// de CategoryBrowse (ancho auto, "› " en las anidadas) se colarían en el sheet. En móvil
+// mide ≥44 px como las filas de FilterSelect.
+function Item({ active, label, count, onClick, nested = 0, mobile = false }: { active: boolean; label: string; count: number; onClick: () => void; nested?: 0 | 1 | 2; mobile?: boolean }) {
   return (
     <button
       type="button"
       role="menuitemradio"
       aria-checked={active}
       onClick={onClick}
-      className={`cat-rail-item${nested === 1 ? ' cat-rail-sub' : nested === 2 ? ' cat-rail-sub2' : ''}`}
+      className="dep-filtros-item"
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%',
-        textAlign: 'left', cursor: 'pointer', padding: '8px 10px', borderRadius: 8, border: 'none',
+        textAlign: 'left', cursor: 'pointer', padding: mobile ? '13px 10px' : '8px 10px', paddingLeft: nested === 1 ? 24 : nested === 2 ? 38 : 10,
+        borderRadius: 8, border: 'none',
         background: active ? 'var(--bg-elevated)' : 'transparent', color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-        fontWeight: active ? 600 : 500, fontSize: 14, fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s',
+        fontWeight: active ? 600 : 500, fontSize: mobile ? 15 : 14, fontFamily: 'inherit', whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s',
       }}
     >
       <span>{label}</span>
@@ -85,12 +89,12 @@ export function FiltrosPopover({ markets, sport, sub, kind, onSport, onSub, onKi
   const items = (
     <>
       <div className="meta-label" style={{ padding: '8px 10px 4px' }}>{t('categoryBrowse.allSports')}</div>
-      <Item active={!sport && !sub} label={t('categoryBrowse.subcatAll')} count={markets.length} onClick={() => { onSport(null); setOpen(false) }} />
+      <Item mobile={isMobile} active={!sport && !sub} label={t('categoryBrowse.subcatAll')} count={markets.length} onClick={() => { onSport(null); setOpen(false) }} />
       {tree.map(node => (
         <React.Fragment key={node.sport}>
-          <Item active={sport === node.sport && !sub} label={node.sport} count={node.count} onClick={() => { onSport(sport === node.sport && !sub ? null : node.sport); if (!isMobile) setOpen(false) }} />
+          <Item mobile={isMobile} active={sport === node.sport && !sub} label={node.sport} count={node.count} onClick={() => { onSport(sport === node.sport && !sub ? null : node.sport); if (!isMobile) setOpen(false) }} />
           {sport === node.sport && node.leagues.length > 1 && node.leagues.map(l => (
-            <Item key={l} nested={1} active={sub === l} label={l} count={subCounts[l] ?? 0} onClick={() => { onSub(sub === l ? null : l); if (!isMobile) setOpen(false) }} />
+            <Item mobile={isMobile} key={l} nested={1} active={sub === l} label={l} count={subCounts[l] ?? 0} onClick={() => { onSub(sub === l ? null : l); if (!isMobile) setOpen(false) }} />
           ))}
         </React.Fragment>
       ))}
@@ -98,7 +102,7 @@ export function FiltrosPopover({ markets, sport, sub, kind, onSport, onSub, onKi
         <>
           <div className="meta-label" style={{ padding: '10px 10px 4px', borderTop: '1px solid var(--border-subtle)', marginTop: 6 }}>{t('deportes.kind')}</div>
           {KINDS.map(k => (
-            <Item key={k} active={kind === k} label={t(kindLabelKey(k))} count={kindCounts[k]} onClick={() => { onKind(kind === k ? null : k); setOpen(false) }} />
+            <Item mobile={isMobile} key={k} active={kind === k} label={t(kindLabelKey(k))} count={kindCounts[k]} onClick={() => { onKind(kind === k ? null : k); setOpen(false) }} />
           ))}
         </>
       )}

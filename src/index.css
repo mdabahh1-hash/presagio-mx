@@ -579,6 +579,7 @@ input[type='range']::-webkit-slider-thumb {
 .ligas-rail-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
 .ligas-rail-arrows { display: flex; gap: 4px; }
 .ligas-rail-arrows .carousel-nav-btn:disabled { opacity: 0.35; cursor: default; }
+.dep-filtros-item:hover { background: var(--bg-hover) !important; }
 .ligas-rail { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
 .liga-card {
   flex: 0 0 auto; width: 178px; display: flex; flex-direction: column; align-items: flex-start;
