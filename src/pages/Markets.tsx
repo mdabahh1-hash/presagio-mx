@@ -7,6 +7,8 @@ import { MarketCard } from '../components/MarketCard'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
+import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, cryptoLandingAvailable, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { isVentana, type Ventana } from '../components/crypto/escalera'
 import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
@@ -38,9 +40,13 @@ export function Markets() {
   const kindParam: Kind | null = isKind(rawKind) ? rawKind : null
   // Día de la jornada de Deportes (hoy | manana | AAAA-MM-DD | later | pending), enlazable
   const diaParam = searchParams.get('dia')
+  // Crypto: ventana de cierre (mes | anio | multi | 7d) y orden propio (default: cierra pronto), enlazables
+  const rawVentana = searchParams.get('ventana')
+  const ventanaParam: Ventana | null = isVentana(rawVentana) ? rawVentana : null
   // ?sort= vive en la URL para que la pestaña "Nuevo" de la barra (/mercados?sort=new) sea enlazable
   const rawSort = searchParams.get('sort')
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
+  const cryptoSort: CryptoSort = isCryptoSort(rawSort) ? rawSort : 'ending'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
@@ -59,13 +65,15 @@ export function Markets() {
     setSortBy(sortParam)
   }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
 
+  // Crypto ordena en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
+  const fetchSort = activeCategory === 'Crypto' ? 'volume' : sortBy
   useEffect(() => {
     let active = true
     setLoading(true)
     const params = {
       category: activeCategory !== 'Todos' ? activeCategory : undefined,
       q: searchInput || undefined,
-      sort: sortBy,
+      sort: fetchSort,
     }
     // Una categoría se lista completa (paginado); "Todos" conserva el top-100 por volumen.
     const req = activeCategory !== 'Todos'
@@ -76,7 +84,7 @@ export function Markets() {
       .catch(() => { if (active) setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }  // drop out-of-order responses from fast typing / tab switches
-  }, [activeCategory, searchInput, sortBy])
+  }, [activeCategory, searchInput, fetchSort])
 
   // "Nuevos (3 días)": el API ordena por siembra; el recorte a 3 días (y el
   // respaldo de los 12 más recientes) es de UI, compartido con la Home.
@@ -92,6 +100,9 @@ export function Markets() {
   // Deportes: landing propia (components/deportes) con la misma regla (deportesLandingAvailable)
   const isDeportes = activeCategory === 'Deportes' && !searchInput
   const showDeportes = isDeportes && deportesLandingAvailable(markets, loading)
+  // Crypto: landing propia (components/crypto) con la misma regla (cryptoLandingAvailable)
+  const isCrypto = activeCategory === 'Crypto' && !searchInput
+  const showCrypto = isCrypto && cryptoLandingAvailable(markets, loading)
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
   const abiertos = useMemo(() => markets.filter(m => m.status === 'open').length, [markets])
   const hoy = useMemo(() => markets.filter(m => diaKeyOf(m) === 'hoy').length, [markets])
@@ -127,7 +138,8 @@ export function Markets() {
       p.delete('sport')
       p.delete('kind')
       p.delete('dia')
-      p.delete('sort')  // el orden solo existe en "Todos"
+      p.delete('ventana')
+      p.delete('sort')  // el orden solo existe en "Todos" (y en la landing de Crypto)
       return p
     })
   }
@@ -180,6 +192,30 @@ export function Markets() {
     })
   }
 
+  // Ventana de cierre, orden y "Todos" de la landing de Crypto
+  const handleVentanaChange = (v: Ventana | null) => {
+    setSearchParams(p => {
+      if (v) p.set('ventana', v)
+      else p.delete('ventana')
+      return p
+    })
+  }
+  const handleCryptoSort = (s: CryptoSort) => {
+    setSearchParams(p => {
+      if (s === 'ending') p.delete('sort')
+      else p.set('sort', s)
+      return p
+    })
+  }
+  const handleCryptoClear = () => {
+    setActiveSub(null)
+    setSearchParams(p => {
+      p.delete('sub')
+      p.delete('ventana')
+      return p
+    })
+  }
+
   // Día de la jornada (landing de Deportes)
   const handleDiaChange = (dia: string | null) => {
     setActiveDia(dia)
@@ -199,11 +235,14 @@ export function Markets() {
         alignItems: 'flex-start', flexWrap: 'wrap', gap: 16,
       }}>
         <div>
+          {showCrypto && activeSub && <CryptoBreadcrumb sub={activeSub} onRoot={handleCryptoClear} />}
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {showLanding || showDeportes ? activeCategory : t('markets.title')}
+            {showCrypto ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
-            {loading ? t('common.loading') : showLanding ? (
+            {loading ? t('common.loading') : showCrypto ? (
+              <CryptoHeaderMeta markets={markets} sub={activeSub} />
+            ) : showLanding ? (
               <span className="num">{t('politica.headerMeta', { count: markets.length, volume: formatVolume(categoryVolume) })}</span>
             ) : showDeportes ? (
               <span className="num">{t('deportes.headerMeta', { count: abiertos, today: hoy, volume: formatVolume(categoryVolume) })}</span>
@@ -290,6 +329,20 @@ export function Markets() {
           onKindChange={handleKindChange}
           activeDia={activeDia}
           onDiaChange={handleDiaChange}
+          onTraded={patchPrice}
+        />
+      ) : showCrypto ? (
+        <CryptoLanding
+          markets={markets}
+          loading={loading}
+          subcats={SUBCATEGORIES['Crypto'] ?? []}
+          activeSub={activeSub}
+          onSubChange={handleSubChange}
+          ventana={ventanaParam}
+          onVentanaChange={handleVentanaChange}
+          onClear={handleCryptoClear}
+          sort={cryptoSort}
+          onSortChange={handleCryptoSort}
           onTraded={patchPrice}
         />
       ) : activeCategory !== 'Todos' ? (

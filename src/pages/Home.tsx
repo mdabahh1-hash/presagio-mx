@@ -9,6 +9,8 @@ import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
+import { CryptoLanding, cryptoLandingAvailable, type CryptoSort } from '../components/crypto/CryptoLanding'
+import type { Ventana } from '../components/crypto/escalera'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import { BetBox } from '../components/BetBox'
@@ -95,7 +97,13 @@ export function Home() {
   // estado local como homeSub; /mercados los sincroniza con la URL
   const [homeDep, setHomeDep] = useState<{ sub: string | null; sport: string | null; kind: Kind | null; dia: string | null }>({ sub: null, sport: null, kind: null, dia: null })
 
-  useEffect(() => { setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null }) }, [mobileTab])
+  // Filtros de la landing de Crypto dentro de la Home (subcategoría, ventana, orden): estado local
+  const [homeCrypto, setHomeCrypto] = useState<{ sub: string | null; ventana: Ventana | null; sort: CryptoSort }>({ sub: null, ventana: null, sort: 'ending' })
+
+  useEffect(() => {
+    setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
+    setHomeCrypto({ sub: null, ventana: null, sort: 'ending' })
+  }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
   // ruta puede no cambiar pero location.key sí → volver al feed de la URL en
@@ -177,6 +185,25 @@ export function Home() {
     />
   )
 
+  // Crypto: misma regla que Política y Deportes (in-place, con cabecera)
+  const showCrypto = mobileTab === 'Crypto' && cryptoLandingAvailable(markets, loading)
+  const cryptoLanding = (
+    <CryptoLanding
+      markets={markets}
+      loading={loading}
+      subcats={SUBCATEGORIES['Crypto'] ?? []}
+      activeSub={homeCrypto.sub}
+      onSubChange={sub => setHomeCrypto(c => ({ ...c, sub }))}
+      ventana={homeCrypto.ventana}
+      onVentanaChange={ventana => setHomeCrypto(c => ({ ...c, ventana }))}
+      onClear={() => setHomeCrypto(c => ({ ...c, sub: null, ventana: null }))}
+      sort={homeCrypto.sort}
+      onSortChange={sort => setHomeCrypto(c => ({ ...c, sort }))}
+      onTraded={handleTraded}
+      showHeader
+    />
+  )
+
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
     return (
@@ -240,7 +267,7 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : (
+            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : (
               <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
             )}
           </div>
@@ -311,7 +338,7 @@ export function Home() {
         <NewFeed markets={markets} loading={loading} />
       ) : (
         <section style={{ marginBottom: 56 }}>
-          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : (
+          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : (
             <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
           )}
         </section>

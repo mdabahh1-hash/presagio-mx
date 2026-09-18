@@ -763,6 +763,10 @@ input[type='range']::-webkit-slider-thumb {
     grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); justify-content: stretch; width: auto;
   }
   .row-outcome-btn--track { padding: 0 9px; }
+  /* Landing de Crypto en móvil: la escalera pasa los chips a su propio renglón */
+  .crypto-ladder-row { grid-template-columns: 96px minmax(0, 1fr) !important; gap: 8px 12px !important; }
+  .crypto-ladder-row .market-row-outcomes { grid-column: 1 / -1; }
+  .crypto-row-title { white-space: normal !important; }
   /* Landing de Deportes en móvil: ligas como píldoras, celdas apiladas, CTA a ancho completo */
   .ligas-rail-arrows { display: none; }
   .liga-card { flex-direction: row; align-items: center; gap: 7px; width: auto; height: 44px; padding: 0 12px; border-radius: 999px; background: var(--bg-elevated); border-color: transparent; }

@@ -18,6 +18,7 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Saudi Pro League', 'NFL', 'F1', 'Boxeo',
   ],
   'Política': ['Elecciones', 'Sheinbaum'],
+  'Crypto': ['Bitcoin', 'Ethereum', 'Solana', 'Stablecoins', 'Regulación', 'Adopción México'],
   'Entretenimiento': ['Influencers'],
   'Global': ['Migración'],
 }

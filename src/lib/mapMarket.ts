@@ -29,7 +29,7 @@ export function apiToMarket(m: ApiMarket): Market {
     endsAt: m.ends_at,
     kickoffAt: m.kickoff_at ?? null,
     createdAt: m.created_at,
-    resolutionCriteria: '',
+    resolutionCriteria: m.resolution_criteria ?? '',
     resolutionSourceUrl: m.resolution_source_url ?? null,
     numTrades: m.num_trades,
     trending: m.trending,
