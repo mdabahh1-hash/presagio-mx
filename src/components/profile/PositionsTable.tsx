@@ -8,6 +8,7 @@ import { Icon } from '../Icon'
 import { Tabs } from '../Tabs'
 import { TeamMark } from '../TeamMark'
 import { cleanLabel } from '../../lib/mapMarket'
+import { isOutcomeNo } from '../../lib/prices'
 
 interface Props {
   positions: ApiPosition[]
@@ -20,12 +21,14 @@ function positionValue(p: ApiPosition): number {
 
 function OutcomeBadge({ side, outcomeKey, outcomeLabel, marketId }: { side: string | null; outcomeKey: string | null; outcomeLabel?: string | null; marketId?: string | null }) {
   const { t } = useTranslation()
+  const outcomeNo = isOutcomeNo(side, outcomeKey)
   const isYes = side === 'YES'
-  const isNo = side === 'NO'
+  const isNo = side === 'NO' && !outcomeNo
   const raw = outcomeLabel ?? outcomeKey ?? '—'
-  const label = isYes ? t('common.yes') : isNo ? t('common.no') : cleanLabel(raw)
+  const label = isYes ? t('common.yes') : isNo ? t('common.no')
+    : outcomeNo ? t('common.noOutcome', { label: cleanLabel(raw) }) : cleanLabel(raw)
   return (
-    <Badge tone={isYes ? 'green' : isNo ? 'red' : 'neutral'} style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+    <Badge tone={isYes ? 'green' : isNo || outcomeNo ? 'red' : 'neutral'} style={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
       {!isYes && !isNo && <TeamMark label={raw} outcomeKey={outcomeKey ?? ''} marketId={marketId} size={14} />}
       {label}
     </Badge>

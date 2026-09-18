@@ -2,6 +2,7 @@
   "common": {
     "yes": "Yes",
     "no": "No",
+    "noOutcome": "No · {{label}}",
     "loading": "Loading...",
     "back": "Back",
     "share": "Share",

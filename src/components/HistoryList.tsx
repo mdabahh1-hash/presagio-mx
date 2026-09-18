@@ -4,6 +4,7 @@ import type { ApiHistoryEvent } from '../lib/api'
 import { formatPnl, timeAgo } from '../lib/format'
 import { Icon, type IconName } from './Icon'
 import { Badge } from './Badge'
+import { isOutcomeNo } from '../lib/prices'
 
 // Color del icono por tipo de evento.
 function badgeStyle(type: ApiHistoryEvent['type']) {
@@ -41,8 +42,9 @@ export function HistoryList({ events, variant }: HistoryListProps) {
   const { t } = useTranslation()
 
   const evLabel = (e: ApiHistoryEvent) =>
-    e.side === 'YES' ? t('common.yes') : e.side === 'NO' ? t('common.no') : (e.outcome_label ?? e.outcome_key ?? '')
-  // price_after is the YES price for binary markets; a NO buyer paid the complement.
+    isOutcomeNo(e.side, e.outcome_key) ? t('common.noOutcome', { label: e.outcome_label ?? e.outcome_key ?? '' })
+      : e.side === 'YES' ? t('common.yes') : e.side === 'NO' ? t('common.no') : (e.outcome_label ?? e.outcome_key ?? '')
+  // price_after is the YES price (of the outcome, in multi); a NO buyer paid the complement.
   const evPrice = (e: ApiHistoryEvent) =>
     Math.round(e.side === 'NO' ? 100 - (e.price_after ?? 0) : (e.price_after ?? 0))
 
