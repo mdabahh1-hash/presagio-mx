@@ -269,7 +269,7 @@ export function CryptoLanding({
     return (
       <div aria-busy="true" aria-label={t('common.loading')} style={{ marginBottom: 48 }}>
         {header}
-        <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '212px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
+        <div className="cat-browse crypto-browse" style={{ display: 'grid', gridTemplateColumns: '212px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
           <div className="cat-rail">
             {[...Array(7)].map((_, i) => <div key={i} className="skeleton" style={{ height: 32, marginBottom: 2 }} />)}
           </div>
@@ -297,7 +297,7 @@ export function CryptoLanding({
   return (
     <div style={{ marginBottom: 48 }}>
       {header}
-      <div className="cat-browse" style={{ display: 'grid', gridTemplateColumns: '212px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
+      <div className="cat-browse crypto-browse" style={{ display: 'grid', gridTemplateColumns: '212px minmax(0, 1fr)', gap: 24, alignItems: 'start' }}>
         {/* Barra lateral: ?sub= y ventanas de cierre; en móvil .cat-rail es una fila con scroll */}
         <nav className="cat-rail anim-1" aria-label={CRYPTO}>
           <div className="meta-label cat-rail-header" style={{ marginBottom: 8, padding: '0 10px' }}>{CRYPTO}</div>
