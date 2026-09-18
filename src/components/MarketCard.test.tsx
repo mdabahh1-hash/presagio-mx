@@ -25,11 +25,12 @@ describe('MarketCard quickLayout="chips"', () => {
     expect(screen.getAllByRole('button')).toHaveLength(4)
   })
 
-  it('binaria: botones con centavos que suman 100', () => {
+  it('binaria: medidor con el % y botones Sí/No', () => {
     const onQuickTrade = vi.fn()
     renderCard(<MarketCard market={makeMarket({ yesPrice: 43 })} onQuickTrade={onQuickTrade} quickLayout="chips" />)
-    fireEvent.click(screen.getByText('Sí 43¢'))
-    fireEvent.click(screen.getByText('No 57¢'))
+    expect(screen.getByText('43%')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Sí' }))
+    fireEvent.click(screen.getByRole('button', { name: 'No' }))
     expect(onQuickTrade.mock.calls).toEqual([['YES'], ['NO']])
   })
 

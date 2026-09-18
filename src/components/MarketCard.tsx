@@ -20,7 +20,7 @@ interface MarketCardProps {
   // la compra sin navegar. Sin la prop la tarjeta queda como siempre.
   onQuickTrade?: QuickTradeHandler
   // 'chips' (landing de Economía, estilo Polymarket): cada opción de un multi
-  // lleva chips Sí/No y la binaria su número, barra y par Sí/No en centavos.
+  // lleva chips Sí/No y la binaria un medidor junto al título y el par Sí/No.
   // Sin la prop, onQuickTrade conserva el layout del inicio móvil.
   quickLayout?: 'chips'
 }
@@ -41,6 +41,23 @@ function OutcomeChip({ side, onClick, label }: { side: 'YES' | 'NO'; onClick: (e
   )
 }
 
+// Medidor de medio círculo (binaria con chips, como Polymarket): % dentro del arco
+function Gauge({ pct, color, label }: { pct: number; color: string; label: string }) {
+  const arc = 'M 5 33 A 27 27 0 0 1 59 33'
+  return (
+    <div style={{ position: 'relative', width: 64, height: 46, flexShrink: 0, textAlign: 'center' }}>
+      <svg width="64" height="36" viewBox="0 0 64 36" aria-hidden style={{ display: 'block' }}>
+        <path d={arc} fill="none" stroke="var(--border-subtle)" strokeWidth="4" strokeLinecap="round" />
+        <path d={arc} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" pathLength={100} strokeDasharray={`${pct} 100`} />
+      </svg>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 17, lineHeight: 1.1 }}>
+        <div className="num" style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{pct}%</div>
+        <div className="meta-label" style={{ fontSize: 11 }}>{label}</div>
+      </div>
+    </div>
+  )
+}
+
 function ChipOutcomeList({ outcomes, onQuickTrade }: { outcomes: Outcome[]; onQuickTrade: QuickTradeHandler }) {
   const { t } = useTranslation()
   const sorted = [...outcomes].sort((a, b) => b.price - a.price)
@@ -49,7 +66,7 @@ function ChipOutcomeList({ outcomes, onQuickTrade }: { outcomes: Outcome[]; onQu
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {top.map(o => (
-        <div key={o.outcome_key} style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
+        <div key={o.outcome_key} style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 40 }}>
           <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {o.label}
           </span>
@@ -131,17 +148,24 @@ export function MarketCard({ market, animClass = '', onQuickTrade, quickLayout }
       <div
         className="card"
         style={{
-          padding: onQuickTrade && !(chips && !isMobile) ? 14 : 16, cursor: 'pointer', height: '100%',
-          display: 'flex', flexDirection: 'column', gap: onQuickTrade && !chips ? 12 : 14,
+          padding: chips ? 12 : onQuickTrade ? 14 : 16, cursor: 'pointer', height: '100%',
+          display: 'flex', flexDirection: 'column', gap: onQuickTrade ? 12 : 14,
           opacity: isPending ? 0.85 : 1,
         }}
       >
         {/* Cabecera: thumbnail + pregunta (+ % en binario compacto) */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <MarketThumb market={market} size={chips && isMobile ? 36 : 40} />
-          <p style={{ margin: 0, fontSize: chips && isMobile ? 14 : 15, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+          <p
+            title={chips ? market.question : undefined}
+            style={{
+              margin: 0, fontSize: chips && isMobile ? 14 : 15, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.35, flex: 1, minWidth: 0,
+              ...(chips && { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }),
+            }}
+          >
             {market.question}
           </p>
+          {chips && !isMulti && <Gauge pct={pair.yes} color={chipColor} label={t('card.chance', { defaultValue: 'Sí' })} />}
           {onQuickTrade && !chips && !isMulti && (
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
               <div className="num" style={{ fontSize: 18, fontWeight: 600, color: yesColor, lineHeight: 1.1 }}>{market.yesPrice}%</div>
@@ -155,29 +179,16 @@ export function MarketCard({ market, animClass = '', onQuickTrade, quickLayout }
           canQuick ? <ChipOutcomeList outcomes={market.outcomes ?? []} onQuickTrade={onQuickTrade!} />
             : <MultiOutcomeList outcomes={market.outcomes ?? []} sub={market.subcategory} marketId={market.id} />
         ) : chips ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
-                <span className="num" style={{ fontSize: isMobile ? 22 : 24, fontWeight: 600, color: chipColor, lineHeight: 1, letterSpacing: '-0.01em' }}>
-                  {pair.yes}%
-                </span>
-                <span className="meta-label">{t('card.chance', { defaultValue: 'Sí' })}</span>
-              </div>
-              <div className="prob-bar-track">
-                <div className="prob-bar-fill" style={{ width: `${pair.yes}%`, background: chipColor }} />
-              </div>
+          canQuick && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button className="btn price-yes" onClick={quick(() => onQuickTrade!('YES'))} style={{ height: 40, padding: 0, fontSize: 14, fontWeight: 600 }}>
+                {t('common.yes')}
+              </button>
+              <button className="btn price-no" onClick={quick(() => onQuickTrade!('NO'))} style={{ height: 40, padding: 0, fontSize: 14, fontWeight: 600 }}>
+                {t('common.no')}
+              </button>
             </div>
-            {canQuick && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <button className="btn btn-yes num" onClick={quick(() => onQuickTrade!('YES'))} style={{ height: 40, padding: 0 }}>
-                  {t('card.buyCents', { side: t('common.yes'), cents: pair.yes })}
-                </button>
-                <button className="btn btn-no num" onClick={quick(() => onQuickTrade!('NO'))} style={{ height: 40, padding: 0 }}>
-                  {t('card.buyCents', { side: t('common.no'), cents: pair.no })}
-                </button>
-              </div>
-            )}
-          </div>
+          )
         ) : isMulti ? (
           <MultiOutcomeList outcomes={market.outcomes ?? []} sub={market.subcategory} marketId={market.id} onQuickTrade={canQuick ? onQuickTrade : undefined} />
         ) : canQuick ? (
