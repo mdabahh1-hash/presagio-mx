@@ -210,10 +210,6 @@ export function Navbar() {
     return location.pathname.startsWith(to)
   }
 
-  const initials = user
-    ? user.display_name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
-    : '?'
-
   return (
     <>
       {/* Main navbar */}

@@ -8,8 +8,9 @@ export const CATEGORIES: Category[] = [
 ]
 
 // Subcategorías por categoría, en orden de display (México primero en Deportes).
-// El string es exactamente el valor guardado en markets.subcategory; solo se
-// listan las que tienen mercados hoy — agregar aquí al sembrar mercados nuevos.
+// El string es exactamente el valor guardado en markets.subcategory. Los rails
+// (CategoryBrowse y las landings) ocultan las que tienen 0 mercados, así que una
+// subcategoría puede listarse antes de sembrarla (Economía, 2026-09-18).
 
 export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
   'Deportes': [
@@ -18,6 +19,10 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Saudi Pro League', 'NFL', 'F1', 'Boxeo',
   ],
   'Política': ['Elecciones', 'Sheinbaum'],
+  'Economía': [
+    'Tasas Banxico', 'Inflación (INPC)', 'Tipo de cambio USD/MXN', 'PIB México',
+    'Empleo / IMSS', 'Aranceles / T-MEC', 'Fed / tasas EE.UU.', 'Bolsa (BMV)',
+  ],
   'Crypto': ['Bitcoin', 'Ethereum', 'Solana', 'Stablecoins', 'Regulación', 'Adopción México'],
   'Entretenimiento': ['Influencers'],
   'Global': ['Migración'],

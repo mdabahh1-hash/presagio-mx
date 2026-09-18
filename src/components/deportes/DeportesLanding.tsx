@@ -73,7 +73,7 @@ function hostOf(url: string): string | null {
 // destacado con compra en sitio, volumen por liga, jornada por día, tabla de título y
 // accesorios. Cada bloque se monta solo si su dato llegó de la API; nada ilustrativo.
 export function DeportesLanding({
-  markets, loading, subcats, activeSub, onSubChange, activeSport, onSportChange,
+  markets, loading, activeSub, onSubChange, activeSport, onSportChange,
   activeKind, onKindChange, activeDia, onDiaChange, onTraded, showHeader = false,
 }: DeportesLandingProps) {
   const { t } = useTranslation()

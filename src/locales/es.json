@@ -2,6 +2,7 @@
   "common": {
     "yes": "Sí",
     "no": "No",
+    "noOutcome": "No · {{label}}",
     "loading": "Cargando...",
     "back": "Volver",
     "share": "Compartir",
@@ -179,6 +180,7 @@
     "waitingResolution": "Por resolverse",
     "new": "Nuevo",
     "more": "+ {{count}} más",
+    "buyCents": "{{side}} {{cents}}¢",
     "chance": "Sí"
   },
   "carousel": {
@@ -257,10 +259,9 @@
     "slippageCost": "Costo por tamaño de orden",
     "priceImpact": "Tu orden mueve el precio de {{from}}% a {{to}}% por su tamaño.",
     "lowLiquidity": "Este mercado tiene poca liquidez. Tu orden se ejecutará a un precio promedio de {{price}}%, mayor al precio mostrado.",
-    "processing": "PROCESANDO...",
+    "processing": "Procesando...",
     "selectOutcomeBtn": "Selecciona un resultado",
-    "buyBtn": "COMPRAR {{side}} · {{amount}} PT",
-    "betBtn": "APOSTAR \"{{label}}\" · {{amount}} PT",
+    "buyBtn": "Comprar {{side}} · {{amount}} PT",
     "loginToTrade": "Inicia sesión para operar",
     "loginToTradeLink": "Inicia sesión para operar",
     "disclaimer": "VEREDIKT opera con puntos virtuales. No se involucra dinero real.",
@@ -716,6 +717,23 @@
     "viewAll": "Ver todos",
     "emptySub": "No hay mercados abiertos en {{sub}}",
     "emptyFilter": "Ningún mercado cumple este filtro"
+  },
+  "economia": {
+    "headerMeta_one": "{{count}} mercado · {{volume}} PT de volumen",
+    "headerMeta_other": "{{count}} mercados · {{volume}} PT de volumen",
+    "all": "Todos",
+    "sortLabel": "Ordenar",
+    "sortAll": "Todos",
+    "sortPending": "Por resolverse",
+    "sortEndingSoon": "Cierra pronto",
+    "sortVolume": "Mayor volumen",
+    "showMore_one": "Ver más mercados ({{count}} restante)",
+    "showMore_other": "Ver más mercados ({{count}} restantes)",
+    "emptySub": "No hay mercados abiertos en {{sub}}",
+    "viewAll": "Ver todos",
+    "optionsTitle": "Opciones",
+    "optionsHeader_one": "{{count}} opción · suman 100",
+    "optionsHeader_other": "{{count}} opciones · suman 100"
   },
   "errors": {
     "unknown": "Error desconocido",

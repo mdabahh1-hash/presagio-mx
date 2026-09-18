@@ -7,10 +7,12 @@ import { track } from '../lib/analytics'
 import { formatPnl, formatNum, timeAgo } from '../lib/format'
 import { Avatar } from '../components/Avatar'
 import { Tabs } from '../components/Tabs'
+import { isOutcomeNo } from '../lib/prices'
 
 const TABS = ['Actividad', 'Usuarios'] as const
 
 function positionTag(p: { side: string | null; outcome_key: string | null }, yesLabel: string, noLabel: string) {
+  if (isOutcomeNo(p.side, p.outcome_key)) return `${noLabel} · ${p.outcome_key}`
   if (p.side === 'YES') return yesLabel
   if (p.side === 'NO') return noLabel
   return p.outcome_key ?? ''
@@ -22,6 +24,7 @@ function sideColor(side: string | null) {
 }
 
 function tradeTag(t: ApiFeedTrade, yesLabel: string, noLabel: string) {
+  if (isOutcomeNo(t.side, t.outcome_key)) return `${noLabel} · ${t.outcome_label ?? t.outcome_key}`
   if (t.side === 'YES') return yesLabel
   if (t.side === 'NO') return noLabel
   return t.outcome_label ?? t.outcome_key ?? ''
@@ -29,7 +32,7 @@ function tradeTag(t: ApiFeedTrade, yesLabel: string, noLabel: string) {
 function tradeColor(t: ApiFeedTrade) {
   return sideColor(t.side)
 }
-// price_after is the YES price for binary markets; a NO buyer paid the complement.
+// price_after is the YES price (of the outcome, in multi); a NO buyer paid the complement.
 function tradePrice(t: ApiFeedTrade) {
   return t.side === 'NO' ? 100 - t.price_after : t.price_after
 }

@@ -686,14 +686,15 @@ input[type='range']::-webkit-slider-thumb {
   /* Landing de Crypto: la barra lateral pasa a fila horizontal desde 1024 (spec del handoff:
      la fila lleva una pista fija de 308 px y el panel de Operar; con la barra vertical entre
      769 y 1024 la pregunta se corta antes del umbral). Misma regla que .cat-rail en móvil,
-     acotada a .crypto-browse; CategoryBrowse, Política y Deportes siguen en 768. */
-  .crypto-browse { grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
-  .crypto-browse .cat-rail {
+     acotada a .crypto-browse (y .economia-browse, mismo handoff de rail → chips); CategoryBrowse,
+     Política y Deportes siguen en 768. */
+  .crypto-browse, .economia-browse { grid-template-columns: minmax(0, 1fr) !important; gap: 12px !important; }
+  .crypto-browse .cat-rail, .economia-browse .cat-rail {
     flex-direction: row !important; overflow-x: auto; position: static !important;
     padding-bottom: 8px; margin-bottom: 6px; -ms-overflow-style: none; scrollbar-width: none;
   }
-  .crypto-browse .cat-rail::-webkit-scrollbar { display: none; }
-  .crypto-browse .cat-rail-item { width: auto !important; flex-shrink: 0; }
+  .crypto-browse .cat-rail::-webkit-scrollbar, .economia-browse .cat-rail::-webkit-scrollbar { display: none; }
+  .crypto-browse .cat-rail-item, .economia-browse .cat-rail-item { width: auto !important; flex-shrink: 0; }
   .crypto-browse .cat-rail-header { display: none; }
   .crypto-browse .cat-rail-divider { width: 1px; height: auto !important; align-self: stretch; margin: 4px 6px !important; flex-shrink: 0; }
   .crypto-browse .cat-rail > div:last-child { flex-wrap: nowrap !important; flex-shrink: 0; }

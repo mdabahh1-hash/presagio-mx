@@ -8,6 +8,12 @@ export function displayPair(yesPrice: number): { yes: number; no: number } {
   return { yes, no: 100 - yes }
 }
 
+// «No» de una opción en un multi: side NO con la clave de la opción. Las filas
+// binarias guardan outcome_key = lado ('YES'/'NO'), así que no entran aquí.
+export function isOutcomeNo(side: string | null | undefined, outcomeKey: string | null | undefined): boolean {
+  return side === 'NO' && !!outcomeKey && outcomeKey !== 'NO'
+}
+
 // Color de una probabilidad SÍ (0-100): verde si es alta, rojo si es baja, neutro
 // en medio. Regla del design system (veredikt.md §7); antes vivía copiada inline.
 export function probColor(yesPrice: number): string {

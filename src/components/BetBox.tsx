@@ -29,6 +29,9 @@ interface BetBoxProps {
   compact?: boolean
   initialSide?: 'YES' | 'NO'
   initialAmount?: number
+  // Lado controlado desde fuera (filas Sí/No del detalle multi); sin la prop, estado interno
+  side?: 'YES' | 'NO'
+  onSideChange?: (side: 'YES' | 'NO') => void
 }
 
 export function BetBox({
@@ -44,10 +47,14 @@ export function BetBox({
   compact = false,
   initialSide,
   initialAmount,
+  side: sideProp,
+  onSideChange,
 }: BetBoxProps) {
   const { t } = useTranslation()
   const { user, refreshUser } = useAuth()
-  const [side, setSide] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
+  const [sideState, setSideState] = useState<'YES' | 'NO'>(initialSide ?? 'YES')
+  const side = sideProp ?? sideState
+  const setSide = (s: 'YES' | 'NO') => { setSideState(s); onSideChange?.(s) }
   // El input guarda texto para poder borrarlo y escribir libremente; el mínimo
   // se valida al operar, nunca en onChange.
   const [amountInput, setAmountInput] = useState(String(initialAmount && initialAmount > 0 ? Math.max(MIN_AMOUNT, Math.round(initialAmount)) : 1000))
@@ -64,12 +71,18 @@ export function BetBox({
   const [confettiKey, setConfettiKey] = useState(0)
 
   const isMulti = marketType === 'multi'
-  // NO label derived from rounded YES so the pair always sums to 100.
-  const pair = displayPair(yesPrice)
-
   const selectedOutcome = isMulti
     ? outcomes.find(o => o.outcome_key === selectedOutcomeKey) ?? outcomes[0] ?? null
     : null
+  // NO label derived from rounded YES so the pair always sums to 100. En multi, el
+  // Sí/No es el de la opción elegida (el No paga si gana cualquier otra).
+  const pair = displayPair(isMulti ? selectedOutcome?.price ?? 0 : yesPrice)
+  // Multi cotiza en centavos (handoff de Economía); el binario conserva el %
+  const unit = isMulti ? '¢' : '%'
+  // Opts de cotización/ejecución: en multi el No viaja como side=NO junto a la opción
+  const target = () => (isMulti
+    ? { outcome_key: selectedOutcome!.outcome_key, ...(side === 'NO' ? { side } : {}) }
+    : { side })
 
   // Re-quote triggers: amount is debounced (300ms — user input), while
   // WS-driven price ticks are throttled to at most one re-quote per 2s
@@ -81,10 +94,8 @@ export function BetBox({
   useEffect(() => {
     let cancelled = false
     if (debouncedAmount < MIN_AMOUNT) { setQuote(null); return }
-    const opts = isMulti
-      ? selectedOutcome ? { outcome_key: selectedOutcome.outcome_key, amount: debouncedAmount } : null
-      : { side, amount: debouncedAmount }
-    if (!opts) { setQuote(null); return }
+    if (isMulti && !selectedOutcome) { setQuote(null); return }
+    const opts = { ...target(), amount: debouncedAmount }
     marketsApi.quote(marketId, opts)
       .then(q => { if (!cancelled) setQuote(q) })
       .catch(() => { if (!cancelled) setQuote(null) })
@@ -107,9 +118,7 @@ export function BetBox({
       let quotedPrice = quote?.avg_fill_price
       if (quote && Date.now() > new Date(quote.quote_expires_at).getTime()) {
         try {
-          const fresh = await marketsApi.quote(marketId, isMulti
-            ? { outcome_key: selectedOutcome!.outcome_key, amount }
-            : { side, amount })
+          const fresh = await marketsApi.quote(marketId, { ...target(), amount })
           setQuote(fresh)
           quotedPrice = fresh.avg_fill_price
         } catch { quotedPrice = undefined }
@@ -118,8 +127,9 @@ export function BetBox({
       let result
       if (isMulti) {
         if (!selectedOutcome) { setTradeError(t('bet.selectOutcome')); setTrading(false); return }
-        result = await tradesApi.execute(marketId, { outcome_key: selectedOutcome.outcome_key, points: amount, quoted_avg_price: quotedPrice })
-        setTradeSuccess(t('bet.successMulti', { shares: result.shares.toFixed(1), label: selectedOutcome.label, cost: Math.round(result.cost) }))
+        result = await tradesApi.execute(marketId, { ...target(), points: amount, quoted_avg_price: quotedPrice })
+        const label = side === 'NO' ? t('common.noOutcome', { label: selectedOutcome.label }) : selectedOutcome.label
+        setTradeSuccess(t('bet.successMulti', { shares: result.shares.toFixed(1), label, cost: Math.round(result.cost) }))
       } else {
         result = await tradesApi.execute(marketId, { side, points: amount, quoted_avg_price: quotedPrice })
         setTradeSuccess(t('bet.successBinary', { shares: result.shares.toFixed(1), side: side === 'YES' ? t('common.yes') : t('common.no'), cost: Math.round(result.cost) }))
@@ -134,9 +144,7 @@ export function BetBox({
       if (err.code === 'PRICE_MOVED') {
         setTradeError(t('errors.PRICE_MOVED'))
         // Auto re-quote so the panel shows the fresh execution price.
-        marketsApi.quote(marketId, isMulti
-          ? { outcome_key: selectedOutcome!.outcome_key, amount }
-          : { side, amount })
+        marketsApi.quote(marketId, { ...target(), amount })
           .then(setQuote)
           .catch(() => {})
       } else {
@@ -183,8 +191,10 @@ export function BetBox({
             )
           })}
         </div>
-      ) : (
-        /* ── Binary: YES / NO selector ── */
+      ) : null}
+
+      {(!isMulti || selectedOutcome) && (
+        /* ── Sí / No: del mercado (binario) o de la opción elegida (multi) ── */
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: compact ? 14 : 18 }}>
           {(['YES', 'NO'] as const).map(s => {
             const isSelected = side === s
@@ -206,7 +216,7 @@ export function BetBox({
                 }}
               >
                 {s === 'YES' ? t('common.yes') : t('common.no')}
-                <span className="num" style={{ fontSize: 15, fontWeight: 700 }}>{price}%</span>
+                <span className="num" style={{ fontSize: 15, fontWeight: 700 }}>{price}{unit}</span>
               </button>
             )
           })}
@@ -284,7 +294,7 @@ export function BetBox({
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.avgPrice')}</span>
           <span className="num" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-            {quote ? `${quote.avg_fill_price.toFixed(1)}%` : '—'}
+            {quote ? `${quote.avg_fill_price.toFixed(isMulti ? 0 : 1)}${unit}` : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -382,11 +392,9 @@ export function BetBox({
       >
         {trading
           ? t('bet.processing')
-          : isMulti
-          ? selectedOutcome
-            ? t('bet.betBtn', { label: selectedOutcome.label, amount })
-            : t('bet.selectOutcomeBtn')
-          : t('bet.buyBtn', { side: side === 'YES' ? t('common.yes') : t('common.no'), amount })
+          : isMulti && !selectedOutcome
+          ? t('bet.selectOutcomeBtn')
+          : t('bet.buyBtn', { side: side === 'YES' ? t('common.yes') : t('common.no'), amount: amount.toLocaleString('en-US') })
         }
       </button>
       </div>

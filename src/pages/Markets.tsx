@@ -9,6 +9,7 @@ import { PoliticaLanding, politicaLandingAvailable } from '../components/politic
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
 import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, cryptoLandingAvailable, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
 import { isVentana, type Ventana } from '../components/crypto/escalera'
+import { EconomiaLanding, EconomiaBreadcrumb, EconomiaHeaderMeta, economiaLandingAvailable, isEconomiaSort, type EconomiaSort } from '../components/economia/EconomiaLanding'
 import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
@@ -47,6 +48,7 @@ export function Markets() {
   const rawSort = searchParams.get('sort')
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
   const cryptoSort: CryptoSort = isCryptoSort(rawSort) ? rawSort : 'ending'
+  const economiaSort: EconomiaSort = isEconomiaSort(rawSort) ? rawSort : 'all'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
@@ -65,8 +67,8 @@ export function Markets() {
     setSortBy(sortParam)
   }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
 
-  // Crypto ordena en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
-  const fetchSort = activeCategory === 'Crypto' ? 'volume' : sortBy
+  // Crypto y Economía ordenan en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
+  const fetchSort = activeCategory === 'Crypto' || activeCategory === 'Economía' ? 'volume' : sortBy
   useEffect(() => {
     let active = true
     setLoading(true)
@@ -103,6 +105,9 @@ export function Markets() {
   // Crypto: landing propia (components/crypto) con la misma regla (cryptoLandingAvailable)
   const isCrypto = activeCategory === 'Crypto' && !searchInput
   const showCrypto = isCrypto && cryptoLandingAvailable(markets, loading)
+  // Economía: landing propia (components/economia) con la misma regla (economiaLandingAvailable)
+  const isEconomia = activeCategory === 'Economía' && !searchInput
+  const showEconomia = isEconomia && economiaLandingAvailable(markets, loading)
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
   const abiertos = useMemo(() => markets.filter(m => m.status === 'open').length, [markets])
   const hoy = useMemo(() => markets.filter(m => diaKeyOf(m) === 'hoy').length, [markets])
@@ -216,6 +221,15 @@ export function Markets() {
     })
   }
 
+  // Orden de la landing de Economía ('all' es el default y no se escribe)
+  const handleEconomiaSort = (s: EconomiaSort) => {
+    setSearchParams(p => {
+      if (s === 'all') p.delete('sort')
+      else p.set('sort', s)
+      return p
+    })
+  }
+
   // Día de la jornada (landing de Deportes)
   const handleDiaChange = (dia: string | null) => {
     setActiveDia(dia)
@@ -236,12 +250,15 @@ export function Markets() {
       }}>
         <div>
           {showCrypto && activeSub && <CryptoBreadcrumb sub={activeSub} onRoot={handleCryptoClear} />}
+          {showEconomia && activeSub && <EconomiaBreadcrumb sub={activeSub} onRoot={() => handleSubChange(null)} />}
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {showCrypto ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
+            {showCrypto || showEconomia ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
             {loading ? t('common.loading') : showCrypto ? (
               <CryptoHeaderMeta markets={markets} sub={activeSub} />
+            ) : showEconomia ? (
+              <EconomiaHeaderMeta markets={markets} sub={activeSub} />
             ) : showLanding ? (
               <span className="num">{t('politica.headerMeta', { count: markets.length, volume: formatVolume(categoryVolume) })}</span>
             ) : showDeportes ? (
@@ -343,6 +360,17 @@ export function Markets() {
           onClear={handleCryptoClear}
           sort={cryptoSort}
           onSortChange={handleCryptoSort}
+          onTraded={patchPrice}
+        />
+      ) : showEconomia ? (
+        <EconomiaLanding
+          markets={markets}
+          loading={loading}
+          subcats={SUBCATEGORIES['Economía'] ?? []}
+          activeSub={activeSub}
+          onSubChange={handleSubChange}
+          sort={economiaSort}
+          onSortChange={handleEconomiaSort}
           onTraded={patchPrice}
         />
       ) : activeCategory !== 'Todos' ? (

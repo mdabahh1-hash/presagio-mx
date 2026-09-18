@@ -2,6 +2,7 @@
   "common": {
     "yes": "Yes",
     "no": "No",
+    "noOutcome": "No · {{label}}",
     "loading": "Loading...",
     "back": "Back",
     "share": "Share",
@@ -179,6 +180,7 @@
     "waitingResolution": "Awaiting resolution",
     "new": "New",
     "more": "+ {{count}} more",
+    "buyCents": "{{side}} {{cents}}¢",
     "chance": "Yes"
   },
   "carousel": {
@@ -257,10 +259,9 @@
     "slippageCost": "Cost from order size",
     "priceImpact": "Your order moves the price from {{from}}% to {{to}}% due to its size.",
     "lowLiquidity": "This market has low liquidity. Your order will execute at an average price of {{price}}%, higher than the displayed price.",
-    "processing": "PROCESSING...",
+    "processing": "Processing...",
     "selectOutcomeBtn": "Select an outcome",
-    "buyBtn": "BUY {{side}} · {{amount}} PT",
-    "betBtn": "BET \"{{label}}\" · {{amount}} PT",
+    "buyBtn": "Buy {{side}} · {{amount}} PT",
     "loginToTrade": "Log in to trade",
     "loginToTradeLink": "Log in to trade",
     "disclaimer": "VEREDIKT runs on virtual points. No real money is involved.",
@@ -716,6 +717,23 @@
     "viewAll": "View all",
     "emptySub": "No open markets in {{sub}}",
     "emptyFilter": "No markets match this filter"
+  },
+  "economia": {
+    "headerMeta_one": "{{count}} market · {{volume}} PT volume",
+    "headerMeta_other": "{{count}} markets · {{volume}} PT volume",
+    "all": "All",
+    "sortLabel": "Sort",
+    "sortAll": "All",
+    "sortPending": "Awaiting resolution",
+    "sortEndingSoon": "Ending soon",
+    "sortVolume": "Highest volume",
+    "showMore_one": "Show more markets ({{count}} left)",
+    "showMore_other": "Show more markets ({{count}} left)",
+    "emptySub": "No open markets in {{sub}}",
+    "viewAll": "View all",
+    "optionsTitle": "Options",
+    "optionsHeader_one": "{{count}} option · add up to 100",
+    "optionsHeader_other": "{{count}} options · add up to 100"
   },
   "errors": {
     "unknown": "Unknown error",
