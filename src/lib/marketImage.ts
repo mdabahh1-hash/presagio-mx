@@ -4,10 +4,15 @@ import { SPORT_GROUPS } from './categories'
 
 // Imagen cuadrada por mercado. Prioridad:
 //   1. market.imageUrl (backend: https:// absoluta o ruta /img/... del frontend)
-//   2. imagen de la subcategoría (liga)        — estático, sin backend
-//   3. imagen de la categoría                  — estático, sin backend
-//   4. null → MarketThumb pinta un tile con icono
+//   2. foto por id de mercado (MARKET_IMAGE)   — estático, sin backend
+//   3. imagen de la subcategoría (liga)        — estático, sin backend
+//   4. imagen de la categoría                  — estático, sin backend
+//   5. null → MarketThumb pinta un tile con icono
 // Los assets viven en public/img/markets/ (marcas propias, no logos oficiales).
+
+function economiaFoto(slug: string): string {
+  return `/img/markets/economia/${slug}.jpg`
+}
 
 export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'Liga MX': '/img/markets/sub/liga-mx.svg',
@@ -25,6 +30,30 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'F1': '/img/markets/sub/f1.svg',
   'Boxeo': '/img/markets/sub/boxeo.svg',
   'Elecciones': '/img/markets/sub/elecciones.svg',
+  // Economía: fotos de Wikimedia Commons (scripts/fetch-economia-photos.mjs, créditos en
+  // public/img/markets/economia/CREDITS.md). Empleo / IMSS no tiene foto: cae a la categoría.
+  'Tasas Banxico': economiaFoto('banxico'),
+  'Inflación (INPC)': economiaFoto('pesos'),
+  'Tipo de cambio USD/MXN': economiaFoto('pesos'),
+  'PIB México': economiaFoto('inegi'),
+  'Aranceles / T-MEC': economiaFoto('contenedores'),
+  'Fed / tasas EE.UU.': economiaFoto('fed'),
+  'Bolsa (BMV)': economiaFoto('bmv'),
+}
+
+// Mercados ya sembrados sin subcategoría (Economía, 2026-09-18): foto por id. Al darles
+// subcategoría, la de SUBCATEGORY_IMAGE los cubre y la entrada sobra.
+export const MARKET_IMAGE: Record<string, string> = {
+  'banxico-mantiene-tasa-sep26': economiaFoto('banxico'),
+  'banxico-recorte-tasa-2026-q3': economiaFoto('banxico'),
+  'mexico-inflacion-2026': economiaFoto('pesos'),
+  'tmec-extension-16-anos-2026': economiaFoto('contenedores'),
+}
+
+/** Fotos locales con variante @2x (hoy solo Economía): srcSet para pantallas densas. */
+export function marketImageSrcSet(src: string): string | undefined {
+  const m = /^(\/img\/markets\/economia\/[\w-]+)\.jpg$/.exec(src)
+  return m ? `${src} 1x, ${m[1]}@2x.jpg 2x` : undefined
 }
 
 // Logos OFICIALES de liga (scripts/fetch-league-logos.mjs, CDN de ESPN), dos variantes
@@ -96,8 +125,9 @@ export function resolveMarketImage(url?: string | null): string | null {
   return null
 }
 
-export function marketImageSrc(m: Pick<Market, 'imageUrl' | 'subcategory' | 'category'>): string | null {
+export function marketImageSrc(m: Pick<Market, 'imageUrl' | 'subcategory' | 'category'> & Partial<Pick<Market, 'id'>>): string | null {
   return resolveMarketImage(m.imageUrl)
+    ?? (m.id ? MARKET_IMAGE[m.id] ?? null : null)
     ?? (m.subcategory ? SUBCATEGORY_IMAGE[m.subcategory] ?? null : null)
     ?? CATEGORY_IMAGE[m.category]
     ?? null

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import type { Category, Market } from '../types'
-import { marketImageSrc, subcategoryIcon } from '../lib/marketImage'
+import { marketImageSrc, marketImageSrcSet, subcategoryIcon } from '../lib/marketImage'
 import { matchLogos } from '../lib/teamLogos'
 import { marketFaces } from '../lib/peoplePhotos'
 import { getCategoryColor } from '../lib/categoryColors'
@@ -60,6 +60,7 @@ export function MarketThumb({ market, size = 40, radius, style, className = '' }
       {src ? (
         <img
           src={src}
+          srcSet={marketImageSrcSet(src)}
           alt=""
           loading="lazy"
           decoding="async"

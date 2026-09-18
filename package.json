@@ -11,7 +11,8 @@
     "photos": "node scripts/fetch-people-photos.mjs",
     "logos:ligas": "node scripts/fetch-league-logos.mjs",
     "lint": "eslint src",
-    "test": "vitest run"
+    "test": "vitest run",
+    "photos:economia": "node scripts/fetch-economia-photos.mjs"
   },
   "dependencies": {
     "i18next": "^26.3.6",
