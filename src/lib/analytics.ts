@@ -22,6 +22,8 @@ export function initAnalytics(): void {
   window.plausible =
     window.plausible ||
     (function () {
+      // Snippet oficial de Plausible: la cola guarda el objeto `arguments`.
+      // eslint-disable-next-line prefer-rest-params
       ;(window.plausible!.q = window.plausible!.q || []).push(arguments)
     } as unknown as PlausibleFn)
 

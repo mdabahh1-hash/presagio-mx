@@ -29,7 +29,6 @@ import type { Category } from '../types'
 import { CHART_RANGES, RANGE_LABELS, filterRange, type ChartRange } from '../lib/chartRange'
 
 type InfoTab = 'criteria' | 'rules' | 'context'
-const INFO_CLAMP_LINES = 6
 
 export function MarketDetail() {
   const { t } = useTranslation()
