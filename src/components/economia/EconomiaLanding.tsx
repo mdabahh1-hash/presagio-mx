@@ -145,7 +145,7 @@ export function EconomiaLanding({
     </div>
   )
 
-  const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 } as const
+  const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 } as const
 
   if (loading) {
     return (
@@ -156,7 +156,7 @@ export function EconomiaLanding({
             {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 40, marginBottom: 2 }} />)}
           </div>
           <div style={grid}>
-            {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 210 }} />)}
+            {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 180 }} />)}
           </div>
         </div>
       </div>
