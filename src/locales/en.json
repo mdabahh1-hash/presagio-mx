@@ -180,6 +180,7 @@
     "waitingResolution": "Awaiting resolution",
     "new": "New",
     "more": "+ {{count}} more",
+    "buyCents": "{{side}} {{cents}}¢",
     "chance": "Yes"
   },
   "carousel": {
