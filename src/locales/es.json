@@ -719,6 +719,23 @@
     "emptySub": "No hay mercados abiertos en {{sub}}",
     "emptyFilter": "Ningún mercado cumple este filtro"
   },
+  "economia": {
+    "headerMeta_one": "{{count}} mercado · {{volume}} PT de volumen",
+    "headerMeta_other": "{{count}} mercados · {{volume}} PT de volumen",
+    "all": "Todos",
+    "sortLabel": "Ordenar",
+    "sortAll": "Todos",
+    "sortPending": "Por resolverse",
+    "sortEndingSoon": "Cierra pronto",
+    "sortVolume": "Mayor volumen",
+    "showMore_one": "Ver más mercados ({{count}} restante)",
+    "showMore_other": "Ver más mercados ({{count}} restantes)",
+    "emptySub": "No hay mercados abiertos en {{sub}}",
+    "viewAll": "Ver todos",
+    "optionsTitle": "Opciones",
+    "optionsHeader_one": "{{count}} opción · suman 100",
+    "optionsHeader_other": "{{count}} opciones · suman 100"
+  },
   "errors": {
     "unknown": "Error desconocido",
     "invalidData": "Datos inválidos",

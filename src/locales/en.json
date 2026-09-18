@@ -719,6 +719,23 @@
     "emptySub": "No open markets in {{sub}}",
     "emptyFilter": "No markets match this filter"
   },
+  "economia": {
+    "headerMeta_one": "{{count}} market · {{volume}} PT volume",
+    "headerMeta_other": "{{count}} markets · {{volume}} PT volume",
+    "all": "All",
+    "sortLabel": "Sort",
+    "sortAll": "All",
+    "sortPending": "Awaiting resolution",
+    "sortEndingSoon": "Ending soon",
+    "sortVolume": "Highest volume",
+    "showMore_one": "Show more markets ({{count}} left)",
+    "showMore_other": "Show more markets ({{count}} left)",
+    "emptySub": "No open markets in {{sub}}",
+    "viewAll": "View all",
+    "optionsTitle": "Options",
+    "optionsHeader_one": "{{count}} option · add up to 100",
+    "optionsHeader_other": "{{count}} options · add up to 100"
+  },
   "errors": {
     "unknown": "Unknown error",
     "invalidData": "Invalid data",
