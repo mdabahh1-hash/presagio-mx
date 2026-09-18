@@ -85,6 +85,8 @@ export function MarketDetail() {
   const isMobile = useMobile()
   const [sheetSide, setSheetSide] = useState<'YES' | 'NO' | null>(null)
   const closeSheet = useCallback(() => setSheetSide(null), [])
+  // Lado del BetBox en escritorio: lo eligen las filas Sí/No de cada opción (multi)
+  const [betSide, setBetSide] = useState<'YES' | 'NO'>(copySide ?? 'YES')
   useEffect(() => { setSheetSide(null) }, [id])
 
   // Ancho real de la columna del chart: el SVG usa viewBox fijo, y sin
@@ -271,6 +273,8 @@ export function MarketDetail() {
       onOutcomeSelect={setSelectedOutcomeKey}
       subcategory={market.subcategory}
       initialSide={sheetSide ?? copySide}
+      side={market.market_type === 'multi' ? betSide : undefined}
+      onSideChange={setBetSide}
       initialAmount={copyAmount}
       compact={hasMobileBar}
       onTraded={(p) => {
@@ -379,20 +383,30 @@ export function MarketDetail() {
 
             {/* Probability display — binary or multi */}
             {market.market_type === 'multi' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 4 }}>
+              <div style={{ marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 4 }}>
+                  <h2 className="section-title" style={{ margin: 0 }}>{t('economia.optionsTitle')}</h2>
+                  <span className="meta-label num">{t('economia.optionsHeader', { count: outcomes.length })}</span>
+                </div>
                 {outcomes.map((o, i) => {
                   const isSelected = selectedOutcomeKey === o.outcome_key
                   const isWinner = market.status === 'resolved' && market.resolved_outcome_key === o.outcome_key
+                  const cents = displayPair(o.price)
+                  // Sí/No de la opción: elige opción y lado en el BetBox (en móvil abre el sheet)
+                  const pick = (side: 'YES' | 'NO') => (e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    setSelectedOutcomeKey(o.outcome_key)
+                    setBetSide(side)
+                    if (hasMobileBar) setSheetSide(side)
+                  }
                   return (
                     <div
                       key={o.outcome_key}
+                      className="list-row"
                       onClick={() => setSelectedOutcomeKey(o.outcome_key)}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
-                        border: `1px solid ${isWinner ? 'var(--green-border)' : isSelected ? 'var(--border-hover)' : 'var(--border-subtle)'}`,
+                        cursor: 'pointer', padding: '12px 8px', borderRadius: isSelected || isWinner ? 8 : 0,
                         background: isWinner ? 'var(--green-soft)' : isSelected ? 'var(--bg-elevated)' : 'transparent',
-                        transition: 'all 0.15s',
                       }}
                     >
                       <span className="num" style={{ fontSize: 12, fontWeight: 500, width: 22, height: 22, flexShrink: 0, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -400,16 +414,30 @@ export function MarketDetail() {
                           ? <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={22} />
                           : i + 1}
                       </span>
-                      <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         {o.label}
                         {isWinner && <Icon name="check" size={14} strokeWidth={2.2} style={{ color: 'var(--green)' }} />}
                       </span>
-                      <div style={{ width: 80, background: 'var(--border-subtle)', borderRadius: 2, height: 4, flexShrink: 0 }}>
-                        <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--text-secondary)', borderRadius: 2 }} />
-                      </div>
-                      <span className="num" style={{ width: 52, textAlign: 'right', flexShrink: 0, fontSize: 14, fontWeight: 600, color: isWinner ? 'var(--green)' : 'var(--text-primary)' }}>
-                        {o.price.toFixed(1)}%
+                      {!isMobile && (
+                        <div style={{ width: 120, background: 'var(--border-subtle)', borderRadius: 2, height: 4, flexShrink: 0 }}>
+                          <div style={{ width: `${Math.min(o.price, 100)}%`, height: '100%', background: isWinner ? 'var(--green)' : 'var(--text-secondary)', borderRadius: 2 }} />
+                        </div>
+                      )}
+                      <span className="num" style={{ width: 44, textAlign: 'right', flexShrink: 0, fontSize: 15, fontWeight: 600, color: isWinner ? 'var(--green)' : 'var(--text-primary)' }}>
+                        {Math.round(o.price)}%
                       </span>
+                      {market.status === 'open' && (
+                        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                          <button type="button" className="btn row-outcome-btn price-yes" onClick={pick('YES')} aria-pressed={isSelected && betSide === 'YES'} style={{ minWidth: 64, flex: '0 0 auto' }}>
+                            <span className="row-outcome-label">{t('common.yes')}</span>
+                            <span className="row-outcome-price">{cents.yes}¢</span>
+                          </button>
+                          <button type="button" className="btn row-outcome-btn price-no" onClick={pick('NO')} aria-pressed={isSelected && betSide === 'NO'} style={{ minWidth: 64, flex: '0 0 auto' }}>
+                            <span className="row-outcome-label">{t('common.no')}</span>
+                            <span className="row-outcome-price">{cents.no}¢</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
