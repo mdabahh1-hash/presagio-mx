@@ -1,9 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { Market } from '../types'
 import { MarketCard } from './MarketCard'
-import { BetBox } from './BetBox'
-import { TradeSheet } from './TradeSheet'
-import { AuthModal } from './AuthModal'
+import { QuickTradeSheet } from './QuickTradeSheet'
 
 interface MarketGridProps {
   markets: Market[]
@@ -19,7 +17,6 @@ interface MarketGridProps {
 export function MarketGrid({ markets, onTraded, loading = false, skeletons = 6 }: MarketGridProps) {
   const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
   const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
   const closeTrade = useCallback(() => setTrade(null), [])
   // El sheet lee el mercado vivo por id: tras operar refleja el precio nuevo
   const tradeMarket = trade ? markets.find(m => m.id === trade.marketId) ?? null : null
@@ -45,25 +42,15 @@ export function MarketGrid({ markets, onTraded, loading = false, skeletons = 6 }
         ))}
       </div>
 
-      <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
-        {tradeMarket && trade && (
-          <BetBox
-            key={`${tradeMarket.id}-${trade.side}-${trade.outcomeKey ?? ''}`}
-            marketId={tradeMarket.id}
-            yesPrice={tradeMarket.yesPrice}
-            marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
-            outcomes={tradeMarket.outcomes ?? []}
-            selectedOutcomeKey={tradeOutcome}
-            onOutcomeSelect={setTradeOutcome}
-            subcategory={tradeMarket.subcategory}
-            initialSide={trade.side}
-            compact
-            onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
-            onTraded={p => onTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
-          />
-        )}
-      </TradeSheet>
-      {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
+      <QuickTradeSheet
+        market={tradeMarket}
+        side={trade?.side ?? 'YES'}
+        betKey={`${trade?.marketId}-${trade?.side}-${trade?.outcomeKey ?? ''}`}
+        outcomeKey={tradeOutcome}
+        onOutcomeChange={setTradeOutcome}
+        onClose={closeTrade}
+        onTraded={p => tradeMarket && onTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
+      />
     </>
   )
 }

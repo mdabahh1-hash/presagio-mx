@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { tradesApi, marketsApi, authApi, type ApiOutcome, type ApiQuote } from '../lib/api'
 import { oauthNext } from '../lib/returnTo'
+import { buildTradeRoute, type TradeIntent } from '../lib/tradeIntent'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { displayPair } from '../lib/prices'
@@ -25,7 +26,8 @@ interface BetBoxProps {
   // Para resolver escudos junto a cada resultado
   subcategory?: string | null
   onTraded?: (newYesPrice: number) => void
-  onRequireAuth?: () => void
+  // Sin sesión: quien lo monta abre el acceso; recibe lo elegido para poder volver a ello
+  onRequireAuth?: (intent: TradeIntent) => void
   compact?: boolean
   initialSide?: 'YES' | 'NO'
   initialAmount?: number
@@ -103,9 +105,11 @@ export function BetBox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketId, debouncedAmount, side, selectedOutcome?.outcome_key, isMulti, throttledWsPrice])
 
+  const intent: TradeIntent = { side, amount: amount || undefined, outcomeKey: isMulti ? selectedOutcome?.outcome_key : undefined }
+
   const handleTrade = async () => {
     if (!user) {
-      if (onRequireAuth) { onRequireAuth(); return }
+      if (onRequireAuth) { onRequireAuth(intent); return }
       setTradeError(t('bet.loginToTrade'))
       return
     }
@@ -401,7 +405,8 @@ export function BetBox({
 
       {!user && !onRequireAuth && (
         <div style={{ marginTop: 12, textAlign: 'center' }}>
-          <a href={authApi.googleUrl(oauthNext())} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
+          {/* El regreso del OAuth trae de vuelta lo elegido (side, monto, opción) al detalle */}
+          <a href={authApi.googleUrl(buildTradeRoute(marketId, intent) ?? oauthNext())} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
             {t('bet.loginToTradeLink')}
           </a>
         </div>

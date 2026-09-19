@@ -24,12 +24,12 @@ export function setReturnTo(route: string) {
   }
 }
 
-/** Devuelve la ruta pendiente y la borra (un solo uso). */
+/** Devuelve la ruta pendiente y la borra (un solo uso). Si no es una ruta interna segura, null. */
 export function consumeReturnTo(): string | null {
   try {
     const v = sessionStorage.getItem(KEY)
     if (v) sessionStorage.removeItem(KEY)
-    return v
+    return isSafeRoute(v) ? v : null
   } catch {
     return null
   }
@@ -38,7 +38,8 @@ export function consumeReturnTo(): string | null {
 /** Lee la ruta pendiente sin borrarla (para armar el `next` del OAuth). */
 export function peekReturnTo(): string | null {
   try {
-    return sessionStorage.getItem(KEY)
+    const v = sessionStorage.getItem(KEY)
+    return isSafeRoute(v) ? v : null
   } catch {
     return null
   }

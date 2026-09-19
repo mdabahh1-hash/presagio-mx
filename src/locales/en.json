@@ -79,6 +79,7 @@
   },
   "auth": {
     "verifyTitle": "Verify your email",
+    "backToTrade": "Back to your trade",
     "verifySubtitle": "We sent a 6-digit code to",
     "codeLabel": "Verification code",
     "verifying": "Verifying...",
