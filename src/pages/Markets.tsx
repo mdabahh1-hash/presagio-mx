@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
-import { MarketCard } from '../components/MarketCard'
+import { MarketGrid } from '../components/MarketGrid'
 import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
@@ -420,17 +420,9 @@ export function Markets() {
 
           {/* Grid */}
           {loading ? (
-            <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: 210 }} />
-              ))}
-            </div>
+            <MarketGrid markets={[]} onTraded={patchPrice} loading />
           ) : shown.length > 0 ? (
-            <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-              {shown.map((market, i) => (
-                <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
-              ))}
-            </div>
+            <MarketGrid markets={shown} onTraded={patchPrice} />
           ) : (
             <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--text-secondary)' }}>
               <div style={{

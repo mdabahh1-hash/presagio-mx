@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
-import { MarketCard } from '../components/MarketCard'
+import { MarketGrid } from '../components/MarketGrid'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { CategoryBrowse } from '../components/CategoryBrowse'
@@ -14,9 +14,6 @@ import { CategoryLanding, type CategorySort } from '../components/categoria/Cate
 import type { Ventana } from '../components/crypto/escalera'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
-import { BetBox } from '../components/BetBox'
-import { TradeSheet } from '../components/TradeSheet'
-import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
 import { SUBCATEGORIES, usaLandingGenerica, sportOfSub, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
@@ -29,9 +26,10 @@ type MobileTab = CategoryTab
 const PAGE_SIZE = 12
 
 // Sección de grid de Tendencia en desktop (título + "Ver todos" + paginado)
-function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore }: {
+function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore, onTraded }: {
   title: string; viewAllTo: string; emptyText: string
   markets: Market[]; loading: boolean; visible: number; onMore: () => void
+  onTraded: (marketId: string, newYesPrice: number, isMulti: boolean) => void
 }) {
   const { t } = useTranslation()
   return (
@@ -48,18 +46,10 @@ function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visi
         </Link>
       </div>
       {loading ? (
-        <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-          {[...Array(9)].map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 210 }} />
-          ))}
-        </div>
+        <MarketGrid markets={[]} onTraded={onTraded} loading skeletons={9} />
       ) : markets.length > 0 ? (
         <>
-          <div className="market-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
-            {markets.slice(0, visible).map((market, i) => (
-              <MarketCard key={market.id} market={market} animClass={`anim-${Math.min(i + 1, 6)}`} />
-            ))}
-          </div>
+          <MarketGrid markets={markets.slice(0, visible)} onTraded={onTraded} />
           {markets.length > visible && (
             <SeeMoreButton remaining={markets.length - visible} onClick={onMore} />
           )}
@@ -86,11 +76,6 @@ export function Home() {
   const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()
   const isMobile = useMobile()
-  // Compra rápida desde la lista (móvil): el sheet lee el mercado vivo por id
-  const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
-  const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
-  const closeTrade = useCallback(() => setTrade(null), [])
   // Tema (?sub) de la landing de Política dentro de la Home: estado local, como
   // el sub interno de CategoryBrowse (la Home no sincroniza con la URL)
   const [homeSub, setHomeSub] = useState<string | null>(null)
@@ -127,13 +112,6 @@ export function Home() {
     () => (usingMock ? MOCK_MARKETS : apiMarkets.map(apiToMarket)),
     [apiMarkets, usingMock],
   )
-
-  const tradeMarket = trade ? markets.find(m => m.id === trade.marketId) ?? null : null
-
-  const openTrade = (marketId: string, side: 'YES' | 'NO', outcomeKey?: string) => {
-    setTradeOutcome(outcomeKey ?? null)
-    setTrade({ marketId, side, outcomeKey })
-  }
 
   // Tras operar, la tarjeta refleja el precio nuevo
   const handleTraded = (marketId: string, newYesPrice: number, isMulti: boolean) => {
@@ -254,28 +232,17 @@ export function Home() {
 
         {mobileTab === 'Nuevo' ? (
           <div style={{ padding: '16px 14px 80px' }}>
-            <NewFeed markets={markets} loading={loading} compact onQuickTrade={market => (side, outcomeKey) => openTrade(market.id, side, outcomeKey)} />
+            <NewFeed markets={markets} loading={loading} onTraded={handleTraded} />
           </div>
         ) : isFeed(mobileTab) ? (
           <>
-            {/* Feed Tendencia estilo Polymarket: sin carrusel destacado,
-                tarjetas compactas con Sí/No que abren la compra. Paginado como en desktop. */}
-            <div style={{ padding: '12px 14px 80px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <div key={i} className="skeleton" style={{ height: 130 }} />
-                ))
-              ) : filtered.length > 0 ? (
+            {/* Feed Tendencia: sin carrusel destacado, la misma tarjeta y grid que el resto
+                del sitio (1 columna en teléfono). Paginado como en desktop. */}
+            <div style={{ padding: '12px 14px 80px' }}>
+              {loading || filtered.length > 0 ? (
                 <>
-                  {filtered.slice(0, visibleTrending).map((market, i) => (
-                    <MarketCard
-                      key={market.id}
-                      market={market}
-                      animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''}
-                      onQuickTrade={(side, outcomeKey) => openTrade(market.id, side, outcomeKey)}
-                    />
-                  ))}
-                  {filtered.length > visibleTrending && (
+                  <MarketGrid markets={filtered.slice(0, visibleTrending)} onTraded={handleTraded} loading={loading} skeletons={5} />
+                  {!loading && filtered.length > visibleTrending && (
                     <SeeMoreButton remaining={filtered.length - visibleTrending} onClick={() => setVisibleTrending(v => v + PAGE_SIZE)} />
                   )}
                 </>
@@ -294,25 +261,6 @@ export function Home() {
           </div>
         )}
 
-        <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
-          {tradeMarket && trade && (
-            <BetBox
-              key={`${tradeMarket.id}-${trade.side}-${trade.outcomeKey ?? ''}`}
-              marketId={tradeMarket.id}
-              yesPrice={tradeMarket.yesPrice}
-              marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
-              outcomes={tradeMarket.outcomes ?? []}
-              selectedOutcomeKey={tradeOutcome}
-              onOutcomeSelect={setTradeOutcome}
-              subcategory={tradeMarket.subcategory}
-              initialSide={trade.side}
-              compact
-              onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
-              onTraded={p => handleTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
-            />
-          )}
-        </TradeSheet>
-        {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
 
       </div>
     )
@@ -352,11 +300,12 @@ export function Home() {
             loading={loading}
             visible={visibleTrending}
             onMore={() => setVisibleTrending(v => v + PAGE_SIZE)}
+            onTraded={handleTraded}
           />
         </>
       ) : mobileTab === 'Nuevo' ? (
         /* Nuevo: página propia estilo Polymarket (píldoras + filtros + grid) */
-        <NewFeed markets={markets} loading={loading} />
+        <NewFeed markets={markets} loading={loading} onTraded={handleTraded} />
       ) : (
         <section style={{ marginBottom: 56 }}>
           {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showCategoria ? categoriaLanding : (
