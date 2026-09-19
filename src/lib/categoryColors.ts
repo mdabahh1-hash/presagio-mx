@@ -9,8 +9,8 @@ const CATEGORY_TOKEN: Record<string, string> = {
   'México': 'gold',
   'Deportes': 'green',
   'Mundial 2026': 'green', // legado: mercados ya resueltos siguen usándola
+  'Mercados Globales': 'gold', // legado: 7 resueltos en prod (fusionada en Economía, 2026-09-19)
   'Global': 'blue',
-  'Mercados Globales': 'blue',
   'Tech': 'purple',
   'Entretenimiento': 'pink',
   'Crypto': 'orange',

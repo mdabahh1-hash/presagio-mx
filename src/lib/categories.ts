@@ -4,7 +4,7 @@ import type { Category } from '../types'
 // Markets/Home/Footer). El string es el identificador de API — no se traduce.
 export const CATEGORIES: Category[] = [
   'Deportes', 'Política', 'Economía', 'Crypto', 'Tech', 'Global',
-  'Mercados Globales', 'México', 'Clima', 'Entretenimiento',
+  'México', 'Clima', 'Entretenimiento',
 ]
 
 // Subcategorías por categoría, en orden de display (México primero en Deportes).

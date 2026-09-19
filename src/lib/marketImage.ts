@@ -84,11 +84,11 @@ export const CATEGORY_IMAGE: Partial<Record<string, string>> = {
   'Crypto': '/img/markets/cat/crypto.svg',
   'Tech': '/img/markets/cat/tech.svg',
   'Global': '/img/markets/cat/global.svg',
-  'Mercados Globales': '/img/markets/cat/mercados-globales.svg',
   'México': '/img/markets/cat/mexico.svg',
   'Clima': '/img/markets/cat/clima.svg',
   'Entretenimiento': '/img/markets/cat/entretenimiento.svg',
   'Mundial 2026': '/img/markets/cat/deportes.svg',
+  'Mercados Globales': '/img/markets/cat/economia.svg', // legado, ver categoryColors
 }
 
 // Fuente única: SPORT_GROUPS (antes había una copia literal que se desfasaba).
@@ -105,8 +105,7 @@ export function subcategoryIcon(sub?: string | null, cat?: Category | string): I
   switch (cat) {
     case 'Deportes': case 'Mundial 2026': return 'ball'
     case 'Política': return 'vote'
-    case 'Economía': return 'bank'
-    case 'Mercados Globales': return 'chart'
+    case 'Economía': case 'Mercados Globales': return 'bank'
     case 'Crypto': return 'coin'
     case 'Tech': return 'cpu'
     case 'Entretenimiento': return 'film'
