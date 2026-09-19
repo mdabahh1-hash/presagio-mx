@@ -395,13 +395,34 @@ select.input { padding-right: 32px; appearance: none; }
 .price-yes { color: var(--green); background: var(--green-soft); border: none; }
 .price-no  { color: var(--red);   background: var(--red-soft);   border: none; }
 
-/* Compra rápida en tarjetas del inicio móvil (estilo Polymarket) */
-.quick-yes-btn { color: var(--green); background: var(--green-soft); border: 1px solid transparent; gap: 6px; }
-.quick-no-btn  { color: var(--red);   background: var(--red-soft);   border: 1px solid transparent; gap: 6px; }
-.quick-yes-btn:active { border-color: var(--green-border); }
-.quick-no-btn:active  { border-color: var(--red-border); }
-.quick-outcome-btn { color: var(--text-primary); background: var(--bg-elevated); border: 1px solid var(--border-subtle); }
-.quick-outcome-btn:active { border-color: var(--border-hover); }
+/* Tarjeta única de mercado y su grid (MarketCard / MarketGrid). El mínimo de
+   columna y el gap son los de la landing de categoría. --market-card-h es el peor
+   caso medido (244.75 px): tarjeta de 300 px, título de 3 líneas, multi de 3 filas +
+   «+N más» y pie con sello. --market-card-h-1col ≈ una binaria (skeletons en 1 columna). */
+:root { --market-card-min: 300px; --market-card-gap: 12px; --market-card-h: 246px; --market-card-h-1col: 154px; }
+.market-grid {
+  display: grid; container-type: inline-size; gap: var(--market-card-gap);
+  /* min(…, 100%): en pantallas más angostas que el mínimo la columna no se desborda */
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--market-card-min), 100%), 1fr));
+}
+.market-card { padding: 12px; cursor: pointer; display: flex; flex-direction: column; gap: 12px; }
+.market-card-row { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+.market-card-buy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.market-card-foot { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; margin-top: auto; }
+.market-card-foot > * { flex-shrink: 0; }
+.market-card-foot-vol { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.market-card-foot-new { display: inline-flex; flex: 0 1 auto; min-width: 0; overflow: hidden; }
+.market-card-skeleton { height: var(--market-card-h-1col); }
+/* 2+ columnas (2 × --market-card-min + gap; @container no acepta var()): altura fija
+   e igual para todas, filas multi compactas y Sí/No de la binaria anclados abajo.
+   En 1 columna no hay tarjetas que igualar: altura automática y filas táctiles de 40 px. */
+@container (min-width: 612px) {
+  .market-card { height: var(--market-card-h); }
+  .market-card-row { min-height: 32px; }
+  .market-card-buy { margin-top: auto; }
+  .market-card-buy + .market-card-foot { margin-top: 0; }
+  .market-card-skeleton { height: var(--market-card-h); }
+}
 
 /* Probability bars */
 .prob-bar-track { height: 4px; background: var(--border-subtle); border-radius: 2px; overflow: hidden; }
@@ -729,7 +750,6 @@ input[type='range']::-webkit-slider-thumb {
   .chart-head { flex-direction: column; align-items: flex-start; gap: 10px; }
 
   .home-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .market-grid { grid-template-columns: 1fr !important; }
 
   .market-detail-grid   { grid-template-columns: 1fr !important; gap: 20px !important; }
   .market-trading-panel { position: static !important; }

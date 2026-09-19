@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MarketCard, type QuickTradeHandler } from './MarketCard'
+import { MarketGrid } from './MarketGrid'
 import { FilterSelect } from './FilterSelect'
 import { Icon } from './Icon'
 import { SeeMoreButton } from './SeeMoreButton'
@@ -17,21 +17,17 @@ type Partidos = 'show' | 'hide'
 
 const ALL = '__all__'
 
-const gridStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }
-
 interface Props {
   markets: Market[]
   loading: boolean
-  // Móvil: tarjetas compactas con Sí/No que abren la compra sin navegar
-  onQuickTrade?: (market: Market) => QuickTradeHandler
-  // Móvil: skeletons de tarjeta compacta
-  compact?: boolean
+  // Tras operar, la página parchea el precio (y recarga las opciones si es multi)
+  onTraded: (marketId: string, newYesPrice: number, isMulti: boolean) => void
 }
 
 // Pestaña Nuevo estilo Polymarket: título, píldoras de tema, fila de filtros
 // (orden, cierre, estado, ocultar partidos, borrar) y grid. Todo el filtrado es
 // en cliente sobre los mercados ya cargados por la Home.
-export function NewFeed({ markets, loading, onQuickTrade, compact = false }: Props) {
+export function NewFeed({ markets, loading, onTraded }: Props) {
   const { t } = useTranslation()
   const [tag, setTag] = useState(ALL)
   const [sort, setSort] = useState<Sort>('recent')
@@ -179,23 +175,10 @@ export function NewFeed({ markets, loading, onQuickTrade, compact = false }: Pro
 
       {/* Grid / lista */}
       {loading ? (
-        <div className="market-grid" style={gridStyle}>
-          {[...Array(compact ? 5 : 9)].map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: compact ? 130 : 210 }} />
-          ))}
-        </div>
+        <MarketGrid markets={[]} onTraded={onTraded} loading skeletons={9} />
       ) : filtered.length > 0 ? (
         <>
-          <div className="market-grid anim-3" style={gridStyle}>
-            {filtered.slice(0, visible).map((market, i) => (
-              <MarketCard
-                key={market.id}
-                market={market}
-                animClass={i < 6 ? `anim-${Math.min(i + 1, 6)}` : ''}
-                onQuickTrade={onQuickTrade ? onQuickTrade(market) : undefined}
-              />
-            ))}
-          </div>
+          <MarketGrid markets={filtered.slice(0, visible)} onTraded={onTraded} />
           {filtered.length > visible && (
             <SeeMoreButton remaining={filtered.length - visible} onClick={() => setVisible(v => v + PAGE_SIZE)} />
           )}

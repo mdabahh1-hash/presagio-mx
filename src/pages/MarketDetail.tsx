@@ -21,9 +21,10 @@ import { Icon, type IconName } from '../components/Icon'
 import { Avatar } from '../components/Avatar'
 import { MarketThumb } from '../components/MarketThumb'
 import { Tabs } from '../components/Tabs'
-import { TeamMark } from '../components/TeamMark'
+import { TeamMark, DrawMark } from '../components/TeamMark'
 import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
+import { orderOutcomes, is1x2 } from '../lib/outcomeOrder'
 import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
 import { CHART_RANGES, RANGE_LABELS, filterRange, type ChartRange } from '../lib/chartRange'
@@ -102,10 +103,12 @@ export function MarketDetail() {
       setYesPrice(m.yes_price)
       setVolume(m.volume)
       if (m.market_type === 'multi') {
-        const sorted = [...(m.outcomes ?? [])].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price)
+        const sorted = orderOutcomes((m.outcomes ?? []).map(o => ({ ...o, label: cleanLabel(o.label) })))
         setOutcomes(sorted)
         const preselected = copyOutcome && sorted.some(o => o.outcome_key === copyOutcome) ? copyOutcome : null
-        setSelectedOutcomeKey(preselected ?? sorted[0]?.outcome_key ?? null)
+        // La preselección es la líder por probabilidad (en un 1X2 sorted[0] es el local)
+        const lider = sorted.reduce<typeof sorted[number] | null>((a, o) => (!a || o.price > a.price ? o : a), null)
+        setSelectedOutcomeKey(preselected ?? lider?.outcome_key ?? null)
         setVisibleKeys(new Set(sorted.slice(0, 4).map(o => o.outcome_key)))
       }
 
@@ -155,7 +158,7 @@ export function MarketDetail() {
               const u = incoming.find(x => x.outcome_key === o.outcome_key)
               return u ? { ...o, price: u.price } : o
             })
-            return [...updated].sort((a, b) => b.price - a.price)
+            return orderOutcomes(updated)
           })
         } else if (typeof data.yes_price === 'number') {
           // Guard: comment broadcasts also carry type 'price_update' but no yes_price.
@@ -252,7 +255,8 @@ export function MarketDetail() {
   const pair = displayPair(yesPrice)  // NO derived from rounded YES: always sums to 100
   const yesColor = yesPrice >= 65 ? 'var(--green)' : yesPrice <= 35 ? 'var(--red)' : 'var(--text-primary)'
   const hasMobileBar = isMobile && market.status === 'open'
-  const leader = outcomes[0]
+  // Líder por probabilidad (en un 1X2 outcomes[0] es el local, no la líder)
+  const leader = outcomes.reduce<typeof outcomes[number] | undefined>((a, o) => (!a || o.price > a.price ? o : a), undefined)
   const thumbMarket = { id: market.id, question: market.question, outcomes, imageUrl: market.image_url, subcategory: market.subcategory, category: market.category as Category }
   const statusPanel: Record<string, { icon: IconName; color: string; title: string; body: string }> = {
     resolved: { icon: 'trophy', color: 'var(--green)', title: t('market.winnerTitle', { label: outcomes.find(o => o.outcome_key === market.resolved_outcome_key)?.label ?? market.resolved_outcome_key ?? '' }), body: t('market.pointsDistributed') },
@@ -281,7 +285,7 @@ export function MarketDetail() {
         setYesPrice(p)
         if (market.market_type === 'multi') {
           marketsApi.outcomes(market.id).then(updated => {
-            setOutcomes([...updated].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price))
+            setOutcomes(orderOutcomes(updated.map(o => ({ ...o, label: cleanLabel(o.label) }))))
           }).catch(() => {})
         }
       }}
@@ -412,6 +416,9 @@ export function MarketDetail() {
                       <span className="num" style={{ fontSize: 12, fontWeight: 500, width: 22, height: 22, flexShrink: 0, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                         {outcomeLogo(o, market.subcategory, market.id)
                           ? <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={22} />
+                          // 1X2: nunca el número de posición (en notación 1X2 el «2» es el visitante);
+                          // el Empate lleva su marca y un equipo sin escudo deja el hueco reservado
+                          : is1x2(outcomes) ? (o.outcome_key === 'empate' ? <DrawMark size={22} /> : null)
                           : i + 1}
                       </span>
                       <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>

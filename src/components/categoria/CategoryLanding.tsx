@@ -1,11 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Category, Market } from '../../types'
-import { MarketCard } from '../MarketCard'
-import { BetBox } from '../BetBox'
-import { TradeSheet } from '../TradeSheet'
-import { AuthModal } from '../AuthModal'
+import { MarketGrid } from '../MarketGrid'
 import { byClosing } from '../../lib/closing'
 import { formatVolume } from '../../lib/format'
 
@@ -110,17 +107,8 @@ export function CategoryLanding({
   const visibleSubs = subcats.filter(s => (subCounts[s] ?? 0) > 0)
 
   const [shown, setShown] = useState(PAGE)
-  const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
-  const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
-  const closeTrade = useCallback(() => setTrade(null), [])
-  const tradeMarket = trade ? inCat.find(m => m.id === trade.marketId) ?? null : null
 
   const pickSub = (sub: string | null) => { setShown(PAGE); onSubChange(sub) }
-  const openTrade = (m: Market, side: 'YES' | 'NO', outcomeKey?: string) => {
-    setTradeOutcome(outcomeKey ?? null)
-    setTrade({ marketId: m.id, side, outcomeKey })
-  }
 
   const header = showHeader && (
     <div className="anim-1" style={{ marginBottom: 24 }}>
@@ -132,8 +120,6 @@ export function CategoryLanding({
     </div>
   )
 
-  const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 } as const
-
   if (loading) {
     return (
       <div aria-busy="true" aria-label={t('common.loading')} style={{ marginBottom: 48 }}>
@@ -142,9 +128,7 @@ export function CategoryLanding({
           <div className="cat-rail">
             {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 40, marginBottom: 2 }} />)}
           </div>
-          <div style={grid}>
-            {[...Array(6)].map((_, i) => <div key={i} className="skeleton" style={{ height: 180 }} />)}
-          </div>
+          <MarketGrid markets={[]} onTraded={onTraded} loading />
         </div>
       </div>
     )
@@ -177,16 +161,7 @@ export function CategoryLanding({
           </div>
 
           {list.length > 0 ? (
-            <div className="anim-2" style={grid}>
-              {list.slice(0, shown).map(m => (
-                <MarketCard
-                  key={m.id}
-                  market={m}
-                  quickLayout="chips"
-                  onQuickTrade={(side, outcomeKey) => openTrade(m, side, outcomeKey)}
-                />
-              ))}
-            </div>
+            <MarketGrid markets={list.slice(0, shown)} onTraded={onTraded} />
           ) : (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
               <p style={{ margin: '0 0 8px', fontWeight: 600 }}>{t('categoria.emptySub', { sub: activeSub ?? category })}</p>
@@ -207,26 +182,6 @@ export function CategoryLanding({
           )}
         </div>
       </div>
-
-      <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
-        {tradeMarket && trade && (
-          <BetBox
-            key={`${tradeMarket.id}-${trade.side}-${trade.outcomeKey ?? ''}`}
-            marketId={tradeMarket.id}
-            yesPrice={tradeMarket.yesPrice}
-            marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
-            outcomes={tradeMarket.outcomes ?? []}
-            selectedOutcomeKey={tradeOutcome}
-            onOutcomeSelect={setTradeOutcome}
-            subcategory={tradeMarket.subcategory}
-            initialSide={trade.side}
-            compact
-            onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
-            onTraded={p => onTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
-          />
-        )}
-      </TradeSheet>
-      {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
     </div>
   )
 }

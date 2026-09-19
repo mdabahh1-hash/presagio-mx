@@ -6,6 +6,7 @@ import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
 import { outcomeLogo } from '../lib/teamLogos'
+import { orderOutcomes } from '../lib/outcomeOrder'
 import { MarketThumb } from './MarketThumb'
 import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
@@ -67,9 +68,7 @@ export function MarketRow({
   const diff = useCountdown(market.endsAt)
   const { text: countdownText, urgent } = formatCountdown(diff)
 
-  const sortedOutcomes = isMulti
-    ? [...(market.outcomes ?? [])].sort((a, b) => b.price - a.price)
-    : []
+  const sortedOutcomes = isMulti ? orderOutcomes(market.outcomes ?? []) : []
   const topOutcomes = sortedOutcomes.slice(0, 3)
   const restOutcomes = sortedOutcomes.length - topOutcomes.length
   // Si algún resultado tiene escudo, toda la fila usa el chip horizontal
