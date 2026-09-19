@@ -504,6 +504,9 @@ input[type='range']::-webkit-slider-thumb {
 .sheet-overlay--out { animation: fadeOut 0.18s ease-in both; pointer-events: none; }
 .sheet-overlay--out .sheet-panel { animation: sheetOut 0.18s cubic-bezier(0.4, 0, 1, 1) both; }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+/* Cambio de contenido dentro de la hoja (compra ↔ acceso): misma curva que sheetIn */
+.sheet-swap { animation: sheetSwap 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes sheetSwap { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes sheetOut { from { transform: translateY(0); opacity: 1; } to { transform: translateY(24px); opacity: 0; } }
 
 .mobile-trade-bar { display: none; }

@@ -25,6 +25,7 @@ import { TeamMark, DrawMark } from '../components/TeamMark'
 import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
 import { orderOutcomes, is1x2 } from '../lib/outcomeOrder'
+import { parseTradeIntent } from '../lib/tradeIntent'
 import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
 import { CHART_RANGES, RANGE_LABELS, filterRange, type ChartRange } from '../lib/chartRange'
@@ -37,10 +38,14 @@ export function MarketDetail() {
   const { user } = useAuth()
   const navigate = useNavigate()
   // "Copiar jugada" prefill: /mercado/:id?side=YES&monto=120&outcome=key
-  const [searchParams] = useSearchParams()
-  const copySide = searchParams.get('side') === 'NO' ? 'NO' : searchParams.get('side') === 'YES' ? 'YES' : undefined
-  const copyAmount = Number(searchParams.get('monto')) || undefined
-  const copyOutcome = searchParams.get('outcome')
+  // (también el regreso de OAuth desde una compra). Se valida en parseTradeIntent y se
+  // lee UNA vez por visita: la URL se limpia al abrir la hoja (abajo).
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [first] = useState(() => ({ id, intent: parseTradeIntent(searchParams) }))
+  const intent = first.id === id ? first.intent : null // no arrastrarla a otro mercado
+  const copySide = intent?.side
+  const copyAmount = intent?.amount
+  const copyOutcome = intent?.outcomeKey ?? null
 
   const [market, setMarket] = useState<ApiMarket | null>(null)
   const [yesPrice, setYesPrice] = useState(50)
@@ -89,6 +94,17 @@ export function MarketDetail() {
   // Lado del BetBox en escritorio: lo eligen las filas Sí/No de cada opción (multi)
   const [betSide, setBetSide] = useState<'YES' | 'NO'>(copySide ?? 'YES')
   useEffect(() => { setSheetSide(null) }, [id])
+  // Llegar con ?side= en móvil (Copiar jugada, regreso de OAuth) abre la hoja sola, UNA
+  // vez: la URL se limpia con replace (history.replaceState) para que cerrar la hoja,
+  // recargar o volver con «atrás» no la reabra.
+  const autoOpened = useRef(false)
+  const canAutoOpen = !!market && market.id === id && market.status === 'open' && isMobile && !!intent
+  useEffect(() => {
+    if (!canAutoOpen || !intent || autoOpened.current) return
+    autoOpened.current = true
+    setSheetSide(intent.side)
+    setSearchParams({}, { replace: true })
+  }, [canAutoOpen, intent, setSearchParams])
 
   // Ancho real de la columna del chart: el SVG usa viewBox fijo, y sin
   // medirlo en móvil las etiquetas de los ejes se escalaban a ~5px.
