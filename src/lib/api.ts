@@ -218,6 +218,9 @@ export const marketsApi = {
     request<ApiResumenCategoria>(`/markets/resumen?category=${encodeURIComponent(category)}`),
   // Marcador en vivo de los partidos en ventana; [] si el job está apagado
   enVivo: () => request<ApiEnVivo[]>('/markets/en-vivo'),
+  // Categorías con mercados activos (OPEN + PENDING_RESOLUTION) y cuántos; las que no
+  // aparecen no tienen ninguno (ver lib/useCategoriasVisibles.ts)
+  categorias: () => request<ApiCategoriaActivos[]>('/markets/categorias'),
   comments: (id: string) => request<ApiComment[]>(`/markets/${id}/comments`),
   postComment: (id: string, text: string) =>
     request<ApiComment>(`/markets/${id}/comments`, { method: 'POST', body: JSON.stringify({ text }) }),
@@ -226,6 +229,11 @@ export const marketsApi = {
 }
 
 // ── Contenido curado por categoría (landing de Política) ───────────────────
+export interface ApiCategoriaActivos {
+  categoria: string
+  activos: number
+}
+
 // Espejo de app/schemas/contenido.py; formato en contenido_categorias/__init__.py.
 
 export interface ApiHito { fecha: string; etiqueta: string; texto: string; clave: boolean }

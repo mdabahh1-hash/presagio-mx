@@ -17,9 +17,8 @@ import { Icon } from '../components/Icon'
 import { CATEGORIES, SUBCATEGORIES, LANDINGS_PROPIAS, usaLandingGenerica, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket, cleanLabel } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
+import { useCategoriasVisibles } from '../lib/useCategoriasVisibles'
 import { formatVolume } from '../lib/format'
-
-const ALL_CATEGORIES: (Category | 'Todos')[] = ['Todos', ...CATEGORIES]
 
 export function Markets() {
   const { t } = useTranslation()
@@ -32,6 +31,8 @@ export function Markets() {
   ]
   const [markets, setMarkets] = useState<Market[]>([])
   const [loading, setLoading] = useState(true)
+  // Pestañas: las categorías sin mercados activos (y sin landing propia) no se listan
+  const allCategories: (Category | 'Todos')[] = ['Todos', ...useCategoriasVisibles()]
 
   const queryParam = searchParams.get('q') || ''
   const catParam = (searchParams.get('cat') || 'Todos') as Category | 'Todos'
@@ -309,7 +310,7 @@ export function Markets() {
         {/* Tabs de categoría (texto + subrayado, escriben ?cat=) + orden */}
         <div className="markets-controls tabs-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
           <Tabs<Category | 'Todos'>
-            items={ALL_CATEGORIES.map(cat => ({ key: cat, label: cat === 'Todos' ? t('markets.allCategory') : cat }))}
+            items={allCategories.map(cat => ({ key: cat, label: cat === 'Todos' ? t('markets.allCategory') : cat }))}
             active={activeCategory}
             onChange={handleCategoryClick}
             style={{ minWidth: 0, flex: 1 }}

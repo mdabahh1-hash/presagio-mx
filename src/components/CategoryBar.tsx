@@ -2,6 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CATEGORIES } from '../lib/categories'
+import { useCategoriasVisibles } from '../lib/useCategoriasVisibles'
 import { Tabs, type TabItem } from './Tabs'
 
 // Feeds (no son categorías del API): Tendencia, Noticias y Nuevo, con icono,
@@ -11,8 +12,7 @@ import { Tabs, type TabItem } from './Tabs'
 // parecía caer en "todos los mercados".
 export const FEEDS = ['Tendencia', 'Noticias', 'Nuevo'] as const
 export type Feed = (typeof FEEDS)[number]
-const TABS = [...FEEDS, ...CATEGORIES] as const
-export type CategoryTab = (typeof TABS)[number]
+export type CategoryTab = Feed | (typeof CATEGORIES)[number]
 export const isFeed = (tab: string): tab is Feed => (FEEDS as readonly string[]).includes(tab)
 
 // Barra de categorías estilo Polymarket: tabs de texto con subrayado, pegada
@@ -34,6 +34,8 @@ interface Props {
 export function CategoryBar({ active, onChange, sticky = true, children, style }: Props) {
   const { t } = useTranslation()
   const location = useLocation()
+  // Categorías sin mercados activos (y sin landing propia) no se listan
+  const visibles = useCategoriasVisibles()
 
   const urlActive: CategoryTab | null = (() => {
     if (onChange) return null
@@ -53,14 +55,14 @@ export function CategoryBar({ active, onChange, sticky = true, children, style }
     return onChange ? undefined : `/mercados?cat=${encodeURIComponent(tab)}`
   }
 
-  const items: TabItem<CategoryTab>[] = TABS.map(tab => ({
+  const items: TabItem<CategoryTab>[] = [...FEEDS, ...visibles].map(tab => ({
     key: tab,
     label: tab === 'Tendencia' ? t('home.tabTrending')
       : tab === 'Noticias' ? t('home.tabNews')
       : tab === 'Nuevo' ? t('home.tabNew')
       : tab,
     icon: tab === 'Tendencia' ? 'trending' : tab === 'Noticias' ? 'news' : tab === 'Nuevo' ? 'sparkle' : undefined,
-    divider: tab === CATEGORIES[0],
+    divider: tab === visibles[0],
     to: linkTo(tab),
   }))
 

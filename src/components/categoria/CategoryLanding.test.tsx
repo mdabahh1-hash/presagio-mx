@@ -96,7 +96,7 @@ vi.mock('../../lib/api', async orig => {
     status: m.status, market_type: m.marketType, outcomes: m.outcomes ?? [], num_trades: 0,
   })
   const listAll = vi.fn(async (params?: { category?: string }) => MARKETS.filter(m => m.category === params?.category).map(api))
-  return { ...mod, marketsApi: { ...mod.marketsApi, listAll } }
+  return { ...mod, marketsApi: { ...mod.marketsApi, listAll, categorias: vi.fn(async () => []) } }
 })
 
 async function renderMarkets(url: string) {
