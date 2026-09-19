@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { EconomiaLanding, economiaLandingAvailable } from './EconomiaLanding'
+import { CategoryLanding } from './CategoryLanding'
 import { makeMarket, MULTI_OUTCOMES } from '../../test/market'
-import { SUBCATEGORIES } from '../../lib/categories'
+import { CATEGORIES, LANDINGS_PROPIAS, SUBCATEGORIES, usaLandingGenerica } from '../../lib/categories'
 import type { Market } from '../../types'
 
 // BetBox real pide sesión y cotizaciones: aquí solo importa con qué lo abre la landing.
@@ -20,36 +20,45 @@ const MARKETS: Market[] = [
   makeMarket({ id: 'f1', subcategory: 'Fed / tasas EE.UU.', volume: 500 }),
   makeMarket({ id: 'x1', subcategory: null, volume: 10 }),
   makeMarket({ id: 'otra', category: 'Crypto', subcategory: 'Bitcoin', trending: true }),
+  makeMarket({ id: 't1', category: 'Tech', volume: 20 }),
 ]
 
-function renderLanding(over: Partial<React.ComponentProps<typeof EconomiaLanding>> = {}) {
+function renderLanding(over: Partial<React.ComponentProps<typeof CategoryLanding>> = {}) {
   const props = {
-    markets: MARKETS, loading: false, subcats: SUBS, activeSub: null, onSubChange: vi.fn(),
+    category: 'Economía' as const, markets: MARKETS, loading: false, subcats: SUBS, activeSub: null, onSubChange: vi.fn(),
     sort: 'all' as const, onSortChange: vi.fn(), onTraded: vi.fn(), ...over,
   }
-  render(<MemoryRouter><EconomiaLanding {...props} /></MemoryRouter>)
+  render(<MemoryRouter><CategoryLanding {...props} /></MemoryRouter>)
 }
 
-const rail = () => screen.getByRole('navigation', { name: 'Economía' })
+const rail = (name = 'Economía') => screen.getByRole('navigation', { name })
 const railCounts = () => within(rail()).getAllByRole('button').map(b => b.textContent)
 
-describe('economiaLandingAvailable', () => {
-  it('monta con un mercado trending abierto de Economía, o mientras carga', () => {
-    expect(economiaLandingAvailable(MARKETS, false)).toBe(true)
-    expect(economiaLandingAvailable([], true)).toBe(true)
-  })
-  it('sin trending (o trending solo en otra categoría o ya cerrado) cae a CategoryBrowse', () => {
-    const sinTrending = MARKETS.map(m => ({ ...m, trending: m.category !== 'Economía' }))
-    expect(economiaLandingAvailable(sinTrending, false)).toBe(false)
-    const cerrado = [makeMarket({ trending: true, status: 'pending_resolution' })]
-    expect(economiaLandingAvailable(cerrado, false)).toBe(false)
+describe('usaLandingGenerica', () => {
+  it('toda categoría menos las de landing propia; nada fuera de CATEGORIES', () => {
+    expect(CATEGORIES.filter(usaLandingGenerica)).toEqual(CATEGORIES.filter(c => !LANDINGS_PROPIAS.includes(c)))
+    expect(LANDINGS_PROPIAS.some(usaLandingGenerica)).toBe(false)
+    expect(usaLandingGenerica('Basura')).toBe(false)
+    expect(usaLandingGenerica('Todos')).toBe(false)
   })
 })
 
-describe('EconomiaLanding', () => {
+describe('CategoryLanding', () => {
   it('rail: conteos derivados de markets, en orden de categories.ts y sin subcategorías vacías', () => {
     renderLanding()
     expect(railCounts()).toEqual(['Todos4', 'Tasas Banxico2', 'Fed / tasas EE.UU.1'])
+  })
+
+  it('pinta la categoría de la prop, sin exigir trending ni subcategorías', () => {
+    renderLanding({ category: 'Tech', subcats: [] })
+    expect(within(rail('Tech')).getAllByRole('button').map(b => b.textContent)).toEqual(['Todos1'])
+    expect(screen.getAllByRole('link').map(a => a.getAttribute('href'))).toEqual(['/mercado/t1'])
+  })
+
+  it('categoría sin mercados: estado vacío con «Ver todos» a /mercados', () => {
+    renderLanding({ category: 'Clima', subcats: [] })
+    expect(screen.getByText('No hay mercados abiertos en Clima')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Ver todos' }).getAttribute('href')).toBe('/mercados')
   })
 
   it('con activeSub filtra el grid; clic en la activa limpia y en otra la elige', () => {
@@ -86,24 +95,44 @@ vi.mock('../../lib/api', async orig => {
     yes_price: m.yesPrice, volume: m.volume, ends_at: m.endsAt, created_at: m.endsAt, trending: m.trending,
     status: m.status, market_type: m.marketType, outcomes: m.outcomes ?? [], num_trades: 0,
   })
-  return { ...mod, marketsApi: { ...mod.marketsApi, listAll: vi.fn(async () => MARKETS.filter(m => m.category === 'Economía').map(api)) } }
+  const listAll = vi.fn(async (params?: { category?: string }) => MARKETS.filter(m => m.category === params?.category).map(api))
+  return { ...mod, marketsApi: { ...mod.marketsApi, listAll } }
 })
 
-describe('Markets ?cat=Economía', () => {
+async function renderMarkets(url: string) {
+  const { Markets } = await import('../../pages/Markets')
+  let search = ''
+  function Spy() { search = decodeURIComponent(useLocation().search); return null }
+  render(
+    <MemoryRouter initialEntries={[url]}>
+      <Routes><Route path="/mercados" element={<><Markets /><Spy /></>} /></Routes>
+    </MemoryRouter>,
+  )
+  return () => search
+}
+
+describe('Markets ?cat=', () => {
   it('?sub= filtra, pinta la miga y el clic en la activa la limpia de la URL', async () => {
-    const { Markets } = await import('../../pages/Markets')
-    let search = ''
-    function Spy() { search = decodeURIComponent(useLocation().search); return null }
-    render(
-      <MemoryRouter initialEntries={['/mercados?cat=Economía&sub=Tasas Banxico']}>
-        <Routes><Route path="/mercados" element={<><Markets /><Spy /></>} /></Routes>
-      </MemoryRouter>,
-    )
+    const search = await renderMarkets('/mercados?cat=Economía&sub=Tasas Banxico')
     await waitFor(() => expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Tasas Banxico'))
     expect(screen.getByRole('navigation', { name: 'breadcrumb' }).textContent).toContain('Economía')
     expect(screen.getAllByRole('link').filter(a => a.getAttribute('href')?.startsWith('/mercado/')).length).toBe(2)
     fireEvent.click(within(screen.getByRole('navigation', { name: 'Economía' })).getByText('Tasas Banxico'))
-    await waitFor(() => expect(search).toBe('?cat=Economía'))
+    await waitFor(() => expect(search()).toBe('?cat=Economía'))
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Economía')
+  })
+
+  it('cualquier categoría sin landing propia monta la genérica, sin trending', async () => {
+    await renderMarkets('/mercados?cat=Tech')
+    await waitFor(() => expect(screen.getByRole('navigation', { name: 'Tech' })).toBeTruthy())
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Tech')
+  })
+
+  it('?cat= inexistente: ni landing ni mocks, solo el grid vacío', async () => {
+    const { marketsApi } = await import('../../lib/api')
+    await renderMarkets('/mercados?cat=Basura')
+    await waitFor(() => expect(screen.getByText('0 resultados')).toBeTruthy())
+    expect(screen.queryByRole('navigation', { name: 'Basura' })).toBeNull()
+    expect(marketsApi.listAll).not.toHaveBeenCalledWith(expect.objectContaining({ category: 'Basura' }))
   })
 })

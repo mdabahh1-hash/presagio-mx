@@ -717,7 +717,7 @@
     "emptySub": "No hay mercados abiertos en {{sub}}",
     "emptyFilter": "Ningún mercado cumple este filtro"
   },
-  "economia": {
+  "categoria": {
     "headerMeta_one": "{{count}} mercado · {{volume}} PT de volumen",
     "headerMeta_other": "{{count}} mercados · {{volume}} PT de volumen",
     "all": "Todos",

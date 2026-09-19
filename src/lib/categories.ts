@@ -60,3 +60,14 @@ export function kindLabelKey(kind: Kind) {
 export function isKind(value: string | null | undefined): value is Kind {
   return value === 'partido' || value === 'accesorio'
 }
+
+// Categorías con landing propia (components/deportes|politica|crypto). Cualquier
+// otra categoría de CATEGORIES usa CategoryLanding (components/categoria), que es
+// el diseño por defecto: una categoría nueva lo hereda sin tocar las páginas.
+export const LANDINGS_PROPIAS: readonly Category[] = ['Deportes', 'Política', 'Crypto']
+
+// Acepta string porque llega del querystring (?cat=) o de la pestaña de la Home:
+// un valor que no esté en CATEGORIES no monta ninguna landing.
+export function usaLandingGenerica(cat: string): cat is Category {
+  return (CATEGORIES as readonly string[]).includes(cat) && !(LANDINGS_PROPIAS as readonly string[]).includes(cat)
+}

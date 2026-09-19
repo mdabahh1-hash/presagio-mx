@@ -10,7 +10,7 @@ import { CategoryBrowse } from '../components/CategoryBrowse'
 import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
 import { CryptoLanding, cryptoLandingAvailable, type CryptoSort } from '../components/crypto/CryptoLanding'
-import { EconomiaLanding, economiaLandingAvailable, type EconomiaSort } from '../components/economia/EconomiaLanding'
+import { CategoryLanding, type CategorySort } from '../components/categoria/CategoryLanding'
 import type { Ventana } from '../components/crypto/escalera'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
@@ -18,7 +18,7 @@ import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
 import { AuthModal } from '../components/AuthModal'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES, sportOfSub, type Kind } from '../lib/categories'
+import { SUBCATEGORIES, usaLandingGenerica, sportOfSub, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -100,13 +100,13 @@ export function Home() {
 
   // Filtros de la landing de Crypto dentro de la Home (subcategoría, ventana, orden): estado local
   const [homeCrypto, setHomeCrypto] = useState<{ sub: string | null; ventana: Ventana | null; sort: CryptoSort }>({ sub: null, ventana: null, sort: 'ending' })
-  // Filtros de la landing de Economía dentro de la Home (subcategoría, orden): estado local
-  const [homeEco, setHomeEco] = useState<{ sub: string | null; sort: EconomiaSort }>({ sub: null, sort: 'all' })
+  // Filtros de la landing genérica de categoría dentro de la Home (subcategoría, orden): estado local
+  const [homeCat, setHomeCat] = useState<{ sub: string | null; sort: CategorySort }>({ sub: null, sort: 'all' })
 
   useEffect(() => {
     setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
     setHomeCrypto({ sub: null, ventana: null, sort: 'ending' })
-    setHomeEco({ sub: null, sort: 'all' })
+    setHomeCat({ sub: null, sort: 'all' })
   }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
@@ -208,17 +208,18 @@ export function Home() {
     />
   )
 
-  // Economía: misma regla que Política, Deportes y Crypto (in-place, con cabecera)
-  const showEconomia = mobileTab === 'Economía' && economiaLandingAvailable(markets, loading)
-  const economiaLanding = (
-    <EconomiaLanding
+  // Cualquier otra categoría: landing genérica, siempre (in-place, con cabecera)
+  const showCategoria = usaLandingGenerica(mobileTab)
+  const categoriaLanding = (
+    <CategoryLanding
+      category={mobileTab as Category}
       markets={markets}
       loading={loading}
-      subcats={SUBCATEGORIES['Economía'] ?? []}
-      activeSub={homeEco.sub}
-      onSubChange={sub => setHomeEco(e => ({ ...e, sub }))}
-      sort={homeEco.sort}
-      onSortChange={sort => setHomeEco(e => ({ ...e, sort }))}
+      subcats={SUBCATEGORIES[mobileTab as Category] ?? []}
+      activeSub={homeCat.sub}
+      onSubChange={sub => setHomeCat(c => ({ ...c, sub }))}
+      sort={homeCat.sort}
+      onSortChange={sort => setHomeCat(c => ({ ...c, sort }))}
       onTraded={handleTraded}
       showHeader
     />
@@ -287,7 +288,7 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showEconomia ? economiaLanding : (
+            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showCategoria ? categoriaLanding : (
               <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
             )}
           </div>
@@ -358,7 +359,7 @@ export function Home() {
         <NewFeed markets={markets} loading={loading} />
       ) : (
         <section style={{ marginBottom: 56 }}>
-          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showEconomia ? economiaLanding : (
+          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showCategoria ? categoriaLanding : (
             <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
           )}
         </section>

@@ -385,8 +385,8 @@ export function MarketDetail() {
             {market.market_type === 'multi' ? (
               <div style={{ marginBottom: 4 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, marginBottom: 4 }}>
-                  <h2 className="section-title" style={{ margin: 0 }}>{t('economia.optionsTitle')}</h2>
-                  <span className="meta-label num">{t('economia.optionsHeader', { count: outcomes.length })}</span>
+                  <h2 className="section-title" style={{ margin: 0 }}>{t('categoria.optionsTitle')}</h2>
+                  <span className="meta-label num">{t('categoria.optionsHeader', { count: outcomes.length })}</span>
                 </div>
                 {outcomes.map((o, i) => {
                   const isSelected = selectedOutcomeKey === o.outcome_key

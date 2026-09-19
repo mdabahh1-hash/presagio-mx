@@ -9,12 +9,12 @@ import { PoliticaLanding, politicaLandingAvailable } from '../components/politic
 import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
 import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, cryptoLandingAvailable, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
 import { isVentana, type Ventana } from '../components/crypto/escalera'
-import { EconomiaLanding, EconomiaBreadcrumb, EconomiaHeaderMeta, economiaLandingAvailable, isEconomiaSort, type EconomiaSort } from '../components/economia/EconomiaLanding'
+import { CategoryLanding, CategoryBreadcrumb, CategoryHeaderMeta, isCategorySort, type CategorySort } from '../components/categoria/CategoryLanding'
 import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
-import { CATEGORIES, SUBCATEGORIES, sportOfSub, isKind, type Kind } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES, LANDINGS_PROPIAS, usaLandingGenerica, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket, cleanLabel } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
 import { formatVolume } from '../lib/format'
@@ -48,7 +48,7 @@ export function Markets() {
   const rawSort = searchParams.get('sort')
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
   const cryptoSort: CryptoSort = isCryptoSort(rawSort) ? rawSort : 'ending'
-  const economiaSort: EconomiaSort = isEconomiaSort(rawSort) ? rawSort : 'all'
+  const categoriaSort: CategorySort = isCategorySort(rawSort) ? rawSort : 'all'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
@@ -67,10 +67,14 @@ export function Markets() {
     setSortBy(sortParam)
   }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
 
-  // Crypto y Economía ordenan en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
-  const fetchSort = activeCategory === 'Crypto' || activeCategory === 'Economía' ? 'volume' : sortBy
+  // Crypto y la landing genérica ordenan en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
+  const fetchSort = activeCategory === 'Crypto' || usaLandingGenerica(activeCategory) ? 'volume' : sortBy
+  // ?cat= viene del querystring: una categoría que no existe no se pide (el catch
+  // de abajo metería los mocks como si fueran de esa categoría)
+  const validCategory = activeCategory === 'Todos' || (CATEGORIES as readonly string[]).includes(activeCategory)
   useEffect(() => {
     let active = true
+    if (!validCategory) { setMarkets([]); setLoading(false); return }
     setLoading(true)
     const params = {
       category: activeCategory !== 'Todos' ? activeCategory : undefined,
@@ -86,7 +90,7 @@ export function Markets() {
       .catch(() => { if (active) setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }  // drop out-of-order responses from fast typing / tab switches
-  }, [activeCategory, searchInput, fetchSort])
+  }, [activeCategory, searchInput, fetchSort, validCategory])
 
   // "Nuevos (3 días)": el API ordena por siembra; el recorte a 3 días (y el
   // respaldo de los 12 más recientes) es de UI, compartido con la Home.
@@ -105,9 +109,10 @@ export function Markets() {
   // Crypto: landing propia (components/crypto) con la misma regla (cryptoLandingAvailable)
   const isCrypto = activeCategory === 'Crypto' && !searchInput
   const showCrypto = isCrypto && cryptoLandingAvailable(markets, loading)
-  // Economía: landing propia (components/economia) con la misma regla (economiaLandingAvailable)
-  const isEconomia = activeCategory === 'Economía' && !searchInput
-  const showEconomia = isEconomia && economiaLandingAvailable(markets, loading)
+  // Cualquier otra categoría: landing genérica (components/categoria), siempre que no
+  // haya búsqueda; con ?q= cae al grid de «Todos», que trae el contador y el botón
+  // para limpiar la búsqueda
+  const showCategoria = usaLandingGenerica(activeCategory) && !searchInput
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
   const abiertos = useMemo(() => markets.filter(m => m.status === 'open').length, [markets])
   const hoy = useMemo(() => markets.filter(m => diaKeyOf(m) === 'hoy').length, [markets])
@@ -144,7 +149,7 @@ export function Markets() {
       p.delete('kind')
       p.delete('dia')
       p.delete('ventana')
-      p.delete('sort')  // el orden solo existe en "Todos" (y en la landing de Crypto)
+      p.delete('sort')  // el orden solo existe en "Todos" (y en las landings de Crypto y genérica)
       return p
     })
   }
@@ -221,8 +226,8 @@ export function Markets() {
     })
   }
 
-  // Orden de la landing de Economía ('all' es el default y no se escribe)
-  const handleEconomiaSort = (s: EconomiaSort) => {
+  // Orden de la landing genérica ('all' es el default y no se escribe)
+  const handleCategoriaSort = (s: CategorySort) => {
     setSearchParams(p => {
       if (s === 'all') p.delete('sort')
       else p.set('sort', s)
@@ -250,15 +255,15 @@ export function Markets() {
       }}>
         <div>
           {showCrypto && activeSub && <CryptoBreadcrumb sub={activeSub} onRoot={handleCryptoClear} />}
-          {showEconomia && activeSub && <EconomiaBreadcrumb sub={activeSub} onRoot={() => handleSubChange(null)} />}
+          {showCategoria && activeSub && <CategoryBreadcrumb category={activeCategory as Category} sub={activeSub} onRoot={() => handleSubChange(null)} />}
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {showCrypto || showEconomia ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
+            {showCrypto || showCategoria ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
             {loading ? t('common.loading') : showCrypto ? (
               <CryptoHeaderMeta markets={markets} sub={activeSub} />
-            ) : showEconomia ? (
-              <EconomiaHeaderMeta markets={markets} sub={activeSub} />
+            ) : showCategoria ? (
+              <CategoryHeaderMeta category={activeCategory as Category} markets={markets} sub={activeSub} />
             ) : showLanding ? (
               <span className="num">{t('politica.headerMeta', { count: markets.length, volume: formatVolume(categoryVolume) })}</span>
             ) : showDeportes ? (
@@ -362,24 +367,25 @@ export function Markets() {
           onSortChange={handleCryptoSort}
           onTraded={patchPrice}
         />
-      ) : showEconomia ? (
-        <EconomiaLanding
+      ) : showCategoria ? (
+        <CategoryLanding
+          category={activeCategory as Category}
           markets={markets}
           loading={loading}
-          subcats={SUBCATEGORIES['Economía'] ?? []}
+          subcats={SUBCATEGORIES[activeCategory as Category] ?? []}
           activeSub={activeSub}
           onSubChange={handleSubChange}
-          sort={economiaSort}
-          onSortChange={handleEconomiaSort}
+          sort={categoriaSort}
+          onSortChange={handleCategoriaSort}
           onTraded={patchPrice}
         />
-      ) : activeCategory !== 'Todos' ? (
-        /* Category view — same sidebar layout as the home page */
+      ) : (LANDINGS_PROPIAS as readonly string[]).includes(activeCategory) ? (
+        /* Respaldo de las landings propias (sin trending o con búsqueda): sidebar como la Home */
         <CategoryBrowse
-          category={activeCategory}
+          category={activeCategory as Category}
           markets={markets}
           loading={loading}
-          subcats={SUBCATEGORIES[activeCategory]}
+          subcats={SUBCATEGORIES[activeCategory as Category]}
           activeSub={activeSub}
           onSubChange={handleSubChange}
           activeSport={activeSport}
