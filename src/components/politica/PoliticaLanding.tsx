@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { marketsApi, contenidoApi, type ApiPricePoint, type ApiContenidoCategoria } from '../../lib/api'
 import type { Market, PricePoint } from '../../types'
 import type { MultiSeries } from '../SparkChart'
-import { BetBox } from '../BetBox'
-import { TradeSheet } from '../TradeSheet'
-import { AuthModal } from '../AuthModal'
+import { QuickTradeSheet } from '../QuickTradeSheet'
 import { PoliticaHero } from './PoliticaHero'
 import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
 import { ElectionTimeline } from './ElectionTimeline'
@@ -202,7 +200,6 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
 
   // Compra en sitio (patrón de Home): el sheet lee el mercado vivo por id
   const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO' } | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
   const closeTrade = useCallback(() => setTrade(null), [])
   const tradeMarket = trade ? inCat.find(m => m.id === trade.marketId) ?? null : null
 
@@ -293,23 +290,14 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
         extraMetaOf={extraMetaOf}
       />
 
-      <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
-        {tradeMarket && trade && (
-          <BetBox
-            key={`${tradeMarket.id}-${trade.side}`}
-            marketId={tradeMarket.id}
-            yesPrice={tradeMarket.yesPrice}
-            marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
-            outcomes={tradeMarket.outcomes ?? []}
-            subcategory={tradeMarket.subcategory}
-            initialSide={trade.side}
-            compact
-            onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
-            onTraded={p => onTraded(tradeMarket.id, p)}
-          />
-        )}
-      </TradeSheet>
-      {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
+      {/* Sin opción controlada: el BetBox lleva su propia selección */}
+      <QuickTradeSheet
+        market={tradeMarket}
+        side={trade?.side ?? 'YES'}
+        betKey={`${trade?.marketId}-${trade?.side}`}
+        onClose={closeTrade}
+        onTraded={p => tradeMarket && onTraded(tradeMarket.id, p)}
+      />
     </div>
   )
 }

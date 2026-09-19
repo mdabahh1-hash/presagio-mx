@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, contenidoApi, type ApiContenidoCategoria, type ApiPricePoint } from '../../lib/api'
 import type { Category, Market } from '../../types'
-import { BetBox } from '../BetBox'
-import { TradeSheet } from '../TradeSheet'
+import { QuickTradeSheet } from '../QuickTradeSheet'
 import { AuthModal } from '../AuthModal'
 import { Tabs } from '../Tabs'
 import { Icon } from '../Icon'
@@ -388,25 +387,18 @@ export function CryptoLanding({
         </div>
       </div>
 
-      <TradeSheet open={!!sheetMarket} onClose={closeSheet}>
-        {sheetMarket && sheet && (
-          <BetBox
-            key={`${sheetMarket.id}-${sheet.side}`}
-            marketId={sheetMarket.id}
-            yesPrice={sheetMarket.yesPrice}
-            marketType={sheetMarket.marketType === 'multi' ? 'multi' : 'binary'}
-            outcomes={sheetMarket.outcomes ?? []}
-            selectedOutcomeKey={openOutcome}
-            onOutcomeSelect={setOpenOutcome}
-            subcategory={sheetMarket.subcategory}
-            initialSide={sheet.side}
-            initialAmount={quick}
-            compact
-            onRequireAuth={requireAuth}
-            onTraded={p => onTraded(sheetMarket.id, p, sheetMarket.marketType === 'multi')}
-          />
-        )}
-      </TradeSheet>
+      {/* Móvil: la hoja arranca con el monto de compra rápida y comparte la opción con la fila */}
+      <QuickTradeSheet
+        market={sheetMarket}
+        side={sheet?.side ?? 'YES'}
+        betKey={`${sheet?.id}-${sheet?.side}`}
+        outcomeKey={openOutcome}
+        onOutcomeChange={setOpenOutcome}
+        initialAmount={quick}
+        onClose={closeSheet}
+        onTraded={p => sheetMarket && onTraded(sheetMarket.id, p, sheetMarket.marketType === 'multi')}
+      />
+      {/* Escritorio: el acceso de la fila expandida (CryptoExpanded) sigue en modal */}
       {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
     </div>
   )

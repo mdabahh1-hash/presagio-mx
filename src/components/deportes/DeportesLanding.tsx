@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { marketsApi, contenidoApi, type ApiContenidoCategoria, type ApiPricePoint, type ApiResumenCategoria } from '../../lib/api'
 import type { Category, Market } from '../../types'
 import type { MultiSeries } from '../SparkChart'
-import { BetBox } from '../BetBox'
-import { TradeSheet } from '../TradeSheet'
-import { AuthModal } from '../AuthModal'
+import { QuickTradeSheet } from '../QuickTradeSheet'
 import { LigasRail, type LigaCard } from './LigasRail'
 import { DeportesHero } from './DeportesHero'
 import { VolumenLigas } from './VolumenLigas'
@@ -182,7 +180,6 @@ export function DeportesLanding({
   // Compra en sitio (patrón de Política): el sheet lee el mercado vivo por id
   const [trade, setTrade] = useState<{ marketId: string } | null>(null)
   const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
   const closeTrade = useCallback(() => setTrade(null), [])
   const tradeMarket = trade ? inCat.find(m => m.id === trade.marketId) ?? null : null
   const openTrade = (m: Market) => {
@@ -298,25 +295,16 @@ export function DeportesLanding({
         </>
       )}
 
-      <TradeSheet open={!!tradeMarket} onClose={closeTrade}>
-        {tradeMarket && (
-          <BetBox
-            key={`${tradeMarket.id}-${tradeOutcome ?? ''}`}
-            marketId={tradeMarket.id}
-            yesPrice={tradeMarket.yesPrice}
-            marketType={tradeMarket.marketType === 'multi' ? 'multi' : 'binary'}
-            outcomes={tradeMarket.outcomes ?? []}
-            selectedOutcomeKey={tradeOutcome}
-            onOutcomeSelect={setTradeOutcome}
-            subcategory={tradeMarket.subcategory}
-            initialSide="YES"
-            compact
-            onRequireAuth={() => { setTrade(null); setAuthOpen(true) }}
-            onTraded={p => onTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
-          />
-        )}
-      </TradeSheet>
-      {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
+      {/* Siempre abre en Sí con la opción líder; elegir otra opción remonta el BetBox (key) */}
+      <QuickTradeSheet
+        market={tradeMarket}
+        side="YES"
+        betKey={`${trade?.marketId}-${tradeOutcome ?? ''}`}
+        outcomeKey={tradeOutcome}
+        onOutcomeChange={setTradeOutcome}
+        onClose={closeTrade}
+        onTraded={p => tradeMarket && onTraded(tradeMarket.id, p, tradeMarket.marketType === 'multi')}
+      />
     </div>
   )
 }
