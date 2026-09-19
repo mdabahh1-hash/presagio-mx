@@ -9,6 +9,7 @@ import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { displayPair } from '../lib/prices'
 import { SITE } from '../lib/embed'
 import { cleanLabel } from '../lib/mapMarket'
+import { orderOutcomes } from '../lib/outcomeOrder'
 import { TeamMark } from '../components/TeamMark'
 import type { PricePoint } from '../types'
 
@@ -31,7 +32,7 @@ export function Embed() {
     marketsApi.get(id).then(m => {
       setMarket(m)
       setYesPrice(m.yes_price)
-      setOutcomes([...(m.outcomes ?? [])].map(o => ({ ...o, label: cleanLabel(o.label) })).sort((a, b) => b.price - a.price))
+      setOutcomes(orderOutcomes((m.outcomes ?? []).map(o => ({ ...o, label: cleanLabel(o.label) }))))
       marketsApi.history(id, 365).then(hist => {
         setHistory(hist.filter((p: ApiPricePoint) => !p.outcome_key).map(p => ({ date: p.recorded_at, price: p.yes_price })))
         const series: Record<string, PricePoint[]> = {}
@@ -61,10 +62,10 @@ export function Embed() {
           for (const o of incoming) next[o.outcome_key] = [...(next[o.outcome_key] ?? []), { date: now, price: o.price }]
           return next
         })
-        setOutcomes(prev => [...prev.map(o => {
+        setOutcomes(prev => orderOutcomes(prev.map(o => {
           const u = incoming.find(x => x.outcome_key === o.outcome_key)
           return u ? { ...o, price: u.price } : o
-        })].sort((a, b) => b.price - a.price))
+        })))
       }
     })
     return () => { unsub(); marketSocket.disconnect() }
