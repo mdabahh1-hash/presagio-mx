@@ -5,6 +5,7 @@ import type { Market } from '../../types'
 import { TeamMark } from '../TeamMark'
 import { Icon } from '../Icon'
 import { formatDate } from '../../lib/format'
+import { probText } from '../../lib/prices'
 
 const MAX_ROWS = 6
 
@@ -34,7 +35,7 @@ export function TituloTable({ market, liga, compact = false }: { market: Market;
             <span className="dep-bar" style={{ width: compact ? 72 : 120 }}>
               <span className={i === 0 ? 'lead' : ''} style={{ width: `${Math.max(2, Math.round((o.price / max) * 100))}%` }} />
             </span>
-            <span className="num" style={{ width: 44, textAlign: 'right', fontSize: 14, fontWeight: 600 }}>{Math.round(o.price)}%</span>
+            <span className="num" style={{ width: 44, textAlign: 'right', fontSize: 14, fontWeight: 600 }}>{probText(o.price, market.status)}</span>
           </div>
         ))}
       </div>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiPricePoint } from '../lib/api'
 import { FullChart, MultiLineChart } from './SparkChart'
-import { displayPair } from '../lib/prices'
+import { displayPair, probText } from '../lib/prices'
 import type { Market, PricePoint } from '../types'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { formatVolume, daysLeft } from '../lib/format'
@@ -171,7 +171,7 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                       {o.label}
                     </span>
                     <span className="num" style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                      {Math.round(o.price)}%
+                      {probText(o.price)}
                     </span>
                   </div>
                 ))}
@@ -185,16 +185,16 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
               <>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 12 }}>
                   <span className="num" style={{ fontSize: 'clamp(2rem, 2.6vw, 2.6rem)', fontWeight: 700, color: yesColor, lineHeight: 1, letterSpacing: '-0.02em' }}>
-                    {pair.yes}%
+                    {probText(pair.yes)}
                   </span>
                   <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{t('carousel.chance', { defaultValue: 'probabilidad' })}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
                   <Link to={`/mercado/${m.id}?side=YES`} className="btn btn-yes" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center', textDecoration: 'none' }}>
-                    {t('common.yes')} <span className="num">{pair.yes}%</span>
+                    {t('common.yes')} <span className="num">{probText(pair.yes)}</span>
                   </Link>
                   <Link to={`/mercado/${m.id}?side=NO`} className="btn btn-no" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center', textDecoration: 'none' }}>
-                    {t('common.no')} <span className="num">{pair.no}%</span>
+                    {t('common.no')} <span className="num">{probText(pair.no)}</span>
                   </Link>
                 </div>
               </>

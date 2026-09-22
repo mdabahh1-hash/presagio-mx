@@ -14,6 +14,9 @@ const labelStyle: React.CSSProperties = {
   display: 'block', marginBottom: 6, fontWeight: 500,
 }
 
+// Espejo de ProposalCreate en el backend (veredikt.md §5: 70 caracteres, meta 65)
+const QUESTION_MAX = 70
+
 export function Propose() {
   const { t } = useTranslation()
   const [question, setQuestion] = useState('')
@@ -75,7 +78,7 @@ export function Propose() {
           <label style={labelStyle}>
             {t('propose.questionLabel')}
             <span className="num" style={{ float: 'right', color: 'var(--text-tertiary)' }}>
-              {question.length}/200
+              {question.length}/{QUESTION_MAX}
             </span>
           </label>
           <input
@@ -83,7 +86,7 @@ export function Propose() {
             style={inputStyle}
             value={question}
             onChange={e => setQuestion(e.target.value)}
-            maxLength={200}
+            maxLength={QUESTION_MAX}
             placeholder={t('propose.questionPlaceholder')}
             required
           />

@@ -5,7 +5,7 @@ import { oauthNext } from '../lib/returnTo'
 import { buildTradeRoute, type TradeIntent } from '../lib/tradeIntent'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
-import { displayPair } from '../lib/prices'
+import { displayPair, probText } from '../lib/prices'
 import { useDebouncedValue, useThrottledValue } from '../lib/useDebouncedValue'
 import { formatNum } from '../lib/format'
 import { translateApiError } from '../lib/errors'
@@ -189,7 +189,7 @@ export function BetBox({
                   {o.label}
                 </span>
                 <span className="num" style={{ fontSize: 14, fontWeight: 600, color: isSelected ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
-                  {o.price.toFixed(1)}%
+                  {probText(o.price, undefined, 1)}
                 </span>
               </button>
             )
@@ -220,7 +220,7 @@ export function BetBox({
                 }}
               >
                 {s === 'YES' ? t('common.yes') : t('common.no')}
-                <span className="num" style={{ fontSize: 15, fontWeight: 700 }}>{price}{unit}</span>
+                <span className="num" style={{ fontSize: 15, fontWeight: 700 }}>{probText(price, undefined, 0, unit)}</span>
               </button>
             )
           })}
@@ -298,7 +298,7 @@ export function BetBox({
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.avgPrice')}</span>
           <span className="num" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-            {quote ? `${quote.avg_fill_price.toFixed(isMulti ? 0 : 1)}${unit}` : '—'}
+            {quote ? probText(quote.avg_fill_price, undefined, isMulti ? 0 : 1, unit) : '—'}
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
@@ -335,18 +335,18 @@ export function BetBox({
               <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border-subtle)', paddingTop: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.bestPrice')}</span>
-                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.mid_price.toFixed(1)}%</span>
+                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{probText(quote.mid_price, undefined, 1)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.orderAvgPrice')}</span>
-                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.avg_fill_price.toFixed(1)}%</span>
+                  <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{probText(quote.avg_fill_price, undefined, 1)}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                   <span style={{ color: 'var(--text-tertiary)' }}>{t('bet.slippageCost')}</span>
                   <span className="num" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{quote.slippage_cost.toFixed(1)} PT</span>
                 </div>
                 <p style={{ margin: 0, fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
-                  {t('bet.priceImpact', { from: quote.mid_price.toFixed(1), to: quote.price_after.toFixed(1) })}
+                  {t('bet.priceImpact', { from: probText(quote.mid_price, undefined, 1), to: probText(quote.price_after, undefined, 1) })}
                 </p>
               </div>
             )}
@@ -357,7 +357,7 @@ export function BetBox({
       {/* Low-liquidity warning (amber) — informs, never blocks */}
       {quote?.liquidity_warning && (
         <div style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--warning)', background: 'var(--warning-bg)', borderRadius: 8, padding: '10px 12px', lineHeight: 1.5 }}>
-          {t('bet.lowLiquidity', { price: quote.avg_fill_price.toFixed(1) })}
+          {t('bet.lowLiquidity', { price: probText(quote.avg_fill_price, undefined, 1) })}
         </div>
       )}
 

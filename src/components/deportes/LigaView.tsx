@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { probText } from '../../lib/prices'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { LiveState, Market } from '../../types'
@@ -98,7 +99,7 @@ export function LigaView({
                 <div className="meta-label">{t('deportes.favorite')}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
                   <TeamMark label={favorito.label} outcomeKey={favorito.outcome_key} sub={liga} marketId={tituloMarket.id} size={18} />
-                  <span className="num" style={{ fontSize: 16, fontWeight: 600 }}>{favorito.label} {Math.round(favorito.price)}%</span>
+                  <span className="num" style={{ fontSize: 16, fontWeight: 600 }}>{favorito.label} {probText(favorito.price, tituloMarket.status)}</span>
                 </div>
               </div>
             )}

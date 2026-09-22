@@ -1,4 +1,5 @@
 import React, { useId, useMemo, useRef, useState, useCallback } from 'react'
+import { probText } from '../lib/prices'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
 import type { PricePoint } from '../types'
@@ -217,7 +218,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
       const i = lastIndexAtOrBefore(s.times.ts, tm)
       if (i < 0) continue
       const p = s.data[i]
-      rows.push({ color: s.color, label: s.label, value: `${p.price.toFixed(1)}%` })
+      rows.push({ color: s.color, label: s.label, value: probText(p.price, undefined, 1) })
       dots.push({ x: toX(tm), y: toY(p.price), color: s.color })
       if (!rawDate) rawDate = p.date
     }
@@ -280,7 +281,7 @@ export function MultiLineChart({ series, height = 220, viewW = 700, interactive 
                 {s.label}
               </span>
               <span style={{ fontSize: '0.7rem', fontWeight: 700, color: s.color }}>
-                {last !== null && last !== undefined ? `${last.toFixed(1)}%` : '—'}
+                {last !== null && last !== undefined ? probText(last, undefined, 1) : '—'}
               </span>
             </div>
           )
@@ -443,7 +444,7 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
     hover = {
       x: toX(ts[i]), y: toY(p.price),
       title: tooltipDate(ts[i], p.date, span, real),
-      value: `${valueSuffix === '%' ? p.price.toFixed(1) : Math.round(p.price).toLocaleString(locale())}${valueSuffix}`,
+      value: valueSuffix === '%' ? probText(p.price, undefined, 1) : `${Math.round(p.price).toLocaleString(locale())}${valueSuffix}`,
     }
   }
 

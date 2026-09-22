@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { ApiProyeccion, ApiPartido } from '../../lib/api'
 import type { SeatProjectionResult } from '../../lib/seatProjection'
 import { getPartyColor, getPartyTextColor } from '../../lib/partyColors'
-import { probColor } from '../../lib/prices'
+import { probColor, probText } from '../../lib/prices'
 import { useElementWidth } from '../../lib/useElementWidth'
 
 interface SeatProjectionProps {
@@ -93,7 +93,7 @@ export function SeatProjection({ proyeccion, partidos, projection, thresholdProb
         {main && <Stat label={t('politica.partyAlone', { party: ficha(main)?.nombre ?? main })} value={seats(main) ?? '—'} />}
         <Stat
           label={t('politica.thresholdProb', { count: umbral })}
-          value={thresholdProb !== null ? `${thresholdProb}%` : '—'}
+          value={thresholdProb !== null ? probText(thresholdProb) : '—'}
           color={thresholdProb !== null ? probColor(thresholdProb) : undefined}
         />
       </div>

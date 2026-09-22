@@ -8,6 +8,19 @@ export function displayPair(yesPrice: number): { yes: number; no: number } {
   return { yes, no: 100 - yes }
 }
 
+// Probabilidad para mostrar (0-100), con su unidad («%», o «¢» donde un multi
+// cotiza en centavos). Mientras el mercado no resuelve nada es seguro: nunca «0%»
+// ni «100%», sino «<1%» y «>99%» (con un decimal, «<0.1%» y «>99.9%»). Solo un
+// mercado resuelto o cancelado enseña el número tal cual.
+export function probText(p: number, status?: string | null, decimales = 0, unidad = '%'): string {
+  const txt = p.toFixed(decimales)
+  const min = 10 ** -decimales
+  const terminado = !!status && (status.startsWith('resolved') || status === 'cancelled')
+  if (!terminado && +txt < min) return `<${min}${unidad}`
+  if (!terminado && +txt > 100 - min) return `>${(100 - min).toFixed(decimales)}${unidad}`
+  return `${txt}${unidad}`
+}
+
 // «No» de una opción en un multi: side NO con la clave de la opción. Las filas
 // binarias guardan outcome_key = lado ('YES'/'NO'), así que no entran aquí.
 export function isOutcomeNo(side: string | null | undefined, outcomeKey: string | null | undefined): boolean {

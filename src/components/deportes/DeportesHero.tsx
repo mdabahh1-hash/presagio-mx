@@ -8,7 +8,7 @@ import { Icon } from '../Icon'
 import { Tabs } from '../Tabs'
 import { TeamMark } from '../TeamMark'
 import { MarketThumb } from '../MarketThumb'
-import { probColor } from '../../lib/prices'
+import { probColor, probText } from '../../lib/prices'
 import { formatVolume, formatCountdown } from '../../lib/format'
 import { useCountdown } from '../../lib/useCountdown'
 import { useElementWidth } from '../../lib/useElementWidth'
@@ -90,7 +90,7 @@ export function DeportesHero({ market, series, historyLoading, delta, range, onR
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div className="num" style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: isMulti ? 'var(--text-primary)' : probColor(market.yesPrice) }}>
-            {headline}%
+            {probText(headline, market.status)}
           </div>
           {deltaText && (
             <div className="meta-label num" style={{ marginTop: 5, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, color: deltaColor }}>
@@ -139,18 +139,18 @@ export function DeportesHero({ market, series, historyLoading, delta, range, onR
             <div key={o.outcome_key} className={`dep-cell${mark ? ' has-mark' : ''}`}>
               {mark && <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={22} />}
               <span className="dep-cell-label">{o.label}</span>
-              <span className="dep-cell-price num">{Math.round(o.price)}%</span>
+              <span className="dep-cell-price num">{probText(o.price, market.status)}</span>
             </div>
           )
         }) : (
           <>
             <div className="dep-cell price-yes" style={{ border: 'none' }}>
               <span className="dep-cell-label">{t('common.yes')}</span>
-              <span className="dep-cell-price num">{market.yesPrice}%</span>
+              <span className="dep-cell-price num">{probText(market.yesPrice, market.status)}</span>
             </div>
             <div className="dep-cell price-no" style={{ border: 'none' }}>
               <span className="dep-cell-label">{t('common.no')}</span>
-              <span className="dep-cell-price num">{100 - market.yesPrice}%</span>
+              <span className="dep-cell-price num">{probText(100 - market.yesPrice, market.status)}</span>
             </div>
           </>
         )}

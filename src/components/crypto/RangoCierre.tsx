@@ -1,4 +1,5 @@
 import React from 'react'
+import { probText } from '../../lib/prices'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Market } from '../../types'
@@ -30,7 +31,7 @@ export function RangoCierre({ market, sub, className = '' }: { market: Market; s
             <div className="prob-bar-track" style={{ height: 10, borderRadius: 5 }}>
               <div style={{ width: `${o.price}%`, height: '100%', borderRadius: 5, background: lead ? 'var(--text-primary)' : 'var(--text-secondary)' }} />
             </div>
-            <span className="num" style={{ fontSize: 13, fontWeight: 600, textAlign: 'right', color: lead ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{Math.round(o.price)}%</span>
+            <span className="num" style={{ fontSize: 13, fontWeight: 600, textAlign: 'right', color: lead ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{probText(o.price)}</span>
           </div>
         )
       })}

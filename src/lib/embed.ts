@@ -3,6 +3,7 @@
 // invisible sobre el logo + figcaption oculto para lectores de pantalla.
 
 import type { ApiMarket } from './api'
+import { probText } from './prices'
 
 export const SITE = 'https://veredikt.mx'
 
@@ -23,11 +24,11 @@ export function buildEmbedSnippet(m: ApiMarket, yesPrice: number, opts: { ref?: 
   const src = embedUrl(m.id, ref)
   const sorted = [...(m.outcomes ?? [])].sort((a, b) => b.price - a.price)
   const oddsText = m.market_type === 'multi'
-    ? sorted.slice(0, 3).map(o => `${o.label} ${Math.round(o.price)}%`).join(' · ')
-    : `SÍ ${Math.round(yesPrice)}% · NO ${Math.round(100 - yesPrice)}%`
+    ? sorted.slice(0, 3).map(o => `${o.label} ${probText(o.price, m.status)}`).join(' · ')
+    : `SÍ ${probText(yesPrice, m.status)} · NO ${probText(100 - Math.round(yesPrice), m.status)}`
   const description = m.market_type === 'multi' && sorted[0]
-    ? `Probabilidades en vivo en VEREDIKT. ${sorted[0].label} lidera con ${Math.round(sorted[0].price)}%.`
-    : `Probabilidades en vivo en VEREDIKT. El mercado da ${Math.round(yesPrice)}% al SÍ.`
+    ? `Probabilidades en vivo en VEREDIKT. ${sorted[0].label} lidera con ${probText(sorted[0].price, m.status)}.`
+    : `Probabilidades en vivo en VEREDIKT. El mercado da ${probText(yesPrice, m.status)} al SÍ.`
 
   const ld = {
     '@context': 'https://schema.org',

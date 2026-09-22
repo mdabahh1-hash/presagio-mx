@@ -4,7 +4,7 @@ import type { ApiHistoryEvent } from '../lib/api'
 import { formatPnl, timeAgo } from '../lib/format'
 import { Icon, type IconName } from './Icon'
 import { Badge } from './Badge'
-import { isOutcomeNo } from '../lib/prices'
+import { isOutcomeNo, probText } from '../lib/prices'
 
 // Color del icono por tipo de evento.
 function badgeStyle(type: ApiHistoryEvent['type']) {
@@ -64,7 +64,7 @@ export function HistoryList({ events, variant }: HistoryListProps) {
     const label = evLabel(e)
     switch (e.type) {
       case 'trade':
-        return t(own ? 'profile.historyBuyText' : 'profile.historyBuyTextPublic', { label, price: evPrice(e) })
+        return t(own ? 'profile.historyBuyText' : 'profile.historyBuyTextPublic', { label, price: probText(evPrice(e)) })
       case 'win':
         return t(own ? 'profile.historyWinText' : 'profile.historyWinTextPublic', { label })
       case 'loss':

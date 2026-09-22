@@ -7,7 +7,7 @@ import { useTheme } from '../lib/ThemeContext'
 import { authApi, marketsApi, type ApiMarket } from '../lib/api'
 import { oauthNext } from '../lib/returnTo'
 import { useDebouncedValue } from '../lib/useDebouncedValue'
-import { displayPair } from '../lib/prices'
+import { displayPair, probText } from '../lib/prices'
 import { cleanLabel } from '../lib/mapMarket'
 import type { Category } from '../types'
 import { Icon } from './Icon'
@@ -324,7 +324,7 @@ export function Navbar() {
                           {isMulti ? (leader && (
                             <span style={{ textAlign: 'right', flexShrink: 0, maxWidth: 110 }}>
                               <span className="num" style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
-                                {Math.round(leader.price)}%
+                                {probText(leader.price, m.status)}
                               </span>
                               <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4, fontSize: 11, color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden' }}>
                                 <TeamMark label={leader.label} outcomeKey={leader.outcome_key} sub={m.subcategory} marketId={m.id} size={14} />
@@ -333,7 +333,7 @@ export function Navbar() {
                             </span>
                           )) : (
                             <span className="num" style={{ fontSize: 14, fontWeight: 600, color: yesColor, flexShrink: 0 }}>
-                              {displayPair(m.yes_price).yes}%
+                              {probText(displayPair(m.yes_price).yes, m.status)}
                             </span>
                           )}
                         </Link>
