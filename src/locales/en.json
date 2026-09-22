@@ -198,9 +198,9 @@
     "noResults": "No results for \"{{q}}\""
   },
   "popular": {
-    "title": "Popular topics",
-    "volumeLine": "{{vol}} PT in volume",
-    "trending": "Trending"
+    "title": "Explore by topic",
+    "markets_one": "{{count}} market",
+    "markets_other": "{{count}} markets"
   },
   "market": {
     "loading": "Loading market...",

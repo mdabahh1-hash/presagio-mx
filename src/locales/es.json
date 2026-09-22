@@ -198,9 +198,9 @@
     "noResults": "Sin resultados para «{{q}}»"
   },
   "popular": {
-    "title": "Temas populares",
-    "volumeLine": "{{vol}} PT en volumen",
-    "trending": "En tendencia"
+    "title": "Explora por tema",
+    "markets_one": "{{count}} mercado",
+    "markets_other": "{{count}} mercados"
   },
   "market": {
     "loading": "Cargando mercado...",

@@ -275,7 +275,7 @@ export function Home() {
 
       {mobileTab === 'Tendencia' ? (
         <>
-          {/* Featured carousel + Temas populares */}
+          {/* Featured carousel + Explora por tema */}
           <section className="featured-row" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start', marginBottom: 48 }}>
             {loading ? (
               <div className="skeleton" style={{ height: 420 }} />

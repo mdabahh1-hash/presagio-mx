@@ -549,7 +549,7 @@ input[type='range']::-webkit-slider-thumb {
 .featured-title { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .featured-slide-chart { min-width: 0; }
 
-/* Temas populares */
+/* Explora por tema (PopularTopics) */
 .popular-row { transition: background 0.15s; border-radius: var(--r-md); }
 .popular-row:hover { background: var(--bg-hover); }
 
@@ -703,7 +703,7 @@ input[type='range']::-webkit-slider-thumb {
   .navbar-howitworks { display: none !important; }
 }
 
-/* Altura unificada hero ↔ Temas populares (solo desktop real) */
+/* Altura unificada hero ↔ Explora por tema (solo desktop real) */
 @media (min-width: 1025px) {
   .featured-slide-grid { height: 420px; }
   .featured-outcome-row { padding: 7px 0 !important; }

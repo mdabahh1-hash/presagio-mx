@@ -18,14 +18,21 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'Champions League',
     'Saudi Pro League', 'NFL', 'F1', 'Boxeo',
   ],
-  'Política': ['Elecciones', 'Sheinbaum'],
+  'Política': ['Elecciones', 'Sheinbaum', 'Visas de EEUU', 'Congreso', 'Regulación digital'],
   'Economía': [
-    'Tasas Banxico', 'Inflación (INPC)', 'Tipo de cambio USD/MXN', 'PIB México',
+    'Tasas Banxico', 'Inflación (INPC)', 'Tipo de cambio', 'PIB México',
     'Empleo / IMSS', 'Aranceles / T-MEC', 'Fed / tasas EE.UU.', 'Bolsa (BMV)',
+    'Mercados EEUU', 'Remesas',
   ],
-  'Crypto': ['Bitcoin', 'Ethereum', 'Solana', 'Stablecoins', 'Regulación', 'Adopción México'],
-  'Entretenimiento': ['Influencers'],
-  'Global': ['Migración'],
+  'Crypto': ['Bitcoin', 'Ethereum', 'Solana', 'Stablecoins', 'Regulación', 'Adopción México', 'Mercado cripto'],
+  'Entretenimiento': ['Influencers', 'Reality shows'],
+  'Global': [
+    'Europa', 'Elecciones EEUU', 'Trump', 'Medio Oriente', 'Asia-Pacífico',
+    'Rusia-Ucrania', 'Américas', 'África', 'ONU y OTAN', 'Migración',
+  ],
+  'Tech': ['IA'],
+  'México': ['Batallas de aura', 'Seguridad'],
+  'Clima': ['Huracanes', 'Sequía y calor'],
 }
 
 // Deporte → ligas (rail "Todos los deportes" en CategoryBrowse). Solo Deportes
