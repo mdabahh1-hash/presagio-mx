@@ -7,6 +7,7 @@ import { formatVolume, formatCountdown } from '../lib/format'
 import { useCountdown } from '../lib/useCountdown'
 import { outcomeLogo } from '../lib/teamLogos'
 import { orderOutcomes } from '../lib/outcomeOrder'
+import { probText } from '../lib/prices'
 import { MarketThumb } from './MarketThumb'
 import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
@@ -83,7 +84,7 @@ export function MarketRow({
             <div key={o.outcome_key} className={chipCls} style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
               {hasMarks && <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={18} />}
               <span className="row-outcome-label" title={o.label}>{o.label}</span>
-              <span className="row-outcome-price">{Math.round(o.price)}%</span>
+              <span className="row-outcome-price">{probText(o.price, market.status)}</span>
             </div>
           ))}
           {restOutcomes > 0 && (
@@ -96,11 +97,11 @@ export function MarketRow({
         <>
           <div className="row-outcome-btn price-yes">
             <span className="row-outcome-label">{t('common.yes')}</span>
-            <span className="row-outcome-price">{market.yesPrice}%</span>
+            <span className="row-outcome-price">{probText(market.yesPrice, market.status)}</span>
           </div>
           <div className="row-outcome-btn price-no">
             <span className="row-outcome-label">{t('common.no')}</span>
-            <span className="row-outcome-price">{100 - market.yesPrice}%</span>
+            <span className="row-outcome-price">{probText(100 - market.yesPrice, market.status)}</span>
           </div>
         </>
       )}
@@ -119,7 +120,7 @@ export function MarketRow({
             <div key={o.outcome_key} className="row-outcome-btn row-outcome-btn--track" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
               {hasMarks && <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={18} />}
               <span className="row-outcome-label" title={o.label}>{o.label}</span>
-              <span className="row-outcome-price">{Math.round(o.price)}%</span>
+              <span className="row-outcome-price">{probText(o.price, market.status)}</span>
             </div>
           ))}
           {trackRest > 0 && (
@@ -130,11 +131,11 @@ export function MarketRow({
         <>
           <div className="row-outcome-btn row-outcome-btn--track price-yes">
             <span className="row-outcome-label">{t('common.yes')}</span>
-            <span className="row-outcome-price">{market.yesPrice}%</span>
+            <span className="row-outcome-price">{probText(market.yesPrice, market.status)}</span>
           </div>
           <div className="row-outcome-btn row-outcome-btn--track price-no">
             <span className="row-outcome-label">{t('common.no')}</span>
-            <span className="row-outcome-price">{100 - market.yesPrice}%</span>
+            <span className="row-outcome-price">{probText(100 - market.yesPrice, market.status)}</span>
           </div>
         </>
       )}

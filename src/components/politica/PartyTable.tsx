@@ -1,4 +1,5 @@
 import React from 'react'
+import { probText } from '../../lib/prices'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ApiPartido } from '../../lib/api'
@@ -46,7 +47,7 @@ export function PartyTable({ rows, total, partidos, className = '' }: PartyTable
                 </span>
                 {r.top && (
                   <span className="meta-label num" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {r.top.label} · {Math.round(r.top.price)}%
+                    {r.top.label} · {probText(r.top.price)}
                   </span>
                 )}
               </div>

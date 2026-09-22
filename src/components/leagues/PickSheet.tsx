@@ -18,6 +18,7 @@ import { Cycle, CycleMarket, leaguesApi, potentialPayout, STAKE_CHIPS } from '..
 import { translateApiError } from '../../lib/errors'
 import { formatDate, formatNum } from '../../lib/format'
 import { cleanLabel } from '../../lib/mapMarket'
+import { probText } from '../../lib/prices'
 import { Icon } from '../Icon'
 import { outcomeLabel } from './adapters'
 
@@ -135,7 +136,7 @@ export default function PickSheet({
             <button key={o.key} type="button" className={`lg-tile${o.active ? ' is-active' : ''}`} aria-pressed={o.active} onClick={o.select}>
               <span className="lg-tile__text">
                 <span className="lg-tile__name">{o.label}</span>
-                <span className="lg-tile__count num">{Math.round(o.price * 100)}%</span>
+                <span className="lg-tile__count num">{probText(o.price * 100)}</span>
               </span>
               {o.active && <Icon name="check" size={14} className="lg-tile__check" />}
             </button>

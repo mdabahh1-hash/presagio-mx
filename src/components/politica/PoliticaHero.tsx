@@ -6,7 +6,7 @@ import { MultiLineChart, type MultiSeries } from '../SparkChart'
 import { Badge } from '../Badge'
 import { Icon } from '../Icon'
 import { getCategoryColor, getCategoryBg } from '../../lib/categoryColors'
-import { displayPair, probColor } from '../../lib/prices'
+import { displayPair, probColor, probText } from '../../lib/prices'
 import { formatVolume, formatCountdown } from '../../lib/format'
 import { useCountdown } from '../../lib/useCountdown'
 import { useElementWidth } from '../../lib/useElementWidth'
@@ -74,7 +74,7 @@ export function PoliticaHero({ market, series, historyLoading, delta7, onBuy }: 
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div className="num" style={{ fontSize: 40, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1, color: probColor(market.yesPrice) }}>
-            {pair.yes}%
+            {probText(pair.yes)}
           </div>
           {deltaText && (
             <div className="meta-label num" style={{ marginTop: 4, color: deltaColor }}>{deltaText}</div>
@@ -85,10 +85,10 @@ export function PoliticaHero({ market, series, historyLoading, delta7, onBuy }: 
       {/* CTAs: abren el sheet de operar, no navegan */}
       <div className="pol-hero-cta">
         <button type="button" className="btn btn-yes" onClick={() => onBuy('YES')}>
-          {t('politica.buyYes', { pct: pair.yes })}
+          {t('politica.buyYes', { pct: probText(pair.yes) })}
         </button>
         <button type="button" className="btn btn-no" onClick={() => onBuy('NO')}>
-          {t('politica.buyNo', { pct: pair.no })}
+          {t('politica.buyNo', { pct: probText(pair.no) })}
         </button>
       </div>
 

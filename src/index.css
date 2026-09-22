@@ -395,34 +395,49 @@ select.input { padding-right: 32px; appearance: none; }
 .price-yes { color: var(--green); background: var(--green-soft); border: none; }
 .price-no  { color: var(--red);   background: var(--red-soft);   border: none; }
 
-/* Tarjeta única de mercado y su grid (MarketCard / MarketGrid). El mínimo de
-   columna y el gap son los de la landing de categoría. --market-card-h es el peor
-   caso medido (244.75 px): tarjeta de 300 px, título de 3 líneas, multi de 3 filas +
-   «+N más» y pie con sello. --market-card-h-1col ≈ una binaria (skeletons en 1 columna). */
-:root { --market-card-min: 300px; --market-card-gap: 12px; --market-card-h: 246px; --market-card-h-1col: 154px; }
+/* Tarjeta única de mercado y su grid (MarketCard / MarketGrid). ESTÁNDAR (Mark,
+   2026-09-20): TODAS las tarjetas miden --market-card-h en todas las vistas; el
+   contenido se adapta a la tarjeta, nunca al revés. Lo de abajo (compra o barra de
+   pendiente 40, pie 20, dos gaps y el padding) suma 110 px fijos; el bloque de
+   arriba se queda con el resto (flex: 1) y el título se ajusta solo (useFitText):
+   72 px en binaria y partido, 48 en multi (que además lleva sus 2 filas de 32).
+   Única excepción: en 1 columna el multi crece para tener filas táctiles de 40. */
+:root { --market-card-min: 300px; --market-card-gap: 12px; --market-card-h: 182px; --market-card-skeleton-h: 182px; }
 .market-grid {
   display: grid; container-type: inline-size; gap: var(--market-card-gap);
   /* min(…, 100%): en pantallas más angostas que el mínimo la columna no se desborda */
   grid-template-columns: repeat(auto-fill, minmax(min(var(--market-card-min), 100%), 1fr));
 }
-.market-card { padding: 12px; cursor: pointer; display: flex; flex-direction: column; gap: 12px; }
-.market-card-row { display: flex; align-items: center; gap: 8px; min-height: 40px; }
+.market-card { padding: 12px; cursor: pointer; height: var(--market-card-h); display: flex; flex-direction: column; gap: 12px; }
+.market-card-head { display: flex; align-items: flex-start; gap: 12px; flex: 1; min-height: 0; }
+.market-card-title {
+  margin: 0; font-weight: 500; color: var(--text-primary); flex: 1; min-width: 0;
+  /* tamaño, alto exacto y clamp los pone useFitText; si ni el más chico cabe, deja «…» */
+  display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+}
+.market-card-row { display: flex; align-items: center; gap: 8px; min-height: 32px; }
+.market-card-teams { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.market-card-team { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
 .market-card-buy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.market-card-pending {
+  height: 40px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-md); background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary); font-size: 13px; font-weight: 600;
+}
+/* 1 columna (menos de 2 × --market-card-min + gap): el multi crece EXACTAMENTE los
+   16 px que necesitan sus dos filas táctiles de 40, y todos los multi siguen
+   midiendo lo mismo entre sí. El resto de las tarjetas no cambia. */
+@container (max-width: 611px) {
+  .market-card-row { min-height: 40px; }
+  .market-card--multi { height: calc(var(--market-card-h) + 16px); }
+}
 .market-card-foot { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; margin-top: auto; }
 .market-card-foot > * { flex-shrink: 0; }
-.market-card-foot-vol { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* margin/padding de 1px: la caja de recorte se sale un pixel por cada lado para no
+   comerse el antialiasing de la primera y la última letra (el texto no se mueve) */
+.market-card-foot-vol, .market-card-foot-liga { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin: 0 -1px; padding: 0 1px; }
 .market-card-foot-new { display: inline-flex; flex: 0 1 auto; min-width: 0; overflow: hidden; }
-.market-card-skeleton { height: var(--market-card-h-1col); }
-/* 2+ columnas (2 × --market-card-min + gap; @container no acepta var()): altura fija
-   e igual para todas, filas multi compactas y Sí/No de la binaria anclados abajo.
-   En 1 columna no hay tarjetas que igualar: altura automática y filas táctiles de 40 px. */
-@container (min-width: 612px) {
-  .market-card { height: var(--market-card-h); }
-  .market-card-row { min-height: 32px; }
-  .market-card-buy { margin-top: auto; }
-  .market-card-buy + .market-card-foot { margin-top: 0; }
-  .market-card-skeleton { height: var(--market-card-h); }
-}
+.market-card-skeleton { height: var(--market-card-skeleton-h); }
 
 /* Probability bars */
 .prob-bar-track { height: 4px; background: var(--border-subtle); border-radius: 2px; overflow: hidden; }

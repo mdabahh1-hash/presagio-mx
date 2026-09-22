@@ -6,7 +6,7 @@ import { marketSocket } from '../lib/websocket'
 import { FullChart, MultiLineChart, outcomeColor, type MultiSeries } from '../components/SparkChart'
 import { Logo } from '../components/Logo'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
-import { displayPair } from '../lib/prices'
+import { displayPair, probText } from '../lib/prices'
 import { SITE } from '../lib/embed'
 import { cleanLabel } from '../lib/mapMarket'
 import { orderOutcomes } from '../lib/outcomeOrder'
@@ -129,7 +129,7 @@ export function Embed() {
                   <TeamMark label={o.label} outcomeKey={o.outcome_key} sub={market.subcategory} marketId={market.id} size={14} />
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.label}</span>
                 </span>
-                <span style={{ fontWeight: 700 }}>{Math.round(o.price)}%</span>
+                <span style={{ fontWeight: 700 }}>{probText(o.price, market.status)}</span>
               </div>
             ))}
           </div>
@@ -140,9 +140,9 @@ export function Embed() {
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ fontWeight: 700, fontSize: '1.7rem', color: 'var(--green)' }}>{pair.yes}%</span>
+            <span style={{ fontWeight: 700, fontSize: '1.7rem', color: 'var(--green)' }}>{probText(pair.yes, market.status)}</span>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--green)' }}>{t('common.yes')}</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 'auto' }}>{t('common.no')} · {pair.no}%</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 'auto' }}>{t('common.no')} · {probText(pair.no, market.status)}</span>
           </div>
           <div style={{ flex: 1, minHeight: 0 }}>
             <FullChart data={history} height={130} label={t('common.yes')} />

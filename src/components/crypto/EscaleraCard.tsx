@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '../Badge'
 import { Icon } from '../Icon'
-import { displayPair, probColor } from '../../lib/prices'
+import { displayPair, probColor, probText } from '../../lib/prices'
 import { formatVolume, formatDate } from '../../lib/format'
 import type { Escalera } from './escalera'
 import type { Side } from './CryptoRow'
@@ -55,10 +55,10 @@ export function EscaleraCard({ escalera, source, expandedId, onChip, onCollapse,
               ) : (
                 <div className="market-row-outcomes">
                   <button type="button" className="row-outcome-btn price-yes" style={chip} onClick={() => onChip(m.id, 'YES')}>
-                    <span className="row-outcome-price">{t('common.yes')} {pair.yes}%</span>
+                    <span className="row-outcome-price">{t('common.yes')} {probText(pair.yes)}</span>
                   </button>
                   <button type="button" className="row-outcome-btn price-no" style={chip} onClick={() => onChip(m.id, 'NO')}>
-                    <span className="row-outcome-price">{t('common.no')} {pair.no}%</span>
+                    <span className="row-outcome-price">{t('common.no')} {probText(pair.no)}</span>
                   </button>
                 </div>
               )}

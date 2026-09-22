@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { displayPair } from '../lib/prices'
+import { displayPair, probText } from '../lib/prices'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
 import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { oauthNext } from '../lib/returnTo'
@@ -447,17 +447,17 @@ export function MarketDetail() {
                         </div>
                       )}
                       <span className="num" style={{ width: 44, textAlign: 'right', flexShrink: 0, fontSize: 15, fontWeight: 600, color: isWinner ? 'var(--green)' : 'var(--text-primary)' }}>
-                        {Math.round(o.price)}%
+                        {probText(o.price, market.status)}
                       </span>
                       {market.status === 'open' && (
                         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                           <button type="button" className="btn row-outcome-btn price-yes" onClick={pick('YES')} aria-pressed={isSelected && betSide === 'YES'} style={{ minWidth: 64, flex: '0 0 auto' }}>
                             <span className="row-outcome-label">{t('common.yes')}</span>
-                            <span className="row-outcome-price">{cents.yes}¢</span>
+                            <span className="row-outcome-price">{probText(cents.yes, market.status, 0, '¢')}</span>
                           </button>
                           <button type="button" className="btn row-outcome-btn price-no" onClick={pick('NO')} aria-pressed={isSelected && betSide === 'NO'} style={{ minWidth: 64, flex: '0 0 auto' }}>
                             <span className="row-outcome-label">{t('common.no')}</span>
-                            <span className="row-outcome-price">{cents.no}¢</span>
+                            <span className="row-outcome-price">{probText(cents.no, market.status, 0, '¢')}</span>
                           </button>
                         </div>
                       )}
@@ -469,7 +469,7 @@ export function MarketDetail() {
               <>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 10 }}>
                   <span className="num" style={{ fontSize: 'clamp(2.2rem, 4vw, 2.8rem)', fontWeight: 700, color: yesColor, lineHeight: 1, letterSpacing: '-0.02em' }}>
-                    {pair.yes}%
+                    {probText(pair.yes, market.status)}
                   </span>
                   <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{t('carousel.chance')}</span>
                 </div>
@@ -477,8 +477,8 @@ export function MarketDetail() {
                   <div className="prob-bar-fill" style={{ width: `${yesPrice}%`, background: yesColor === 'var(--text-primary)' ? 'var(--text-secondary)' : yesColor }} />
                 </div>
                 <div className="meta-label num" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--green)' }}>{t('common.yes')} {pair.yes}%</span>
-                  <span style={{ color: 'var(--red)' }}>{t('common.no')} {pair.no}%</span>
+                  <span style={{ color: 'var(--green)' }}>{t('common.yes')} {probText(pair.yes, market.status)}</span>
+                  <span style={{ color: 'var(--red)' }}>{t('common.no')} {probText(pair.no, market.status)}</span>
                 </div>
               </>
             )}
@@ -822,17 +822,17 @@ export function MarketDetail() {
                 {t('bet.title')}
                 {leader && (
                   <span style={{ fontWeight: 600, opacity: 0.8, fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '55%' }}>
-                    · {leader.label} {Math.round(leader.price)}%
+                    · {leader.label} {probText(leader.price, market.status)}
                   </span>
                 )}
               </button>
             ) : (
               <>
                 <button className="mtb-yes" onClick={() => setSheetSide('YES')}>
-                  {t('common.yes')} <span className="font-mono">{pair.yes}%</span>
+                  {t('common.yes')} <span className="font-mono">{probText(pair.yes, market.status)}</span>
                 </button>
                 <button className="mtb-no" onClick={() => setSheetSide('NO')}>
-                  {t('common.no')} <span className="font-mono">{pair.no}%</span>
+                  {t('common.no')} <span className="font-mono">{probText(pair.no, market.status)}</span>
                 </button>
               </>
             )}

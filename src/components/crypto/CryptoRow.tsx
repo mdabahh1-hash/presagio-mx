@@ -7,7 +7,7 @@ import { MarketThumb } from '../MarketThumb'
 import { Icon } from '../Icon'
 import { FullChart } from '../SparkChart'
 import { BetBox } from '../BetBox'
-import { displayPair } from '../../lib/prices'
+import { displayPair, probText } from '../../lib/prices'
 import { formatVolume, formatCountdown } from '../../lib/format'
 import { useCountdown } from '../../lib/useCountdown'
 import { useElementWidth } from '../../lib/useElementWidth'
@@ -82,7 +82,7 @@ export function CryptoRow({ market, expanded, hideSub, source, onChip, onCollaps
               <>
                 <button type="button" className="row-outcome-btn" style={{ ...chip, background: 'var(--bg-elevated)', color: 'var(--text-primary)' }} onClick={() => onChip('YES')}>
                   <span className="row-outcome-label" title={lider.label}>{lider.label}</span>
-                  <span className="row-outcome-price">{Math.round(lider.price)}%</span>
+                  <span className="row-outcome-price">{probText(lider.price)}</span>
                 </button>
                 {rest > 0 && (
                   <button type="button" className="row-outcome-btn" style={{ ...chip, minWidth: 0, background: 'transparent', color: 'var(--text-tertiary)', fontSize: 12, fontWeight: 500 }} onClick={() => onChip('YES')}>
@@ -95,11 +95,11 @@ export function CryptoRow({ market, expanded, hideSub, source, onChip, onCollaps
             <>
               <button type="button" className="row-outcome-btn price-yes" style={chip} onClick={() => onChip('YES')}>
                 <span className="row-outcome-label">{t('common.yes')}</span>
-                <span className="row-outcome-price">{pair.yes}%</span>
+                <span className="row-outcome-price">{probText(pair.yes)}</span>
               </button>
               <button type="button" className="row-outcome-btn price-no" style={chip} onClick={() => onChip('NO')}>
                 <span className="row-outcome-label">{t('common.no')}</span>
-                <span className="row-outcome-price">{pair.no}%</span>
+                <span className="row-outcome-price">{probText(pair.no)}</span>
               </button>
             </>
           )}

@@ -7,7 +7,7 @@ import { track } from '../lib/analytics'
 import { formatPnl, formatNum, timeAgo } from '../lib/format'
 import { Avatar } from '../components/Avatar'
 import { Tabs } from '../components/Tabs'
-import { isOutcomeNo } from '../lib/prices'
+import { isOutcomeNo, probText } from '../lib/prices'
 
 const TABS = ['Actividad', 'Usuarios'] as const
 
@@ -140,7 +140,7 @@ export function Following() {
                     </Link>
                     {' '}{t('following.bought')}{' '}
                     <span style={{ color: tradeColor(tr), fontWeight: 600 }}>{tradeTag(tr, t('common.yes'), t('common.no'))}</span>
-                    {' '}{t('following.atPrice')} <span className="num" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{Math.round(tradePrice(tr))}%</span> {t('following.inMarket')}{' '}
+                    {' '}{t('following.atPrice')} <span className="num" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{probText(tradePrice(tr))}</span> {t('following.inMarket')}{' '}
                     <Link to={`/mercado/${tr.market_id}`} style={{ color: 'var(--text-primary)', fontWeight: 500, textDecoration: 'none' }}>
                       {tr.market_question}
                     </Link>

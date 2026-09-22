@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { probText } from '../lib/prices'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { marketsApi, type ApiMover } from '../lib/api'
@@ -63,7 +64,7 @@ function MoverRow({ item, rank }: { item: ApiMover; rank: number }) {
         )}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
           <span className="num" style={{ fontSize: 24, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
-            {Math.round(item.price)}%
+            {probText(item.price)}
           </span>
           <Change value={item.change} />
         </div>
