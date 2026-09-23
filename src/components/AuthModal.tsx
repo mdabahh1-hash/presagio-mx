@@ -9,6 +9,7 @@ import { translateApiError } from '../lib/errors'
 import { consumeReturnTo, oauthNext } from '../lib/returnTo'
 import { Icon } from './Icon'
 import { Tabs } from './Tabs'
+import { marcarBienvenida } from '../lib/bienvenida'
 
 interface AuthModalProps {
   onClose: () => void
@@ -88,6 +89,7 @@ export function AuthModal({ onClose, initialMode = 'login', hidePasskey = false,
       const result = await authApi.verifyEmail(pendingEmail, code)
       setToken(result.token)
       track('Signup', { method: 'email' })
+      marcarBienvenida()
       await refreshUser()
       finish()
     } catch (err: unknown) {

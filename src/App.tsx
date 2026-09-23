@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
+import { WelcomeModal } from './components/WelcomeModal'
 import { Home } from './pages/Home'
 import { Markets } from './pages/Markets'
 import { MarketDetail } from './pages/MarketDetail'
@@ -10,6 +11,7 @@ import { ThemeProvider } from './lib/ThemeContext'
 import { ScrollToTop } from './lib/ScrollToTop'
 import { setToken } from './lib/api'
 import { consumeReturnTo, isSafeRoute } from './lib/returnTo'
+import { marcarBienvenida } from './lib/bienvenida'
 import { useTranslation } from 'react-i18next'
 import './components/leagues/leagues.css'
 
@@ -85,6 +87,7 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <WelcomeModal />
     </AuthProvider>
     </ThemeProvider>
   )
@@ -114,6 +117,8 @@ function AuthCallbackRedirect() {
       return
     }
     if (token) setToken(token)
+    // El backend agrega ?nuevo=1 si el OAuth acaba de crear la cuenta
+    if (token && params.get('nuevo') === '1') marcarBienvenida()
     // Load the user (and attach any pending referral) before leaving the page.
     refreshUser().finally(() => navigate(dest, { replace: true }))
   }, [navigate, refreshUser, t])

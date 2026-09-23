@@ -395,6 +395,21 @@
     "topGainers": "Mayores ganancias",
     "noData": "Aún no hay datos."
   },
+  "welcome": {
+    "title": "Bienvenido a VEREDIKT",
+    "intro": "El mercado de predicciones de México. Esto es lo que hay hoy y lo que viene.",
+    "todayLabel": "Hoy",
+    "todayTitle": "Predices con puntos virtuales",
+    "todayBody": "Compra Sí o No en eventos reales de México y el mundo. Te regalamos 10,000 PT para empezar. Los PT no son dinero ni se cambian por dinero.",
+    "soonLabel": "Muy pronto",
+    "soonTitle": "Leaderboard mensual con premios",
+    "soonBody": "Cada mes, los 3 jugadores que mejor tradeen se llevan premios.",
+    "futureLabel": "A futuro",
+    "futureTitle": "Dinero real, regulado",
+    "futureBody": "Queremos llevar VEREDIKT a dinero real y trading, como un mercado de predicciones regulado en México. Todavía no hay fecha; te avisaremos.",
+    "cta": "Empezar a predecir",
+    "howItWorks": "Cómo funciona"
+  },
   "how": {
     "title": "Cómo funciona",
     "intro": "VEREDIKT es un mercado de predicciones con puntos virtuales. Predice eventos reales, compite y demuestra qué tan bien lees el futuro — sin arriesgar un solo peso.",
