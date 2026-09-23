@@ -692,7 +692,6 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 @media (max-width: 1280px) {
-  .navbar-search { max-width: 360px !important; }
   .navbar-live   { display: none !important; }
 }
 @media (max-width: 1180px) {

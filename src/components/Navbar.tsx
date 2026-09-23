@@ -162,6 +162,21 @@ export function Navbar() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [searchOpen])
 
+  // «/» enfoca el buscador (como Polymarket), salvo si ya se está escribiendo en un campo.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
+      const el = e.target as HTMLElement
+      if (el.closest('input, textarea, select, [contenteditable="true"]')) return
+      const input = searchRef.current?.querySelector('input')
+      if (!input || input.offsetParent === null) return  // oculto en móvil
+      e.preventDefault()
+      input.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchOpen && results && highlighted >= 0) {
@@ -230,12 +245,12 @@ export function Navbar() {
           </Link>
 
           {/* Búsqueda global (desktop) — navega a /mercados?q= */}
-          <form className="navbar-search" ref={searchRef} onSubmit={handleSearch} style={{ position: 'relative', flex: '1 1 0%', minWidth: 120, maxWidth: 480 }}>
+          <form className="navbar-search" ref={searchRef} onSubmit={handleSearch} style={{ position: 'relative', flex: '1 1 0%', minWidth: 120, maxWidth: 600 }}>
             <div className="input" style={{
-              display: 'flex', alignItems: 'center', height: 38, gap: 8, padding: '0 10px 0 12px',
+              display: 'flex', alignItems: 'center', height: 40, gap: 8, padding: '0 10px 0 14px',
               background: 'var(--bg-surface)',
             }}>
-              <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
+              <Icon name="search" size={18} style={{ color: 'var(--text-tertiary)' }} />
               <input
                 type="text"
                 value={q}
@@ -260,10 +275,17 @@ export function Navbar() {
                 aria-activedescendant={highlighted >= 0 ? `search-opt-${highlighted}` : undefined}
                 style={{
                   flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none',
-                  padding: 0, fontSize: 14, fontFamily: 'inherit',
+                  padding: 0, fontSize: 15, fontFamily: 'inherit',
                   color: 'var(--text-primary)',
                 }}
               />
+              {!q && (
+                <kbd aria-hidden="true" style={{
+                  flexShrink: 0, minWidth: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  border: '1px solid var(--border-default)', borderRadius: 4,
+                  fontSize: 12, fontFamily: 'inherit', color: 'var(--text-tertiary)',
+                }}>/</kbd>
+              )}
               {q && (
                 <button type="button" onClick={() => { setQ(''); setResults(null); setSearchOpen(false); setHighlighted(-1) }} aria-label={t('common.close')} className="icon-btn" style={{ width: 26, height: 26 }}>
                   <Icon name="x" size={14} />
@@ -411,7 +433,8 @@ export function Navbar() {
           </button>
 
           {/* Spacer pushes the user section to the right */}
-          <div style={{ flex: 1 }} />
+          {/* margin auto (no flex: 1): solo toma lo que sobra cuando el buscador llega a su tope */}
+          <div style={{ marginLeft: 'auto' }} />
 
           {/* Registrarse visible arriba a la derecha en móvil (estilo Polymarket) */}
           {!user && (
