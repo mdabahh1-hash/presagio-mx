@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../lib/AuthContext'
 import { borrarBienvenida, leerBienvenida } from '../lib/bienvenida'
 import { Icon, type IconName } from './Icon'
+import { Logo } from './Logo'
 
 const BLOQUES: { icon: IconName; key: 'today' | 'soon' | 'future' }[] = [
   { icon: 'coin', key: 'today' },
@@ -75,7 +76,8 @@ export function WelcomeModal() {
           <Icon name="x" size={16} />
         </button>
 
-        <h2 id="welcome-title" style={{ fontSize: 20, fontWeight: 600, margin: '0 32px 6px 0', color: 'var(--text-primary)' }}>
+        <h2 id="welcome-title" style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 20, fontWeight: 600, margin: '0 32px 6px 0', color: 'var(--text-primary)' }}>
+          <Logo size={26} />
           {t('welcome.title')}
         </h2>
         <p style={{ fontSize: 14, color: 'var(--text-secondary)', margin: '0 0 20px' }}>
