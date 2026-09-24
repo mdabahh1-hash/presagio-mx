@@ -200,7 +200,10 @@
   "popular": {
     "title": "Explore by topic",
     "markets_one": "{{count}} market",
-    "markets_other": "{{count}} markets"
+    "markets_other": "{{count}} markets",
+    "topMonth": "{{month}} top 3",
+    "closesIn_one": "closes in {{count}} day",
+    "closesIn_other": "closes in {{count}} days"
   },
   "market": {
     "loading": "Loading market...",
@@ -334,7 +337,8 @@
     "inviteFriends": "Invite friends",
     "settingsTitle": "Settings",
     "shareProfile": "Share profile",
-    "copiedLink": "Link copied"
+    "copiedLink": "Link copied",
+    "trophy": "#{{rank}} {{month}}"
   },
   "publicProfile": {
     "notFound": "User not found.",
@@ -398,7 +402,7 @@
       "previewTitle": "Prizes start in October",
       "prizes_one": "The top player of the month wins a prize (to be announced).",
       "prizes_other": "The top {{count}} players of the month win prizes (to be announced).",
-      "rules": "Whoever earns the most PT from this month's predictions wins. To qualify: {{trades}} predictions across {{markets}} different markets.",
+      "rules": "Whoever earns the most PT from this month's predictions wins; anything still open can only subtract, never add, until it resolves. To qualify: {{trades}} predictions across {{markets}} different markets.",
       "closesIn": "Closes in {{days}}d {{hours}}h",
       "yourRank": "You're in place {{rank}} with {{pnl}}",
       "missing": "You need {{trades}} more predictions and {{markets}} more markets to qualify",
@@ -407,7 +411,16 @@
       "notEligible_one": "Not qualified yet · {{count}} market",
       "notEligible_other": "Not qualified yet · {{count}} markets",
       "statLine_one": "{{count}} market this month",
-      "statLine_other": "{{count}} markets this month"
+      "statLine_other": "{{count}} markets this month",
+      "you": "You",
+      "missingShort": "{{trades}} more predictions and {{markets}} more markets",
+      "podiums_one": "On the podium {{count}} time",
+      "podiums_other": "On the podium {{count}} times",
+      "share": "Share",
+      "shareText": "I'm in place {{rank}} on the {{month}} VEREDIKT leaderboard. Can you catch me?",
+      "shareKicker": "{{month}} leaderboard",
+      "shareTitle": "I'm #{{rank}} on VEREDIKT",
+      "shareSub": "{{pnl}} this month"
     },
     "statLine_one": "{{accuracy}}% accuracy · {{count}} market",
     "statLine_other": "{{accuracy}}% accuracy · {{count}} markets"
@@ -858,5 +871,28 @@
     "escanosTiempo": "{{partido}}: seats over time",
     "rangoTiempo": "{{sub}}: closing range over time",
     "carreraTitulo": "Title race · {{liga}}"
+  },
+  "bases": {
+    "title": "Monthly contest rules",
+    "intro": "Draft. Rules of the VEREDIKT monthly leaderboard and its prizes.",
+    "metricaTitle": "How to win",
+    "metricaBody": "Each calendar month (Mexico City time), the player with the highest PT profit from predictions made that month wins. Each prediction counts what it's worth minus what it cost: a correct one is worth 1 PT per share, a wrong one 0, and a cancelled market neither adds nor subtracts. Daily bonuses, referrals and welcome points don't count.",
+    "elegibilidadTitle": "Who can take part",
+    "elegibilidadBody": "Any account with a verified email that makes at least 10 predictions across at least 5 different markets during the month. One person, one account. The VEREDIKT admin doesn't take part. Minimum age and country of residence: [PENDING].",
+    "abiertosTitle": "Markets still open",
+    "abiertosBody": "A prediction in a market that hasn't resolved by month end is worth its market price, capped at what it cost. An open loss subtracts; an open gain doesn't add until the market resolves. That way nobody can climb the board by moving a market's price on the last day.",
+    "cierreTitle": "Month close",
+    "cierreBody": "On the 1st at 00:00 (Mexico City time) the previous month's leaderboard is frozen. The VEREDIKT team reviews it before publishing the winners on the leaderboard.",
+    "empatesTitle": "Ties",
+    "empatesBody": "Accounts with the same profit share a place. Tie-break for the prize: [PENDING].",
+    "descalificacionTitle": "Disqualification",
+    "descalificacionBody": "VEREDIKT may disqualify duplicate, coordinated or abusive accounts. When someone is disqualified, the players below move up.",
+    "premiosTitle": "Prizes",
+    "premiosBody": "The top 3 each month receive a prize: [PENDING]. PT are not money and can't be exchanged for money.",
+    "entregaTitle": "Delivery",
+    "entregaBody": "How winners are contacted, the deadline to claim and how prizes are delivered: [PENDING].",
+    "organizadorTitle": "Organizer",
+    "organizadorBody": "Organizer's legal name, address and contact: [PENDING].",
+    "cta": "See the leaderboard"
   }
 }

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usersApi, type ApiLeaderboardEntry, type ApiLeaderboardGanadores, type ApiLeaderboardMes, type LeaderboardPeriod } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
-import { formatPnl, formatNum } from '../lib/format'
+import { formatPnl, formatNum, formatMonth } from '../lib/format'
+import { generateResultCard } from '../lib/shareCard'
+import { track } from '../lib/analytics'
 import { Avatar } from '../components/Avatar'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
@@ -72,7 +74,9 @@ export function Leaderboard() {
         {t('leaderboard.title')}
       </h1>
 
-      {monthly && mes && <MonthlyCard mes={mes} />}
+      {monthly && mes && (
+        <MonthlyCard mes={mes} podium={users.filter(u => u.elegible).slice(0, 3)} refCode={user?.referral_code ?? null} />
+      )}
 
       {/* Period tabs + search */}
       <div className="tabs-line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -137,6 +141,26 @@ export function Leaderboard() {
             </div>
           ) : (
             <div>
+              {monthly && user && mes?.yo && !search && (
+                <div className="list-row lb-row" style={{ gap: 16, padding: '12px 8px', background: 'var(--bg-surface)', borderRadius: 'var(--r-md)' }}>
+                  <span className="num" style={{ width: 28, flexShrink: 0, textAlign: 'center', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {mes.yo.rank ?? '—'}
+                  </span>
+                  <Avatar name={user.display_name} url={user.avatar_url} size={36} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t('leaderboard.monthly.you')}</div>
+                    <div className="meta-label num">
+                      {mes.yo.elegible
+                        ? t('leaderboard.monthly.statLine', { count: mes.yo.n_mercados })
+                        : t('leaderboard.monthly.missingShort', { trades: mes.yo.faltan_predicciones, markets: mes.yo.faltan_mercados })}
+                    </div>
+                  </div>
+                  <span className="num lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: 14, fontWeight: 600, color: mes.yo.ganancia >= 0 ? 'var(--green)' : 'var(--red)' }}>
+                    {formatPnl(mes.yo.ganancia)}
+                  </span>
+                  <span className="lb-vol" style={{ width: 120 }} />
+                </div>
+              )}
               {rows.map((u, i) => {
                 const rank = monthly ? u.rank ?? null : i + 1
                 const ineligible = monthly && !u.elegible
@@ -145,7 +169,7 @@ export function Leaderboard() {
                   key={u.id}
                   to={`/u/${u.username}`}
                   className="list-row is-link lb-row"
-                  style={{ gap: 16, padding: '12px 8px' }}
+                  style={{ gap: 16, padding: '12px 8px', background: u.id === user?.id ? 'var(--bg-surface)' : undefined }}
                 >
                   <span className="num" style={{ width: 28, flexShrink: 0, textAlign: 'center', fontSize: 13, fontWeight: rank && rank <= 3 ? 600 : 500, color: rank && rank <= 3 ? 'var(--text-primary)' : 'var(--text-tertiary)', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
                     {rank === null ? '—'
@@ -153,10 +177,15 @@ export function Leaderboard() {
                         ? <><Icon name="medal" size={16} style={{ color: rank === 1 ? 'var(--accent)' : 'var(--text-secondary)' }} />{monthly && rank > 1 ? rank : null}</>
                         : rank}
                   </span>
-                  <Avatar name={u.display_name} size={36} />
+                  <Avatar name={u.display_name} url={u.avatar_url} size={36} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {u.display_name}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.display_name}</span>
+                      {!!u.trofeos && (
+                        <span title={t('leaderboard.monthly.podiums', { count: u.trofeos })} style={{ display: 'inline-flex', flexShrink: 0, color: 'var(--text-secondary)' }}>
+                          <Icon name="trophy" size={14} />
+                        </span>
+                      )}
                     </div>
                     <div className="meta-label num">
                       {ineligible
@@ -196,7 +225,7 @@ export function Leaderboard() {
                 {topGainers.map((u, i) => (
                   <Link key={u.id} to={`/u/${u.username}`} className="list-row is-link" style={{ gap: 10, padding: '10px 4px' }}>
                     <span className="num" style={{ width: 14, fontSize: 12, fontWeight: 500, color: 'var(--text-tertiary)', flexShrink: 0 }}>{i + 1}</span>
-                    <Avatar name={u.display_name} size={28} />
+                    <Avatar name={u.display_name} url={u.avatar_url} size={28} />
                     <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {u.display_name}
                     </span>
@@ -214,11 +243,11 @@ export function Leaderboard() {
               <h3 className="section-title" style={{ fontSize: 16, marginBottom: 6 }}>{t('leaderboard.monthly.pastWinners')}</h3>
               {ganadores.map(g => (
                 <div key={g.mes} style={{ padding: '6px 0' }}>
-                  <div className="meta-label">{monthName(g.mes, i18n.language)}</div>
+                  <div className="meta-label">{formatMonth(g.mes, i18n.language)}</div>
                   {g.ganadores.map(w => (
                     <Link key={w.username} to={`/u/${w.username}`} className="list-row is-link" style={{ gap: 10, padding: '8px 4px' }}>
                       <span className="num" style={{ width: 14, fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', flexShrink: 0 }}>{w.rank}</span>
-                      <Avatar name={w.display_name} size={28} />
+                      <Avatar name={w.display_name} url={w.avatar_url} size={28} />
                       <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {w.display_name}
                       </span>
@@ -237,27 +266,58 @@ export function Leaderboard() {
   )
 }
 
-/** 'YYYY-MM' → «octubre 2026» en el idioma activo. */
-function monthName(mes: string, lang?: string): string {
-  const [y, m] = mes.split('-').map(Number)
-  const s = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString(lang, { month: 'long', year: 'numeric', timeZone: 'UTC' })
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
-/** Premios del mes, cierre y lo que me falta para calificar. */
-function MonthlyCard({ mes }: { mes: ApiLeaderboardMes }) {
+/** Premios del mes, cierre, lo que me falta para calificar y compartir mi lugar. */
+function MonthlyCard({ mes, podium, refCode }: { mes: ApiLeaderboardMes; podium: ApiLeaderboardEntry[]; refCode: string | null }) {
   const { t, i18n } = useTranslation()
+  const [sharing, setSharing] = useState(false)
   const ms = Math.max(0, new Date(mes.termina_at).getTime() - Date.now())
   const days = Math.floor(ms / 86_400_000)
   const hours = Math.floor((ms % 86_400_000) / 3_600_000)
   const yo = mes.yo
   const preview = mes.mes < '2026-10'  // los premios empiezan en octubre 2026 (espejo del backend)
+  const month = formatMonth(mes.mes, i18n.language, { month: 'long' }, false)
+
+  // Mismo patrón que CycleResultCard: imagen por navigator.share; si no se puede, descargar + WhatsApp.
+  const share = async () => {
+    if (!yo?.rank) return
+    const url = refCode ? `https://veredikt.mx/?ref=${refCode}` : 'https://veredikt.mx'
+    const text = t('leaderboard.monthly.shareText', { rank: yo.rank, month })
+    track('Share', { channel: 'leaderboard' })
+    setSharing(true)
+    try {
+      const blob = await generateResultCard({
+        kicker: t('leaderboard.monthly.shareKicker', { month }),
+        leagueName: t('leaderboard.monthly.shareTitle', { rank: yo.rank }),
+        cycleName: t('leaderboard.monthly.shareSub', { pnl: formatPnl(yo.ganancia) }),
+        podium: podium.map(p => ({ name: p.display_name, points: formatPnl(p.pnl).replace(/ PT$/, ''), hits: '' })),
+        unit: 'PT',
+        footer: 'veredikt.mx',
+      }, 'feed')
+      const file = new File([blob], 'veredikt-clasificacion.png', { type: 'image/png' })
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text: `${text} ${url}` })
+        return
+      }
+      const dl = document.createElement('a')
+      dl.href = URL.createObjectURL(blob)
+      dl.download = 'veredikt-clasificacion.png'
+      dl.click()
+      URL.revokeObjectURL(dl.href)
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank')
+    } catch {
+      if (navigator.share) await navigator.share({ text: `${text} ${url}` }).catch(() => undefined)
+      else window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank')
+    } finally {
+      setSharing(false)
+    }
+  }
+
   return (
     <div className="card anim-1" style={{ padding: 16, marginBottom: 20, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
       <Icon name="trophy" size={28} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
       <div style={{ flex: '1 1 260px', minWidth: 0 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-          {preview ? t('leaderboard.monthly.previewTitle') : t('leaderboard.monthly.title', { month: monthName(mes.mes, i18n.language) })}
+          {preview ? t('leaderboard.monthly.previewTitle') : t('leaderboard.monthly.title', { month: formatMonth(mes.mes, i18n.language) })}
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
           {t('leaderboard.monthly.prizes', { count: mes.premiados })}{' '}
@@ -271,7 +331,14 @@ function MonthlyCard({ mes }: { mes: ApiLeaderboardMes }) {
             : t('leaderboard.monthly.missing', { trades: yo.faltan_predicciones, markets: yo.faltan_mercados }))}
         </div>
       </div>
-      <Link to="/mercados" className="btn btn-primary" style={{ flexShrink: 0 }}>{t('leaderboard.monthly.cta')}</Link>
+      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+        {yo?.elegible && (
+          <button className="btn btn-secondary" onClick={share} disabled={sharing}>
+            <Icon name="share" size={15} />{t('leaderboard.monthly.share')}
+          </button>
+        )}
+        <Link to="/mercados" className="btn btn-primary">{t('leaderboard.monthly.cta')}</Link>
+      </div>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { usersApi, authApi, type ApiPosition, type ApiHistoryEvent } from '../lib/api'
+import { usersApi, authApi, type ApiPosition, type ApiHistoryEvent, type ApiTrofeo } from '../lib/api'
 import { oauthNext } from '../lib/returnTo'
 import { useAuth } from '../lib/AuthContext'
 import { HistoryList } from '../components/HistoryList'
@@ -23,11 +23,13 @@ export function Profile() {
   const [history, setHistory] = useState<ApiHistoryEvent[]>([])
   const [activeTab, setActiveTab] = useState<'posiciones' | 'actividad'>('posiciones')
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [trofeos, setTrofeos] = useState<ApiTrofeo[]>([])
 
   useEffect(() => {
     if (!user) return
     usersApi.myPositions().then(setPositions).catch(() => {})
     usersApi.history().then(setHistory).catch(() => {})
+    usersApi.get(user.username).then(p => setTrofeos(p.trofeos ?? [])).catch(() => {})
     usersApi.pointsHistory(366)
       .then(data => {
         setPointsHistory(data.map(d => ({ date: d.date, price: d.price })))
@@ -93,6 +95,7 @@ export function Profile() {
           biggestWin={biggestWin}
           predictions={user.total_predictions}
           onOpenSettings={openSettings}
+          trofeos={trofeos}
         />
         <PnlChartCard pointsHistory={pointsHistory} pnl={pnl} />
       </div>

@@ -21,6 +21,7 @@ const Embed = lazy(() => import('./pages/Embed').then(m => ({ default: m.Embed }
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })))
 const Admin = lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin })))
 const HowItWorks = lazy(() => import('./pages/HowItWorks').then(m => ({ default: m.HowItWorks })))
+const Bases = lazy(() => import('./pages/Bases').then(m => ({ default: m.Bases })))
 const Propose = lazy(() => import('./pages/Propose').then(m => ({ default: m.Propose })))
 const Leaderboard = lazy(() => import('./pages/Leaderboard').then(m => ({ default: m.Leaderboard })))
 const News = lazy(() => import('./pages/News').then(m => ({ default: m.News })))
@@ -73,6 +74,7 @@ export default function App() {
               <Route path="/siguiendo" element={<Following />} />
               <Route path="/clasificacion" element={<Leaderboard />} />
               <Route path="/como-funciona" element={<HowItWorks />} />
+              <Route path="/bases" element={<Bases />} />
               <Route path="/proponer" element={<Propose />} />
               <Route path="/u/:username" element={<PublicProfile />} />
               <Route path="/ligas" element={<LeaguesPage />} />

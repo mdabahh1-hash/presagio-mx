@@ -337,7 +337,11 @@ export interface ApiProfilePublic {
   followers_count: number
   following_count: number
   is_following: boolean | null
+  /** Podios del leaderboard mensual en meses publicados. */
+  trofeos?: ApiTrofeo[]
 }
+
+export interface ApiTrofeo { mes: string; rank: number }
 
 export interface ApiPosition {
   id: number
@@ -371,6 +375,8 @@ export interface ApiLeaderboardEntry {
   /** Solo en period=month: lugar entre los elegibles (null = no califica). */
   rank?: number | null
   elegible?: boolean | null
+  /** Veces en el podio de un mes publicado. */
+  trofeos?: number
 }
 
 export interface ApiLeaderboardMes {

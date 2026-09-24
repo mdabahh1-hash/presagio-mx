@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { formatNum, formatDate } from '../../lib/format'
+import { formatNum, formatDate, formatMonth } from '../../lib/format'
+import type { ApiTrofeo } from '../../lib/api'
 import { Avatar } from '../Avatar'
 import { Icon } from '../Icon'
 
@@ -14,6 +15,7 @@ interface Props {
   biggestWin: number | null
   predictions: number
   variant: 'own' | 'public'
+  trofeos?: ApiTrofeo[]
   // own
   balance?: number
   onOpenSettings?: () => void
@@ -28,11 +30,11 @@ interface Props {
 
 export function ProfileHeaderCard({
   displayName, username, avatarUrl, createdAt,
-  positionsValue, biggestWin, predictions, variant,
+  positionsValue, biggestWin, predictions, variant, trofeos = [],
   balance, onOpenSettings,
   followersCount, followingCount, isFollowing, followBusy, onToggleFollow, showFollow,
 }: Props) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const share = () => {
@@ -80,6 +82,14 @@ export function ProfileHeaderCard({
           <div className="meta-label" style={{ marginTop: 2 }}>
             @{username} · {joined}
           </div>
+          {trofeos.length > 0 && (
+            <div className="meta-label num" style={{ marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)' }}>
+              <Icon name="trophy" size={14} style={{ flexShrink: 0 }} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {trofeos.map(tr => t('profile.trophy', { rank: tr.rank, month: formatMonth(tr.mes, i18n.language, { month: 'short', year: 'numeric' }, false) })).join(' · ')}
+              </span>
+            </div>
+          )}
           {variant === 'own' && balance != null && (
             <div className="num" style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4, fontWeight: 500 }}>
               {t('profile.balanceLabel')}: <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{formatNum(Math.floor(balance))} PT</span>
