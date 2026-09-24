@@ -6,15 +6,14 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketGrid } from '../components/MarketGrid'
 import { PoliticaLanding } from '../components/politica/PoliticaLanding'
 import { DeportesLanding } from '../components/deportes/DeportesLanding'
-import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { CryptoLanding, CryptoHeaderMeta } from '../components/crypto/CryptoLanding'
 import { PanelCard, PanelBack, panelDisponible } from '../components/categoria/PanelCard'
-import { isVentana, type Ventana } from '../components/crypto/escalera'
 import { CategoryLanding, CategoryBreadcrumb, CategoryHeaderMeta, isCategorySort, type CategorySort } from '../components/categoria/CategoryLanding'
 import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
-import { CATEGORIES, SUBCATEGORIES, usaLandingGenerica, tienePanel, sportOfSub, isKind, type Kind } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES, usaLandingGenerica, tienePanel } from '../lib/categories'
 import { apiToMarket, cleanLabel } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
 import { useCategoriasVisibles } from '../lib/useCategoriasVisibles'
@@ -37,26 +36,17 @@ export function Markets() {
   const queryParam = searchParams.get('q') || ''
   const catParam = (searchParams.get('cat') || 'Todos') as Category | 'Todos'
   const subParam = searchParams.get('sub')
-  const sportParam = searchParams.get('sport')
-  const rawKind = searchParams.get('kind')
-  const kindParam: Kind | null = isKind(rawKind) ? rawKind : null
   // Día de la jornada de Deportes (hoy | manana | AAAA-MM-DD | later | pending), enlazable
   const diaParam = searchParams.get('dia')
-  // Crypto: ventana de cierre (mes | anio | multi | 7d) y orden propio (default: cierra pronto), enlazables
-  const rawVentana = searchParams.get('ventana')
-  const ventanaParam: Ventana | null = isVentana(rawVentana) ? rawVentana : null
   // ?sort= vive en la URL para que la pestaña "Nuevo" de la barra (/mercados?sort=new) sea enlazable
   const rawSort = searchParams.get('sort')
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
-  const cryptoSort: CryptoSort = isCryptoSort(rawSort) ? rawSort : 'ending'
   const categoriaSort: CategorySort = isCategorySort(rawSort) ? rawSort : 'all'
   // Deportes, Política y Crypto: ?vista=panel abre la landing con gráficas; sin él, el grid
   const vistaPanel = searchParams.get('vista') === 'panel'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
-  const [activeSport, setActiveSport] = useState<string | null>(sportParam)
-  const [activeKind, setActiveKind] = useState<Kind | null>(kindParam)
   const [activeDia, setActiveDia] = useState<string | null>(diaParam)
   const [sortBy, setSortBy] = useState(sortParam)
 
@@ -64,11 +54,9 @@ export function Markets() {
     setSearchInput(queryParam)
     setActiveCategory(catParam)
     setActiveSub(subParam)
-    setActiveSport(sportParam)
-    setActiveKind(kindParam)
     setActiveDia(diaParam)
     setSortBy(sortParam)
-  }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
+  }, [queryParam, catParam, subParam, diaParam, sortParam])
 
   // Toda categoría ordena en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
   const fetchSort = activeCategory === 'Todos' ? sortBy : 'volume'
@@ -137,8 +125,6 @@ export function Markets() {
   const handleCategoryClick = (cat: Category | 'Todos') => {
     setActiveCategory(cat)
     setActiveSub(null)
-    setActiveSport(null)
-    setActiveKind(null)
     setActiveDia(null)
     setSearchParams(p => {
       if (cat === 'Todos') p.delete('cat')
@@ -164,64 +150,10 @@ export function Markets() {
   }
 
   const handleSubChange = (sub: string | null) => {
-    // Una liga implica su deporte (Deportes); en otras categorías no hay deporte.
-    const sport = sub && activeCategory === 'Deportes' ? (sportOfSub(sub) ?? sub) : activeSport
     setActiveSub(sub)
-    setActiveSport(sport)
-    setActiveKind(null)
     setSearchParams(p => {
       if (sub) p.set('sub', sub)
       else p.delete('sub')
-      if (sport) p.set('sport', sport)
-      else p.delete('sport')
-      p.delete('kind')
-      return p
-    })
-  }
-
-  const handleSportChange = (sport: string | null) => {
-    setActiveSport(sport)
-    setActiveSub(null)
-    setActiveKind(null)
-    setSearchParams(p => {
-      if (sport) p.set('sport', sport)
-      else p.delete('sport')
-      p.delete('sub')
-      p.delete('kind')
-      return p
-    })
-  }
-
-  // Partidos / Accesorios: hoja bajo la liga (o bajo NFL); cambiar de liga o deporte lo limpia.
-  const handleKindChange = (kind: Kind | null) => {
-    setActiveKind(kind)
-    setSearchParams(p => {
-      if (kind) p.set('kind', kind)
-      else p.delete('kind')
-      return p
-    })
-  }
-
-  // Ventana de cierre, orden y "Todos" de la landing de Crypto
-  const handleVentanaChange = (v: Ventana | null) => {
-    setSearchParams(p => {
-      if (v) p.set('ventana', v)
-      else p.delete('ventana')
-      return p
-    })
-  }
-  const handleCryptoSort = (s: CryptoSort) => {
-    setSearchParams(p => {
-      if (s === 'ending') p.delete('sort')
-      else p.set('sort', s)
-      return p
-    })
-  }
-  const handleCryptoClear = () => {
-    setActiveSub(null)
-    setSearchParams(p => {
-      p.delete('sub')
-      p.delete('ventana')
       return p
     })
   }
@@ -267,14 +199,13 @@ export function Markets() {
         alignItems: 'flex-start', flexWrap: 'wrap', gap: 16,
       }}>
         <div>
-          {showCrypto && activeSub && <CryptoBreadcrumb sub={activeSub} onRoot={handleCryptoClear} />}
           {showCategoria && activeSub && <CategoryBreadcrumb category={activeCategory as Category} sub={activeSub} onRoot={() => handleSubChange(null)} />}
           <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: '-0.01em', margin: '0 0 4px' }}>
-            {showCrypto || showCategoria ? (activeSub ?? activeCategory) : showLanding || showDeportes ? activeCategory : t('markets.title')}
+            {showCategoria ? (activeSub ?? activeCategory) : showLanding || showDeportes || showCrypto ? activeCategory : t('markets.title')}
           </h1>
           <p className="meta-label" style={{ margin: 0 }}>
             {loading ? t('common.loading') : showCrypto ? (
-              <CryptoHeaderMeta markets={markets} sub={activeSub} />
+              <CryptoHeaderMeta markets={markets} sub={null} />
             ) : showCategoria ? (
               <CategoryHeaderMeta category={activeCategory as Category} markets={markets} sub={activeSub} />
             ) : showLanding ? (
@@ -347,38 +278,22 @@ export function Markets() {
         <PoliticaLanding
           markets={markets}
           loading={loading}
-          subcats={SUBCATEGORIES['Política'] ?? []}
-          activeSub={activeSub}
-          onSubChange={handleSubChange}
           onTraded={patchPrice}
         />
       ) : showDeportes ? (
         <DeportesLanding
           markets={markets}
           loading={loading}
-          subcats={SUBCATEGORIES['Deportes'] ?? []}
           activeSub={activeSub}
           onSubChange={handleSubChange}
-          activeSport={activeSport}
-          onSportChange={handleSportChange}
-          activeKind={activeKind}
-          onKindChange={handleKindChange}
           activeDia={activeDia}
           onDiaChange={handleDiaChange}
-          onTraded={patchPrice}
         />
       ) : showCrypto ? (
         <CryptoLanding
           markets={markets}
           loading={loading}
           subcats={SUBCATEGORIES['Crypto'] ?? []}
-          activeSub={activeSub}
-          onSubChange={handleSubChange}
-          ventana={ventanaParam}
-          onVentanaChange={handleVentanaChange}
-          onClear={handleCryptoClear}
-          sort={cryptoSort}
-          onSortChange={handleCryptoSort}
           onTraded={patchPrice}
         />
       ) : showCategoria ? (

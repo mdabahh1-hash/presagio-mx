@@ -52,3 +52,15 @@ export function enVentana(m: Market, v: Ventana, now = new Date()): boolean {
   const mes = mesCdmx(m.endsAt)
   return v === 'mes' ? mes === mesCdmx(now) : mes === `${mesCdmx(now).slice(0, 4)}-12`
 }
+
+// Precio de cierre donde la escalera cruza el 50 % (interpolación lineal entre los dos
+// peldaños que lo rodean): la mediana que espera el mercado. null si toda la escalera
+// queda de un lado del 50 %.
+export function medianaImplicita(peldanos: { valor: number; market: { yesPrice: number } }[]): number | null {
+  for (let i = 1; i < peldanos.length; i++) {
+    const a = peldanos[i - 1], b = peldanos[i]
+    const pa = a.market.yesPrice, pb = b.market.yesPrice
+    if (pa >= 50 && pb <= 50 && pa !== pb) return a.valor + ((pa - 50) / (pa - pb)) * (b.valor - a.valor)
+  }
+  return null
+}

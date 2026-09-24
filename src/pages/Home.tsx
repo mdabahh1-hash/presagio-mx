@@ -8,14 +8,13 @@ import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
 import { PoliticaLanding } from '../components/politica/PoliticaLanding'
 import { DeportesLanding } from '../components/deportes/DeportesLanding'
-import { CryptoLanding, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { CryptoLanding } from '../components/crypto/CryptoLanding'
 import { PanelCard, PanelBack, panelDisponible } from '../components/categoria/PanelCard'
 import { CategoryLanding, type CategorySort } from '../components/categoria/CategoryLanding'
-import type { Ventana } from '../components/crypto/escalera'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES, sportOfSub, type Kind } from '../lib/categories'
+import { SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -76,23 +75,16 @@ export function Home() {
   const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()
   const isMobile = useMobile()
-  // Tema (?sub) de la landing de Política dentro de la Home: estado local, como
-  // el sub interno de CategoryBrowse (la Home no sincroniza con la URL)
-  const [homeSub, setHomeSub] = useState<string | null>(null)
-  // Filtros de la landing de Deportes dentro de la Home (liga, deporte, tipo, día):
-  // estado local como homeSub; /mercados los sincroniza con la URL
-  const [homeDep, setHomeDep] = useState<{ sub: string | null; sport: string | null; kind: Kind | null; dia: string | null }>({ sub: null, sport: null, kind: null, dia: null })
-
-  // Filtros de la landing de Crypto dentro de la Home (subcategoría, ventana, orden): estado local
-  const [homeCrypto, setHomeCrypto] = useState<{ sub: string | null; ventana: Ventana | null; sort: CryptoSort }>({ sub: null, ventana: null, sort: 'ending' })
+  // Liga y día del panel de Deportes dentro de la Home: estado local; /mercados los
+  // sincroniza con la URL
+  const [homeDep, setHomeDep] = useState<{ sub: string | null; dia: string | null }>({ sub: null, dia: null })
   // Filtros de la landing genérica de categoría dentro de la Home (subcategoría, orden): estado local
   const [homeCat, setHomeCat] = useState<{ sub: string | null; sort: CategorySort }>({ sub: null, sort: 'all' })
   // Deportes, Política y Crypto: landing con gráficas abierta desde la tarjeta panel (estado local)
   const [homePanel, setHomePanel] = useState(false)
 
   useEffect(() => {
-    setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
-    setHomeCrypto({ sub: null, ventana: null, sort: 'ending' })
+    setVisibleTrending(PAGE_SIZE); setHomeDep({ sub: null, dia: null })
     setHomeCat({ sub: null, sort: 'all' }); setHomePanel(false)
   }, [mobileTab])
 
@@ -141,8 +133,7 @@ export function Home() {
   const panelAbierto = homePanel && panelOk
   const setPanel = (open: boolean) => {
     setHomePanel(open)
-    setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
-    setHomeCrypto({ sub: null, ventana: null, sort: 'ending' }); setHomeCat({ sub: null, sort: 'all' })
+    setHomeDep({ sub: null, dia: null }); setHomeCat({ sub: null, sort: 'all' })
     window.scrollTo({ top: 0 })
   }
   const showPolitica = panelAbierto && mobileTab === 'Política'
@@ -150,30 +141,21 @@ export function Home() {
     <PoliticaLanding
       markets={markets}
       loading={loading}
-      subcats={SUBCATEGORIES['Política'] ?? []}
-      activeSub={homeSub}
-      onSubChange={setHomeSub}
       onTraded={(id, p) => handleTraded(id, p, false)}
       showHeader
     />
   )
 
-  // Deportes: misma regla que Política (in-place, con cabecera); una liga implica su deporte
+  // Deportes: misma regla que Política (in-place, con cabecera)
   const showDeportes = panelAbierto && mobileTab === 'Deportes'
   const deportesLanding = (
     <DeportesLanding
       markets={markets}
       loading={loading}
-      subcats={SUBCATEGORIES['Deportes'] ?? []}
       activeSub={homeDep.sub}
-      onSubChange={sub => setHomeDep(d => ({ ...d, sub, sport: sub ? (sportOfSub(sub) ?? sub) : d.sport, kind: null }))}
-      activeSport={homeDep.sport}
-      onSportChange={sport => setHomeDep(d => ({ ...d, sport, sub: null, kind: null }))}
-      activeKind={homeDep.kind}
-      onKindChange={kind => setHomeDep(d => ({ ...d, kind }))}
+      onSubChange={sub => setHomeDep(d => ({ ...d, sub }))}
       activeDia={homeDep.dia}
       onDiaChange={dia => setHomeDep(d => ({ ...d, dia }))}
-      onTraded={handleTraded}
       showHeader
     />
   )
@@ -184,13 +166,6 @@ export function Home() {
       markets={markets}
       loading={loading}
       subcats={SUBCATEGORIES['Crypto'] ?? []}
-      activeSub={homeCrypto.sub}
-      onSubChange={sub => setHomeCrypto(c => ({ ...c, sub }))}
-      ventana={homeCrypto.ventana}
-      onVentanaChange={ventana => setHomeCrypto(c => ({ ...c, ventana }))}
-      onClear={() => setHomeCrypto(c => ({ ...c, sub: null, ventana: null }))}
-      sort={homeCrypto.sort}
-      onSortChange={sort => setHomeCrypto(c => ({ ...c, sort }))}
       onTraded={handleTraded}
       showHeader
     />

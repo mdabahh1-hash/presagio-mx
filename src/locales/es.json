@@ -701,7 +701,9 @@
     "privateLeagues": "Ligas privadas",
     "privateLeaguesText": "Arma una liga con tus amigos y compite por puntos en esta jornada.",
     "createLeague": "Crear liga",
-    "kind": "Tipo"
+    "kind": "Tipo",
+    "finished": "Terminó",
+    "draw": "Empate"
   },
   "crypto": {
     "all": "Todos",
@@ -731,7 +733,10 @@
     "rangeSub": "Varias opciones · solo una resuelve Sí",
     "viewAll": "Ver todos",
     "emptySub": "No hay mercados abiertos en {{sub}}",
-    "emptyFilter": "Ningún mercado cumple este filtro"
+    "emptyFilter": "Ningún mercado cumple este filtro",
+    "curvaTitle": "{{sub}}: precio implícito de cierre",
+    "curvaMediana": "Probabilidad de cerrar arriba de cada precio · el mercado espera ~{{precio}}",
+    "curvaSub": "Probabilidad de cerrar arriba de cada precio"
   },
   "categoria": {
     "headerMeta_one": "{{count}} mercado · {{volume}} PT de volumen",
@@ -825,6 +830,16 @@
     "Crypto": {
       "titulo": "Crypto del mes",
       "subtitulo": "Escaleras y rangos de cierre"
-    }
+    },
+    "verMercado": "Ver mercado",
+    "movers": "Los que más se movieron",
+    "movers24h": "24 h",
+    "movers7d": "7 días",
+    "moversEmpty": "Sin movimientos en las últimas 24 horas.",
+    "volumenTema": "Volumen por tema",
+    "volumenTotal": "Total",
+    "escanosTiempo": "{{partido}}: escaños en el tiempo",
+    "rangoTiempo": "{{sub}}: rango de cierre en el tiempo",
+    "carreraTitulo": "Carrera por el título · {{liga}}"
   }
 }
