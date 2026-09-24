@@ -1,12 +1,14 @@
 import type { Market } from '../../types'
 
 // La API no expone auto_resolucion (el umbral con el que se resuelve), así que la
-// escalera se reconoce por la redacción de siembra «cerrará <mes> en US$N [millones] o más».
+// escalera se reconoce por la redacción de siembra «cerrará(n) <mes> en US$N [millones | mil millones] o más»
+// (stablecoins desde octubre-2026: «¿Las stablecoins cerrarán octubre en US$312 mil millones o más?»).
 // ponytail: el umbral sale de la pregunta; tests/test_escaleras_crypto.py (backend)
 // garantiza que N == auto_resolucion.valor. Exponer el campo en la API si esto crece.
 // Espejo exacto de LADDER_RE en ese test.
 const MESES = 'enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre'
-const LADDER_RE = new RegExp(`cerrará (?:${MESES}) en (US\\$([\\d,]+(?:\\.\\d+)?)( millones)?) o más`)
+const LADDER_RE = new RegExp(`cerrarán? (?:${MESES}) en (US\\$([\\d,]+(?:\\.\\d+)?)( mil millones| millones)?) o más`)
+const ESCALA: Record<string, number> = { ' mil millones': 1e9, ' millones': 1e6 }
 
 export interface Peldano { market: Market; label: string; valor: number }
 export interface Escalera { sub: string; endsAt: string; peldanos: Peldano[] }
@@ -17,7 +19,7 @@ function peldano(m: Market): Peldano | null {
   const r = LADDER_RE.exec(m.question)
   if (!r) return null
   const n = Number(r[2].replace(/,/g, ''))
-  return { market: m, label: r[1], valor: r[3] ? n * 1e6 : n }
+  return { market: m, label: r[1], valor: n * (ESCALA[r[3] ?? ''] ?? 1) }
 }
 
 // Binarios abiertos de la subcategoría con redacción de escalera y el mismo ends_at;
