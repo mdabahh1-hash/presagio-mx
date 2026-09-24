@@ -25,12 +25,12 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Mercados EEUU', 'Remesas',
   ],
   'Crypto': ['Bitcoin', 'Ethereum', 'Solana', 'Stablecoins', 'Regulación', 'Adopción México', 'Mercado cripto'],
-  'Entretenimiento': ['Influencers', 'Reality shows'],
+  'Entretenimiento': ['Influencers', 'Reality shows', 'Música', 'Cine y series', 'Farándula'],
   'Global': [
     'Europa', 'Elecciones EEUU', 'Trump', 'Medio Oriente', 'Asia-Pacífico',
     'Rusia-Ucrania', 'Américas', 'África', 'ONU y OTAN', 'Migración',
   ],
-  'Tech': ['IA'],
+  'Tech': ['IA', 'Videojuegos', 'Apps y redes'],
   'México': ['CDMX', 'Cultura y tradición', 'Estados', 'Mascotas y virales', 'Batallas de aura', 'Seguridad'],
   'Clima': ['Huracanes', 'Sequía y calor'],
 }
