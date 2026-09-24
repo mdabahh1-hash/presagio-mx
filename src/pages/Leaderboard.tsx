@@ -52,9 +52,10 @@ export function Leaderboard() {
   }, [])
 
   // Sidebar: top gainers always by P&L
+  // En «Este mes» solo los que califican (el admin y los que no llegan al mínimo, fuera).
   const topGainers = useMemo(
-    () => [...users].sort((a, b) => b.pnl - a.pnl).slice(0, 7),
-    [users],
+    () => users.filter(u => !monthly || u.elegible).sort((a, b) => b.pnl - a.pnl).slice(0, 7),
+    [users, monthly],
   )
 
   const rows = useMemo(() => {
@@ -159,10 +160,10 @@ export function Leaderboard() {
                     </div>
                     <div className="meta-label num">
                       {ineligible
-                        ? t('leaderboard.monthly.notEligible', { markets: u.markets_traded })
+                        ? t('leaderboard.monthly.notEligible', { count: u.markets_traded })
                         : monthly
-                          ? t('leaderboard.monthly.statLine', { markets: u.markets_traded })
-                          : t('leaderboard.statLine', { accuracy: u.accuracy, markets: u.markets_traded })}
+                          ? t('leaderboard.monthly.statLine', { count: u.markets_traded })
+                          : t('leaderboard.statLine', { accuracy: u.accuracy, count: u.markets_traded })}
                     </div>
                   </div>
                   <span className="num lb-pnl" style={{ width: 140, textAlign: 'right', fontSize: 14, fontWeight: 600, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>

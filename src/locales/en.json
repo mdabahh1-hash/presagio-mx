@@ -391,7 +391,6 @@
     "loadError": "Couldn't load the leaderboard. Try again later.",
     "emptySearch": "No results for your search.",
     "emptyNoTraders": "No traders on the leaderboard yet. Be the first to trade!",
-    "statLine": "{{accuracy}}% accuracy · {{markets}} markets",
     "topGainers": "Top gainers",
     "noData": "No data yet.",
     "monthly": {
@@ -403,11 +402,15 @@
       "closesIn": "Closes in {{days}}d {{hours}}h",
       "yourRank": "You're in place {{rank}} with {{pnl}}",
       "missing": "You need {{trades}} more predictions and {{markets}} more markets to qualify",
-      "notEligible": "Not qualified yet · {{markets}} markets",
-      "statLine": "{{markets}} markets this month",
       "pastWinners": "Past winners",
-      "cta": "Predict now"
-    }
+      "cta": "Predict now",
+      "notEligible_one": "Not qualified yet · {{count}} market",
+      "notEligible_other": "Not qualified yet · {{count}} markets",
+      "statLine_one": "{{count}} market this month",
+      "statLine_other": "{{count}} markets this month"
+    },
+    "statLine_one": "{{accuracy}}% accuracy · {{count}} market",
+    "statLine_other": "{{accuracy}}% accuracy · {{count}} markets"
   },
   "welcome": {
     "title": "Welcome to VEREDIKT",

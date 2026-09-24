@@ -391,7 +391,6 @@
     "loadError": "No se pudo cargar la clasificación. Intenta más tarde.",
     "emptySearch": "Sin resultados para tu búsqueda.",
     "emptyNoTraders": "Aún no hay traders en la clasificación. ¡Sé el primero en operar!",
-    "statLine": "{{accuracy}}% precisión · {{markets}} mercados",
     "topGainers": "Mayores ganancias",
     "noData": "Aún no hay datos.",
     "monthly": {
@@ -403,11 +402,15 @@
       "closesIn": "Cierra en {{days}} d {{hours}} h",
       "yourRank": "Vas en el lugar {{rank}} con {{pnl}}",
       "missing": "Te faltan {{trades}} predicciones y {{markets}} mercados para calificar",
-      "notEligible": "No califica aún · {{markets}} mercados",
-      "statLine": "{{markets}} mercados este mes",
       "pastWinners": "Ganadores anteriores",
-      "cta": "Predecir ahora"
-    }
+      "cta": "Predecir ahora",
+      "notEligible_one": "No califica aún · {{count}} mercado",
+      "notEligible_other": "No califica aún · {{count}} mercados",
+      "statLine_one": "{{count}} mercado este mes",
+      "statLine_other": "{{count}} mercados este mes"
+    },
+    "statLine_one": "{{accuracy}}% precisión · {{count}} mercado",
+    "statLine_other": "{{accuracy}}% precisión · {{count}} mercados"
   },
   "welcome": {
     "title": "Bienvenido a VEREDIKT",
