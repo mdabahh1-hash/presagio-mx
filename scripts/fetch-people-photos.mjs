@@ -84,6 +84,7 @@ const SOURCES = {
   boxeo: {
     canelo: WIKI('Canelo Álvarez'),
     mbilli: WIKI('Christian Mbilli'),
+    munguia: WIKI('Jaime Munguía'),
   },
 }
 

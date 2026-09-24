@@ -52,7 +52,7 @@ export function OpcionesChart({ market, title, top = 5 }: { market: Market; titl
           onChange={setRange}
         />
       </div>
-      <p className="meta-label" style={{ margin: '0 0 8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{market.question}</p>
+      {title !== market.question && <p className="meta-label" style={{ margin: '0 0 8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{market.question}</p>}
       <div ref={ref} style={{ minWidth: 0 }}>
         {hist ? (
           <MultiLineChart series={series} height={CHART_H} viewW={width || 700} />

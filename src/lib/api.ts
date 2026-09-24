@@ -264,7 +264,7 @@ export interface ApiContenidoCategoria {
   fuentes: ApiFuente[]
   notas: Record<string, string>
   // Deportes: liga → id del multi de campeón (tabla "Probabilidad de título"); puede faltar
-  titulos?: Record<string, string>
+  titulos?: Record<string, string | string[]>
 }
 
 export const contenidoApi = {

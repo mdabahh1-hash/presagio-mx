@@ -5,6 +5,7 @@ Creative Commons (se indica autor y licencia); las de ESPN / Formula 1 se usan c
 
 - `boxeo/canelo.png` — [Saúl_Álvarez.png](https://commons.wikimedia.org/wiki/File:Sa%C3%BAl_%C3%81lvarez.png) · Box Azteca · CC BY 3.0
 - `boxeo/mbilli.png` — [Christian_Mbilli_Assomo_Rio2016.jpg](https://commons.wikimedia.org/wiki/File:Christian_Mbilli_Assomo_Rio2016.jpg) · Boxing AIBA · CC BY-SA 2.0
+- `boxeo/munguia.png` — [Jaime_Munguia_(cropped).jpg](https://commons.wikimedia.org/wiki/File:Jaime_Munguia_(cropped).jpg) · User:International.Boxing.Entertainment · CC BY-SA 4.0
 - `f1/albon.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png · uso editorial
 - `f1/alonso.png` — https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png · uso editorial
 - `f1/antonelli.png` — https://media.formula1.com/content/dam/fom-website/drivers/2025Drivers/antonelli.jpg · uso editorial

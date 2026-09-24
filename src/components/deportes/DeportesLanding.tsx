@@ -79,13 +79,23 @@ export function DeportesLanding({ markets, loading, activeSub, onSubChange, acti
     [resumen],
   )
 
-  // Carrera por el título: la liga activa o la primera del riel con multi de campeón cargado
-  const titulos = content?.titulos ?? {}
-  const tituloLiga = useMemo(() => {
+  // Carrera por el título: la liga activa o la primera del riel con multi de campeón cargado.
+  // Una liga puede traer varios (Boxeo: un multi por cinturón); entonces cada tarjeta se
+  // titula con su pregunta en vez de «Probabilidad de título».
+  const titulos = content?.titulos
+  const { tituloLiga, tituloMarkets, varios } = useMemo(() => {
+    const multisDe = (liga: string) => {
+      const v = titulos?.[liga]
+      const ids = v === undefined ? [] : Array.isArray(v) ? v : [v]
+      return { ms: ids.flatMap(id => inCat.find(m => m.id === id && m.marketType === 'multi') ?? []), varios: Array.isArray(v) }
+    }
     const candidatas = activeSub ? [activeSub] : ligas.map(l => l.sub)
-    return candidatas.find(l => titulos[l] && inCat.some(m => m.id === titulos[l] && m.marketType === 'multi')) ?? null
+    for (const liga of candidatas) {
+      const { ms, varios } = multisDe(liga)
+      if (ms.length) return { tituloLiga: liga, tituloMarkets: ms, varios }
+    }
+    return { tituloLiga: null, tituloMarkets: [], varios: false }
   }, [activeSub, ligas, titulos, inCat])
-  const tituloMarket = tituloLiga ? inCat.find(m => m.id === titulos[tituloLiga]) ?? null : null
 
   const abiertos = inCat.filter(m => m.status === 'open').length
   const hoy = inCat.filter(m => diaKeyOf(m) === 'hoy').length
@@ -130,14 +140,14 @@ export function DeportesLanding({ markets, loading, activeSub, onSubChange, acti
 
       <Marcador className="anim-2" markets={inScope} activeDia={activeDia} onDiaChange={onDiaChange} live={live} />
 
-      {tituloMarket && tituloLiga && (
-        <div className="anim-3" style={{ marginBottom: 14 }}>
-          <OpcionesChart market={tituloMarket} title={t('panel.carreraTitulo', { liga: tituloLiga })} />
+      {tituloLiga && tituloMarkets.map((m, i) => (
+        <div key={m.id} className={i === 0 ? 'anim-3' : undefined} style={{ marginBottom: 14 }}>
+          <OpcionesChart market={m} title={varios ? m.question : t('panel.carreraTitulo', { liga: tituloLiga })} />
         </div>
-      )}
+      ))}
 
       <div className="dep-cards anim-4">
-        {tituloMarket && tituloLiga && <TituloTable market={tituloMarket} liga={tituloLiga} />}
+        {tituloLiga && tituloMarkets.map(m => <TituloTable key={m.id} market={m} liga={tituloLiga} title={varios ? m.question : undefined} />)}
         {resumen && <VolumenTemas resumen={resumen} title={t('deportes.volumeByLeague')} mark={sub => <LeagueMark sub={sub} size={20} radius={5} />} />}
       </div>
     </div>

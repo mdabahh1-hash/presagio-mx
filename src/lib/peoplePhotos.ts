@@ -141,6 +141,7 @@ export const FOOTBALLERS: PersonDef[] = [
 export const BOXERS: PersonDef[] = [
   { slug: 'canelo', names: ['Canelo Álvarez', 'Saúl Álvarez', 'Saúl "Canelo" Álvarez', 'Canelo'] },
   { slug: 'mbilli', names: ['Christian Mbilli', "Christian M'billi", 'Mbilli'] },
+  { slug: 'munguia', names: ['Jaime Munguía', 'Munguía'] },
 ]
 
 const DEFS: Record<PersonGroup, PersonDef[]> = { nfl: NFL_PLAYERS, f1: F1_DRIVERS, futbol: FOOTBALLERS, boxeo: BOXERS }

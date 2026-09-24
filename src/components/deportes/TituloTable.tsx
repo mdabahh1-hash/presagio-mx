@@ -12,7 +12,8 @@ const MAX_ROWS = 6
 // "Probabilidad de título": precios vivos del multi de campeón de la liga
 // (contenido.titulos). Nada estimado: cada fila es una opción del mercado.
 // `compact`: columna lateral de 320 px (vista de liga): título corto y barra de 72 px
-export function TituloTable({ market, liga, compact = false }: { market: Market; liga: string; compact?: boolean }) {
+// `title`: encabezado propio (cinturones de Boxeo); sin él, «Probabilidad de título · liga»
+export function TituloTable({ market, liga, compact = false, title }: { market: Market; liga: string; compact?: boolean; title?: string }) {
   const { t } = useTranslation()
   const outs = [...(market.outcomes ?? [])].sort((a, b) => b.price - a.price)
   if (outs.length === 0) return null
@@ -22,10 +23,10 @@ export function TituloTable({ market, liga, compact = false }: { market: Market;
   return (
     <div className="card" style={{ padding: '16px 18px 14px', minWidth: 0 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, marginBottom: 4 }}>
-        <h3 className="section-title">{compact ? t('deportes.titleShort') : t('deportes.titleProb', { league: liga })}</h3>
+        <h3 className="section-title">{title ?? (compact ? t('deportes.titleShort') : t('deportes.titleProb', { league: liga }))}</h3>
         <span className="meta-label num" style={{ whiteSpace: 'nowrap' }}>{t('deportes.closes', { date: formatDate(market.endsAt, { day: 'numeric', month: 'short' }) })}</span>
       </div>
-      <p className="meta-label" style={{ margin: '0 0 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t('deportes.titleSubtitle', { question: market.question })}</p>
+      {!title && <p className="meta-label" style={{ margin: '0 0 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t('deportes.titleSubtitle', { question: market.question })}</p>}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {rows.map((o, i) => (
           <div key={o.outcome_key} className="list-row" style={{ padding: '10px 0', gap: 12 }}>
