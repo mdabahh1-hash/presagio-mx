@@ -18,7 +18,7 @@ export function RangoCierre({ market, sub, className = '' }: { market: Market; s
   const { t } = useTranslation()
   const lider = topOutcome(market)
   return (
-    <section className={`card ${className}`} style={{ padding: '16px 18px', marginTop: 18 }}>
+    <section className={`card ${className}`} style={{ padding: '16px 18px', minWidth: 0 }}>
       <Link to={`/mercado/${market.id}`} style={{ color: 'inherit' }}>
         <h2 className="section-title">{t('crypto.rangeTitle', { sub })}</h2>
       </Link>

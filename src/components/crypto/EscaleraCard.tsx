@@ -6,7 +6,7 @@ import { Icon } from '../Icon'
 import { displayPair, probColor, probText } from '../../lib/prices'
 import { formatVolume, formatDate } from '../../lib/format'
 import type { Escalera } from './escalera'
-import type { Side } from './CryptoRow'
+import type { Side } from './CryptoExpanded'
 
 // Escalera del mes: binarios del mismo activo y cierre, un nivel por fila (datos del listado).
 export function EscaleraCard({ escalera, source, expandedId, onChip, onCollapse, renderExpanded, className = '' }: {

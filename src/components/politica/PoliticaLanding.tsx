@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { marketsApi, contenidoApi, type ApiPricePoint, type ApiContenidoCategoria } from '../../lib/api'
+import { marketsApi, contenidoApi, type ApiPricePoint, type ApiContenidoCategoria, type ApiResumenCategoria } from '../../lib/api'
 import type { Market, PricePoint } from '../../types'
 import type { MultiSeries } from '../SparkChart'
 import { QuickTradeSheet } from '../QuickTradeSheet'
 import { PoliticaHero } from './PoliticaHero'
-import { PoliticaTopics, type TopicRow, type SourceRow } from './PoliticaTopics'
+import { PoliticaFuentes, type SourceRow } from './PoliticaFuentes'
 import { ElectionTimeline } from './ElectionTimeline'
 import { SeatProjection } from './SeatProjection'
 import { PartyTable } from './PartyTable'
-import { PoliticaSections, type MarketSection } from './PoliticaSections'
-import { byClosing } from '../../lib/closing'
+import { OpcionesChart } from '../panel/OpcionesChart'
+import { MoversCard } from '../panel/MoversCard'
+import { VolumenTemas } from '../panel/VolumenTemas'
 import { formatVolume } from '../../lib/format'
 import { projectSeats } from '../../lib/seatProjection'
 import { deltaSince, DAY_MS } from '../../lib/priceDelta'
@@ -19,11 +20,6 @@ interface PoliticaLandingProps {
   // Todos los mercados cargados por Markets.tsx; la landing filtra por categoría.
   markets: Market[]
   loading: boolean
-  // Subcategorías declaradas (categories.ts) en orden de display
-  subcats: string[]
-  // ?sub= controlado por Markets.tsx
-  activeSub: string | null
-  onSubChange: (sub: string | null) => void
   // Tras operar en el sheet, la página parchea el precio en su estado
   onTraded: (marketId: string, newYesPrice: number) => void
   // h1 + conteo arriba (Home); Markets.tsx ya tiene su propia cabecera
@@ -69,10 +65,11 @@ function truncate(s: string, n: number): string {
   return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s
 }
 
-// Landing de Política (píldora de la Home y /mercados?cat=Política): hero
-// destacado con compra en sitio, temas, cronología, proyección de escaños y
-// secciones por subcategoría. Se monta solo con un mercado trending abierto.
-export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubChange, onTraded, showHeader = false }: PoliticaLandingProps) {
+// Panel de Política (se abre desde la tarjeta panel del grid): hero destacado con
+// compra en sitio, volumen por tema, cronología, proyección de escaños, escaños en el
+// tiempo, los que más se movieron y fuentes. Sin listas de mercados (esas están en el
+// grid). Se monta solo con un mercado trending abierto.
+export function PoliticaLanding({ markets, loading, onTraded, showHeader = false }: PoliticaLandingProps) {
   const { t } = useTranslation()
   const inCat = useMemo(() => markets.filter(m => m.category === POLITICA), [markets])
   const candidates = useMemo(() => featuredCandidates(inCat), [inCat])
@@ -86,6 +83,14 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     contenidoApi.categoria(POLITICA)
       .then(c => { if (alive) setContent(c) })
       .catch(() => {})
+    return () => { alive = false }
+  }, [])
+
+  // Volumen por tema (GET /markets/resumen); sin él, la columna del hero lleva las fuentes
+  const [resumen, setResumen] = useState<ApiResumenCategoria | null>(null)
+  useEffect(() => {
+    let alive = true
+    marketsApi.resumen(POLITICA).then(r => { if (alive) setResumen(r) }).catch(() => {})
     return () => { alive = false }
   }, [])
 
@@ -125,19 +130,6 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     return out
   }, [featured, secondary, histories, labelOf])
 
-  // Temas: subcategorías declaradas con mercados + "Otros" (sin subcategoría o no declarada)
-  const topics = useMemo<TopicRow[]>(() => {
-    const counts = new Map<string | null, number>()
-    for (const m of inCat) {
-      const key = m.subcategory && subcats.includes(m.subcategory) ? m.subcategory : null
-      counts.set(key, (counts.get(key) ?? 0) + 1)
-    }
-    const out: TopicRow[] = subcats.filter(sub => counts.has(sub)).map(sub => ({ sub, count: counts.get(sub) ?? 0 }))
-    const rest = counts.get(null)
-    if (rest) out.push({ sub: null, count: rest })
-    return out
-  }, [inCat, subcats])
-
   const labelForHost = useCallback(
     (host: string) => content?.fuentes.find(f => f.host === host)?.etiqueta ?? host,
     [content],
@@ -157,32 +149,6 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
     return [...byHost.values()].sort((a, b) => b.count - a.count)
   }, [inCat, labelForHost])
 
-  // Tercer dato de la fila: nota curada, si no la fuente en corto
-  const extraMetaOf = useCallback((m: Market): string | null => {
-    const nota = content?.notas[m.id]
-    if (nota) return nota
-    const host = m.resolutionSourceUrl ? hostOf(m.resolutionSourceUrl) : null
-    return host ? labelForHost(host) : null
-  }, [content, labelForHost])
-
-  // Secciones por subcategoría declarada (orden de categories.ts) + "Otros";
-  // con ?sub= activo, solo esa sección. Una sección vacía no se renderiza.
-  const sections = useMemo<MarketSection[]>(() => {
-    const byKey = new Map<string | null, Market[]>()
-    for (const m of inCat) {
-      const key = m.subcategory && subcats.includes(m.subcategory) ? m.subcategory : null
-      byKey.set(key, [...(byKey.get(key) ?? []), m])
-    }
-    const out: MarketSection[] = []
-    for (const sub of subcats) {
-      const items = byKey.get(sub)
-      if (items?.length) out.push({ title: sub, sub, items: items.sort(byClosing) })
-    }
-    const rest = byKey.get(null)
-    if (rest?.length) out.push({ title: t('categoryBrowse.otherSection'), sub: null, items: rest.sort(byClosing) })
-    return activeSub ? out.filter(sec => sec.sub === activeSub) : out
-  }, [inCat, subcats, activeSub, t])
-
   // Proyección de escaños: esperados con los precios vivos de los mercados de rangos
   const projection = useMemo(
     () => (content?.proyeccion ? projectSeats(content.proyeccion, inCat) : null),
@@ -194,6 +160,11 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
   const thresholdId = content?.proyeccion?.mercado_umbral_id ?? null
   const thresholdMarket = thresholdId ? inCat.find(m => m.id === thresholdId) : undefined
   const thresholdProb = thresholdMarket ? thresholdMarket.yesPrice : null
+
+  // Escaños en el tiempo: el multi de rangos del primer partido de la proyección
+  const bloque = content?.proyeccion?.bloques[0]
+  const rangoMarket = bloque ? inCat.find(m => m.id === bloque.mercado_id && m.marketType === 'multi') : undefined
+  const rangoPartido = bloque ? content?.partidos.find(p => p.clave === bloque.partido)?.siglas ?? bloque.partido : ''
 
   const featuredPoints = featured ? histories[featured.id] : undefined
   const historyLoading = !!featured && featuredPoints === undefined
@@ -227,11 +198,6 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           <div className="skeleton" style={{ height: 220 }} />
           <div className="skeleton" style={{ height: 220 }} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 72, background: 'var(--bg-surface)', border: 'none' }} />
-          ))}
-        </div>
       </div>
     )
   }
@@ -255,13 +221,10 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
           delta7={featuredPoints ? delta7(featuredPoints) : null}
           onBuy={side => setTrade({ marketId: featured.id, side })}
         />
-        <PoliticaTopics
-          total={inCat.length}
-          topics={topics}
-          activeSub={activeSub}
-          onSelect={onSubChange}
-          sources={sources}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
+          {resumen && <VolumenTemas resumen={resumen} title={t('panel.volumenTema')} />}
+          <PoliticaFuentes sources={sources} />
+        </div>
       </div>
 
       {content?.cronologia && (
@@ -281,14 +244,12 @@ export function PoliticaLanding({ markets, loading, subcats, activeSub, onSubCha
         </div>
       )}
 
-      <PoliticaSections
-        className="anim-4"
-        sections={sections}
-        activeSub={activeSub}
-        onViewAll={sub => onSubChange(sub)}
-        onClearSub={() => onSubChange(null)}
-        extraMetaOf={extraMetaOf}
-      />
+      {rangoMarket && (
+        <div className="anim-4" style={{ marginBottom: 14 }}>
+          <OpcionesChart market={rangoMarket} title={t('panel.escanosTiempo', { partido: rangoPartido })} />
+        </div>
+      )}
+      <MoversCard category={POLITICA} />
 
       {/* Sin opción controlada: el BetBox lleva su propia selección */}
       <QuickTradeSheet

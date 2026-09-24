@@ -701,7 +701,9 @@
     "privateLeagues": "Private leagues",
     "privateLeaguesText": "Set up a league with your friends and compete for points this matchday.",
     "createLeague": "Create league",
-    "kind": "Type"
+    "kind": "Type",
+    "finished": "Final",
+    "draw": "Draw"
   },
   "crypto": {
     "all": "All",
@@ -731,7 +733,10 @@
     "rangeSub": "Multiple choice · only one resolves Yes",
     "viewAll": "View all",
     "emptySub": "No open markets in {{sub}}",
-    "emptyFilter": "No markets match this filter"
+    "emptyFilter": "No markets match this filter",
+    "curvaTitle": "{{sub}}: implied closing price",
+    "curvaMediana": "Probability of closing above each price · market expects ~{{precio}}",
+    "curvaSub": "Probability of closing above each price"
   },
   "categoria": {
     "headerMeta_one": "{{count}} market · {{volume}} PT volume",
@@ -825,6 +830,16 @@
     "Crypto": {
       "titulo": "Crypto this month",
       "subtitulo": "Ladders and closing ranges"
-    }
+    },
+    "verMercado": "View market",
+    "movers": "Biggest movers",
+    "movers24h": "24h",
+    "movers7d": "7 days",
+    "moversEmpty": "No moves in the last 24 hours.",
+    "volumenTema": "Volume by topic",
+    "volumenTotal": "Total",
+    "escanosTiempo": "{{partido}}: seats over time",
+    "rangoTiempo": "{{sub}}: closing range over time",
+    "carreraTitulo": "Title race · {{liga}}"
   }
 }
