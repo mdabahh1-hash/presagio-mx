@@ -10,8 +10,8 @@ import { SPORT_GROUPS } from './categories'
 //   5. null → MarketThumb pinta un tile con icono
 // Los assets viven en public/img/markets/ (marcas propias, no logos oficiales).
 
-function economiaFoto(slug: string): string {
-  return `/img/markets/economia/${slug}.jpg`
+function temaFoto(slug: string): string {
+  return `/img/markets/temas/${slug}.jpg`
 }
 
 export const SUBCATEGORY_IMAGE: Record<string, string> = {
@@ -30,29 +30,67 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'F1': '/img/markets/sub/f1.svg',
   'Boxeo': '/img/markets/sub/boxeo.svg',
   'Elecciones': '/img/markets/sub/elecciones.svg',
-  // Economía: fotos de Wikimedia Commons (scripts/fetch-economia-photos.mjs, créditos en
-  // public/img/markets/economia/CREDITS.md). Empleo / IMSS no tiene foto: cae a la categoría.
-  'Tasas Banxico': economiaFoto('banxico'),
-  'Inflación (INPC)': economiaFoto('pesos'),
-  'Tipo de cambio USD/MXN': economiaFoto('pesos'),
-  'PIB México': economiaFoto('inegi'),
-  'Aranceles / T-MEC': economiaFoto('contenedores'),
-  'Fed / tasas EE.UU.': economiaFoto('fed'),
-  'Bolsa (BMV)': economiaFoto('bmv'),
+  // Fotos de Wikimedia Commons por tema (scripts/fetch-tema-photos.mjs, créditos en
+  // public/img/markets/temas/CREDITS.md). Espejo en el backend: SUBCATEGORIAS_CON_IMAGEN
+  // (seeds/plantillas.py); el agente revisor avisa de los temas que caen al ícono genérico.
+  'Tasas Banxico': temaFoto('banxico'),
+  'Inflación (INPC)': temaFoto('pesos'),
+  'Tipo de cambio': temaFoto('pesos'),
+  'PIB México': temaFoto('inegi'),
+  'Aranceles / T-MEC': temaFoto('contenedores'),
+  'Fed / tasas EE.UU.': temaFoto('fed'),
+  'Bolsa (BMV)': temaFoto('bmv'),
+  'Empleo / IMSS': temaFoto('imss'),
+  'Mercados EEUU': temaFoto('nyse'),
+  'Remesas': temaFoto('dolares'),
+  'Bitcoin': temaFoto('bitcoin'),
+  'Ethereum': temaFoto('ethereum'),
+  'Solana': temaFoto('solana'),
+  'Stablecoins': temaFoto('usdt'),
+  'Mercado cripto': temaFoto('cripto'),
+  'Regulación': temaFoto('sec'),
+  'Sheinbaum': temaFoto('sheinbaum'),
+  'Visas de EEUU': temaFoto('visa'),
+  'Congreso': temaFoto('san-lazaro'),
+  'Regulación digital': temaFoto('apps'),
+  'Europa': temaFoto('europa'),
+  'Elecciones EEUU': temaFoto('capitolio'),
+  'Trump': temaFoto('trump'),
+  'Medio Oriente': temaFoto('jerusalen'),
+  'Asia-Pacífico': temaFoto('taipei'),
+  'Américas': temaFoto('americas'),
+  'Rusia-Ucrania': temaFoto('ucrania'),
+  'África': temaFoto('africa'),
+  'ONU y OTAN': temaFoto('onu'),
+  'Migración': temaFoto('frontera'),
+  'IA': temaFoto('ia'),
+  'Videojuegos': temaFoto('control'),
+  'Influencers': temaFoto('celular'),
+  'Reality shows': temaFoto('estudio-tv'),
+  'Música': temaFoto('concierto'),
+  'Cine y series': temaFoto('claqueta'),
+  'Farándula': temaFoto('alfombra'),
+  'CDMX': temaFoto('angel'),
+  'Cultura': temaFoto('basilica'),
+  'Estados': temaFoto('estados'),
+  'Batallas de aura': temaFoto('batalla'),
+  'Seguridad': temaFoto('guardia'),
+  'Huracanes': temaFoto('huracan'),
+  'Sequía y calor': temaFoto('sequia'),
 }
 
 // Mercados ya sembrados sin subcategoría (Economía, 2026-09-18): foto por id. Al darles
 // subcategoría, la de SUBCATEGORY_IMAGE los cubre y la entrada sobra.
 export const MARKET_IMAGE: Record<string, string> = {
-  'banxico-mantiene-tasa-sep26': economiaFoto('banxico'),
-  'banxico-recorte-tasa-2026-q3': economiaFoto('banxico'),
-  'mexico-inflacion-2026': economiaFoto('pesos'),
-  'tmec-extension-16-anos-2026': economiaFoto('contenedores'),
+  'banxico-mantiene-tasa-sep26': temaFoto('banxico'),
+  'banxico-recorte-tasa-2026-q3': temaFoto('banxico'),
+  'mexico-inflacion-2026': temaFoto('pesos'),
+  'tmec-extension-16-anos-2026': temaFoto('contenedores'),
 }
 
-/** Fotos locales con variante @2x (hoy solo Economía): srcSet para pantallas densas. */
+/** Fotos locales de temas con variante @2x: srcSet para pantallas densas. */
 export function marketImageSrcSet(src: string): string | undefined {
-  const m = /^(\/img\/markets\/economia\/[\w-]+)\.jpg$/.exec(src)
+  const m = /^(\/img\/markets\/temas\/[\w-]+)\.jpg$/.exec(src)
   return m ? `${src} 1x, ${m[1]}@2x.jpg 2x` : undefined
 }
 

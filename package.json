@@ -12,7 +12,7 @@
     "logos:ligas": "node scripts/fetch-league-logos.mjs",
     "lint": "eslint src",
     "test": "vitest run",
-    "photos:economia": "node scripts/fetch-economia-photos.mjs"
+    "photos:temas": "node scripts/fetch-tema-photos.mjs"
   },
   "dependencies": {
     "i18next": "^26.3.6",
