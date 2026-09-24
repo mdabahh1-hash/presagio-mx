@@ -78,3 +78,9 @@ export const LANDINGS_PROPIAS: readonly Category[] = ['Deportes', 'Política', '
 export function usaLandingGenerica(cat: string): cat is Category {
   return (CATEGORIES as readonly string[]).includes(cat) && !(LANDINGS_PROPIAS as readonly string[]).includes(cat)
 }
+
+// Desde 2026-09-24 las tres propias también abren con el grid de CategoryLanding; su
+// landing con gráficas queda detrás de la tarjeta panel (PanelCard), la primera celda.
+export function tienePanel(cat: string): cat is Category {
+  return (LANDINGS_PROPIAS as readonly string[]).includes(cat)
+}

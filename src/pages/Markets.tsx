@@ -4,17 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { marketsApi } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketGrid } from '../components/MarketGrid'
-import { CategoryBrowse } from '../components/CategoryBrowse'
-import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
-import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
-import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, cryptoLandingAvailable, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { PoliticaLanding } from '../components/politica/PoliticaLanding'
+import { DeportesLanding } from '../components/deportes/DeportesLanding'
+import { CryptoLanding, CryptoBreadcrumb, CryptoHeaderMeta, isCryptoSort, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { PanelCard, PanelBack, panelDisponible } from '../components/categoria/PanelCard'
 import { isVentana, type Ventana } from '../components/crypto/escalera'
 import { CategoryLanding, CategoryBreadcrumb, CategoryHeaderMeta, isCategorySort, type CategorySort } from '../components/categoria/CategoryLanding'
 import { diaKeyOf } from '../lib/jornada'
 import type { Category, Market } from '../types'
 import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
-import { CATEGORIES, SUBCATEGORIES, LANDINGS_PROPIAS, usaLandingGenerica, sportOfSub, isKind, type Kind } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES, usaLandingGenerica, tienePanel, sportOfSub, isKind, type Kind } from '../lib/categories'
 import { apiToMarket, cleanLabel } from '../lib/mapMarket'
 import { selectNewMarkets } from '../lib/newMarkets'
 import { useCategoriasVisibles } from '../lib/useCategoriasVisibles'
@@ -50,6 +50,8 @@ export function Markets() {
   const sortParam = sortOptions.some(o => o.value === rawSort) ? (rawSort as string) : 'volume'
   const cryptoSort: CryptoSort = isCryptoSort(rawSort) ? rawSort : 'ending'
   const categoriaSort: CategorySort = isCategorySort(rawSort) ? rawSort : 'all'
+  // Deportes, Política y Crypto: ?vista=panel abre la landing con gráficas; sin él, el grid
+  const vistaPanel = searchParams.get('vista') === 'panel'
   const [searchInput, setSearchInput] = useState(queryParam)
   const [activeCategory, setActiveCategory] = useState<Category | 'Todos'>(catParam)
   const [activeSub, setActiveSub] = useState<string | null>(subParam)
@@ -68,8 +70,8 @@ export function Markets() {
     setSortBy(sortParam)
   }, [queryParam, catParam, subParam, sportParam, kindParam, diaParam, sortParam])
 
-  // Crypto y la landing genérica ordenan en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
-  const fetchSort = activeCategory === 'Crypto' || usaLandingGenerica(activeCategory) ? 'volume' : sortBy
+  // Toda categoría ordena en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
+  const fetchSort = activeCategory === 'Todos' ? sortBy : 'volume'
   // ?cat= viene del querystring: una categoría que no existe no se pide (el catch
   // de abajo metería los mocks como si fueran de esa categoría)
   const validCategory = activeCategory === 'Todos' || (CATEGORIES as readonly string[]).includes(activeCategory)
@@ -99,21 +101,17 @@ export function Markets() {
   const shown = nuevos ? nuevos.items : markets
   const notice = nuevos?.fallback ? t('home.newFallback') : null
 
-  // Política tiene landing propia (components/politica) cuando hay un mercado
-  // trending abierto y no hay búsqueda; si no, cae al CategoryBrowse genérico.
-  // Misma regla que la píldora de la Home (politicaLandingAvailable).
-  const isPolitica = activeCategory === 'Política' && !searchInput
-  const showLanding = isPolitica && politicaLandingAvailable(markets, loading)
-  // Deportes: landing propia (components/deportes) con la misma regla (deportesLandingAvailable)
-  const isDeportes = activeCategory === 'Deportes' && !searchInput
-  const showDeportes = isDeportes && deportesLandingAvailable(markets, loading)
-  // Crypto: landing propia (components/crypto) con la misma regla (cryptoLandingAvailable)
-  const isCrypto = activeCategory === 'Crypto' && !searchInput
-  const showCrypto = isCrypto && cryptoLandingAvailable(markets, loading)
-  // Cualquier otra categoría: landing genérica (components/categoria), siempre que no
-  // haya búsqueda; con ?q= cae al grid de «Todos», que trae el contador y el botón
-  // para limpiar la búsqueda
-  const showCategoria = usaLandingGenerica(activeCategory) && !searchInput
+  // Deportes, Política y Crypto abren con el grid como las demás; su landing con
+  // gráficas (?vista=panel) se monta si tiene qué mostrar (un trending abierto,
+  // panelDisponible) y no hay búsqueda. Misma regla que la Home.
+  const panelAbierto = vistaPanel && !searchInput && panelDisponible(activeCategory, markets, loading)
+  const showLanding = panelAbierto && activeCategory === 'Política'
+  const showDeportes = panelAbierto && activeCategory === 'Deportes'
+  const showCrypto = panelAbierto && activeCategory === 'Crypto'
+  // Cualquier categoría fuera del panel: landing genérica (components/categoria),
+  // siempre que no haya búsqueda; con ?q= cae al grid de «Todos», que trae el
+  // contador y el botón para limpiar la búsqueda
+  const showCategoria = (usaLandingGenerica(activeCategory) || tienePanel(activeCategory)) && !searchInput && !panelAbierto
   const categoryVolume = useMemo(() => markets.reduce((sum, m) => sum + m.volume, 0), [markets])
   const abiertos = useMemo(() => markets.filter(m => m.status === 'open').length, [markets])
   const hoy = useMemo(() => markets.filter(m => diaKeyOf(m) === 'hoy').length, [markets])
@@ -151,6 +149,7 @@ export function Markets() {
       p.delete('dia')
       p.delete('ventana')
       p.delete('sort')  // el orden solo existe en "Todos" (y en las landings de Crypto y genérica)
+      p.delete('vista')
       return p
     })
   }
@@ -246,6 +245,19 @@ export function Markets() {
     })
   }
 
+  // Entrar o salir del panel: cada vista tiene sus filtros (el ?sort= de Crypto y el
+  // del grid chocan), así que se limpian todos
+  const setPanel = (open: boolean) => {
+    setSearchParams(p => {
+      for (const k of ['sub', 'sport', 'kind', 'dia', 'ventana', 'sort']) p.delete(k)
+      if (open) p.set('vista', 'panel')
+      else p.delete('vista')
+      return p
+    })
+    window.scrollTo({ top: 0 })
+  }
+  const panelBack = <PanelBack category={activeCategory as Category} onBack={() => setPanel(false)} />
+
   return (
     <div className="page-container" style={{ paddingTop: 36, paddingBottom: 36 }}>
 
@@ -330,6 +342,7 @@ export function Markets() {
         </div>
       </div>
 
+      {panelAbierto && panelBack}
       {showLanding ? (
         <PoliticaLanding
           markets={markets}
@@ -379,20 +392,9 @@ export function Markets() {
           sort={categoriaSort}
           onSortChange={handleCategoriaSort}
           onTraded={patchPrice}
-        />
-      ) : (LANDINGS_PROPIAS as readonly string[]).includes(activeCategory) ? (
-        /* Respaldo de las landings propias (sin trending o con búsqueda): sidebar como la Home */
-        <CategoryBrowse
-          category={activeCategory as Category}
-          markets={markets}
-          loading={loading}
-          subcats={SUBCATEGORIES[activeCategory as Category]}
-          activeSub={activeSub}
-          onSubChange={handleSubChange}
-          activeSport={activeSport}
-          onSportChange={handleSportChange}
-          activeKind={activeKind}
-          onKindChange={handleKindChange}
+          feature={panelDisponible(activeCategory, markets, loading) && (
+            <PanelCard category={activeCategory as Category} markets={markets} onOpen={() => setPanel(true)} />
+          )}
         />
       ) : (
         <>

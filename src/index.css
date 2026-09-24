@@ -438,6 +438,14 @@ select.input { padding-right: 32px; appearance: none; }
 .market-card-foot-vol, .market-card-foot-liga { flex: 0 1000 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; margin: 0 -1px; padding: 0 1px; }
 .market-card-foot-new { display: inline-flex; flex: 0 1 auto; min-width: 0; overflow: hidden; }
 .market-card-skeleton { height: var(--market-card-skeleton-h); }
+/* Tarjeta panel (PanelCard): primera celda del grid de Deportes/Política/Crypto,
+   abre la landing con gráficas. Misma altura que la tarjeta; solo tipografía. */
+.panel-card { text-align: left; font: inherit; color: var(--text-primary); justify-content: space-between; }
+.panel-card-title { font-size: 26px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; }
+.panel-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
+.panel-card-cta { display: inline-flex; align-items: center; gap: 4px; color: var(--text-secondary); }
+.panel-card:hover .panel-card-cta { color: var(--text-primary); }
+@container (max-width: 611px) { .panel-card-title { font-size: 22px; } }
 
 /* Probability bars */
 .prob-bar-track { height: 4px; background: var(--border-subtle); border-radius: 2px; overflow: hidden; }

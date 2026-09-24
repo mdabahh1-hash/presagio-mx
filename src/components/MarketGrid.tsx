@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import type { Market } from '../types'
 import { MarketCard } from './MarketCard'
 import { QuickTradeSheet } from './QuickTradeSheet'
@@ -9,12 +9,14 @@ interface MarketGridProps {
   onTraded: (marketId: string, newYesPrice: number, isMulti: boolean) => void
   loading?: boolean
   skeletons?: number
+  // Primera celda del grid (tarjeta panel de Deportes/Política/Crypto)
+  lead?: ReactNode
 }
 
 // Grid de tarjetas del sitio (Tendencia, Nuevo, /mercados y landing de categoría):
 // mismas columnas y gap en todas las vistas (.market-grid en index.css) y compra
 // rápida Sí/No en un TradeSheet sin navegar.
-export function MarketGrid({ markets, onTraded, loading = false, skeletons = 6 }: MarketGridProps) {
+export function MarketGrid({ markets, onTraded, loading = false, skeletons = 6, lead }: MarketGridProps) {
   const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO'; outcomeKey?: string } | null>(null)
   const [tradeOutcome, setTradeOutcome] = useState<string | null>(null)
   const closeTrade = useCallback(() => setTrade(null), [])
@@ -32,6 +34,7 @@ export function MarketGrid({ markets, onTraded, loading = false, skeletons = 6 }
   return (
     <>
       <div className="market-grid">
+        {lead}
         {markets.map((m, i) => (
           <MarketCard
             key={m.id}
