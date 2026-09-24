@@ -31,7 +31,7 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
     'Rusia-Ucrania', 'Américas', 'África', 'ONU y OTAN', 'Migración',
   ],
   'Tech': ['IA'],
-  'México': ['Batallas de aura', 'Seguridad'],
+  'México': ['CDMX', 'Cultura y tradición', 'Estados', 'Mascotas y virales', 'Batallas de aura', 'Seguridad'],
   'Clima': ['Huracanes', 'Sequía y calor'],
 }
 
