@@ -1,15 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Category, Market } from '../types'
 import { SUBCATEGORIES } from '../lib/categories'
 import { Icon } from './Icon'
+import { Avatar } from './Avatar'
+import { usersApi, type ApiLeaderboardEntry } from '../lib/api'
+import { formatPnl, formatMonth } from '../lib/format'
 
 // "Explora por tema" (antes "Temas populares"), como los hot topics de Polymarket:
 // cada renglón es una subcategoría, no un mercado (Mark, 2026-09-22). Usa los
 // mercados que la Home ya cargó, sin otra petición.
 // 6 filas llenan exactos los 420px que comparte con el hero en desktop; 7 no caben.
+// Con el top 3 del mes abajo quedan 4 (TOP_N_CON_PODIO).
 const TOP_N = 6
+const TOP_N_CON_PODIO = 4
 const MAX_POR_CATEGORIA = 2
 const MIN_ABIERTOS = 2
 
@@ -18,7 +23,7 @@ export interface Tema { category: Category; sub: string; abiertos: number; volum
 // Solo abiertos (un pendiente ya no se puede operar) y solo subcategorías
 // declaradas: la landing solo sabe filtrar esas. Orden: abiertos, luego volumen
 // total, luego nombre. Máximo 2 temas por categoría.
-export function temasPopulares(markets: Market[]): Tema[] {
+export function temasPopulares(markets: Market[], tope = TOP_N): Tema[] {
   const grupos = new Map<string, Tema>()
   for (const m of markets) {
     if (m.status !== 'open' || !m.subcategory || !SUBCATEGORIES[m.category]?.includes(m.subcategory)) continue
@@ -37,13 +42,29 @@ export function temasPopulares(markets: Market[]): Tema[] {
       porCategoria.set(g.category, n + 1)
       return n < MAX_POR_CATEGORIA
     })
-    .slice(0, TOP_N)
+    .slice(0, tope)
+}
+
+/** Días que faltan para el cierre del mes CDMX (UTC−6, sin horario de verano). */
+function diasParaCierre(ahora = new Date()): number {
+  const mx = new Date(ahora.getTime() - 6 * 3_600_000)
+  const fin = Date.UTC(mx.getUTCFullYear(), mx.getUTCMonth() + 1, 1, 6)
+  return Math.max(0, Math.floor((fin - ahora.getTime()) / 86_400_000))
 }
 
 export function PopularTopics({ markets }: { markets: Market[] }) {
-  const { t } = useTranslation()
-  const temas = temasPopulares(markets)
+  const { t, i18n } = useTranslation()
+  const [podio, setPodio] = useState<ApiLeaderboardEntry[]>([])
+  useEffect(() => {
+    usersApi.leaderboard(10, 'month')
+      .then(data => setPodio(data.filter(u => u.elegible).slice(0, 3)))
+      .catch(() => {})
+  }, [])
+  const temas = temasPopulares(markets, podio.length ? TOP_N_CON_PODIO : TOP_N)
   if (temas.length === 0) return null
+  const now = new Date()
+  const mx = new Date(now.getTime() - 6 * 3_600_000)  // mes CDMX, como el backend
+  const mes = `${mx.getUTCFullYear()}-${String(mx.getUTCMonth() + 1).padStart(2, '0')}`
 
   return (
     <div className="card popular-card" style={{ padding: '16px 16px 8px' }}>
@@ -69,6 +90,28 @@ export function PopularTopics({ markets }: { markets: Market[] }) {
           </Link>
         ))}
       </div>
+      {podio.length > 0 && (
+        <div style={{ borderTop: '1px solid var(--border-subtle)', padding: '10px 0 4px', flexShrink: 0 }}>
+          <Link to="/clasificacion" className="meta-label num" style={{ display: 'flex', justifyContent: 'space-between', padding: '0 4px 4px', textDecoration: 'none' }}>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+              {t('popular.topMonth', { month: formatMonth(mes, i18n.language, { month: 'long' }, false) })}
+            </span>
+            <span>{t('popular.closesIn', { count: diasParaCierre(now) })}</span>
+          </Link>
+          {podio.map((u, i) => (
+            <Link key={u.id} to={`/u/${u.username}`} className="list-row is-link popular-row" style={{ padding: '4px', gap: 10, height: 28, flex: 'none' }}>
+              <span className="num" style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', width: 14, flexShrink: 0, textAlign: 'center' }}>{i + 1}</span>
+              <Avatar name={u.display_name} url={u.avatar_url} size={20} />
+              <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {u.display_name}
+              </span>
+              <span className="num" style={{ fontSize: 13, fontWeight: 600, color: u.pnl >= 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0 }}>
+                {formatPnl(u.pnl)}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

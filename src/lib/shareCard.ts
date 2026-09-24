@@ -9,6 +9,8 @@ export interface PodiumEntry {
 }
 
 export interface ResultCardData {
+  kicker?: string // renglón de arriba; por defecto «Liga privada»
+  unit?: string // unidad de los puntos; por defecto «pts»
   leagueName: string
   cycleName: string
   podium: PodiumEntry[] // top 3, orden 1º→3º
@@ -50,7 +52,7 @@ export async function generateResultCard(
   ctx.textAlign = 'center'
   ctx.fillStyle = MUTED
   ctx.font = font(600, 30)
-  ctx.fillText('Liga privada', cx, (format === 'feed' ? 120 : 80))
+  ctx.fillText(data.kicker ?? 'Liga privada', cx, (format === 'feed' ? 120 : 80))
   ctx.fillStyle = TEXT
   ctx.font = font(700, 64)
   ctx.fillText(clip(ctx, data.leagueName, W - 120), cx, (format === 'feed' ? 200 : 150))
@@ -89,7 +91,7 @@ export async function generateResultCard(
     ctx.fillText(clip(ctx, s.name, slotW - 32), mx, y + 124 * scale)
     ctx.fillStyle = podiumIdx === 0 ? GOLD : TEXT
     ctx.font = font(700, 40)
-    ctx.fillText(`${s.points} pts`, mx, y + 182 * scale)
+    ctx.fillText(`${s.points} ${data.unit ?? 'pts'}`, mx, y + 182 * scale)
     ctx.fillStyle = MUTED
     ctx.font = font(500, 28)
     ctx.fillText(s.hits, mx, y + 228 * scale)

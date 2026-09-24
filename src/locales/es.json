@@ -200,7 +200,10 @@
   "popular": {
     "title": "Explora por tema",
     "markets_one": "{{count}} mercado",
-    "markets_other": "{{count}} mercados"
+    "markets_other": "{{count}} mercados",
+    "topMonth": "Top 3 de {{month}}",
+    "closesIn_one": "cierra en {{count}} día",
+    "closesIn_other": "cierra en {{count}} días"
   },
   "market": {
     "loading": "Cargando mercado...",
@@ -334,7 +337,8 @@
     "inviteFriends": "Invitar amigos",
     "settingsTitle": "Configuración",
     "shareProfile": "Compartir perfil",
-    "copiedLink": "Enlace copiado"
+    "copiedLink": "Enlace copiado",
+    "trophy": "{{rank}}.º {{month}}"
   },
   "publicProfile": {
     "notFound": "Usuario no encontrado.",
@@ -398,7 +402,7 @@
       "previewTitle": "Los premios empiezan en octubre",
       "prizes_one": "El 1.er lugar del mes se lleva un premio (por anunciar).",
       "prizes_other": "Los {{count}} primeros lugares del mes se llevan premios (por anunciar).",
-      "rules": "Gana quien más PT gane con lo que predice en el mes. Para calificar: {{trades}} predicciones en {{markets}} mercados distintos.",
+      "rules": "Gana quien más PT gane con lo que predice en el mes; lo que sigue abierto solo resta, nunca suma, hasta que se resuelve. Para calificar: {{trades}} predicciones en {{markets}} mercados distintos.",
       "closesIn": "Cierra en {{days}} d {{hours}} h",
       "yourRank": "Vas en el lugar {{rank}} con {{pnl}}",
       "missing": "Te faltan {{trades}} predicciones y {{markets}} mercados para calificar",
@@ -407,7 +411,16 @@
       "notEligible_one": "No califica aún · {{count}} mercado",
       "notEligible_other": "No califica aún · {{count}} mercados",
       "statLine_one": "{{count}} mercado este mes",
-      "statLine_other": "{{count}} mercados este mes"
+      "statLine_other": "{{count}} mercados este mes",
+      "you": "Tú",
+      "missingShort": "Te faltan {{trades}} predicciones y {{markets}} mercados",
+      "podiums_one": "{{count}} vez en el podio",
+      "podiums_other": "{{count}} veces en el podio",
+      "share": "Compartir",
+      "shareText": "Voy en el lugar {{rank}} de la clasificación de {{month}} en VEREDIKT. ¿Me alcanzas?",
+      "shareKicker": "Clasificación de {{month}}",
+      "shareTitle": "Voy {{rank}}.º en VEREDIKT",
+      "shareSub": "{{pnl}} este mes"
     },
     "statLine_one": "{{accuracy}}% precisión · {{count}} mercado",
     "statLine_other": "{{accuracy}}% precisión · {{count}} mercados"
@@ -858,5 +871,28 @@
     "escanosTiempo": "{{partido}}: escaños en el tiempo",
     "rangoTiempo": "{{sub}}: rango de cierre en el tiempo",
     "carreraTitulo": "Carrera por el título · {{liga}}"
+  },
+  "bases": {
+    "title": "Bases del concurso mensual",
+    "intro": "Borrador. Reglas del leaderboard mensual de VEREDIKT y de sus premios.",
+    "metricaTitle": "Cómo se gana",
+    "metricaBody": "Cada mes calendario (hora de la Ciudad de México) gana quien obtenga la mayor ganancia en PT con las predicciones que hizo en ese mes. Cada predicción cuenta lo que vale menos lo que costó: si acertó vale 1 PT por acción, si falló vale 0 y si el mercado se canceló no suma ni resta. Los bonos diarios, los referidos y los puntos de bienvenida no cuentan.",
+    "elegibilidadTitle": "Quién participa",
+    "elegibilidadBody": "Participa cualquier cuenta con correo verificado que haga al menos 10 predicciones en al menos 5 mercados distintos durante el mes. Una persona, una cuenta. El administrador de VEREDIKT no participa. Edad mínima y país de residencia: [PENDIENTE].",
+    "abiertosTitle": "Mercados que siguen abiertos",
+    "abiertosBody": "Una predicción en un mercado que no se ha resuelto al cierre del mes vale su precio de mercado, con un tope: nunca más de lo que costó. Una pérdida abierta resta; una ganancia abierta no suma hasta que el mercado se resuelve. Así nadie puede subir en la tabla moviendo el precio de un mercado el último día.",
+    "cierreTitle": "Cierre del mes",
+    "cierreBody": "El día 1 a las 00:00 (hora de la Ciudad de México) la clasificación del mes anterior se congela. El equipo de VEREDIKT la revisa antes de publicar a los ganadores en la tabla de clasificación.",
+    "empatesTitle": "Empates",
+    "empatesBody": "Dos cuentas con la misma ganancia comparten lugar. Criterio de desempate para el premio: [PENDIENTE].",
+    "descalificacionTitle": "Descalificación",
+    "descalificacionBody": "VEREDIKT puede descalificar cuentas duplicadas, coordinadas o que abusen del sistema. Al descalificar a alguien, los que siguen suben de lugar.",
+    "premiosTitle": "Premios",
+    "premiosBody": "Los 3 primeros lugares de cada mes reciben un premio: [PENDIENTE]. Los PT no son dinero y no se cambian por dinero.",
+    "entregaTitle": "Entrega",
+    "entregaBody": "Cómo se contacta a los ganadores, plazo para reclamar el premio y forma de entrega: [PENDIENTE].",
+    "organizadorTitle": "Organizador",
+    "organizadorBody": "Razón social, domicilio y contacto del organizador: [PENDIENTE].",
+    "cta": "Ver la clasificación"
   }
 }

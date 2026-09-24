@@ -40,4 +40,12 @@ describe('temasPopulares', () => {
     ])
     expect(temas.map(t => t.sub)).toEqual(['Bitcoin', 'Solana', 'Europa', 'Trump', 'NFL', 'Liga MX'])
   })
+
+  it('acepta un tope menor (4 cuando la tarjeta lleva el top 3 del mes)', () => {
+    const temas = temasPopulares([
+      ...varios(6, 'Crypto', 'Bitcoin'), ...varios(5, 'Global', 'Europa'), ...varios(4, 'Deportes', 'NFL'),
+      ...varios(3, 'Tech', 'IA'), ...varios(2, 'Política', 'Elecciones'),
+    ], 4)
+    expect(temas.map(t => t.sub)).toEqual(['Bitcoin', 'Europa', 'NFL', 'IA'])
+  })
 })

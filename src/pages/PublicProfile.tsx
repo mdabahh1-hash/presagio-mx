@@ -121,6 +121,7 @@ export function PublicProfile() {
           followBusy={followBusy}
           onToggleFollow={toggleFollow}
           showFollow={!isOwnProfile}
+          trofeos={profile.trofeos}
         />
         <PnlChartCard
           pnl={profile.pnl}

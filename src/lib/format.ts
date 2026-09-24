@@ -87,3 +87,13 @@ export function timeAgo(iso: string): string {
   if (s < 86400) return i18n.t('following.timeHours', { count: Math.floor(s / 3600) })
   return i18n.t('following.timeDays', { count: Math.floor(s / 86400) })
 }
+
+/** 'YYYY-MM' → «Octubre de 2026» en el idioma activo (mes del leaderboard mensual).
+ *  `inicial = false` para usarlo a media frase («Top 3 de octubre»). */
+export function formatMonth(
+  mes: string, lang?: string, opts: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' }, inicial = true,
+): string {
+  const [y, m] = mes.split('-').map(Number)
+  const s = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString(lang, { ...opts, timeZone: 'UTC' })
+  return inicial ? s.charAt(0).toUpperCase() + s.slice(1) : s
+}
