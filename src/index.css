@@ -764,6 +764,7 @@ input[type='range']::-webkit-slider-thumb {
 
 @media (max-width: 560px) {
   .lb-vol { display: none !important; }
+  .lb-pnl { width: auto !important; flex-shrink: 0; }
   .news-spark { display: none !important; }
 }
 

@@ -368,6 +368,31 @@ export interface ApiLeaderboardEntry {
   volume: number
   markets_traded: number
   accuracy: number
+  /** Solo en period=month: lugar entre los elegibles (null = no califica). */
+  rank?: number | null
+  elegible?: boolean | null
+}
+
+export interface ApiLeaderboardMes {
+  mes: string
+  termina_at: string
+  min_predicciones: number
+  min_mercados: number
+  premiados: number
+  yo: {
+    rank: number | null
+    elegible: boolean
+    ganancia: number
+    n_trades: number
+    n_mercados: number
+    faltan_predicciones: number
+    faltan_mercados: number
+  } | null
+}
+
+export interface ApiLeaderboardGanadores {
+  mes: string
+  ganadores: { rank: number; username: string; display_name: string; avatar_url: string | null; ganancia: number }[]
 }
 
 export interface ApiFollowedUser extends ApiLeaderboardEntry {
@@ -419,6 +444,8 @@ export const usersApi = {
     const qs = new URLSearchParams({ limit: String(limit), period })
     return request<ApiLeaderboardEntry[]>(`/users/leaderboard?${qs}`)
   },
+  leaderboardMes: () => request<ApiLeaderboardMes>('/users/leaderboard/mes'),
+  leaderboardGanadores: () => request<ApiLeaderboardGanadores[]>('/users/leaderboard/ganadores'),
   attachReferral: (code: string) =>
     request<{ ok: boolean; reason?: string }>('/users/me/referral', {
       method: 'POST',

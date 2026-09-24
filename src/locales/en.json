@@ -383,7 +383,7 @@
     "title": "Leaderboard",
     "periodToday": "Today",
     "periodWeek": "Weekly",
-    "periodMonth": "Monthly",
+    "periodMonth": "This month",
     "periodAll": "All time",
     "searchPlaceholder": "Search by name",
     "colPnl": "Profit/Loss",
@@ -393,7 +393,21 @@
     "emptyNoTraders": "No traders on the leaderboard yet. Be the first to trade!",
     "statLine": "{{accuracy}}% accuracy · {{markets}} markets",
     "topGainers": "Top gainers",
-    "noData": "No data yet."
+    "noData": "No data yet.",
+    "monthly": {
+      "title": "{{month}} prizes",
+      "previewTitle": "Prizes start in October",
+      "prizes_one": "The top player of the month wins a prize (to be announced).",
+      "prizes_other": "The top {{count}} players of the month win prizes (to be announced).",
+      "rules": "Whoever earns the most PT from this month's predictions wins. To qualify: {{trades}} predictions across {{markets}} different markets.",
+      "closesIn": "Closes in {{days}}d {{hours}}h",
+      "yourRank": "You're in place {{rank}} with {{pnl}}",
+      "missing": "You need {{trades}} more predictions and {{markets}} more markets to qualify",
+      "notEligible": "Not qualified yet · {{markets}} markets",
+      "statLine": "{{markets}} markets this month",
+      "pastWinners": "Past winners",
+      "cta": "Predict now"
+    }
   },
   "welcome": {
     "title": "Welcome to VEREDIKT",
@@ -401,9 +415,9 @@
     "todayLabel": "Today",
     "todayTitle": "You predict with virtual points",
     "todayBody": "Buy Yes or No on real events in Mexico and the world. We give you 10,000 PT to start. PT are not money and can't be exchanged for money.",
-    "soonLabel": "Coming soon",
+    "soonLabel": "From October",
     "soonTitle": "Monthly leaderboard with prizes",
-    "soonBody": "Every month, the 3 best traders win prizes.",
+    "soonBody": "Every month, the 3 players who earn the most from their predictions win prizes. Follow it on the leaderboard.",
     "futureLabel": "Down the road",
     "futureTitle": "Real money, regulated",
     "futureBody": "We want to take VEREDIKT to real money and trading, as a regulated prediction market in Mexico. There's no date yet; we'll let you know.",
