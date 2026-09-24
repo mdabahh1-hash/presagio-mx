@@ -808,5 +808,23 @@
     "MIN_AMOUNT": "The minimum bet is 10 PT",
     "AMOUNT_TOO_LARGE": "Maximum 100,000 PT per trade",
     "INSUFFICIENT_BALANCE": "Insufficient balance. You have {{available}} PT, you need {{required}} PT"
+  },
+  "panel": {
+    "abiertos_one": "{{count}} open market",
+    "abiertos_other": "{{count}} open markets",
+    "ver": "Open dashboard",
+    "volver": "All {{category}} markets",
+    "Política": {
+      "titulo": "2027 elections",
+      "subtitulo": "Projection and predictions"
+    },
+    "Deportes": {
+      "titulo": "Matchday and leagues",
+      "subtitulo": "Games and odds"
+    },
+    "Crypto": {
+      "titulo": "Crypto this month",
+      "subtitulo": "Ladders and closing ranges"
+    }
   }
 }

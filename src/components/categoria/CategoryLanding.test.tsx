@@ -13,6 +13,9 @@ vi.mock('../BetBox', () => ({
   ),
 }))
 
+// jsdom no implementa scrollTo (abrir/cerrar el panel sube la página)
+window.scrollTo = vi.fn() as unknown as typeof window.scrollTo
+
 const SUBS = SUBCATEGORIES['Economía'] ?? []
 const MARKETS: Market[] = [
   makeMarket({ id: 'b1', subcategory: 'Tasas Banxico', trending: true, volume: 3000 }),
@@ -111,6 +114,17 @@ async function renderMarkets(url: string) {
   return () => search
 }
 
+describe('CategoryLanding feature', () => {
+  it('va primero en «Todos» y desaparece con una subcategoría', () => {
+    renderLanding({ feature: <div data-testid="feature" /> })
+    expect(screen.getByTestId('feature').parentElement!.firstElementChild).toBe(screen.getByTestId('feature'))
+  })
+  it('no se pinta con activeSub', () => {
+    renderLanding({ feature: <div data-testid="feature" />, activeSub: 'Tasas Banxico' })
+    expect(screen.queryByTestId('feature')).toBeNull()
+  })
+})
+
 describe('Markets ?cat=', () => {
   it('?sub= filtra, pinta la miga y el clic en la activa la limpia de la URL', async () => {
     const search = await renderMarkets('/mercados?cat=Economía&sub=Tasas Banxico')
@@ -126,6 +140,20 @@ describe('Markets ?cat=', () => {
     await renderMarkets('/mercados?cat=Tech')
     await waitFor(() => expect(screen.getByRole('navigation', { name: 'Tech' })).toBeTruthy())
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Tech')
+  })
+
+  it('Crypto abre con el grid y la tarjeta panel primero; el panel monta la landing y «volver» limpia la URL', async () => {
+    const search = await renderMarkets('/mercados?cat=Crypto&sort=volume')
+    const panel = await screen.findByRole('button', { name: /Ver panel/ })
+    const grid = panel.closest('.market-grid')!
+    expect(grid.firstElementChild).toBe(panel)
+    expect(screen.getByRole('navigation', { name: 'Crypto' })).toBeTruthy()
+    fireEvent.click(panel)
+    await waitFor(() => expect(search()).toBe('?cat=Crypto&vista=panel'))
+    expect(screen.queryByRole('button', { name: /Ver panel/ })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Todos los mercados de Crypto/ }))
+    await waitFor(() => expect(search()).toBe('?cat=Crypto'))
+    expect(await screen.findByRole('button', { name: /Ver panel/ })).toBeTruthy()
   })
 
   it('?cat= inexistente: ni landing ni mocks, solo el grid vacío', async () => {

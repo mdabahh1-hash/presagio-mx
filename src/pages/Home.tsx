@@ -6,16 +6,16 @@ import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketGrid } from '../components/MarketGrid'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
 import { PopularTopics } from '../components/PopularTopics'
-import { CategoryBrowse } from '../components/CategoryBrowse'
-import { PoliticaLanding, politicaLandingAvailable } from '../components/politica/PoliticaLanding'
-import { DeportesLanding, deportesLandingAvailable } from '../components/deportes/DeportesLanding'
-import { CryptoLanding, cryptoLandingAvailable, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { PoliticaLanding } from '../components/politica/PoliticaLanding'
+import { DeportesLanding } from '../components/deportes/DeportesLanding'
+import { CryptoLanding, type CryptoSort } from '../components/crypto/CryptoLanding'
+import { PanelCard, PanelBack, panelDisponible } from '../components/categoria/PanelCard'
 import { CategoryLanding, type CategorySort } from '../components/categoria/CategoryLanding'
 import type { Ventana } from '../components/crypto/escalera'
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES, usaLandingGenerica, sportOfSub, type Kind } from '../lib/categories'
+import { SUBCATEGORIES, sportOfSub, type Kind } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -87,11 +87,13 @@ export function Home() {
   const [homeCrypto, setHomeCrypto] = useState<{ sub: string | null; ventana: Ventana | null; sort: CryptoSort }>({ sub: null, ventana: null, sort: 'ending' })
   // Filtros de la landing genérica de categoría dentro de la Home (subcategoría, orden): estado local
   const [homeCat, setHomeCat] = useState<{ sub: string | null; sort: CategorySort }>({ sub: null, sort: 'all' })
+  // Deportes, Política y Crypto: landing con gráficas abierta desde la tarjeta panel (estado local)
+  const [homePanel, setHomePanel] = useState(false)
 
   useEffect(() => {
     setVisibleTrending(PAGE_SIZE); setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
     setHomeCrypto({ sub: null, ventana: null, sort: 'ending' })
-    setHomeCat({ sub: null, sort: 'all' })
+    setHomeCat({ sub: null, sort: 'all' }); setHomePanel(false)
   }, [mobileTab])
 
   // Clic en el logo (Link a "/") o en Tendencia/Nuevo estando ya en Home: la
@@ -132,9 +134,18 @@ export function Home() {
   const filtered = mobileTab === 'Tendencia' ? markets.filter(m => m.trending) : markets.filter(m => m.category === mobileTab)
   const emptyText = t('home.noTrending')
 
-  // Política filtra in-place como las demás, pero con su landing propia en vez
-  // de CategoryBrowse (misma regla que /mercados?cat=Política)
-  const showPolitica = mobileTab === 'Política' && politicaLandingAvailable(markets, loading)
+  // Deportes, Política y Crypto abren con el grid como las demás; la tarjeta panel
+  // monta su landing con gráficas in-place (misma regla que /mercados?vista=panel).
+  // Al entrar o salir, los filtros de ambas vistas vuelven a cero.
+  const panelOk = panelDisponible(mobileTab, markets, loading)
+  const panelAbierto = homePanel && panelOk
+  const setPanel = (open: boolean) => {
+    setHomePanel(open)
+    setHomeSub(null); setHomeDep({ sub: null, sport: null, kind: null, dia: null })
+    setHomeCrypto({ sub: null, ventana: null, sort: 'ending' }); setHomeCat({ sub: null, sort: 'all' })
+    window.scrollTo({ top: 0 })
+  }
+  const showPolitica = panelAbierto && mobileTab === 'Política'
   const politicaLanding = (
     <PoliticaLanding
       markets={markets}
@@ -148,7 +159,7 @@ export function Home() {
   )
 
   // Deportes: misma regla que Política (in-place, con cabecera); una liga implica su deporte
-  const showDeportes = mobileTab === 'Deportes' && deportesLandingAvailable(markets, loading)
+  const showDeportes = panelAbierto && mobileTab === 'Deportes'
   const deportesLanding = (
     <DeportesLanding
       markets={markets}
@@ -168,7 +179,6 @@ export function Home() {
   )
 
   // Crypto: misma regla que Política y Deportes (in-place, con cabecera)
-  const showCrypto = mobileTab === 'Crypto' && cryptoLandingAvailable(markets, loading)
   const cryptoLanding = (
     <CryptoLanding
       markets={markets}
@@ -186,8 +196,7 @@ export function Home() {
     />
   )
 
-  // Cualquier otra categoría: landing genérica, siempre (in-place, con cabecera)
-  const showCategoria = usaLandingGenerica(mobileTab)
+  // Cualquier categoría fuera del panel: landing genérica (in-place, con cabecera)
   const categoriaLanding = (
     <CategoryLanding
       category={mobileTab as Category}
@@ -200,8 +209,15 @@ export function Home() {
       onSortChange={sort => setHomeCat(c => ({ ...c, sort }))}
       onTraded={handleTraded}
       showHeader
+      feature={panelOk && <PanelCard category={mobileTab as Category} markets={markets} onOpen={() => setPanel(true)} />}
     />
   )
+  const categoria = panelAbierto ? (
+    <>
+      <PanelBack category={mobileTab as Category} onBack={() => setPanel(false)} />
+      {showPolitica ? politicaLanding : showDeportes ? deportesLanding : cryptoLanding}
+    </>
+  ) : categoriaLanding
 
   // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
   if (isMobile) {
@@ -255,9 +271,7 @@ export function Home() {
           </>
         ) : (
           <div style={{ padding: '14px 14px 80px' }}>
-            {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showCategoria ? categoriaLanding : (
-              <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
-            )}
+            {categoria}
           </div>
         )}
 
@@ -308,9 +322,7 @@ export function Home() {
         <NewFeed markets={markets} loading={loading} onTraded={handleTraded} />
       ) : (
         <section style={{ marginBottom: 56 }}>
-          {showPolitica ? politicaLanding : showDeportes ? deportesLanding : showCrypto ? cryptoLanding : showCategoria ? categoriaLanding : (
-            <CategoryBrowse category={mobileTab as Category} markets={markets} loading={loading} subcats={SUBCATEGORIES[mobileTab as Category]} />
-          )}
+          {categoria}
         </section>
       )}
     </div>

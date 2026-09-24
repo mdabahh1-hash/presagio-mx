@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Category, Market } from '../../types'
@@ -30,6 +30,8 @@ interface CategoryLandingProps {
   onTraded: (marketId: string, newYesPrice: number, isMulti: boolean) => void
   // h1 + meta arriba (Home); Markets.tsx ya tiene su propia cabecera
   showHeader?: boolean
+  // Primera celda del grid en «Todos» (PanelCard de las categorías con landing propia)
+  feature?: ReactNode
 }
 
 function inScope(markets: Market[], category: Category, sub: string | null): Market[] {
@@ -92,7 +94,7 @@ function sortMarkets(items: Market[], sort: CategorySort): Market[] {
 // por opción. Es el diseño por defecto de toda categoría salvo LANDINGS_PROPIAS
 // (Deportes, Política, Crypto). Se monta siempre; solo pinta lo que trae la API.
 export function CategoryLanding({
-  category, markets, loading, subcats, activeSub, onSubChange, sort, onSortChange, onTraded, showHeader = false,
+  category, markets, loading, subcats, activeSub, onSubChange, sort, onSortChange, onTraded, showHeader = false, feature,
 }: CategoryLandingProps) {
   const { t } = useTranslation()
   const inCat = useMemo(() => inScope(markets, category, null), [markets, category])
@@ -161,7 +163,7 @@ export function CategoryLanding({
           </div>
 
           {list.length > 0 ? (
-            <MarketGrid markets={list.slice(0, shown)} onTraded={onTraded} />
+            <MarketGrid markets={list.slice(0, shown)} onTraded={onTraded} lead={activeSub ? null : feature} />
           ) : (
             <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
               <p style={{ margin: '0 0 8px', fontWeight: 600 }}>{t('categoria.emptySub', { sub: activeSub ?? category })}</p>

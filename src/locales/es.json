@@ -808,5 +808,23 @@
     "MIN_AMOUNT": "La apuesta mínima es 10 PT",
     "AMOUNT_TOO_LARGE": "Máximo 100,000 PT por operación",
     "INSUFFICIENT_BALANCE": "Saldo insuficiente. Tienes {{available}} PT, necesitas {{required}} PT"
+  },
+  "panel": {
+    "abiertos_one": "{{count}} mercado abierto",
+    "abiertos_other": "{{count}} mercados abiertos",
+    "ver": "Ver panel",
+    "volver": "Todos los mercados de {{category}}",
+    "Política": {
+      "titulo": "Elecciones 2027",
+      "subtitulo": "Proyección y predicciones"
+    },
+    "Deportes": {
+      "titulo": "Jornada y ligas",
+      "subtitulo": "Partidos y probabilidades"
+    },
+    "Crypto": {
+      "titulo": "Crypto del mes",
+      "subtitulo": "Escaleras y rangos de cierre"
+    }
   }
 }
