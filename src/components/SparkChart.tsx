@@ -386,9 +386,12 @@ export function FullChart({ data, height = 200, color, viewW = 700, interactive 
   const chart = useMemo(() => {
     if (data.length < 2) return null
     const prices = data.map(d => d.price)
-    const minP = Math.max(0, Math.min(...prices) * 0.95)
-    // Probabilidades: el eje nunca pasa de 100%
-    const maxP = valueSuffix === '%' ? Math.min(100, Math.max(...prices) * 1.05) : Math.max(...prices) * 1.05
+    const lo = Math.min(...prices), hi = Math.max(...prices)
+    const pct = valueSuffix === '%'
+    // Probabilidades: eje entre 0 y 100%. PT (P&L) puede ser negativo: 5% de margen del rango.
+    const pad = (hi - lo) * 0.05 || 1
+    const minP = pct ? Math.max(0, lo * 0.95) : lo - pad
+    const maxP = pct ? Math.min(100, hi * 1.05) : hi + pad
     const range = maxP - minP || 1
 
     const { ts, real } = timesOf(data)
