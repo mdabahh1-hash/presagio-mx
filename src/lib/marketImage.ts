@@ -27,6 +27,7 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'Champions League': '/img/markets/sub/champions-league.svg',
   'Saudi Pro League': '/img/markets/sub/saudi-pro-league.svg',
   'NFL': '/img/markets/sub/nfl.svg',
+  'College Football': temaFoto('cfp'), // sin logo de liga en ESPN
   'F1': '/img/markets/sub/f1.svg',
   'Boxeo': '/img/markets/sub/boxeo.svg',
   'Fecha FIFA': '/img/markets/cat/deportes.svg', // sin logo propio: los partidos pintan banderas
@@ -136,7 +137,7 @@ const FOOTBALL_LEAGUES = new Set(SPORT_GROUPS['Fútbol'] ?? [])
 export function subcategoryIcon(sub?: string | null, cat?: Category | string): IconName {
   if (sub) {
     if (FOOTBALL_LEAGUES.has(sub)) return 'ball'
-    if (sub === 'NFL') return 'football'
+    if (sub === 'NFL' || sub === 'College Football') return 'football'
     if (sub === 'F1') return 'car'
     if (sub === 'Boxeo') return 'gloves'
     if (sub === 'Elecciones') return 'vote'

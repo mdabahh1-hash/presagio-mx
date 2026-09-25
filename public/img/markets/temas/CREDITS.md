@@ -3,6 +3,7 @@
 Generado por `scripts/fetch-tema-photos.mjs`. Fotos de Wikimedia Commons usadas bajo la licencia indicada
 (recortadas a cuadrado de 96 y 192 px; en las CC BY-SA, los recortes se comparten bajo la misma licencia).
 
+- `cfp.jpg` / `cfp@2x.jpg` — [2019 CFP - trophy on the sidelines (crop).jpg](https://commons.wikimedia.org/wiki/File:2019_CFP_-_trophy_on_the_sidelines_(crop).jpg) · Legoktm · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)
 - `banxico.jpg` / `banxico@2x.jpg` — [Fachada del Banco de México.jpg](https://commons.wikimedia.org/wiki/File:Fachada_del_Banco_de_M%C3%A9xico.jpg) · ProtoplasmaKid · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0)
 - `pesos.jpg` / `pesos@2x.jpg` — [Pesos mexicanos.jpg](https://commons.wikimedia.org/wiki/File:Pesos_mexicanos.jpg) · Scott Robinson · [CC BY 2.0](https://creativecommons.org/licenses/by/2.0)
 - `contenedores.jpg` / `contenedores@2x.jpg` — [TECI.JPG](https://commons.wikimedia.org/wiki/File:TECI.JPG) · Puerto Lázaro Cárdenas · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)

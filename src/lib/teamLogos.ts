@@ -11,7 +11,7 @@ import { personPhotoFor } from './peoplePhotos'
 export type TeamLeague =
   | 'liga-mx' | 'nfl' | 'f1'
   | 'premier-league' | 'laliga' | 'serie-a' | 'bundesliga' | 'ligue-1'
-  | 'liga-portugal' | 'mls' | 'champions-league' | 'saudi-pro-league' | 'selecciones'
+  | 'liga-portugal' | 'mls' | 'champions-league' | 'saudi-pro-league' | 'selecciones' | 'ncaaf'
 const BASE = '/img/markets/teams'
 
 interface TeamDef { slug: string; names: string[] }
@@ -380,11 +380,43 @@ export const SELECCIONES: TeamDef[] = [
   { slug: 'civ', names: ['Costa de Marfil', 'Ivory Coast'] },
 ]
 
+// College Football (FBS): solo los equipos que ya tienen mercado; agregar al sembrar uno nuevo.
+export const NCAAF: TeamDef[] = [
+  { slug: 'alabama', names: ['Alabama', 'Alabama Crimson Tide'] },
+  { slug: 'florida', names: ['Florida', 'Florida Gators'] },
+  { slug: 'georgia', names: ['Georgia', 'Georgia Bulldogs'] },
+  { slug: 'georgiasouthern', names: ['Georgia Southern', 'GA Southern', 'Georgia Southern Eagles'] },
+  { slug: 'houston', names: ['Houston', 'Houston Cougars'] },
+  { slug: 'indiana', names: ['Indiana', 'Indiana Hoosiers'] },
+  { slug: 'iowa', names: ['Iowa', 'Iowa Hawkeyes'] },
+  { slug: 'iowastate', names: ['Iowa State', 'Iowa State Cyclones'] },
+  { slug: 'louisville', names: ['Louisville', 'Louisville Cardinals'] },
+  { slug: 'lsu', names: ['LSU', 'LSU Tigers'] },
+  { slug: 'miami', names: ['Miami', 'Miami Hurricanes'] },
+  { slug: 'michigan', names: ['Michigan', 'Michigan Wolverines'] },
+  { slug: 'mississippistate', names: ['Mississippi State', 'Mississippi St', 'Mississippi State Bulldogs'] },
+  { slug: 'missouri', names: ['Missouri', 'Missouri Tigers'] },
+  { slug: 'notredame', names: ['Notre Dame', 'Notre Dame Fighting Irish'] },
+  { slug: 'ohiostate', names: ['Ohio State', 'Ohio State Buckeyes'] },
+  { slug: 'oklahoma', names: ['Oklahoma', 'Oklahoma Sooners'] },
+  { slug: 'olemiss', names: ['Ole Miss', 'Ole Miss Rebels'] },
+  { slug: 'oregon', names: ['Oregon', 'Oregon Ducks'] },
+  { slug: 'pennstate', names: ['Penn State', 'Penn State Nittany Lions'] },
+  { slug: 'southcarolina', names: ['South Carolina', 'South Carolina Gamecocks'] },
+  { slug: 'tennessee', names: ['Tennessee', 'Tennessee Volunteers'] },
+  { slug: 'texas', names: ['Texas', 'Texas Longhorns'] },
+  { slug: 'texasam', names: ['Texas A&M', 'Texas A&M Aggies'] },
+  { slug: 'usc', names: ['USC', 'USC Trojans'] },
+  { slug: 'utah', names: ['Utah', 'Utah Utes'] },
+  { slug: 'wakeforest', names: ['Wake Forest', 'Wake Forest Demon Deacons'] },
+  { slug: 'wisconsin', names: ['Wisconsin', 'Wisconsin Badgers'] },
+]
+
 const DEFS: Record<TeamLeague, TeamDef[]> = {
   'liga-mx': LIGA_MX, nfl: NFL, f1: F1,
   'premier-league': PREMIER_LEAGUE, laliga: LALIGA, 'serie-a': SERIE_A, bundesliga: BUNDESLIGA,
   'ligue-1': LIGUE_1, 'liga-portugal': LIGA_PORTUGAL, mls: MLS, 'champions-league': CHAMPIONS_LEAGUE,
-  'saudi-pro-league': SAUDI_PRO_LEAGUE, selecciones: SELECCIONES,
+  'saudi-pro-league': SAUDI_PRO_LEAGUE, selecciones: SELECCIONES, ncaaf: NCAAF,
 }
 const LEAGUES = Object.keys(DEFS) as TeamLeague[]
 
@@ -404,12 +436,12 @@ const SUB_TO_LEAGUE: Record<string, TeamLeague> = {
   'Liga MX': 'liga-mx', NFL: 'nfl', F1: 'f1',
   'Premier League': 'premier-league', LaLiga: 'laliga', 'Serie A': 'serie-a', Bundesliga: 'bundesliga',
   'Ligue 1': 'ligue-1', 'Liga Portugal': 'liga-portugal', MLS: 'mls', 'Champions League': 'champions-league',
-  'Saudi Pro League': 'saudi-pro-league', 'Fecha FIFA': 'selecciones',
+  'Saudi Pro League': 'saudi-pro-league', 'Fecha FIFA': 'selecciones', 'College Football': 'ncaaf',
 }
 // Prefijo del id de mercado (mx-…, pl-…, laliga-…) → liga.
 const ID_PREFIX_TO_LEAGUE: Record<string, TeamLeague> = {
   mx: 'liga-mx', nfl: 'nfl', f1: 'f1', pl: 'premier-league', laliga: 'laliga', sa: 'serie-a', bl: 'bundesliga',
-  l1: 'ligue-1', lp: 'liga-portugal', mls: 'mls', ucl: 'champions-league', spl: 'saudi-pro-league',
+  l1: 'ligue-1', lp: 'liga-portugal', mls: 'mls', ucl: 'champions-league', spl: 'saudi-pro-league', cfb: 'ncaaf',
 }
 
 export function leagueFor(sub?: string | null, marketId?: string | null): TeamLeague | null {

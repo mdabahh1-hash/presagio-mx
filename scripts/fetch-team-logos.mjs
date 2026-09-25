@@ -17,6 +17,7 @@ const DRY = process.argv.includes('--dry')
 const FORCE = process.argv.includes('--force')
 
 const ESPN_SOCCER = id => `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`
+const ESPN_NCAA = id => `https://a.espncdn.com/i/teamlogos/ncaa/500/${id}.png`
 const ESPN_NFL = abbr => `https://a.espncdn.com/i/teamlogos/nfl/500/${abbr}.png`
 const F1 = (year, name) => `https://media.formula1.com/content/dam/fom-website/teams/${year}/${name}-logo.png`
 
@@ -102,6 +103,13 @@ const SOURCES = {
   }).map(([league, ids]) => [league, Object.fromEntries(Object.entries(ids).map(([slug, id]) => [slug, ESPN_SOCCER(id)]))])),
 }
 // Selecciones (Fecha FIFA): bandera de ESPN por abreviatura; slugs = SELECCIONES de teamLogos.ts.
+SOURCES.ncaaf = Object.fromEntries(Object.entries({
+  alabama: 333, florida: 57, georgia: 61, georgiasouthern: 290, houston: 248, indiana: 84, iowa: 2294, iowastate: 66,
+  louisville: 97, lsu: 99, miami: 2390, michigan: 130, mississippistate: 344, missouri: 142, notredame: 87,
+  ohiostate: 194, oklahoma: 201, olemiss: 145, oregon: 2483, pennstate: 213, southcarolina: 2579, tennessee: 2633,
+  texas: 251, texasam: 245, usc: 30, utah: 254, wakeforest: 154, wisconsin: 275,
+}).map(([slug, id]) => [slug, ESPN_NCAA(id)]))
+
 SOURCES.selecciones = Object.fromEntries('mex usa can pan crc jam hon arg bra uru col chi per par ecu bol ven esp eng fra ger por ita ned bel cro sui den aut pol sco wal tur ukr swe nor sba cze gre irl hun jpn kors aus irn ksa mar sen egy nga civ'
   .split(' ').map(a => [a, `https://a.espncdn.com/i/teamlogos/countries/500/${a}.png`]))
 // ESPN no tiene escudo de Al-Faisaly (404): fallback al escudo del artículo de Wikipedia.

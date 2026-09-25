@@ -21,6 +21,8 @@ const FREE = /^(public domain|cc0|cc by(-sa)? \d(\.\d)?|no restrictions)/i
 
 // slug → { title: archivo en Commons, position: foco del recorte (sharp) }
 const SOURCES = {
+  // Deportes
+  cfp:          { title: 'File:2019 CFP - trophy on the sidelines (crop).jpg', position: 'centre' },
   // Economía
   banxico:      { title: 'File:Fachada del Banco de México.jpg', position: 'centre' },
   pesos:        { title: 'File:Pesos mexicanos.jpg', position: 'centre' },
