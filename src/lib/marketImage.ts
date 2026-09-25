@@ -29,6 +29,7 @@ export const SUBCATEGORY_IMAGE: Record<string, string> = {
   'NFL': '/img/markets/sub/nfl.svg',
   'F1': '/img/markets/sub/f1.svg',
   'Boxeo': '/img/markets/sub/boxeo.svg',
+  'Fecha FIFA': '/img/markets/cat/deportes.svg', // sin logo propio: los partidos pintan banderas
   'Elecciones': '/img/markets/sub/elecciones.svg',
   // Fotos de Wikimedia Commons por tema (scripts/fetch-tema-photos.mjs, créditos en
   // public/img/markets/temas/CREDITS.md). Espejo en el backend: SUBCATEGORIAS_CON_IMAGEN

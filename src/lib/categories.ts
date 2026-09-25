@@ -16,7 +16,7 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
   'Deportes': [
     'Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A',
     'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'Champions League',
-    'Saudi Pro League', 'NFL', 'F1', 'Boxeo',
+    'Saudi Pro League', 'Fecha FIFA', 'NFL', 'F1', 'Boxeo',
   ],
   'Política': ['Elecciones', 'Sheinbaum', 'Visas de EEUU', 'Congreso', 'Regulación digital'],
   'Economía': [
@@ -40,7 +40,7 @@ export const SUBCATEGORIES: Partial<Record<Category, string[]>> = {
 // agregarla también a su deporte aquí; si no está en ningún grupo, el rail la
 // muestra como deporte propio (fallback, no rompe). Identificadores: no se traducen.
 export const SPORT_GROUPS: Record<string, string[]> = {
-  'Fútbol': ['Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'Champions League', 'Saudi Pro League'],
+  'Fútbol': ['Liga MX', 'Leagues Cup', 'Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Liga Portugal', 'MLS', 'Champions League', 'Saudi Pro League', 'Fecha FIFA'],
   'NFL': ['NFL'],
   'F1': ['F1'],
   'Boxeo': ['Boxeo'],

@@ -101,6 +101,9 @@ const SOURCES = {
     },
   }).map(([league, ids]) => [league, Object.fromEntries(Object.entries(ids).map(([slug, id]) => [slug, ESPN_SOCCER(id)]))])),
 }
+// Selecciones (Fecha FIFA): bandera de ESPN por abreviatura; slugs = SELECCIONES de teamLogos.ts.
+SOURCES.selecciones = Object.fromEntries('mex usa can pan crc jam hon arg bra uru col chi per par ecu bol ven esp eng fra ger por ita ned bel cro sui den aut pol sco wal tur ukr swe nor sba cze gre irl hun jpn kors aus irn ksa mar sen egy nga civ'
+  .split(' ').map(a => [a, `https://a.espncdn.com/i/teamlogos/countries/500/${a}.png`]))
 // ESPN no tiene escudo de Al-Faisaly (404): fallback al escudo del artículo de Wikipedia.
 SOURCES['saudi-pro-league'].faisaly = [ESPN_SOCCER(21446), 'https://upload.wikimedia.org/wikipedia/en/c/c9/Al-Faisaly_FC_New_Logo.png']
 

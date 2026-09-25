@@ -11,7 +11,7 @@ import { personPhotoFor } from './peoplePhotos'
 export type TeamLeague =
   | 'liga-mx' | 'nfl' | 'f1'
   | 'premier-league' | 'laliga' | 'serie-a' | 'bundesliga' | 'ligue-1'
-  | 'liga-portugal' | 'mls' | 'champions-league' | 'saudi-pro-league'
+  | 'liga-portugal' | 'mls' | 'champions-league' | 'saudi-pro-league' | 'selecciones'
 const BASE = '/img/markets/teams'
 
 interface TeamDef { slug: string; names: string[] }
@@ -324,11 +324,67 @@ export const CHAMPIONS_LEAGUE: TeamDef[] = [
   { slug: 'villarreal',  names: ['Villarreal'] },
 ]
 
+// Selecciones de «Fecha FIFA»: espejo de fuentes.SELECCIONES del backend (español + ESPN).
+// Slug = archivo de bandera de ESPN (countries/500/<slug>.png).
+export const SELECCIONES: TeamDef[] = [
+  { slug: 'mex', names: ['México', 'Mexico'] },
+  { slug: 'usa', names: ['Estados Unidos', 'United States'] },
+  { slug: 'can', names: ['Canadá', 'Canada'] },
+  { slug: 'pan', names: ['Panamá', 'Panama'] },
+  { slug: 'crc', names: ['Costa Rica'] },
+  { slug: 'jam', names: ['Jamaica'] },
+  { slug: 'hon', names: ['Honduras'] },
+  { slug: 'arg', names: ['Argentina'] },
+  { slug: 'bra', names: ['Brasil', 'Brazil'] },
+  { slug: 'uru', names: ['Uruguay'] },
+  { slug: 'col', names: ['Colombia'] },
+  { slug: 'chi', names: ['Chile'] },
+  { slug: 'per', names: ['Perú', 'Peru'] },
+  { slug: 'par', names: ['Paraguay'] },
+  { slug: 'ecu', names: ['Ecuador'] },
+  { slug: 'bol', names: ['Bolivia'] },
+  { slug: 'ven', names: ['Venezuela'] },
+  { slug: 'esp', names: ['España', 'Spain'] },
+  { slug: 'eng', names: ['Inglaterra', 'England'] },
+  { slug: 'fra', names: ['Francia', 'France'] },
+  { slug: 'ger', names: ['Alemania', 'Germany'] },
+  { slug: 'por', names: ['Portugal'] },
+  { slug: 'ita', names: ['Italia', 'Italy'] },
+  { slug: 'ned', names: ['Países Bajos', 'Netherlands'] },
+  { slug: 'bel', names: ['Bélgica', 'Belgium'] },
+  { slug: 'cro', names: ['Croacia', 'Croatia'] },
+  { slug: 'sui', names: ['Suiza', 'Switzerland'] },
+  { slug: 'den', names: ['Dinamarca', 'Denmark'] },
+  { slug: 'aut', names: ['Austria'] },
+  { slug: 'pol', names: ['Polonia', 'Poland'] },
+  { slug: 'sco', names: ['Escocia', 'Scotland'] },
+  { slug: 'wal', names: ['Gales', 'Wales'] },
+  { slug: 'tur', names: ['Turquía', 'Türkiye'] },
+  { slug: 'ukr', names: ['Ucrania', 'Ukraine'] },
+  { slug: 'swe', names: ['Suecia', 'Sweden'] },
+  { slug: 'nor', names: ['Noruega', 'Norway'] },
+  { slug: 'sba', names: ['Serbia'] },
+  { slug: 'cze', names: ['Chequia', 'Czechia'] },
+  { slug: 'gre', names: ['Grecia', 'Greece'] },
+  { slug: 'irl', names: ['Irlanda', 'Republic of Ireland'] },
+  { slug: 'hun', names: ['Hungría', 'Hungary'] },
+  { slug: 'jpn', names: ['Japón', 'Japan'] },
+  { slug: 'kors', names: ['Corea del Sur', 'South Korea'] },
+  { slug: 'aus', names: ['Australia'] },
+  { slug: 'irn', names: ['Irán', 'Iran'] },
+  { slug: 'ksa', names: ['Arabia Saudita', 'Saudi Arabia'] },
+  { slug: 'mar', names: ['Marruecos', 'Morocco'] },
+  { slug: 'sen', names: ['Senegal'] },
+  { slug: 'egy', names: ['Egipto', 'Egypt'] },
+  { slug: 'nga', names: ['Nigeria'] },
+  { slug: 'civ', names: ['Costa de Marfil', 'Ivory Coast'] },
+]
+
 const DEFS: Record<TeamLeague, TeamDef[]> = {
   'liga-mx': LIGA_MX, nfl: NFL, f1: F1,
   'premier-league': PREMIER_LEAGUE, laliga: LALIGA, 'serie-a': SERIE_A, bundesliga: BUNDESLIGA,
   'ligue-1': LIGUE_1, 'liga-portugal': LIGA_PORTUGAL, mls: MLS, 'champions-league': CHAMPIONS_LEAGUE,
-  'saudi-pro-league': SAUDI_PRO_LEAGUE,
+  'saudi-pro-league': SAUDI_PRO_LEAGUE, selecciones: SELECCIONES,
 }
 const LEAGUES = Object.keys(DEFS) as TeamLeague[]
 
@@ -348,7 +404,7 @@ const SUB_TO_LEAGUE: Record<string, TeamLeague> = {
   'Liga MX': 'liga-mx', NFL: 'nfl', F1: 'f1',
   'Premier League': 'premier-league', LaLiga: 'laliga', 'Serie A': 'serie-a', Bundesliga: 'bundesliga',
   'Ligue 1': 'ligue-1', 'Liga Portugal': 'liga-portugal', MLS: 'mls', 'Champions League': 'champions-league',
-  'Saudi Pro League': 'saudi-pro-league',
+  'Saudi Pro League': 'saudi-pro-league', 'Fecha FIFA': 'selecciones',
 }
 // Prefijo del id de mercado (mx-…, pl-…, laliga-…) → liga.
 const ID_PREFIX_TO_LEAGUE: Record<string, TeamLeague> = {
