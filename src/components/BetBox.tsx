@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { tradesApi, marketsApi, authApi, type ApiOutcome, type ApiQuote } from '../lib/api'
-import { oauthNext } from '../lib/returnTo'
-import { buildTradeRoute, type TradeIntent } from '../lib/tradeIntent'
+import { tradesApi, marketsApi, type ApiOutcome, type ApiQuote } from '../lib/api'
+import { type TradeIntent } from '../lib/tradeIntent'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { displayPair, probText } from '../lib/prices'
@@ -109,8 +108,7 @@ export function BetBox({
 
   const handleTrade = async () => {
     if (!user) {
-      if (onRequireAuth) { onRequireAuth(intent); return }
-      setTradeError(t('bet.loginToTrade'))
+      onRequireAuth?.(intent)
       return
     }
     if (belowMin) { setTradeError(t('bet.minAmount', { min: MIN_AMOUNT })); return }
@@ -402,15 +400,6 @@ export function BetBox({
         }
       </button>
       </div>
-
-      {!user && !onRequireAuth && (
-        <div style={{ marginTop: 12, textAlign: 'center' }}>
-          {/* El regreso del OAuth trae de vuelta lo elegido (side, monto, opción) al detalle */}
-          <a href={authApi.googleUrl(buildTradeRoute(marketId, intent) ?? oauthNext())} style={{ fontSize: 13, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: 3, fontWeight: 500 }}>
-            {t('bet.loginToTradeLink')}
-          </a>
-        </div>
-      )}
 
       <p className="meta-label" style={{ margin: '12px 0 0', textAlign: 'center', lineHeight: 1.5 }}>
         {t('bet.disclaimer')}

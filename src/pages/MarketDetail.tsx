@@ -10,6 +10,7 @@ import { useAuth } from '../lib/AuthContext'
 import { FullChart, MultiLineChart, outcomeColor } from '../components/SparkChart'
 import { BetBox } from '../components/BetBox'
 import { TradeSheet } from '../components/TradeSheet'
+import { AuthModal } from '../components/AuthModal'
 import { track } from '../lib/analytics'
 import type { PricePoint } from '../types'
 import { formatVolume, formatDate, daysLeft } from '../lib/format'
@@ -25,7 +26,7 @@ import { TeamMark, DrawMark } from '../components/TeamMark'
 import { outcomeLogo } from '../lib/teamLogos'
 import { cleanLabel } from '../lib/mapMarket'
 import { orderOutcomes, is1x2 } from '../lib/outcomeOrder'
-import { parseTradeIntent } from '../lib/tradeIntent'
+import { parseTradeIntent, buildTradeRoute, type TradeIntent } from '../lib/tradeIntent'
 import { kindLabelKey } from '../lib/categories'
 import type { Category } from '../types'
 import { CHART_RANGES, RANGE_LABELS, filterRange, type ChartRange } from '../lib/chartRange'
@@ -90,7 +91,9 @@ export function MarketDetail() {
   // sustituye por una barra fija abajo que abre un bottom sheet con el BetBox.
   const isMobile = useMobile()
   const [sheetSide, setSheetSide] = useState<'YES' | 'NO' | null>(null)
-  const closeSheet = useCallback(() => setSheetSide(null), [])
+  // Sin sesión al comprar: lo elegido (lado, monto, opción) mientras se ve el acceso
+  const [authIntent, setAuthIntent] = useState<TradeIntent | null>(null)
+  const closeSheet = useCallback(() => { setSheetSide(null); setAuthIntent(null) }, [])
   // Lado del BetBox en escritorio: lo eligen las filas Sí/No de cada opción (multi)
   const [betSide, setBetSide] = useState<'YES' | 'NO'>(copySide ?? 'YES')
   useEffect(() => { setSheetSide(null) }, [id])
@@ -297,6 +300,7 @@ export function MarketDetail() {
       onSideChange={setBetSide}
       initialAmount={copyAmount}
       compact={hasMobileBar}
+      onRequireAuth={setAuthIntent}
       onTraded={(p) => {
         setYesPrice(p)
         if (market.market_type === 'multi') {
@@ -813,6 +817,11 @@ export function MarketDetail() {
         </div>
       </div>
 
+      {/* Escritorio: comprar sin sesión abre el acceso encima; el BetBox sigue montado */}
+      {!hasMobileBar && authIntent && (
+        <AuthModal initialMode="register" oauthNextRoute={buildTradeRoute(market.id, authIntent)} onClose={() => setAuthIntent(null)} />
+      )}
+
       {/* ── Móvil: barra fija de operar + bottom sheet ── */}
       {hasMobileBar && (
         <>
@@ -837,9 +846,14 @@ export function MarketDetail() {
               </>
             )}
           </div>
-          <TradeSheet open={sheetSide !== null} onClose={closeSheet}>
-            {/* key: el BetBox toma initialSide solo al montar */}
-            <div key={sheetSide}>{betBox}</div>
+          <TradeSheet open={sheetSide !== null} onClose={closeSheet} contentKey={authIntent ? 'auth' : 'trade'}>
+            {/* key: el BetBox toma initialSide solo al montar; oculto (no desmontado) durante el acceso */}
+            <div key={sheetSide} hidden={!!authIntent}>{betBox}</div>
+            {authIntent && (
+              <div className="sheet-swap">
+                <AuthModal embedded initialMode="register" oauthNextRoute={buildTradeRoute(market.id, authIntent)} onClose={() => setAuthIntent(null)} />
+              </div>
+            )}
           </TradeSheet>
         </>
       )}

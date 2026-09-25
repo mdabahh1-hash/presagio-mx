@@ -265,8 +265,6 @@
     "processing": "Processing...",
     "selectOutcomeBtn": "Select an outcome",
     "buyBtn": "Buy {{side}} · {{amount}} PT",
-    "loginToTrade": "Log in to trade",
-    "loginToTradeLink": "Log in to trade",
     "disclaimer": "VEREDIKT runs on virtual points. No real money is involved.",
     "successBinary": "You bought {{shares}} {{side}} shares for {{cost}} PT",
     "successMulti": "You bought {{shares}} shares of \"{{label}}\" for {{cost}} PT",

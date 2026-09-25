@@ -265,8 +265,6 @@
     "processing": "Procesando...",
     "selectOutcomeBtn": "Selecciona un resultado",
     "buyBtn": "Comprar {{side}} · {{amount}} PT",
-    "loginToTrade": "Inicia sesión para operar",
-    "loginToTradeLink": "Inicia sesión para operar",
     "disclaimer": "VEREDIKT opera con puntos virtuales. No se involucra dinero real.",
     "successBinary": "Compraste {{shares}} acciones {{side}} por {{cost}} PT",
     "successMulti": "Compraste {{shares}} acciones de \"{{label}}\" por {{cost}} PT",
