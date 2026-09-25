@@ -4,6 +4,7 @@ import { marketsApi, contenidoApi, type ApiContenidoCategoria, type ApiPricePoin
 import type { Category, Market } from '../../types'
 import { QuickTradeSheet } from '../QuickTradeSheet'
 import { AuthModal } from '../AuthModal'
+import { buildTradeRoute, type TradeIntent } from '../../lib/tradeIntent'
 import { Tabs } from '../Tabs'
 import { CryptoExpanded, type Side } from './CryptoExpanded'
 import { EscaleraCard } from './EscaleraCard'
@@ -132,7 +133,8 @@ export function CryptoLanding({ markets, loading, subcats, onTraded, showHeader 
 
   // Móvil: el mismo toque abre el TradeSheet con BetBox (patrón de Política y Deportes)
   const [sheet, setSheet] = useState<{ id: string; side: Side } | null>(null)
-  const [authOpen, setAuthOpen] = useState(false)
+  // Acceso pedido desde el peldaño expandido: id + lo elegido (la fila sigue abierta)
+  const [auth, setAuth] = useState<{ id: string; intent: TradeIntent } | null>(null)
   const closeSheet = useCallback(() => setSheet(null), [])
   const sheetMarket = sheet ? inCat.find(m => m.id === sheet.id) ?? null : null
 
@@ -142,7 +144,7 @@ export function CryptoLanding({ markets, loading, subcats, onTraded, showHeader 
     setOpen({ id: m.id, side })
   }
   const collapse = useCallback(() => setOpen(null), [])
-  const requireAuth = () => { setOpen(null); setSheet(null); setAuthOpen(true) }
+
 
   const renderExpanded = (id: string) => {
     const m = inCat.find(x => x.id === id)
@@ -156,7 +158,7 @@ export function CryptoLanding({ markets, loading, subcats, onTraded, showHeader 
         outcomeKey={openOutcome}
         onOutcome={setOpenOutcome}
         onClose={collapse}
-        onRequireAuth={requireAuth}
+        onRequireAuth={intent => setAuth({ id: m.id, intent })}
         onTraded={p => onTraded(m.id, p, m.marketType === 'multi')}
       />
     )
@@ -234,7 +236,7 @@ export function CryptoLanding({ markets, loading, subcats, onTraded, showHeader 
         onTraded={p => sheetMarket && onTraded(sheetMarket.id, p, sheetMarket.marketType === 'multi')}
       />
       {/* Escritorio: el acceso del peldaño expandido (CryptoExpanded) sigue en modal */}
-      {authOpen && <AuthModal initialMode="register" onClose={() => setAuthOpen(false)} />}
+      {auth && <AuthModal initialMode="register" oauthNextRoute={buildTradeRoute(auth.id, auth.intent)} onClose={() => setAuth(null)} />}
     </div>
   )
 }

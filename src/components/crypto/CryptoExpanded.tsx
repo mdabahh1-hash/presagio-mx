@@ -5,6 +5,7 @@ import type { ApiPricePoint } from '../../lib/api'
 import { Icon } from '../Icon'
 import { FullChart } from '../SparkChart'
 import { BetBox } from '../BetBox'
+import type { TradeIntent } from '../../lib/tradeIntent'
 import { useElementWidth } from '../../lib/useElementWidth'
 import { splitHistory } from '../../lib/chartRange'
 import { deltaSince, DAY_MS } from '../../lib/priceDelta'
@@ -24,7 +25,7 @@ export function CryptoExpanded({ market, history, side, amount, outcomeKey, onOu
   outcomeKey: string | null
   onOutcome: (key: string) => void
   onClose: () => void
-  onRequireAuth: () => void
+  onRequireAuth: (intent: TradeIntent) => void
   onTraded: (newYesPrice: number) => void
 }) {
   const { t } = useTranslation()
