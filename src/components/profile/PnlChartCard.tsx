@@ -7,8 +7,8 @@ import type { PricePoint } from '../../types'
 
 type Period = '1d' | '1w' | '1m' | 'all'
 
-// El chart grafica el SALDO diario (points-history); la cifra grande es el
-// P&L real (points + invertido − 10000, misma fórmula que el backend).
+// Chart y cifra grande = P&L solo de trades realizados (sin bonos ni referidos):
+// points-history lo acumula por día y `pnl` viene de /users/{username}.
 interface Props {
   pointsHistory?: PricePoint[]   // omitido en perfil público (el ledger es privado)
   pnl: number

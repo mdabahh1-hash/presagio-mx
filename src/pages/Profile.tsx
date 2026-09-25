@@ -13,8 +13,6 @@ import { Tabs } from '../components/Tabs'
 import { Icon } from '../components/Icon'
 import type { PricePoint } from '../types'
 
-const STARTING_POINTS = 10_000
-
 export function Profile() {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -24,12 +22,13 @@ export function Profile() {
   const [activeTab, setActiveTab] = useState<'posiciones' | 'actividad'>('posiciones')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [trofeos, setTrofeos] = useState<ApiTrofeo[]>([])
+  const [pnl, setPnl] = useState(0)
 
   useEffect(() => {
     if (!user) return
     usersApi.myPositions().then(setPositions).catch(() => {})
     usersApi.history().then(setHistory).catch(() => {})
-    usersApi.get(user.username).then(p => setTrofeos(p.trofeos ?? [])).catch(() => {})
+    usersApi.get(user.username).then(p => { setTrofeos(p.trofeos ?? []); setPnl(p.pnl) }).catch(() => {})
     usersApi.pointsHistory(366)
       .then(data => {
         setPointsHistory(data.map(d => ({ date: d.date, price: d.price })))
@@ -69,11 +68,7 @@ export function Profile() {
     )
   }
 
-  const invested = positions.reduce((s, p) => s + p.avg_cost * p.shares, 0)
   const positionsValue = positions.reduce((s, p) => s + (p.current_value ?? p.avg_cost * p.shares), 0)
-  // Misma fórmula que _pnl_and_volume en el backend (app/api/users.py):
-  // apostar es P&L-neutral; solo las resoluciones lo mueven.
-  const pnl = user.points + invested - STARTING_POINTS
   const wins = history.filter(e => e.type === 'win')
   const biggestWin = wins.length ? Math.max(...wins.map(e => e.amount)) : null
 
