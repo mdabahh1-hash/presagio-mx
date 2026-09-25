@@ -14,7 +14,7 @@ import { CategoryLanding, type CategorySort } from '../components/categoria/Cate
 import { CategoryBar, isFeed, type CategoryTab } from '../components/CategoryBar'
 import { Icon } from '../components/Icon'
 import type { Category, Market } from '../types'
-import { SUBCATEGORIES } from '../lib/categories'
+import { CATEGORIES, SUBCATEGORIES } from '../lib/categories'
 import { apiToMarket } from '../lib/mapMarket'
 import { useMobile } from '../lib/useMobile'
 import { SeeMoreButton } from '../components/SeeMoreButton'
@@ -69,8 +69,13 @@ export function Home() {
   const [usingMock, setUsingMock] = useState(false)
   const [loading, setLoading] = useState(true)
   const location = useLocation()
-  // El feed vive en la URL (/ = Tendencia, /nuevo = Nuevo); las categorías filtran in-place
-  const feedFromPath: MobileTab = location.pathname === '/nuevo' ? 'Nuevo' : 'Tendencia'
+  // El feed vive en la URL (/ = Tendencia, /nuevo = Nuevo); las categorías filtran in-place.
+  // /?cat=X llega desde la barra de otras páginas (Noticias, Perfil) y abre la
+  // portada ya en esa categoría, sin salir a /mercados.
+  const catFromUrl = new URLSearchParams(location.search).get('cat')
+  const feedFromPath: MobileTab = location.pathname === '/nuevo' ? 'Nuevo'
+    : catFromUrl && (CATEGORIES as readonly string[]).includes(catFromUrl) ? catFromUrl as Category
+    : 'Tendencia'
   const [mobileTab, setMobileTab] = useState<MobileTab>(feedFromPath)
   const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
   const navigate = useNavigate()

@@ -18,8 +18,9 @@ export const isFeed = (tab: string): tab is Feed => (FEEDS as readonly string[])
 // Barra de categorías estilo Polymarket: tabs de texto con subrayado, pegada
 // bajo el navbar, con una línea inferior que no se mueve ("panel congelado").
 // Dos modos para las CATEGORÍAS: con onChange filtran in-place (Home); sin
-// onChange cada una es un Link a /mercados?cat= y el activo se lee de la URL
-// (Perfil, Noticias). Los feeds son Links en ambos modos.
+// onChange cada una es un Link a /?cat= (la portada abre en esa categoría, sin
+// salir a /mercados) y el activo se lee de la URL (Perfil, Noticias). Los feeds
+// son Links en ambos modos.
 // El wrapper es full-bleed (la línea cruza todo el ancho): renderizar FUERA
 // del .page-container de la página. `children` = slot arriba de los tabs
 // (buscador de la Home móvil).
@@ -52,7 +53,7 @@ export function CategoryBar({ active, onChange, sticky = true, children, style }
     if (tab === 'Tendencia') return '/'
     if (tab === 'Nuevo') return '/nuevo'
     if (tab === 'Noticias') return '/noticias'
-    return onChange ? undefined : `/mercados?cat=${encodeURIComponent(tab)}`
+    return onChange ? undefined : `/?cat=${encodeURIComponent(tab)}`
   }
 
   const items: TabItem<CategoryTab>[] = [...FEEDS, ...visibles].map(tab => ({
