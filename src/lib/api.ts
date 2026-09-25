@@ -19,8 +19,10 @@ export function clearToken() {
 // localized via errors.ts codes or the backend's Spanish message.
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = getToken()
+  // Content-Type solo con body: en un GET convierte la petición en "no simple" y el
+  // navegador manda un preflight OPTIONS antes de cada llamada (el API es otro origen)
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(init.body ? { 'Content-Type': 'application/json' } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...init.headers,
   }
@@ -165,6 +167,21 @@ export interface ApiQuote {
   quote_expires_at: string
 }
 
+type ListParams = { category?: string; subcategory?: string; kind?: string; q?: string; sort?: string; status?: string }
+
+// Última respuesta de listAll por filtros: al volver a una página (Atrás desde un
+// mercado) se pinta al instante con esto mientras llega la fresca.
+const listCache = new Map<string, ApiMarket[]>()
+const cacheKey = (params?: ListParams) => JSON.stringify(params ?? {})
+export const peekAllMarkets = (params?: ListParams) => listCache.get(cacheKey(params))
+// Un mercado ya visto en alguna lista: el detalle lo pinta al instante mientras pide el fresco
+export function peekMarket(id: string): ApiMarket | undefined {
+  for (const list of listCache.values()) {
+    const m = list.find(x => x.id === id)
+    if (m) return m
+  }
+}
+
 export const marketsApi = {
   quote: (id: string, opts: { side?: 'YES' | 'NO'; outcome_key?: string; amount: number }) => {
     const qs = new URLSearchParams({ amount: String(opts.amount) })
@@ -184,24 +201,27 @@ export const marketsApi = {
     return request<ApiMarket[]>(`/markets?${qs}`)
   },
   // El backend capea limit a 100; una categoría (Deportes) puede rebasarlo.
-  // Pagina con offset hasta recibir una página incompleta.
-  listAll: async (params?: { category?: string; subcategory?: string; kind?: string; q?: string; sort?: string; status?: string }): Promise<ApiMarket[]> => {
-    const PAGE = 100
-    const all: ApiMarket[] = []
-    for (let offset = 0; ; offset += PAGE) {
+  // Pagina con offset hasta recibir una página incompleta: la primera sola y las
+  // siguientes de tres en tres en paralelo (antes, una tras otra).
+  listAll: async (params?: ListParams): Promise<ApiMarket[]> => {
+    const PAGE = 100, PARALLEL = 3
+    const page = (offset: number) => {
       const qs = new URLSearchParams()
-      if (params?.category) qs.set('category', params.category)
-      if (params?.subcategory) qs.set('subcategory', params.subcategory)
-      if (params?.kind) qs.set('kind', params.kind)
-      if (params?.q) qs.set('q', params.q)
-      if (params?.sort) qs.set('sort', params.sort)
-      if (params?.status) qs.set('status', params.status)
+      for (const [k, v] of Object.entries(params ?? {})) if (v) qs.set(k, v)
       qs.set('limit', String(PAGE))
       qs.set('offset', String(offset))
-      const page = await request<ApiMarket[]>(`/markets?${qs}`)
-      all.push(...page)
-      if (page.length < PAGE) return all
+      return request<ApiMarket[]>(`/markets?${qs}`)
     }
+    const all = await page(0)
+    for (let offset = PAGE; all.length === offset; offset += PAGE * PARALLEL) {
+      const pages = await Promise.all(Array.from({ length: PARALLEL }, (_, i) => page(offset + i * PAGE)))
+      for (const p of pages) {
+        all.push(...p)
+        if (p.length < PAGE) break
+      }
+    }
+    listCache.set(cacheKey(params), all)
+    return all
   },
   get: (id: string) =>
     request<ApiMarket & { b: number; q_yes: number; q_no: number }>(`/markets/${id}`),
@@ -498,6 +518,8 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ email, password, display_name: displayName }),
     }),
+  resendCode: (email: string) =>
+    request<{ message: string }>('/auth/resend-code', { method: 'POST', body: JSON.stringify({ email }) }),
   verifyEmail: (email: string, code: string) =>
     request<{ token: string; user: ApiUser }>('/auth/verify-email', {
       method: 'POST',

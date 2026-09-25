@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react'
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useParams, Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { displayPair, probText } from '../lib/prices'
 import { getCategoryColor, getCategoryBg } from '../lib/categoryColors'
-import { marketsApi, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
+import { marketsApi, peekMarket, authApi, type ApiMarket, type ApiComment, type ApiPricePoint, type ApiOutcome } from '../lib/api'
 import { oauthNext } from '../lib/returnTo'
 import { marketSocket } from '../lib/websocket'
 import { useAuth } from '../lib/AuthContext'
@@ -38,6 +38,7 @@ export function MarketDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   // "Copiar jugada" prefill: /mercado/:id?side=YES&monto=120&outcome=key
   // (también el regreso de OAuth desde una compra). Se valida en parseTradeIntent y se
   // lee UNA vez por visita: la URL se limpia al abrir la hoja (abajo).
@@ -115,9 +116,8 @@ export function MarketDetail() {
 
   useEffect(() => {
     if (!id) return
-    // Market fetch is the only critical call; a transient history/comments failure
-    // must not make an existing market read as "no encontrado".
-    marketsApi.get(id).then((m) => {
+    let alive = true
+    const applyMarket = (m: ApiMarket) => {
       setMarket(m)
       setYesPrice(m.yes_price)
       setVolume(m.volume)
@@ -125,33 +125,46 @@ export function MarketDetail() {
         const sorted = orderOutcomes((m.outcomes ?? []).map(o => ({ ...o, label: cleanLabel(o.label) })))
         setOutcomes(sorted)
         const preselected = copyOutcome && sorted.some(o => o.outcome_key === copyOutcome) ? copyOutcome : null
-        // La preselección es la líder por probabilidad (en un 1X2 sorted[0] es el local)
+        // La preselección es la líder por probabilidad (en un 1X2 sorted[0] es el local);
+        // si ya había una opción válida elegida (pintado desde la lista), se respeta
         const lider = sorted.reduce<typeof sorted[number] | null>((a, o) => (!a || o.price > a.price ? o : a), null)
-        setSelectedOutcomeKey(preselected ?? lider?.outcome_key ?? null)
+        setSelectedOutcomeKey(prev => (prev && sorted.some(o => o.outcome_key === prev) ? prev : preselected ?? lider?.outcome_key ?? null))
         setVisibleKeys(new Set(sorted.slice(0, 4).map(o => o.outcome_key)))
       }
+    }
+    // Visto en una lista (la tarjeta de donde vino): se pinta ya, sin esqueleto
+    const cached = peekMarket(id)
+    if (cached) { applyMarket(cached); setLoading(false) }
 
-      // Timestamp completo (no truncado a día) para que los rangos 1H/6H/1D
-      // y el tooltip con hora funcionen; los rangos se filtran en cliente.
-      marketsApi.history(id, 365).then((hist) => {
-        setHistory(hist.filter((p: ApiPricePoint) => !p.outcome_key).map((p: ApiPricePoint) => ({ date: p.recorded_at, price: p.yes_price })))
-        if (m.market_type === 'multi') {
-          const series: Record<string, PricePoint[]> = {}
-          for (const pt of hist) {
-            if (!pt.outcome_key) continue
-            if (!series[pt.outcome_key]) series[pt.outcome_key] = []
-            series[pt.outcome_key].push({ date: pt.recorded_at, price: pt.yes_price })
-          }
-          if (Object.keys(series).length === 0) {
-            const today = new Date().toISOString()
-            for (const o of m.outcomes ?? []) series[o.outcome_key] = [{ date: today, price: o.price }]
-          }
-          setOutcomeSeries(series)
+    // Mercado, historial y comentarios en paralelo. Market fetch is the only critical
+    // call; a transient history/comments failure must not make an existing market
+    // read as "no encontrado".
+    const marketP = marketsApi.get(id)
+    // Timestamp completo (no truncado a día) para que los rangos 1H/6H/1D
+    // y el tooltip con hora funcionen; los rangos se filtran en cliente.
+    const historyP = marketsApi.history(id, 365)
+    marketP.then(m => { if (alive) applyMarket(m) })
+      .catch(() => { if (alive && !cached) setMarket(null) })
+      .finally(() => { if (alive) setLoading(false) })
+    Promise.all([marketP, historyP]).then(([m, hist]) => {
+      if (!alive) return
+      setHistory(hist.filter((p: ApiPricePoint) => !p.outcome_key).map((p: ApiPricePoint) => ({ date: p.recorded_at, price: p.yes_price })))
+      if (m.market_type === 'multi') {
+        const series: Record<string, PricePoint[]> = {}
+        for (const pt of hist) {
+          if (!pt.outcome_key) continue
+          if (!series[pt.outcome_key]) series[pt.outcome_key] = []
+          series[pt.outcome_key].push({ date: pt.recorded_at, price: pt.yes_price })
         }
-      }).catch(() => {})
-
-      marketsApi.comments(id).then(setComments).catch(() => {})
-    }).catch(() => setMarket(null)).finally(() => setLoading(false))
+        if (Object.keys(series).length === 0) {
+          const today = new Date().toISOString()
+          for (const o of m.outcomes ?? []) series[o.outcome_key] = [{ date: today, price: o.price }]
+        }
+        setOutcomeSeries(series)
+      }
+    }).catch(() => {})
+    marketsApi.comments(id).then(c => { if (alive) setComments(c) }).catch(() => {})
+    return () => { alive = false }
   }, [id])
 
   useEffect(() => {
@@ -301,6 +314,8 @@ export function MarketDetail() {
       initialAmount={copyAmount}
       compact={hasMobileBar}
       onRequireAuth={setAuthIntent}
+      // Móvil: la hoja se cierra sola tras comprar; en escritorio la caja se queda
+      onDone={hasMobileBar ? closeSheet : undefined}
       onTraded={(p) => {
         setYesPrice(p)
         if (market.market_type === 'multi') {
@@ -317,7 +332,8 @@ export function MarketDetail() {
       {/* Breadcrumb */}
       <div className="anim-1 meta-label" style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', fontSize: 13 }}>
         <button
-          onClick={() => navigate(-1)}
+          // Llegando por un link compartido no hay página anterior en el sitio: -1 sacaría al usuario
+          onClick={() => (location.key === 'default' ? navigate('/') : navigate(-1))}
           className="btn btn-ghost btn-sm"
           style={{ padding: '0 8px 0 4px', height: 28, marginLeft: -4 }}
         >

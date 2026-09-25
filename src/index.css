@@ -684,6 +684,7 @@ input[type='range']::-webkit-slider-thumb {
 /* Navbar */
 .navbar-bonus-mobile { display: none; }
 .navbar-register-mobile { display: none; }
+.navbar-search-toggle { display: none; }
 .navbar-howitworks:hover { color: var(--text-primary) !important; }
 
 /* /mercados: en desktop el navbar ya trae buscador y CTA; los de la página
@@ -780,8 +781,22 @@ input[type='range']::-webkit-slider-thumb {
   .navbar-user      { display: none !important; }
   .navbar-hamburger {
     display: flex !important; align-items: center; justify-content: center;
-    margin-left: auto; min-width: 44px; min-height: 44px;
+    min-width: 44px; min-height: 44px;
   }
+  /* Lupa del buscador global: empuja lupa + menú a la derecha */
+  .navbar-search-toggle {
+    display: flex !important; align-items: center; justify-content: center;
+    margin-left: auto; width: 44px; height: 44px; position: relative; z-index: 3;
+  }
+  .navbar-inner { position: relative; }
+  .nav-search-open .navbar-search {
+    display: flex !important; align-items: center;
+    position: absolute !important; top: 0; bottom: 0; left: 0; right: 0; padding: 0 60px 0 16px;
+    max-width: none !important; min-width: 0 !important; z-index: 2; background: var(--bg-base);
+  }
+  .nav-search-open .navbar-search-toggle { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
+  .nav-search-open .navbar-search > .input { flex: 1; min-width: 0; }
+  .nav-search-open .navbar-search kbd { display: none !important; }
 
   .tabs .tab, .cat-tabs button, .cat-tabs a, .mobile-cat-tab { min-height: 44px; }
   .tabs { gap: 18px; }

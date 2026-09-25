@@ -1,3 +1,4 @@
+import { flushSync } from 'react-dom'
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -131,6 +132,8 @@ export function Navbar() {
   const [q, setQ] = useState('')
   const [results, setResults] = useState<ApiMarket[] | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
+  // Móvil: la lupa despliega el mismo buscador (con sugerencias) sobre el navbar
+  const [mobileSearch, setMobileSearch] = useState(false)
   const [highlighted, setHighlighted] = useState(-1)
   const searchRef = useRef<HTMLFormElement>(null)
   const dq = useDebouncedValue(q, 300)
@@ -195,7 +198,14 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMenuOpen(false); setDeskMenu(false); setSearchOpen(false); setHighlighted(-1) }, [location.pathname])
+  useEffect(() => { setMenuOpen(false); setDeskMenu(false); setSearchOpen(false); setHighlighted(-1); setMobileSearch(false) }, [location.pathname, location.search])
+
+  // flushSync: el input debe existir y enfocarse dentro del toque, o iOS no abre el teclado
+  const toggleMobileSearch = () => {
+    if (mobileSearch) { setMobileSearch(false); setSearchOpen(false); return }
+    flushSync(() => { setMobileSearch(true); setMenuOpen(false) })
+    searchRef.current?.querySelector('input')?.focus()
+  }
 
   // Menú de escritorio: abre por click y cierra al hacer click fuera o con Escape
   const menuRef = useRef<HTMLDivElement>(null)
@@ -228,7 +238,7 @@ export function Navbar() {
   return (
     <>
       {/* Main navbar */}
-      <nav style={{
+      <nav className={mobileSearch ? 'nav-search-open' : undefined} style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: scrolled ? 'var(--nav-bg-scrolled)' : 'var(--nav-bg)',
         // 12px: blur(24px) sobre un sticky repintaba en cada frame de scroll
@@ -414,6 +424,17 @@ export function Navbar() {
           <div className="navbar-bonus-mobile">
             <DailyBonusPill />
           </div>
+
+          {/* Lupa — solo móvil: abre el buscador global desde cualquier página */}
+          <button
+            type="button"
+            className="navbar-search-toggle icon-btn"
+            onClick={toggleMobileSearch}
+            aria-label={mobileSearch ? t('common.close') : t('nav.searchAria')}
+            aria-expanded={mobileSearch}
+          >
+            <Icon name={mobileSearch ? 'x' : 'search'} size={20} />
+          </button>
 
           {/* Hamburger — hidden on desktop, shown via CSS */}
           <button

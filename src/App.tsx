@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { Navbar } from './components/Navbar'
 import { Footer } from './components/Footer'
 import { WelcomeModal } from './components/WelcomeModal'
@@ -84,6 +84,8 @@ export default function App() {
               {/* OAuth callback is handled in AuthProvider useEffect */}
               <Route path="/auth/callback" element={<AuthCallbackRedirect />} />
               <Route path="/admin" element={<Admin />} />
+              {/* Ruta desconocida: a la portada, no una página en blanco */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </main>

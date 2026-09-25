@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { tradesApi, marketsApi, type ApiOutcome, type ApiQuote } from '../lib/api'
 import { type TradeIntent } from '../lib/tradeIntent'
+import { tomarCompraPendiente } from '../lib/compraPendiente'
 import { useAuth } from '../lib/AuthContext'
 import { track } from '../lib/analytics'
 import { displayPair, probText } from '../lib/prices'
@@ -25,6 +26,8 @@ interface BetBoxProps {
   // Para resolver escudos junto a cada resultado
   subcategory?: string | null
   onTraded?: (newYesPrice: number) => void
+  // Tras una compra exitosa, cuando ya se vio la confirmación (la hoja se cierra)
+  onDone?: () => void
   // Sin sesión: quien lo monta abre el acceso; recibe lo elegido para poder volver a ello
   onRequireAuth?: (intent: TradeIntent) => void
   compact?: boolean
@@ -44,6 +47,7 @@ export function BetBox({
   onOutcomeSelect,
   subcategory,
   onTraded,
+  onDone,
   onRequireAuth,
   compact = false,
   initialSide,
@@ -68,6 +72,7 @@ export function BetBox({
   const [tradeError, setTradeError] = useState<string | null>(null)
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null)
   const [quote, setQuote] = useState<ApiQuote | null>(null)
+  const [quoteFailed, setQuoteFailed] = useState(false)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [confettiKey, setConfettiKey] = useState(0)
 
@@ -98,16 +103,22 @@ export function BetBox({
     if (isMulti && !selectedOutcome) { setQuote(null); return }
     const opts = { ...target(), amount: debouncedAmount }
     marketsApi.quote(marketId, opts)
-      .then(q => { if (!cancelled) setQuote(q) })
-      .catch(() => { if (!cancelled) setQuote(null) })
+      .then(q => { if (!cancelled) { setQuote(q); setQuoteFailed(false) } })
+      .catch(() => { if (!cancelled) { setQuote(null); setQuoteFailed(true) } })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketId, debouncedAmount, side, selectedOutcome?.outcome_key, isMulti, throttledWsPrice])
 
   const intent: TradeIntent = { side, amount: amount || undefined, outcomeKey: isMulti ? selectedOutcome?.outcome_key : undefined }
 
+  // Tocó Comprar sin sesión: al terminar el acceso aquí mismo (email, passkey) la
+  // compra se completa sola. Con Google/GitHub la página se recarga y la marca va en
+  // localStorage (compraPendiente).
+  const pendingAuth = useRef(false)
+
   const handleTrade = async () => {
     if (!user) {
+      pendingAuth.current = true
       onRequireAuth?.(intent)
       return
     }
@@ -141,6 +152,7 @@ export function BetBox({
       onTraded?.(result.new_yes_price)
       await refreshUser()
       setTimeout(() => setTradeSuccess(null), 4000)
+      if (onDone) setTimeout(onDone, 1500)
     } catch (e) {
       const err = e as Error & { code?: string }
       if (err.code === 'PRICE_MOVED') {
@@ -156,6 +168,20 @@ export function BetBox({
       setTrading(false)
     }
   }
+
+  // Espera la cotización para comprar con protección de precio
+  useEffect(() => {
+    if (!user || !quote || trading) return
+    if (pendingAuth.current || tomarCompraPendiente(marketId)) {
+      pendingAuth.current = false
+      void handleTrade()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, quote])
+
+  const maxAmount = user ? Math.max(MIN_AMOUNT, Math.floor(user.points)) : 10000
+  // Con sesión, Comprar espera la cotización (si falla, se deja comprar sin ella)
+  const waitingQuote = !!user && !belowMin && !quote && !quoteFailed
 
   return (
     <div>
@@ -266,7 +292,7 @@ export function BetBox({
           </p>
         )}
         <input
-          type="range" min={MIN_AMOUNT} max={10000} step={10}
+          type="range" min={MIN_AMOUNT} max={maxAmount} step={10}
           value={amount}
           onChange={e => setAmount(parseInt(e.target.value))}
           style={{ width: '100%', marginTop: 12 }}
@@ -289,6 +315,19 @@ export function BetBox({
             {v.toLocaleString('en-US')}
           </button>
         ))}
+        {user && (
+          <button
+            onClick={() => setAmount(Math.floor(user.points))}
+            className="btn btn-secondary btn-sm"
+            style={{
+              flex: 1, padding: 0,
+              borderColor: amount === Math.floor(user.points) ? 'var(--border-hover)' : undefined,
+              color: amount === Math.floor(user.points) ? 'var(--text-primary)' : 'var(--text-tertiary)',
+            }}
+          >
+            {t('bet.max')}
+          </button>
+        )}
       </div>
 
       {/* Trade summary — every number comes from the SAME quote (single source of truth) */}
@@ -383,7 +422,7 @@ export function BetBox({
       />
       <button
         onClick={handleTrade}
-        disabled={trading || belowMin || (isMulti && !selectedOutcome)}
+        disabled={trading || belowMin || waitingQuote || (isMulti && !selectedOutcome)}
         className="btn btn-lg"
         style={{
           width: '100%',

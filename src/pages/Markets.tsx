@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { marketsApi } from '../lib/api'
+import { marketsApi, peekAllMarkets } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketGrid } from '../components/MarketGrid'
 import { PoliticaLanding } from '../components/politica/PoliticaLanding'
@@ -58,6 +58,13 @@ export function Markets() {
     setSortBy(sortParam)
   }, [queryParam, catParam, subParam, diaParam, sortParam])
 
+  // La búsqueda pide al API 300 ms después de la última tecla, no una vez por tecla
+  const [fetchQ, setFetchQ] = useState(searchInput)
+  useEffect(() => {
+    const id = setTimeout(() => setFetchQ(searchInput), 300)
+    return () => clearTimeout(id)
+  }, [searchInput])
+
   // Toda categoría ordena en el cliente (?sort= propio): cambiar de orden no vuelve a pedir la lista
   const fetchSort = activeCategory === 'Todos' ? sortBy : 'volume'
   // ?cat= viene del querystring: una categoría que no existe no se pide (el catch
@@ -66,12 +73,14 @@ export function Markets() {
   useEffect(() => {
     let active = true
     if (!validCategory) { setMarkets([]); setLoading(false); return }
-    setLoading(true)
     const params = {
       category: activeCategory !== 'Todos' ? activeCategory : undefined,
-      q: searchInput || undefined,
+      q: fetchQ || undefined,
       sort: fetchSort,
     }
+    // Categoría ya vista (Atrás desde un mercado): se pinta con la lista anterior mientras llega la fresca
+    const hit = activeCategory !== 'Todos' ? peekAllMarkets(params) : undefined
+    if (hit) { setMarkets(hit.map(apiToMarket)); setLoading(false) } else setLoading(true)
     // Una categoría se lista completa (paginado); "Todos" conserva el top-100 por volumen.
     const req = activeCategory !== 'Todos'
       ? marketsApi.listAll(params)
@@ -81,7 +90,7 @@ export function Markets() {
       .catch(() => { if (active) setMarkets(MOCK_MARKETS.map(m => ({ ...m, yesPrice: m.yesPrice }))) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }  // drop out-of-order responses from fast typing / tab switches
-  }, [activeCategory, searchInput, fetchSort, validCategory])
+  }, [activeCategory, fetchQ, fetchSort, validCategory])
 
   // "Nuevos (3 días)": el API ordena por siembra; el recorte a 3 días (y el
   // respaldo de los 12 más recientes) es de UI, compartido con la Home.
@@ -353,9 +362,11 @@ export function Markets() {
               <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
                 {t('markets.emptyTitle')}
               </p>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: 20 }}>
                 {t('markets.emptySubtitle')}
               </p>
+              {/* Nunca un callejón sin salida: a Tendencia en un toque */}
+              <Link to="/" className="btn btn-secondary">{t('markets.emptyCta')}</Link>
             </div>
           )}
         </>
