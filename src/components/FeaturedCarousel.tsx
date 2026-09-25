@@ -11,14 +11,17 @@ import { MarketThumb } from './MarketThumb'
 import { TeamMark } from './TeamMark'
 import { Badge } from './Badge'
 import { Icon } from './Icon'
+import { QuickTradeSheet } from './QuickTradeSheet'
 
 interface FeaturedCarouselProps {
   markets: Market[]
+  // Tras operar desde el Sí/No del hero, la página parchea el precio
+  onTraded?: (marketId: string, newYesPrice: number, isMulti: boolean) => void
 }
 
 // Hero de la Home: [thumb + pregunta + probabilidad + meta | gráfica].
 // Recibe Market[] (ya mapeado: imageUrl y labels limpios).
-export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
+export function FeaturedCarousel({ markets, onTraded }: FeaturedCarouselProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const featured = useMemo(() => {
@@ -32,6 +35,10 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
   }, [markets])
 
   const [active, setActive] = useState(0)
+  // Sí/No del hero: compra rápida en la misma hoja que las tarjetas, sin navegar
+  const [trade, setTrade] = useState<{ marketId: string; side: 'YES' | 'NO' } | null>(null)
+  const closeTrade = useCallback(() => setTrade(null), [])
+  const tradeMarket = trade ? markets.find(x => x.id === trade.marketId) ?? null : null
   // Historial CRUDO por mercado (con outcome_key para multi) — se deriva por variante abajo.
   const [historyCache, setHistoryCache] = useState<Record<string, ApiPricePoint[]>>({})
   const [chartW, setChartW] = useState(0)
@@ -190,12 +197,12 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
                   <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500 }}>{t('carousel.chance', { defaultValue: 'probabilidad' })}</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-                  <Link to={`/mercado/${m.id}?side=YES`} className="btn btn-yes" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center', textDecoration: 'none' }}>
+                  <button type="button" onClick={() => setTrade({ marketId: m.id, side: 'YES' })} className="btn btn-yes" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center' }}>
                     {t('common.yes')} <span className="num">{probText(pair.yes)}</span>
-                  </Link>
-                  <Link to={`/mercado/${m.id}?side=NO`} className="btn btn-no" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center', textDecoration: 'none' }}>
+                  </button>
+                  <button type="button" onClick={() => setTrade({ marketId: m.id, side: 'NO' })} className="btn btn-no" style={{ flex: 1, height: 40, padding: 0, justifyContent: 'center' }}>
                     {t('common.no')} <span className="num">{probText(pair.no)}</span>
-                  </Link>
+                  </button>
                 </div>
               </>
             )}
@@ -254,6 +261,14 @@ export function FeaturedCarousel({ markets }: FeaturedCarouselProps) {
           ))}
         </div>
       )}
+
+      <QuickTradeSheet
+        market={tradeMarket}
+        side={trade?.side ?? 'YES'}
+        betKey={`${trade?.marketId}-${trade?.side}`}
+        onClose={closeTrade}
+        onTraded={p => tradeMarket && onTraded?.(tradeMarket.id, p, false)}
+      />
     </div>
   )
 }

@@ -51,6 +51,7 @@ export function QuickTradeSheet({ market, side, onClose, onTraded, outcomeKey, o
               compact
               onRequireAuth={setAuth}
               onTraded={onTraded}
+              onDone={close}
             />
           </div>
           {auth && (

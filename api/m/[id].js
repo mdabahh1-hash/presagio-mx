@@ -23,9 +23,10 @@ function esc(s) {
     .replace(/'/g, '&#39;')
 }
 
-function page({ id, title, description }) {
+function page({ id, title, description, side }) {
   const ogImage = `${SITE}/og-default.png`
-  const appUrl = `/#/mercado/${encodeURIComponent(id)}`
+  // ?side=YES|NO viaja al SPA: el link abre la compra con el lado ya elegido
+  const appUrl = `/#/mercado/${encodeURIComponent(id)}${side ? `?side=${side}` : ''}`
   const canonical = `${SITE}/m/${encodeURIComponent(id)}`
   const t = esc(title)
   const desc = esc(description)
@@ -61,6 +62,7 @@ function page({ id, title, description }) {
 
 export default async function handler(req, res) {
   const { id } = req.query
+  const side = req.query.side === 'YES' || req.query.side === 'NO' ? req.query.side : null
   let title = 'VEREDIKT — El veredicto del mercado.'
   let description = DEFAULT_DESC
 
@@ -82,5 +84,5 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8')
   // Cache at the edge so repeated crawler hits don't re-fetch the backend.
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=86400')
-  res.status(200).send(page({ id, title, description }))
+  res.status(200).send(page({ id, title, description, side }))
 }

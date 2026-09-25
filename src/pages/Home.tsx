@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { marketsApi, type ApiMarket } from '../lib/api'
+import { marketsApi, peekAllMarkets, type ApiMarket } from '../lib/api'
 import { MARKETS as MOCK_MARKETS } from '../data/markets'
 import { MarketGrid } from '../components/MarketGrid'
 import { FeaturedCarousel } from '../components/FeaturedCarousel'
@@ -23,6 +23,9 @@ import { NewFeed } from '../components/NewFeed'
 type MobileTab = CategoryTab
 
 const PAGE_SIZE = 12
+// Cuántas tarjetas de Tendencia había abiertas («Ver más»): sobrevive a ir a un
+// mercado y volver, para que Atrás caiga en la misma tarjeta
+let visibleMemo = PAGE_SIZE
 
 // Sección de grid de Tendencia en desktop (título + "Ver todos" + paginado)
 function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visible, onMore, onTraded }: {
@@ -54,20 +57,30 @@ function MarketGridSection({ title, viewAllTo, emptyText, markets, loading, visi
           )}
         </>
       ) : (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-          <p style={{ fontWeight: 600 }}>{emptyText}</p>
-        </div>
+        <EmptyFeed text={emptyText} />
       )}
     </section>
+  )
+}
+
+// Sin mercados en el feed: nunca un callejón sin salida
+function EmptyFeed({ text }: { text: string }) {
+  const { t } = useTranslation()
+  return (
+    <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
+      <p style={{ fontWeight: 600, marginBottom: 16 }}>{text}</p>
+      <Link to="/mercados" className="btn btn-secondary">{t('home.viewAllMarkets')}</Link>
+    </div>
   )
 }
 
 export function Home() {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
-  const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>([])
+  // Con la lista de la visita anterior se pinta al instante; la fresca llega detrás
+  const [apiMarkets, setApiMarkets] = useState<ApiMarket[]>(() => peekAllMarkets() ?? [])
   const [usingMock, setUsingMock] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !peekAllMarkets())
   const location = useLocation()
   // El feed vive en la URL (/ = Tendencia, /nuevo = Nuevo); las categorías filtran in-place.
   // /?cat=X llega desde la barra de otras páginas (Noticias, Perfil) y abre la
@@ -77,7 +90,8 @@ export function Home() {
     : catFromUrl && (CATEGORIES as readonly string[]).includes(catFromUrl) ? catFromUrl as Category
     : 'Tendencia'
   const [mobileTab, setMobileTab] = useState<MobileTab>(feedFromPath)
-  const [visibleTrending, setVisibleTrending] = useState(PAGE_SIZE)
+  const [visibleTrending, setVisibleTrendingState] = useState(visibleMemo)
+  const setVisibleTrending = (f: (v: number) => number) => setVisibleTrendingState(v => (visibleMemo = f(v)))
   const navigate = useNavigate()
   const isMobile = useMobile()
   // Liga y día del panel de Deportes dentro de la Home: estado local; /mercados los
@@ -88,8 +102,11 @@ export function Home() {
   // Deportes, Política y Crypto: landing con gráficas abierta desde la tarjeta panel (estado local)
   const [homePanel, setHomePanel] = useState(false)
 
+  // Al cambiar de pestaña (no al montar: Atrás conserva el «Ver más») todo vuelve a cero
+  const mounted = useRef(false)
   useEffect(() => {
-    setVisibleTrending(PAGE_SIZE); setHomeDep({ sub: null, dia: null })
+    if (!mounted.current) { mounted.current = true; return }
+    setVisibleTrending(() => PAGE_SIZE); setHomeDep({ sub: null, dia: null })
     setHomeCat({ sub: null, sort: 'all' }); setHomePanel(false)
   }, [mobileTab])
 
@@ -120,6 +137,13 @@ export function Home() {
         .then(outcomes => setApiMarkets(prev => prev.map(m => (m.id === marketId ? { ...m, outcomes } : m))))
         .catch(() => {})
     }
+  }
+
+  // Una categoría queda en la URL (/?cat=, con replace: no llena el historial) para
+  // que Atrás desde un mercado regrese a ella; sigue siendo in-place, sin salir de la portada
+  const changeTab = (tab: MobileTab) => {
+    if (isFeed(tab)) setMobileTab(tab)
+    else navigate(`/?cat=${encodeURIComponent(tab)}`, { replace: true })
   }
 
   const handleSearch = (e: React.FormEvent) => {
@@ -206,7 +230,7 @@ export function Home() {
 
         {/* Buscador + tabs de categoría, pegados bajo el navbar (mismo
             componente que en desktop; la línea inferior no se mueve) */}
-        <CategoryBar active={mobileTab} onChange={setMobileTab}>
+        <CategoryBar active={mobileTab} onChange={changeTab}>
           <form onSubmit={handleSearch} style={{ padding: '10px 0 4px' }}>
             <div className="input" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px' }}>
               <Icon name="search" size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -243,9 +267,7 @@ export function Home() {
                   )}
                 </>
               ) : (
-                <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-secondary)' }}>
-                  <p style={{ fontWeight: 600 }}>{emptyText}</p>
-                </div>
+                <EmptyFeed text={emptyText} />
               )}
             </div>
           </>
@@ -264,7 +286,7 @@ export function Home() {
   return (
     <>
     {/* Barra de categorías full-bleed y sticky (fuera del container) */}
-    <CategoryBar active={mobileTab} onChange={setMobileTab} />
+    <CategoryBar active={mobileTab} onChange={changeTab} />
     <div className="page-container" style={{ paddingTop: 24 }}>
 
       {mobileTab === 'Tendencia' ? (
@@ -274,7 +296,7 @@ export function Home() {
             {loading ? (
               <div className="skeleton" style={{ height: 420 }} />
             ) : (
-              <FeaturedCarousel markets={markets} />
+              <FeaturedCarousel markets={markets} onTraded={handleTraded} />
             )}
             <div className="featured-side">
               {loading ? (
@@ -288,7 +310,7 @@ export function Home() {
           {/* Trending markets grid */}
           <MarketGridSection
             title={t('home.trendingMarkets')}
-            viewAllTo="/mercados"
+            viewAllTo="/mercados?sort=trending"
             emptyText={emptyText}
             markets={filtered}
             loading={loading}
